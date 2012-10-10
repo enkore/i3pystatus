@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import mailchecker
+import modsde
 from statushandler import I3statusHandler
 
 if __name__ == '__main__':
@@ -32,6 +33,13 @@ if __name__ == '__main__':
     }
     mailchecker = mailchecker.MailChecker(mailsettings)
     status.register_module(mailchecker)
+
+    mdesettings = {
+        'username': "your_username",
+        'password': "your_password"
+    }
+    mde = modsde.ModsDeChecker(mdesettings)
+    status.register_module(mde)
 
     # start the handler
     status.run()
