@@ -36,7 +36,7 @@ class MailChecker(object):
         if not unread:
             return None
 
-        return {'full_text' : '%d new emails' % unread, 
+        return {'full_text' : '%d new email%s' % (unread, ('s' if unread > 1 else '')), 
                 'name' : 'newmail',
                 'urgent' : 'true',
                 'color' : self.settings['color']}
