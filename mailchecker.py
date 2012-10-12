@@ -5,6 +5,7 @@ import sys
 import json
 from datetime import datetime,timedelta
 import imaplib
+from statushandler import has_internet_connection
 
 
 class MailChecker(object):
@@ -73,20 +74,21 @@ class MailChecker(object):
                 datetime.now() - timedelta(seconds=self.pause)
 
         def get_connection(self):
-            if not self.connection:
-                try:
-                    self.connection = self.imap_class(self.host, self.port)
-                    self.connection.login(self.username, self.password)
-                    self.connection.select()
-                except Exception:
-                    self.connection = None
-
-            try:
-                self.connection.select()
-            except Exception,e:
-
-                print e
+            if not has_internet_connection():
                 self.connection = None
+            else:
+                if not self.connection:
+                    try:
+                        self.connection = self.imap_class(self.host, self.port)
+                        self.connection.login(self.username, self.password)
+                        self.connection.select()
+                    except Exception:
+                        self.connection = None
+
+                try:
+                    self.connection.select()
+                except Exception,e:
+                    self.connection = None
 
             return self.connection
 

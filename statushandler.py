@@ -2,6 +2,7 @@
 
 import sys
 import json
+import urllib2
 
 class I3statusHandler:
     modules = []
@@ -61,3 +62,11 @@ class I3statusHandler:
 
             # and echo back new encoded json
             self.print_line(prefix+json.dumps(j))
+
+
+def has_internet_connection():
+    try:
+        response=urllib2.urlopen('http://74.125.113.99',timeout=1)
+        return True
+    except urllib2.URLError as err: pass
+    return False
