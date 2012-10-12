@@ -9,6 +9,8 @@ To install it, follow these steps:
 
     cd ~/.config/i3status/
     git clone git@github.com:janoliver/i3pystatus contrib
+    cd contrib
+    cp wrapper.py.dist wrapper.py
 
 Add the following to `~/.config/i3status/config`:
 
