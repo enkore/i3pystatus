@@ -3,6 +3,7 @@
 
 import mailchecker
 import modsde
+import notmuchmailchecker
 from statushandler import I3statusHandler
 
 if __name__ == '__main__':
