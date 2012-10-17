@@ -31,3 +31,12 @@ Change your i3wm config to the following:
 
 And finally adjust the settings in `~/.config/i3status/contrib/wrapper.py`
 as you like. 
+
+## Contribute
+
+To contribute a script, make sure it has a function `output()` that outputs
+valid json code that can be interpreted by i3status. The protocol is documented
+here: [i3status Protocol](http://i3wm.org/docs/i3bar-protocol.html).
+
+Please add an example for how to configure it to `wrapper.py`. It should be a
+python class that can be registered with the `I3StatusHandler` class.
