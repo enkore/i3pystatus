@@ -31,7 +31,7 @@ class NotmuchMailChecker(object):
             color = '#00FF00'
             urgent = 'false'
         else:
-            color = '#ff0000',
+            color = '#ff0000'
             urgent = 'true'
 
         return {'full_text' : '%d new email%s' % (unread, ('s' if unread > 1 else '')), 
