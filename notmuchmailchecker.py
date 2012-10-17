@@ -13,11 +13,6 @@ class NotmuchMailChecker(object):
     and "unread"
     """
     
-    settings =  {
-        'color': '#ff0000',
-        'servers': []
-    }
-
     db_path = ''
 
     def __init__(self, db_path):
