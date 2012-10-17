@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-import json
-from datetime import datetime,timedelta
+# note that this needs the notmuch python bindings. For more info see:
+# http://notmuchmail.org/howto/#index4h2
 import notmuch
+import json
 
 class NotmuchMailChecker(object):
     """ 
