@@ -8,8 +8,9 @@ import json
 
 class NotmuchMailChecker(object):
     """ 
-    This class checks for the number of unread messages in the notmuch
-    database using the notmuch python bindings
+    This class uses the notmuch python bindings to check for the
+    number of messages in the notmuch database with the tags "inbox"
+    and "unread"
     """
     
     settings =  {
