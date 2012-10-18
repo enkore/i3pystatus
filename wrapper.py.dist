@@ -3,6 +3,7 @@
 
 import mailchecker
 import modsde
+import notmuchmailchecker
 from statushandler import I3statusHandler
 
 if __name__ == '__main__':
@@ -40,6 +41,10 @@ if __name__ == '__main__':
     }
     mde = modsde.ModsDeChecker(mdesettings)
     status.register_module(mde)
+
+    db_path = 'path_to_your_notmuch_database'
+    notmuch = notmuchmailchecker.NotmuchMailChecker(db_path)
+    status.register_module(notmuch)
 
     # start the handler
     status.run()
