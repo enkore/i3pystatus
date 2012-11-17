@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
     status = I3statusHandler()
 
-    #List the modules
+    # The imap checker module
     mailsettings = {
         'color': '#ff0000',
         'servers': [
@@ -35,6 +35,7 @@ if __name__ == '__main__':
     mailchecker = mailchecker.MailChecker(mailsettings)
     status.register_module(mailchecker)
 
+    # the mods.de forum new bookmarks module
     mdesettings = {
         'username': "your_username",
         'password': "your_password"
@@ -42,9 +43,14 @@ if __name__ == '__main__':
     mde = modsde.ModsDeChecker(mdesettings)
     status.register_module(mde)
 
+    # the notmuch mail checker module
     db_path = 'path_to_your_notmuch_database'
     notmuch = notmuchmailchecker.NotmuchMailChecker(db_path)
     status.register_module(notmuch)
+
+    # the thunderbird dbus new mail checker module
+    tb = thunderbirdnewmail.ThunderbirdMailChecker()
+    status.register_module(tb)
 
     # start the handler
     status.run()
