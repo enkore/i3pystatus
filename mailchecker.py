@@ -87,7 +87,7 @@ class MailChecker(object):
 
                 try:
                     self.connection.select()
-                except Exception,e:
+                except Exception as e:
                     self.connection = None
 
             return self.connection

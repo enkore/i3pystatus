@@ -3,9 +3,9 @@
 import sys
 import json
 from datetime import datetime,timedelta
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import re
-import cookielib
+import http.cookiejar
 import xml.etree.ElementTree as ET
 
 class ModsDeChecker:
@@ -31,11 +31,11 @@ class ModsDeChecker:
 
     def __init__(self, settings = None):
         self.settings.update(settings)
-        self.cj = cookielib.CookieJar()
+        self.cj = http.cookiejar.CookieJar()
         self.last_checked = \
             datetime.now() - timedelta(seconds=self.settings['pause'])
-        self.opener = urllib2.build_opener(
-            urllib2.HTTPCookieProcessor(self.cj))
+        self.opener = urllib.request.build_opener(
+            urllib.request.HTTPCookieProcessor(self.cj))
 
     def get_unread_count(self):
         delta = datetime.now() - self.last_checked
@@ -54,8 +54,8 @@ class ModsDeChecker:
                 self.unread_cache = int(root.attrib['newposts'])
             except Exception:
                 self.cj.clear()
-                self.opener = urllib2.build_opener(
-                    urllib2.HTTPCookieProcessor(self.cj))
+                self.opener = urllib.request.build_opener(
+                    urllib.request.HTTPCookieProcessor(self.cj))
                 self.logged_in = False
 
         return self.unread_cache
@@ -63,7 +63,7 @@ class ModsDeChecker:
 
     def login(self):
 
-        data = urllib.urlencode({
+        data = urllib.parse.urlencode({
             "login_username": self.settings["username"],
             "login_password": self.settings["password"],
             "login_lifetime": "31536000"
