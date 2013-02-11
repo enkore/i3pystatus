@@ -4,7 +4,7 @@ import sys
 import json
 import urllib.request, urllib.error, urllib.parse
 
-class I3statusHandler:
+class I3statusHandler(object):
     modules = []
 
     def __init__(self):
@@ -66,7 +66,7 @@ class I3statusHandler:
 
 def has_internet_connection():
     try:
-        response=urllib.request.urlopen('http://74.125.113.99',timeout=1)
+        response=urllib2.urlopen('http://173.194.69.94',timeout=1)
         return True
-    except urllib.error.URLError as err: pass
+    except urllib2.URLError as err: pass
     return False
