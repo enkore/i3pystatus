@@ -9,9 +9,6 @@ import re
 import http.cookiejar
 import xml.etree.ElementTree as ET
 
-class LoginError(Exception):
-    pass
-
 class ModsDeChecker(object):
     """ 
     This class returns i3status parsable output of the number of
@@ -33,6 +30,7 @@ class ModsDeChecker(object):
         "username": "",
         "password": "",
         "offset": 0,
+        "format": "%d new posts in bookmarks"
     }
 
     def __init__(self, settings = None):
@@ -51,10 +49,12 @@ class ModsDeChecker(object):
             if not unread:
                 self.output = None
             else:
-                self.output = {"full_text" : "%d new posts in bookmarks" % unread, 
+                self.output = {
+                    "full_text" : self.settings["format"] % unread, 
                     "name" : "modsde",
                     "urgent" : "true",
-                    "color" : self.settings["color"]}
+                    "color" : self.settings["color"]
+                }
 
             time.sleep(self.settings["pause"])
 

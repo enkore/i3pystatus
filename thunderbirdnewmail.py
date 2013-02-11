@@ -22,9 +22,15 @@ class ThunderbirdMailChecker(object):
     async = True
     output = None
 
+    settings = {
+        "format": "%d new email"
+    }
+
     unread = set()
 
-    def __init__(self):
+    def __init__(self, settings):
+        self.settings.update(settings)
+
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
         bus.add_signal_receiver(self.new_msg,
@@ -61,10 +67,12 @@ class ThunderbirdMailChecker(object):
 
         unread = len(self.unread)
         if unread:
-            self.output = {'full_text' : '%d new email' % unread, 
-                'name' : 'newmail-tb',
-                'urgent' : True,
-                'color' : '#ff0000' }
+            self.output = {
+                "full_text": self.settings["format"] % unread, 
+                "name": "newmail-tb",
+                "urgent": True,
+                "color": "#ff0000",
+            }
         else:
             self.output = None
 
