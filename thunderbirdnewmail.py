@@ -11,6 +11,7 @@ import dbus, gobject
 from dbus.mainloop.glib import DBusGMainLoop
 import json
 import threading
+import time
 
 class ThunderbirdMailChecker(object):
     """ 
@@ -18,7 +19,7 @@ class ThunderbirdMailChecker(object):
     the dbus-sender extension for thunderbird. 
     """
 
-    async = False
+    async = True
     output = None
 
     unread = set()
@@ -36,8 +37,14 @@ class ThunderbirdMailChecker(object):
         dbus.mainloop.glib.threads_init()
         self.context = loop.get_context()
 
-    def tick(self):
-        self.context.iteration(False)
+        self.thread = threading.Thread(target=self.mainloop)
+        self.thread.daemon = True
+        self.thread.start()
+
+    def mainloop(self):
+        while True:
+            self.context.iteration(False)
+            time.sleep(1)
 
     def new_msg(self, id, author, subject):
         if id not in self.unread:

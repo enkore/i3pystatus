@@ -11,7 +11,7 @@ class Module(object):
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
 
-    def run(self):
+    def tick(self):
         """Only called if self.async == False. Called once per tick"""
 
 class I3statusHandler(object):
