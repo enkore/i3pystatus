@@ -4,6 +4,16 @@ import sys
 import json
 import urllib.request, urllib.error, urllib.parse
 
+class Module(object):
+    output = None
+    async = False
+
+    def registered(self, status_handler):
+        """Called when this module is registered with a status handler"""
+
+    def run(self):
+        """Only called if self.async == False. Called once per tick"""
+
 class I3statusHandler(object):
     modules = []
 
@@ -11,24 +21,24 @@ class I3statusHandler(object):
         pass
 
     def register_module(self, module):
-        """ Register a new module. """
+        """Register a new module."""
 
         # check if module implemented the 
         # correct functions
-        if not hasattr(module, 'output'):
-            raise Exception("Module %s does not implement \
-                all the needed functions!".format(module))
+        #if not hasattr(module, 'output'):
+        #    raise Exception("Module %s does not implement \
+        #        all the needed functions!".format(module))
 
         self.modules.append(module)
 
     def print_line(self, message):
-        """ Non-buffered printing to stdout. """
+        """Unbuffered printing to stdout."""
 
         sys.stdout.write(message + '\n')
         sys.stdout.flush()
 
     def read_line(self):
-        """ Interrupted respecting reader for stdin. """
+        """Interrupted respecting reader for stdin."""
 
         # try reading a line, removing any extra whitespace
         try:
@@ -52,13 +62,16 @@ class I3statusHandler(object):
             if line.startswith(','):
                 line, prefix = line[1:], ','
 
-            j = json.loads(line)
+            j = [] #json.loads(line)
 
             for module in self.modules:
-                output = module.output()
+                if not module.async:
+                    module.tick()
+
+                output = module.output
 
                 if output:
-                    j.insert(0, module.output())
+                    j.insert(0, output)
 
             # and echo back new encoded json
             self.print_line(prefix+json.dumps(j))

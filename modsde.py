@@ -2,11 +2,15 @@
 
 import sys
 import json
-from datetime import datetime,timedelta
+import time
+import threading
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import re
 import http.cookiejar
 import xml.etree.ElementTree as ET
+
+class LoginError(Exception):
+    pass
 
 class ModsDeChecker(object):
     """ 
@@ -14,63 +18,68 @@ class ModsDeChecker(object):
     unread posts in any bookmark in the mods.de forums.
     """
 
-    last_checked = datetime.now()
-    unread_cache = 0
-    login_url = 'http://login.mods.de/'
+    async = True
+    output = None
+
+    login_url = "http://login.mods.de/"
     bookmark_url = "http://forum.mods.de/bb/xml/bookmarks.php"
     opener = None
     cj = None
     logged_in = False
     
     settings =  {
-        'color': '#7181fe',
-        'pause': 20,
-        'username': "",
-        'password': ""
+        "color": "#7181fe",
+        "pause": 20,
+        "username": "",
+        "password": "",
+        "offset": 0,
     }
 
     def __init__(self, settings = None):
         self.settings.update(settings)
         self.cj = http.cookiejar.CookieJar()
-        self.last_checked = \
-            datetime.now() - timedelta(seconds=self.settings['pause'])
-        self.opener = urllib.request.build_opener(
-            urllib.request.HTTPCookieProcessor(self.cj))
+        self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+
+        self.thread = threading.Thread(target=self.mainloop)
+        self.thread.daemon = True
+        self.thread.start()
+
+    def mainloop(self):
+        while True:
+            unread = self.get_unread_count()
+
+            if not unread:
+                self.output = None
+            else:
+                self.output = {"full_text" : "%d new posts in bookmarks" % unread, 
+                    "name" : "modsde",
+                    "urgent" : "true",
+                    "color" : self.settings["color"]}
+
+            time.sleep(self.settings["pause"])
 
     def get_unread_count(self):
-        delta = datetime.now() - self.last_checked
+        if not self.logged_in:
+            self.login()
 
-        if delta.total_seconds() > self.settings['pause']:
-            if not self.logged_in:
-                try:
-                    self.login()
-                except Exception:
-                    pass
-            
-            try:
-                f = self.opener.open(self.bookmark_url)
-                root = ET.fromstring(f.read())
-                self.last_checked = datetime.now()
-                self.unread_cache = int(root.attrib['newposts'])
-            except Exception:
-                self.cj.clear()
-                self.opener = urllib.request.build_opener(
-                    urllib.request.HTTPCookieProcessor(self.cj))
-                self.logged_in = False
-
-        return self.unread_cache
-        
+        try:
+            f = self.opener.open(self.bookmark_url)
+            root = ET.fromstring(f.read())
+            return int(root.attrib["newposts"]) - self.settings["offset"]
+        except Exception:
+            self.cj.clear()
+            self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+            self.logged_in = False
 
     def login(self):
-
         data = urllib.parse.urlencode({
             "login_username": self.settings["username"],
             "login_password": self.settings["password"],
             "login_lifetime": "31536000"
         })
 
-        response = self.opener.open(self.login_url, data)
-        m = re.search("http://forum.mods.de/SSO.php[^']*", response.read())
+        response = self.opener.open(self.login_url, data.encode("ascii"))
+        m = re.search("http://forum.mods.de/SSO.php[^']*", response.read().decode("ISO-8859-15"))
         self.cj.clear()
 
         if m and m.group(0):
@@ -79,20 +88,5 @@ class ModsDeChecker(object):
             for cookie in self.cj:
                 self.cj.clear
                 self.logged_in = True
-                self.opener.addheaders.append(('Cookie', 
-                    '{}={}'.format(cookie.name, cookie.value)))
+                self.opener.addheaders.append(('Cookie', '{}={}'.format(cookie.name, cookie.value)))
                 return True
-
-        return False
-
-    def output(self):
-        
-        unread = self.get_unread_count()
-
-        if not unread:
-            return None
-
-        return {'full_text' : '%d new posts in bookmarks' % unread, 
-                'name' : 'modsde',
-                'urgent' : 'true',
-                'color' : self.settings['color']}
