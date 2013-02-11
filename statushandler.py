@@ -4,7 +4,7 @@ import sys
 import json
 import urllib2
 
-class I3statusHandler:
+class I3statusHandler(object):
     modules = []
 
     def __init__(self):
