@@ -62,7 +62,7 @@ class I3statusHandler(object):
             if line.startswith(','):
                 line, prefix = line[1:], ','
 
-            j = [] #json.loads(line)
+            j = json.loads(line)
 
             for module in self.modules:
                 if not module.async:
@@ -75,11 +75,3 @@ class I3statusHandler(object):
 
             # and echo back new encoded json
             self.print_line(prefix+json.dumps(j))
-
-
-def has_internet_connection():
-    try:
-        response=urllib2.urlopen('http://173.194.69.94',timeout=1)
-        return True
-    except urllib2.URLError as err: pass
-    return False
