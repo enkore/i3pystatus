@@ -41,6 +41,20 @@ Requires
 * python-dbus
 * python-gobject2
 
+Settings
+
+* format
+
+### modsde
+
+Settings
+
+* username
+* password
+* pause (delay between updates)
+* offset (subtract number of posts before output)
+* format
+
 ## Contribute
 
 To contribute a script, make sure it has a function `output()` that outputs
