@@ -4,6 +4,7 @@
 import mailchecker
 import modsde
 import notmuchmailchecker
+import thunderbirdnewmail
 from statushandler import I3statusHandler
 
 if __name__ == '__main__':
