@@ -43,10 +43,6 @@ class ThunderbirdMailChecker(object):
         dbus.mainloop.glib.threads_init()
         self.context = loop.get_context()
 
-        self.thread = threading.Thread(target=self.mainloop)
-        self.thread.daemon = True
-        self.thread.start()
-
     def mainloop(self):
         while True:
             self.context.iteration(False)
@@ -75,4 +71,3 @@ class ThunderbirdMailChecker(object):
             }
         else:
             self.output = None
-

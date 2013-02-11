@@ -3,6 +3,7 @@
 import sys
 import json
 import urllib.request, urllib.error, urllib.parse
+from threading import Thread
 
 class Module(object):
     output = None
@@ -22,12 +23,6 @@ class I3statusHandler(object):
 
     def register_module(self, module):
         """Register a new module."""
-
-        # check if module implemented the 
-        # correct functions
-        #if not hasattr(module, 'output'):
-        #    raise Exception("Module %s does not implement \
-        #        all the needed functions!".format(module))
 
         self.modules.append(module)
 
@@ -54,6 +49,12 @@ class I3statusHandler(object):
     def run(self):
         self.print_line(self.read_line())
         self.print_line(self.read_line())
+
+        for module in self.modules:
+            if module.async:
+                module.thread = Thread(target=module.mainloop)
+                module.thread.daemon = True
+                module.thread.start()
 
         while True:
             line, prefix = self.read_line(), ''

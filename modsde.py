@@ -38,10 +38,6 @@ class ModsDeChecker(object):
         self.cj = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
 
-        self.thread = threading.Thread(target=self.mainloop)
-        self.thread.daemon = True
-        self.thread.start()
-
     def mainloop(self):
         while True:
             unread = self.get_unread_count()
