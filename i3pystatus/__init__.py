@@ -5,7 +5,7 @@ import json
 import urllib.request, urllib.error, urllib.parse
 from threading import Thread
 
-class Module(object):
+class Module:
     output = None
     async = False
 
@@ -13,15 +13,18 @@ class Module(object):
         """Called when this module is registered with a status handler"""
 
     def tick(self):
-        """Only called if self.async == False. Called once per tick"""
+        """Only called if async is False. Called once per tick"""
 
-class I3statusHandler(object):
+    def mainloop(self):
+        """This is run in a separate daemon-thread if async is True"""
+
+class I3statusHandler:
     modules = []
 
     def __init__(self):
         pass
 
-    def register_module(self, module):
+    def register(self, module):
         """Register a new module."""
 
         self.modules.append(module)
@@ -50,6 +53,7 @@ class I3statusHandler(object):
         self.print_line(self.read_line())
         self.print_line(self.read_line())
 
+        # Start threads for asynchronous modules
         for module in self.modules:
             if module.async:
                 module.thread = Thread(target=module.mainloop)

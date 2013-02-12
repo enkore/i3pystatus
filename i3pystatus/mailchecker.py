@@ -5,10 +5,10 @@ import sys
 import json
 from datetime import datetime,timedelta
 import imaplib
-from statushandler import has_internet_connection
 
+from i3pystatus import Module
 
-class MailChecker(object):
+class MailChecker(Module):
     """ 
     This class handles mailservers and outputs i3status compatible
     json data for the accumulated unread count. The mail server

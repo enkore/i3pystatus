@@ -9,7 +9,9 @@ import re
 import http.cookiejar
 import xml.etree.ElementTree as ET
 
-class ModsDeChecker(object):
+from i3pystatus import Module
+
+class ModsDeChecker(Module):
     """ 
     This class returns i3status parsable output of the number of
     unread posts in any bookmark in the mods.de forums.

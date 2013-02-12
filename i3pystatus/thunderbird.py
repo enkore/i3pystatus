@@ -13,7 +13,9 @@ import json
 import threading
 import time
 
-class ThunderbirdMailChecker(object):
+from i3pystatus import Module
+
+class ThunderbirdMailChecker(Module):
     """ 
     This class listens for dbus signals emitted by
     the dbus-sender extension for thunderbird. 
@@ -28,8 +30,9 @@ class ThunderbirdMailChecker(object):
 
     unread = set()
 
-    def __init__(self, settings):
-        self.settings.update(settings)
+    def __init__(self, settings=None):
+        if settings is not None:
+            self.settings.update(settings)
 
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
