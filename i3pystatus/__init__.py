@@ -4,6 +4,7 @@ import sys
 import json
 import urllib.request, urllib.error, urllib.parse
 from threading import Thread
+import time
 
 class BaseModule:
     output = None
@@ -25,6 +26,17 @@ class AsyncModule(BaseModule):
 
     def mainloop(self):
         """This is run in a separate daemon-thread"""
+
+class IntervalModule(AsyncModule):
+    interval = 5 # seconds
+
+    def run(self):
+        """Called every self.interval seconds"""
+
+    def mainloop(self):
+        while True:
+            self.run()
+            time.sleep(self.interval)
 
 class I3statusHandler:
     modules = []
