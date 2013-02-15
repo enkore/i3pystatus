@@ -5,18 +5,26 @@ import json
 import urllib.request, urllib.error, urllib.parse
 from threading import Thread
 
-class Module:
+class BaseModule:
     output = None
-    async = False
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
 
     def tick(self):
-        """Only called if async is False. Called once per tick"""
+        """Called once per tick"""
+
+class Module(BaseModule):
+    pass
+
+class AsyncModule(BaseModule):
+    def registered(self, status_handler):
+        self.thread = Thread(target=self.mainloop)
+        self.thread.daemon = True
+        self.thread.start()
 
     def mainloop(self):
-        """This is run in a separate daemon-thread if async is True"""
+        """This is run in a separate daemon-thread"""
 
 class I3statusHandler:
     modules = []
@@ -28,6 +36,7 @@ class I3statusHandler:
         """Register a new module."""
 
         self.modules.append(module)
+        module.registered(self)
 
     def print_line(self, message):
         """Unbuffered printing to stdout."""
@@ -53,13 +62,6 @@ class I3statusHandler:
         self.print_line(self.read_line())
         self.print_line(self.read_line())
 
-        # Start threads for asynchronous modules
-        for module in self.modules:
-            if module.async:
-                module.thread = Thread(target=module.mainloop)
-                module.thread.daemon = True
-                module.thread.start()
-
         while True:
             line, prefix = self.read_line(), ""
 
@@ -70,8 +72,7 @@ class I3statusHandler:
             j = json.loads(line)
 
             for module in self.modules:
-                if not module.async:
-                    module.tick()
+                module.tick()
 
                 output = module.output
 

@@ -9,16 +9,13 @@ import re
 import http.cookiejar
 import xml.etree.ElementTree as ET
 
-from i3pystatus import Module
+from i3pystatus import AsyncModule
 
-class ModsDeChecker(Module):
+class ModsDeChecker(AsyncModule):
     """ 
     This class returns i3status parsable output of the number of
     unread posts in any bookmark in the mods.de forums.
     """
-
-    async = True
-    output = None
 
     login_url = "http://login.mods.de/"
     bookmark_url = "http://forum.mods.de/bb/xml/bookmarks.php"

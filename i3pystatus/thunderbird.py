@@ -13,16 +13,13 @@ import json
 import threading
 import time
 
-from i3pystatus import Module
+from i3pystatus import AsyncModule
 
-class ThunderbirdMailChecker(Module):
+class ThunderbirdMailChecker(AsyncModule):
     """ 
     This class listens for dbus signals emitted by
     the dbus-sender extension for thunderbird. 
     """
-
-    async = True
-    output = None
 
     settings = {
         "format": "%d new email"
