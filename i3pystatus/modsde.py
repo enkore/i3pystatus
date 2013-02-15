@@ -29,8 +29,6 @@ class ModsDeChecker(Module):
     settings =  {
         "color": "#7181fe",
         "pause": 20,
-        "username": "",
-        "password": "",
         "offset": 0,
         "format": "%d new posts in bookmarks"
     }
@@ -86,5 +84,5 @@ class ModsDeChecker(Module):
             for cookie in self.cj:
                 self.cj.clear
                 self.logged_in = True
-                self.opener.addheaders.append(('Cookie', '{}={}'.format(cookie.name, cookie.value)))
+                self.opener.addheaders.append(("Cookie", "{}={}".format(cookie.name, cookie.value)))
                 return True

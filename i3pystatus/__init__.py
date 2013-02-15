@@ -32,7 +32,7 @@ class I3statusHandler:
     def print_line(self, message):
         """Unbuffered printing to stdout."""
 
-        sys.stdout.write(message + '\n')
+        sys.stdout.write(message + "\n")
         sys.stdout.flush()
 
     def read_line(self):
@@ -61,11 +61,11 @@ class I3statusHandler:
                 module.thread.start()
 
         while True:
-            line, prefix = self.read_line(), ''
+            line, prefix = self.read_line(), ""
 
             # ignore comma at start of lines
-            if line.startswith(','):
-                line, prefix = line[1:], ','
+            if line.startswith(","):
+                line, prefix = line[1:], ","
 
             j = json.loads(line)
 
