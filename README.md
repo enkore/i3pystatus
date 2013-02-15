@@ -9,8 +9,8 @@ To install it, follow these steps:
 
     cd ~/.config/i3status/
     git clone git@github.com:janoliver/i3pystatus contrib
-    cd contrib
-    cp wrapper.py.dist wrapper.py
+    cd contrib/i3pystatus
+    cp __main__.py.dist __main__.py
 
 Add the following to `~/.config/i3status/config`:
 
@@ -24,12 +24,12 @@ Change your i3wm config to the following:
 
     # i3bar
     bar {
-        status_command    i3status | python ~/.config/i3status/contrib/wrapper.py
+        status_command    cd ~/.config/i3status/contrib ; i3status | python -m i3pystatus
         position          top
         workspace_buttons yes
     }
 
-And finally adjust the settings in `~/.config/i3status/contrib/wrapper.py`
+And finally adjust the settings in `~/.config/i3status/contrib/i3pystatus/__main__.py`
 as you like. 
 
 ## Modules
