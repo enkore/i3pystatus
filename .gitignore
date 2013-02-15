@@ -1,2 +1,4 @@
+*__pycache__*
 *.pyc
-wrapper.py
+i3pystatus/__main__.py
+

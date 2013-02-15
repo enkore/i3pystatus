@@ -10,16 +10,27 @@
 import dbus, gobject
 from dbus.mainloop.glib import DBusGMainLoop
 import json
+import threading
+import time
 
-class ThunderbirdMailChecker(object):
+from i3pystatus import AsyncModule
+
+class ThunderbirdMailChecker(AsyncModule):
     """ 
     This class listens for dbus signals emitted by
     the dbus-sender extension for thunderbird. 
     """
 
-    unread = []
+    settings = {
+        "format": "%d new email"
+    }
 
-    def __init__(self):
+    unread = set()
+
+    def __init__(self, settings=None):
+        if settings is not None:
+            self.settings.update(settings)
+
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
         bus.add_signal_receiver(self.new_msg,
@@ -32,20 +43,31 @@ class ThunderbirdMailChecker(object):
         dbus.mainloop.glib.threads_init()
         self.context = loop.get_context()
 
+    def mainloop(self):
+        while True:
+            self.context.iteration(False)
+            time.sleep(1)
+
     def new_msg(self, id, author, subject):
         if id not in self.unread:
-            self.unread.append(id)
+            self.unread.add(id)
+            self._output()
 
     def changed_msg(self, id, event):
         if event == "read" and id in self.unread:
             self.unread.remove(id)
+            self._output()
 
-    def output(self):
+    def _output(self):
         self.context.iteration(False)
 
         unread = len(self.unread)
-
-        return {'full_text' : '%d new email' % unread, 
-                'name' : 'newmail-tb',
-                'urgent' : True,
-                'color' : '#ff0000' } if unread else None
+        if unread:
+            self.output = {
+                "full_text": self.settings["format"] % unread, 
+                "name": "newmail-tb",
+                "urgent": True,
+                "color": "#ff0000",
+            }
+        else:
+            self.output = None
