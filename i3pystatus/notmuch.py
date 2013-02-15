@@ -15,23 +15,25 @@ class NotmuchMailChecker(IntervalModule):
     and "unread"
     """
     
-    db_path = ''
+    db_path = ""
 
     def __init__(self, db_path):
         self.db_path = db_path
 
     def run(self):
         db = notmuch.Database(self.db_path)
-        unread = notmuch.Query(db, 'tag:unread and tag:inbox').count_messages()
+        unread = notmuch.Query(db, "tag:unread and tag:inbox").count_messages()
         
         if (unread == 0):
-            color = '#00FF00'
-            urgent = 'false'
+            color = "#00FF00"
+            urgent = "false"
         else:
-            color = '#ff0000'
-            urgent = 'true'
+            color = "#ff0000"
+            urgent = "true"
 
-        return {'full_text' : '%d new email%s' % (unread, ('s' if unread > 1 else '')), 
-                'name' : 'newmail',
-                'urgent' : urgent,
-                'color' : color }
+        self.output = {
+            "full_text" : "%d new email%s" % (unread, ("s" if unread > 1 else "")), 
+            "name" : "newmail",
+            "urgent" : urgent,
+            "color" : color
+        }
