@@ -9,9 +9,9 @@ import re
 import http.cookiejar
 import xml.etree.ElementTree as ET
 
-from i3pystatus import AsyncModule
+from i3pystatus import IntervalModule
 
-class ModsDeChecker(AsyncModule):
+class ModsDeChecker(IntervalModule):
     """ 
     This class returns i3status parsable output of the number of
     unread posts in any bookmark in the mods.de forums.
@@ -25,7 +25,6 @@ class ModsDeChecker(AsyncModule):
     
     settings =  {
         "color": "#7181fe",
-        "pause": 20,
         "offset": 0,
         "format": "%d new posts in bookmarks"
     }
@@ -35,21 +34,18 @@ class ModsDeChecker(AsyncModule):
         self.cj = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
 
-    def mainloop(self):
-        while True:
-            unread = self.get_unread_count()
+    def run(self):
+        unread = self.get_unread_count()
 
-            if not unread:
-                self.output = None
-            else:
-                self.output = {
-                    "full_text" : self.settings["format"] % unread, 
-                    "name" : "modsde",
-                    "urgent" : "true",
-                    "color" : self.settings["color"]
-                }
-
-            time.sleep(self.settings["pause"])
+        if not unread:
+            self.output = None
+        else:
+            self.output = {
+                "full_text" : self.settings["format"] % unread, 
+                "name" : "modsde",
+                "urgent" : "true",
+                "color" : self.settings["color"]
+            }
 
     def get_unread_count(self):
         if not self.logged_in:
