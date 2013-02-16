@@ -40,6 +40,7 @@ class IntervalModule(AsyncModule):
 
 class I3statusHandler:
     modules = []
+    fd = sys.stdin
 
     def __init__(self):
         pass
@@ -61,7 +62,7 @@ class I3statusHandler:
 
         # try reading a line, removing any extra whitespace
         try:
-            line = sys.stdin.readline().strip()
+            line = self.fd.readline().decode("utf-8").strip()
             # i3status sends EOF, or an empty line
             if not line:
                 sys.exit(3)
