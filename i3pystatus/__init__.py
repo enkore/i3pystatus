@@ -38,31 +38,23 @@ class IntervalModule(AsyncModule):
             self.run()
             time.sleep(self.interval)
 
-class I3statusHandler:
-    modules = []
-    fd = sys.stdin
-
-    def __init__(self):
-        pass
-
-    def register(self, module):
-        """Register a new module."""
-
-        self.modules.append(module)
-        module.registered(self)
+class IOHandler:
+    def __init__(self, inp=sys.stdin, out=sys.stdout):
+        self.inp = inp
+        self.out = out
 
     def print_line(self, message):
         """Unbuffered printing to stdout."""
 
-        sys.stdout.write(message + "\n")
-        sys.stdout.flush()
+        self.out.write(message + "\n")
+        self.out.flush()
 
     def read_line(self):
         """Interrupted respecting reader for stdin."""
 
         # try reading a line, removing any extra whitespace
         try:
-            line = self.fd.readline().decode("utf-8").strip()
+            line = self.inp.readline().decode("utf-8").strip()
             # i3status sends EOF, or an empty line
             if not line:
                 sys.exit(3)
@@ -71,12 +63,28 @@ class I3statusHandler:
         except KeyboardInterrupt:
             sys.exit()
 
+class I3statusHandler:
+    modules = []
+    fd = sys.stdin
+
+    def __init__(self, fd=None):
+        if fd is None:
+            fd = sys.stdin
+
+        self.io = IOHandler(fd)
+
+    def register(self, module):
+        """Register a new module."""
+
+        self.modules.append(module)
+        module.registered(self)
+
     def run(self):
-        self.print_line(self.read_line())
-        self.print_line(self.read_line())
+        self.io.print_line(self.io.read_line())
+        self.io.print_line(self.io.read_line())
 
         while True:
-            line, prefix = self.read_line(), ""
+            line, prefix = self.io.read_line(), ""
 
             # ignore comma at start of lines
             if line.startswith(","):
@@ -93,4 +101,4 @@ class I3statusHandler:
                     j.insert(0, output)
 
             # and echo back new encoded json
-            self.print_line(prefix+json.dumps(j))
+            self.io.print_line(prefix+json.dumps(j))
