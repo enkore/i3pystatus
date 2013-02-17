@@ -43,13 +43,13 @@ class IOHandler:
         self.inp = inp
         self.out = out
 
-    def print_line(self, message):
+    def write(self, message):
         """Unbuffered printing to stdout."""
 
         self.out.write(message + "\n")
         self.out.flush()
 
-    def read_line(self):
+    def read(self):
         """Interrupted respecting reader for stdin."""
 
         # try reading a line, removing any extra whitespace
@@ -63,9 +63,26 @@ class IOHandler:
         except KeyboardInterrupt:
             sys.exit()
 
+class JSONIO:
+    def __init__(self, io):
+        self.io = io
+        self.io.write(self.io.read())
+        self.io.write(self.io.read())
+
+    def write(self, prefix, j):
+        self.io.write(prefix + json.dumps(j))
+
+    def read(self):
+        line, prefix = self.io.read(), ""
+
+        # ignore comma at start of lines
+        if line.startswith(","):
+            line, prefix = line[1:], ","
+
+        return (prefix, json.loads(line))
+
 class I3statusHandler:
     modules = []
-    fd = sys.stdin
 
     def __init__(self, fd=None):
         if fd is None:
@@ -80,25 +97,16 @@ class I3statusHandler:
         module.registered(self)
 
     def run(self):
-        self.io.print_line(self.io.read_line())
-        self.io.print_line(self.io.read_line())
+        jio = JSONIO(self.io)
 
         while True:
-            line, prefix = self.io.read_line(), ""
-
-            # ignore comma at start of lines
-            if line.startswith(","):
-                line, prefix = line[1:], ","
-
-            j = json.loads(line)
+            prefix, j = jio.read()
 
             for module in self.modules:
                 module.tick()
 
                 output = module.output
-
                 if output:
                     j.insert(0, output)
 
-            # and echo back new encoded json
-            self.io.print_line(prefix+json.dumps(j))
+            jio.write(prefix, j)
