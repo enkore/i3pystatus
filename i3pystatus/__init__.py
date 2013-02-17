@@ -69,17 +69,29 @@ class JSONIO:
         self.io.write(self.io.read())
         self.io.write(self.io.read())
 
-    def write(self, prefix, j):
-        self.io.write(prefix + json.dumps(j))
+        self._prefix = ""
+
+    @property
+    def prefix(self):
+        prefix = self._prefix
+        self._prefix = ""
+        return prefix
+
+    @prefix.setter
+    def prefix(self, prefix):
+        self._prefix = prefix
+
+    def write(self, j):
+        self.io.write(self.prefix + json.dumps(j))
 
     def read(self):
-        line, prefix = self.io.read(), ""
+        line, self.prefix = self.io.read(), ""
 
         # ignore comma at start of lines
         if line.startswith(","):
-            line, prefix = line[1:], ","
+            line, self.prefix = line[1:], ","
 
-        return (prefix, json.loads(line))
+        return json.loads(line)
 
 class I3statusHandler:
     modules = []
@@ -100,7 +112,7 @@ class I3statusHandler:
         jio = JSONIO(self.io)
 
         while True:
-            prefix, j = jio.read()
+            j = jio.read()
 
             for module in self.modules:
                 module.tick()
@@ -109,4 +121,4 @@ class I3statusHandler:
                 if output:
                     j.insert(0, output)
 
-            jio.write(prefix, j)
+            jio.write(j)
