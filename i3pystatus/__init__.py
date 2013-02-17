@@ -5,6 +5,7 @@ import json
 import urllib.request, urllib.error, urllib.parse
 from threading import Thread
 import time
+from contextlib import contextmanager
 
 class BaseModule:
     output = None
@@ -69,29 +70,18 @@ class JSONIO:
         self.io.write(self.io.read())
         self.io.write(self.io.read())
 
-        self._prefix = ""
-
-    @property
-    def prefix(self):
-        prefix = self._prefix
-        self._prefix = ""
-        return prefix
-
-    @prefix.setter
-    def prefix(self, prefix):
-        self._prefix = prefix
-
-    def write(self, j):
-        self.io.write(self.prefix + json.dumps(j))
-
+    @contextmanager
     def read(self):
-        line, self.prefix = self.io.read(), ""
+        line, prefix = self.io.read(), ""
 
         # ignore comma at start of lines
         if line.startswith(","):
-            line, self.prefix = line[1:], ","
+            line, prefix = line[1:], ","
 
-        return json.loads(line)
+        j = json.loads(line)
+        yield j
+
+        self.io.write(prefix + json.dumps(j))
 
 class I3statusHandler:
     modules = []
@@ -112,13 +102,10 @@ class I3statusHandler:
         jio = JSONIO(self.io)
 
         while True:
-            j = jio.read()
+            with jio.read() as j:
+                for module in self.modules:
+                    module.tick()
 
-            for module in self.modules:
-                module.tick()
-
-                output = module.output
-                if output:
-                    j.insert(0, output)
-
-            jio.write(j)
+                    output = module.output
+                    if output:
+                        j.insert(0, output)
