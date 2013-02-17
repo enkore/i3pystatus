@@ -5,6 +5,7 @@ import json
 import urllib.request, urllib.error, urllib.parse
 from threading import Thread
 import time
+from contextlib import contextmanager
 
 class BaseModule:
     output = None
@@ -38,30 +39,23 @@ class IntervalModule(AsyncModule):
             self.run()
             time.sleep(self.interval)
 
-class I3statusHandler:
-    modules = []
+class IOHandler:
+    def __init__(self, inp=sys.stdin, out=sys.stdout):
+        self.inp = inp
+        self.out = out
 
-    def __init__(self):
-        pass
-
-    def register(self, module):
-        """Register a new module."""
-
-        self.modules.append(module)
-        module.registered(self)
-
-    def print_line(self, message):
+    def write(self, message):
         """Unbuffered printing to stdout."""
 
-        sys.stdout.write(message + "\n")
-        sys.stdout.flush()
+        self.out.write(message + "\n")
+        self.out.flush()
 
-    def read_line(self):
+    def read(self):
         """Interrupted respecting reader for stdin."""
 
         # try reading a line, removing any extra whitespace
         try:
-            line = sys.stdin.readline().strip()
+            line = self.inp.readline().decode("utf-8").strip()
             # i3status sends EOF, or an empty line
             if not line:
                 sys.exit(3)
@@ -70,26 +64,48 @@ class I3statusHandler:
         except KeyboardInterrupt:
             sys.exit()
 
+class JSONIO:
+    def __init__(self, io):
+        self.io = io
+        self.io.write(self.io.read())
+        self.io.write(self.io.read())
+
+    @contextmanager
+    def read(self):
+        line, prefix = self.io.read(), ""
+
+        # ignore comma at start of lines
+        if line.startswith(","):
+            line, prefix = line[1:], ","
+
+        j = json.loads(line)
+        yield j
+
+        self.io.write(prefix + json.dumps(j))
+
+class I3statusHandler:
+    modules = []
+
+    def __init__(self, fd=None):
+        if fd is None:
+            fd = sys.stdin
+
+        self.io = IOHandler(fd)
+
+    def register(self, module):
+        """Register a new module."""
+
+        self.modules.append(module)
+        module.registered(self)
+
     def run(self):
-        self.print_line(self.read_line())
-        self.print_line(self.read_line())
+        jio = JSONIO(self.io)
 
         while True:
-            line, prefix = self.read_line(), ""
+            with jio.read() as j:
+                for module in self.modules:
+                    module.tick()
 
-            # ignore comma at start of lines
-            if line.startswith(","):
-                line, prefix = line[1:], ","
-
-            j = json.loads(line)
-
-            for module in self.modules:
-                module.tick()
-
-                output = module.output
-
-                if output:
-                    j.insert(0, output)
-
-            # and echo back new encoded json
-            self.print_line(prefix+json.dumps(j))
+                    output = module.output
+                    if output:
+                        j.insert(0, output)
