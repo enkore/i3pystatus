@@ -99,6 +99,4 @@ class I3statusHandler:
     def run(self):
         for j in  self.io.read():
             for module in self.modules:
-                output = module.output
-                if output:
-                    j.insert(0, output)
+                j.insert(0, module.output)
