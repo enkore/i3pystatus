@@ -7,19 +7,13 @@ from threading import Thread
 import time
 from contextlib import contextmanager
 
-class BaseModule:
+class Module:
     output = None
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
 
-    def tick(self):
-        """Called once per tick"""
-
-class Module(BaseModule):
-    pass
-
-class AsyncModule(BaseModule):
+class AsyncModule(Module):
     def registered(self, status_handler):
         self.thread = Thread(target=self.mainloop)
         self.thread.daemon = True
@@ -80,7 +74,6 @@ class JSONIO:
 
         j = json.loads(line)
         yield j
-
         self.io.write(prefix + json.dumps(j))
 
 class I3statusHandler:
@@ -104,8 +97,6 @@ class I3statusHandler:
         while True:
             with jio.read() as j:
                 for module in self.modules:
-                    module.tick()
-
                     output = module.output
                     if output:
                         j.insert(0, output)
