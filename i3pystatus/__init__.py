@@ -64,8 +64,13 @@ class JSONIO:
         self.io.write(self.io.read())
         self.io.write(self.io.read())
 
-    @contextmanager
     def read(self):
+        while True:
+            with self.read_line() as j:
+                yield j
+
+    @contextmanager
+    def read_line(self):
         line, prefix = self.io.read(), ""
 
         # ignore comma at start of lines
@@ -83,7 +88,7 @@ class I3statusHandler:
         if fd is None:
             fd = sys.stdin
 
-        self.io = IOHandler(fd)
+        self.io = JSONIO(IOHandler(fd))
 
     def register(self, module):
         """Register a new module."""
@@ -92,11 +97,8 @@ class I3statusHandler:
         module.registered(self)
 
     def run(self):
-        jio = JSONIO(self.io)
-
-        while True:
-            with jio.read() as j:
-                for module in self.modules:
-                    output = module.output
-                    if output:
-                        j.insert(0, output)
+        for j in  self.io.read():
+            for module in self.modules:
+                output = module.output
+                if output:
+                    j.insert(0, output)
