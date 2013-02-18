@@ -9,6 +9,7 @@ from contextlib import contextmanager
 
 class Module:
     output = None
+    position = 0
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
@@ -90,13 +91,14 @@ class I3statusHandler:
 
         self.io = JSONIO(IOHandler(fd))
 
-    def register(self, module):
+    def register(self, module, position=0):
         """Register a new module."""
 
         self.modules.append(module)
+        module.position = position
         module.registered(self)
 
     def run(self):
         for j in  self.io.read():
             for module in self.modules:
-                j.insert(0, module.output)
+                j.insert(module.position, module.output)
