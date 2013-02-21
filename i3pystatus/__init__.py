@@ -60,7 +60,7 @@ class IOHandler:
         Raises EOFError if the end of stream has been reached"""
 
         try:
-            line = self.inp.readline().decode("utf-8").strip()
+            line = self.inp.readline().strip()
         except KeyboardInterrupt:
             raise EOFError()
 
