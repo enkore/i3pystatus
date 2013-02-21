@@ -12,6 +12,12 @@ from i3pystatus import (
 
 status = I3statusHandler()
 
+# If you want to start i3status automatically with i3pystatus,
+# uncomment the following lines
+#import subprocess
+#process = subprocess.Popen(["i3status", "-c", "~/.i3/status"], stdout=subprocess.PIPE, universal_newlines=True)
+#status.file = process.stdout
+ 
 # Regular expression file watcher
 # If you're using a thinkpad, chances are that this displays your fan speed and level
 regexsettings = {

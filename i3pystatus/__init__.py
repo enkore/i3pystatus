@@ -100,12 +100,7 @@ class JSONIO:
 
 class I3statusHandler:
     modules = []
-
-    def __init__(self, fd=None):
-        if fd is None:
-            fd = sys.stdin
-
-        self.io = JSONIO(IOHandler(fd))
+    file = sys.stdin
 
     def register(self, module, position=0):
         """Register a new module."""
@@ -115,6 +110,6 @@ class I3statusHandler:
         module.registered(self)
 
     def run(self):
-        for j in self.io.read():
+        for j in JSONIO(IOHandler(self.file)).read():
             for module in self.modules:
                 j.insert(module.position, module.output)
