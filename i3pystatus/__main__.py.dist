@@ -5,11 +5,21 @@ from i3pystatus import (
     I3statusHandler,
     mailchecker,
     modsde,
-    notmuchmailchecker,
+    notmuch,
     thunderbird,
+    regex,
 )
 
 status = I3statusHandler()
+
+# Regular expression file watcher
+# If you're using a thinkpad, chances are that this displays your fan speed and level
+regexsettings = {
+    "regex": "speed:\s+([0-9]+)\nlevel:\s+([a-zA-Z0-9]+)",
+    "file": "/proc/acpi/ibm/fan",
+    "format": "{0} [{1}]",
+}
+status.register(regex.Regex(regexsettings))
 
 # The imap checker module
 mailsettings = {
@@ -46,8 +56,9 @@ status.register_module(mde)
 
 # the notmuch mail checker module
 db_path = "path_to_your_notmuch_database"
-notmuch = notmuchmailchecker.NotmuchMailChecker(db_path)
-status.register_module(notmuch)
+nm = notmuch.NotmuchMailChecker(db_path)
+status.register_module(nm)
+
 
 # the thunderbird dbus new mail checker module
 tb = thunderbirdnewmail.ThunderbirdMailChecker()

@@ -7,15 +7,17 @@
 # The plugin must be active and thunderbird running for the module to work
 # properly.
 
-import dbus, gobject
-from dbus.mainloop.glib import DBusGMainLoop
 import json
 import threading
 import time
+from functools import partial
 
-from i3pystatus import AsyncModule
+import dbus, gobject
+from dbus.mainloop.glib import DBusGMainLoop
 
-class ThunderbirdMailChecker(AsyncModule):
+from i3pystatus import IntervalModule
+
+class ThunderbirdMailChecker(IntervalModule):
     """ 
     This class listens for dbus signals emitted by
     the dbus-sender extension for thunderbird. 
@@ -24,8 +26,8 @@ class ThunderbirdMailChecker(AsyncModule):
     settings = {
         "format": "%d new email"
     }
-
     unread = set()
+    interval = 1
 
     def __init__(self, settings=None):
         if settings is not None:
@@ -43,10 +45,7 @@ class ThunderbirdMailChecker(AsyncModule):
         dbus.mainloop.glib.threads_init()
         self.context = loop.get_context()
 
-    def mainloop(self):
-        while True:
-            self.context.iteration(False)
-            time.sleep(1)
+        self.run = partial(self.context.iteration, False)
 
     def new_msg(self, id, author, subject):
         if id not in self.unread:
@@ -59,7 +58,7 @@ class ThunderbirdMailChecker(AsyncModule):
             self._output()
 
     def _output(self):
-        self.context.iteration(False)
+        self.run()
 
         unread = len(self.unread)
         if unread:

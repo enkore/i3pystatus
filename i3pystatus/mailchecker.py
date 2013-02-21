@@ -20,27 +20,21 @@ class MailChecker(IntervalModule):
         "servers": []
     }
 
-    servers = []
-
     def __init__(self, settings = None):
         self.settings.update(settings)
 
-        for server in settings["servers"]:
-            srv = MailChecker.MailServer(server)
-            self.servers.append(srv)
+        self.servers = list(map(MailChecker.MailServer, settings["servers"]))
 
     def run(self):
-        unread = sum([server.get_unread_count() for server in self.servers])
+        unread = sum(map(lambda server: server.get_unread_count(), self.servers))
 
-        if not unread:
-            return None
-
-        self.output = {
-            "full_text" : "%d new email%s" % (unread, ("s" if unread > 1 else "")), 
-            "name" : "newmail",
-            "urgent" : "true",
-            "color" : self.settings["color"]
-        }
+        if unread:
+            self.output = {
+                "full_text" : "%d new email%s" % (unread, ("s" if unread > 1 else "")), 
+                "name" : "newmail",
+                "urgent" : "true",
+                "color" : self.settings["color"]
+            }
 
     class MailServer:
         """ 
@@ -50,20 +44,13 @@ class MailChecker(IntervalModule):
         tries to reconnect. It checks every "pause" seconds.
         """
 
-        host = ""
-        port = ""
         imap_class = imaplib.IMAP4
-        username = ""
-        password = ""
         connection = None
 
         def __init__(self, settings_dict):
-            self.host = settings_dict["host"]
-            self.port = settings_dict["port"]
-            self.username = settings_dict["username"]
-            self.password = settings_dict["password"]
+            self.__dict__.update(settings_dict)
 
-            if settings_dict["ssl"]:
+            if self.ssl:
                 self.imap_class = imaplib.IMAP4_SSL
 
         def get_connection(self):
@@ -87,5 +74,5 @@ class MailChecker(IntervalModule):
             conn = self.get_connection()
             if conn:
                 unread += len(conn.search(None,"UnSeen")[1][0].split())
-            
+
             return unread
