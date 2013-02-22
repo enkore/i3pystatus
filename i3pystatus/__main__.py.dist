@@ -70,5 +70,10 @@ battery = batterychecker.BatteryChecker()
 status.register(battery)
 
 
+# the clock
+clock = clock.Clock()
+status.register(clock)
+
+
 # start the handler
 status.run()
