@@ -64,5 +64,11 @@ status.register_module(nm)
 tb = thunderbirdnewmail.ThunderbirdMailChecker()
 status.register_module(tb)
 
+
+# the battery status checker module
+battery = batterychecker.BatteryChecker()
+status.register(battery)
+
+
 # start the handler
 status.run()
