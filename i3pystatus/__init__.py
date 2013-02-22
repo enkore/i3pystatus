@@ -68,6 +68,34 @@ class IOHandler:
             raise EOFError()
         return line
 
+class StandaloneIO(IOHandler):
+    """
+    I/O handler for standalone usage of i3pystatus (w/o i3status)
+
+    writing as usual, reading will always return a empty JSON array,
+    and the i3bar protocol header
+    """
+
+    n = -1
+    def __init__(self, interval=1):
+        super().__init__()
+        self.interval = interval
+
+    def read(self):
+        while True:
+            yield self.read_line()
+            time.sleep(self.interval)
+
+    def read_line(self):
+        self.n += 1
+
+        if self.n == 0:
+            return '{"version": 1}'
+        elif self.n == 1:
+            return "["
+        else:
+            return  ",[]"
+
 class JSONIO:
     def __init__(self, io):
         self.io = io
@@ -97,9 +125,14 @@ class JSONIO:
         yield j
         self.io.write_line(prefix + json.dumps(j))
 
-class I3statusHandler:
+class i3pystatus:
     modules = []
-    file = sys.stdin
+
+    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
+        if standalone:
+            self.io = StandaloneIO(interval)
+        else:
+            self.io = IOHandler(input_stream)
 
     def register(self, module, position=0):
         """Register a new module."""
@@ -109,6 +142,8 @@ class I3statusHandler:
         module.registered(self)
 
     def run(self):
-        for j in JSONIO(IOHandler(self.file)).read():
+        for j in JSONIO(self.io).read():
             for module in self.modules:
                 j.insert(module.position, module.output)
+
+I3statusHandler = i3pystatus
