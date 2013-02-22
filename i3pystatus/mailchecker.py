@@ -15,25 +15,22 @@ class MailChecker(IntervalModule):
     functionality is implemented in the subclass MailChecker.MailServer
     """
     
-    settings =  {
-        "color": "#ff0000",
-        "servers": []
-    }
+    settings = ("color", "servers")
+    required = ("servers",)
+    color = "#ff0000"
 
-    def __init__(self, settings = None):
-        self.settings.update(settings)
-
-        self.servers = list(map(MailChecker.MailServer, settings["servers"]))
+    def init(self):
+        self.server_list = list(map(MailChecker.MailServer, self.servers))
 
     def run(self):
-        unread = sum(map(lambda server: server.get_unread_count(), self.servers))
+        unread = sum(map(lambda server: server.get_unread_count(), self.server_list))
 
         if unread:
             self.output = {
                 "full_text" : "%d new email%s" % (unread, ("s" if unread > 1 else "")), 
                 "name" : "newmail",
                 "urgent" : "true",
-                "color" : self.settings["color"]
+                "color" : self.color
             }
 
     class MailServer:

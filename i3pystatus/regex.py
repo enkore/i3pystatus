@@ -15,10 +15,10 @@ class Regex(IntervalModule):
 
     flags = 0
     format = "{0}"
+    settings = ("format", "regex", "file")
+    required = ("regex", "file")
 
-    def __init__(self, settings):
-        self.__dict__.update(settings)
-
+    def init(self):
         self.re = re.compile(self.regex, self.flags)
 
     def run(self):

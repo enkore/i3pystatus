@@ -17,20 +17,20 @@ class ModsDeChecker(IntervalModule):
     unread posts in any bookmark in the mods.de forums.
     """
 
+    settings = ("color", "offset", "format", "username", "password")
+    required = ("username", "password")
+
+    color = "#7181fe"
+    offset = 0
+    format = "%d new posts in bookmarks"
+
     login_url = "http://login.mods.de/"
     bookmark_url = "http://forum.mods.de/bb/xml/bookmarks.php"
     opener = None
     cj = None
     logged_in = False
-    
-    settings =  {
-        "color": "#7181fe",
-        "offset": 0,
-        "format": "%d new posts in bookmarks"
-    }
 
-    def __init__(self, settings = None):
-        self.settings.update(settings)
+    def init(self):
         self.cj = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
 
@@ -41,10 +41,10 @@ class ModsDeChecker(IntervalModule):
             self.output = None
         else:
             self.output = {
-                "full_text" : self.settings["format"] % unread, 
+                "full_text" : self.format % unread, 
                 "name" : "modsde",
                 "urgent" : "true",
-                "color" : self.settings["color"]
+                "color" : self.color
             }
 
     def get_unread_count(self):
@@ -54,7 +54,7 @@ class ModsDeChecker(IntervalModule):
         try:
             f = self.opener.open(self.bookmark_url)
             root = ET.fromstring(f.read())
-            return int(root.attrib["newposts"]) - self.settings["offset"]
+            return int(root.attrib["newposts"]) - self.offset
         except Exception:
             self.cj.clear()
             self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
@@ -62,8 +62,8 @@ class ModsDeChecker(IntervalModule):
 
     def login(self):
         data = urllib.parse.urlencode({
-            "login_username": self.settings["username"],
-            "login_password": self.settings["password"],
+            "login_username": self.username,
+            "login_password": self.password,
             "login_lifetime": "31536000"
         })
 

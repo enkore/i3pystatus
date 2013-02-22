@@ -42,8 +42,10 @@ class BatteryChecker(IntervalModule):
     battery status
     """
     
-    def __init__(self, battery_ident="BAT0"):
-        self.battery_ident = battery_ident
+    settings = ("battery_ident",)
+    battery_ident = "BAT0"
+
+    def init(self):
         self.base_path = "/sys/class/power_supply/{0}/uevent".format(self.battery_ident)
 
     def run(self):

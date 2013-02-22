@@ -15,10 +15,7 @@ class NotmuchMailChecker(IntervalModule):
     and "unread"
     """
 
-    db_path = ""
-
-    def __init__(self, db_path):
-        self.db_path = db_path
+    settings = required = ("db_path",)
 
     def run(self):
         db = notmuch.Database(self.db_path)

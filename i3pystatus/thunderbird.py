@@ -23,16 +23,13 @@ class ThunderbirdMailChecker(IntervalModule):
     the dbus-sender extension for thunderbird. 
     """
 
-    settings = {
-        "format": "%d new email"
-    }
+    settings = ("format",)
+
     unread = set()
     interval = 1
+    format = "%d new mail"
 
-    def __init__(self, settings=None):
-        if settings is not None:
-            self.settings.update(settings)
-
+    def init(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         bus = dbus.SessionBus()
         bus.add_signal_receiver(self.new_msg,

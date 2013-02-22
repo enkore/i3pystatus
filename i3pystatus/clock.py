@@ -9,23 +9,25 @@ class Clock(IntervalModule):
     """ 
     This class shows a clock
     """
-    
-    def __init__(self, format_string=None):
+
+    settings = ("format",)
+    format = None
+
+    def init(self):
         lang = os.environ.get('LANG', None)
         if lang:
             locale.setlocale(locale.LC_ALL, lang)
-        if not format_string:
+        if self.format is not None:
             lang = locale.getlocale()[0]
             if lang == 'en_US':
                 # MDY format - United States of America
-                format_string = "%a %b %-d %X"
+                self.format = "%a %b %-d %X"
             else:
                 # DMY format - almost all other countries
-                format_string = "%a %-d %b %X"
-        self.format_string = format_string
+                self.format = "%a %-d %b %X"
 
     def run(self):
-        full_text = datetime.datetime.now().strftime(self.format_string)
+        full_text = datetime.datetime.now().strftime(self.format)
         self.output = {
             "full_text": full_text,
             "name": "pyclock",
