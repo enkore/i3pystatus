@@ -10,21 +10,18 @@ class Battery:
     The data from uevent is transformed into attributes of this class, stripping
     their prefix. (i.e. POWER_SUPPLY_NAME becomes the NAME attribute).
 
-    Numbers are automatically converted to floats.
-
-    Strings are stripped.
-
-    (configparser would be a bit overkill for this)
+    Numbers are automatically converted to floats. Strings are stripped.
     """
 
-    prefix = "POWER_SUPPLY_"
+    @staticmethod
+    def lchop(string, prefix="POWER_SUPPLY_"):
+        if string.startswith(prefix):
+            return string[len(prefix):]
+        return string
 
     @staticmethod
-    def lchop(string, substring):
-        if string.startswith(substring):
-            return string[len(substring):]
-
-        return string
+    def convert(value):
+        return float(value) if value.isdecimal() else value.strip()
 
     def __init__(self, file):
         self.parse(file)
@@ -36,13 +33,8 @@ class Battery:
 
     def parse_line(self, line):
         key, value = line.split("=", 2)
-        key = self.lchop(key, self.prefix)
-        value = value.strip()
 
-        if value.isdecimal():
-            value = float(value)
-
-        setattr(self, key, value)
+        setattr(self, self.lchop(key), self.convert(value))
 
 class BatteryChecker(IntervalModule):
     """ 
