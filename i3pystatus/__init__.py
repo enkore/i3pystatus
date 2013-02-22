@@ -2,7 +2,6 @@
 
 import sys
 import json
-import urllib.request, urllib.error, urllib.parse
 from threading import Thread
 import time
 from contextlib import contextmanager
