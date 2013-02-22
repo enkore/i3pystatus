@@ -9,12 +9,12 @@ import json
 from i3pystatus import IntervalModule
 
 class NotmuchMailChecker(IntervalModule):
-    """ 
+    """
     This class uses the notmuch python bindings to check for the
     number of messages in the notmuch database with the tags "inbox"
     and "unread"
     """
-    
+
     db_path = ""
 
     def __init__(self, db_path):
@@ -23,7 +23,7 @@ class NotmuchMailChecker(IntervalModule):
     def run(self):
         db = notmuch.Database(self.db_path)
         unread = notmuch.Query(db, "tag:unread and tag:inbox").count_messages()
-        
+
         if (unread == 0):
             color = "#00FF00"
             urgent = "false"

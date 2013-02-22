@@ -5,7 +5,7 @@ from i3pystatus import (
     I3statusHandler,
     mailchecker,
     modsde,
-    notmuch,
+    notmuchmail,
     thunderbird,
     regex,
 )
@@ -62,7 +62,7 @@ status.register(mde)
 
 # the notmuch mail checker module
 db_path = "path_to_your_notmuch_database"
-nm = notmuch.NotmuchMailChecker(db_path)
+nm = notmuchmail.NotmuchMailChecker(db_path)
 status.register(nm)
 
 
