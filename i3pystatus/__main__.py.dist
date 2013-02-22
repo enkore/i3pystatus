@@ -44,7 +44,7 @@ mailsettings = {
     ]
 }
 mailchecker = mailchecker.MailChecker(mailsettings)
-status.register_module(mailchecker)
+status.register(mailchecker)
 
 # the mods.de forum new bookmarks module
 mdesettings = {
@@ -52,17 +52,17 @@ mdesettings = {
     "password": "your_password"
 }
 mde = modsde.ModsDeChecker(mdesettings)
-status.register_module(mde)
+status.register(mde)
 
 # the notmuch mail checker module
 db_path = "path_to_your_notmuch_database"
 nm = notmuch.NotmuchMailChecker(db_path)
-status.register_module(nm)
+status.register(nm)
 
 
 # the thunderbird dbus new mail checker module
 tb = thunderbirdnewmail.ThunderbirdMailChecker()
-status.register_module(tb)
+status.register(tb)
 
 
 # the battery status checker module
