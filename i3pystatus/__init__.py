@@ -6,9 +6,49 @@ from threading import Thread
 import time
 from contextlib import contextmanager
 
+class ConfigurationError(Exception):
+    def __init__(self, module, key=None, missing=None):
+        message = "Module '{0}'".format(module)
+        if key is not None:
+            message += ": invalid option '{0}'".format(key)
+        if missing is not None:
+            message += ": missing required options: {0}".format(missing)
+
+        super().__init__(message)
+
 class Module:
     output = None
     position = 0
+    settings = tuple()
+    required = tuple()
+
+    def __init__(self, *args, **kwargs):
+        required = set()
+        self.required = set(self.required)
+
+        if len(args) == 1 and not len(kwargs):
+            # User can also pass in a dict for their settings
+            # Note: you could do that anyway, with the ** syntax
+            # Note2: just for backwards compatibility
+            kwargs = args[0]
+
+        for key, value in kwargs.items():
+            if key in self.settings:
+                setattr(self, key, value)
+                required.add(key)
+            else:
+                raise ConfigurationError(type(self).__name__, key=key)
+
+        required &= set(self.required)
+        if len(required) != len(self.required):
+            raise ConfigurationError(type(self).__name__, missing=self.required-required)
+
+        self.init()
+
+    def init(self):
+        """Convenience method which is called after all settings are set
+
+        In case you don't want to type that super()…blabla :-)"""
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
