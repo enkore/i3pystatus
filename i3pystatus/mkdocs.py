@@ -131,11 +131,9 @@ def get_all():
         for cls in classes:
             mods.append(Module(cls, neighbours=len(classes), module_name=name, module=module))
 
-    return mods
+    return sorted(mods, key=lambda module: module.name)
 
 with open("template.md", "r") as template:
-    tpl = template.read()
-
     moddoc = "".join(map(lambda module: module.format(), get_all()))    
 
-    print(tpl.replace("!!module_doc!!", moddoc))
+    print(template.read().replace("!!module_doc!!", moddoc))

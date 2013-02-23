@@ -11,25 +11,35 @@ import functools
 
 __all__ = [
     "SettingsBase", "ClassFinder", "ModuleFinder",
-    "ConfigurationError",
+    "ConfigError", "ConfigKeyError", "ConfigMissingError", "ConfigAmbigiousClassesError", "ConfigInvalidModuleError",
     "Module", "AsyncModule", "IntervalModule",
     "i3pystatus", "I3statusHandler",
     "get_path" # We need that for mkdocs
 ]
 
-class ConfigurationError(Exception):
-    def __init__(self, module, key=None, missing=None, ambigious_classes=None, invalid=False):
-        message = "Module '{0}'".format(module)
-        if key is not None:
-            message += ": invalid option '{0}'".format(key)
-        if missing is not None:
-            message += ": missing required options: {0}".format(missing)
-        if ambigious_classes is not None:
-            message += ": ambigious module specification, found multiple classes: {0}".format(ambigious_classes)
-        if invalid:
-            message += ": no class found"
+class ConfigError(Exception):
+    """ABC for configuration exceptions"""
+    def __init__(self, module, *args, **kwargs):
+        message = "Module '{0}': {1}".format(module, self.format(*args, **kwargs))
 
         super().__init__(message)
+
+class ConfigKeyError(ConfigError, KeyError):
+    def format(self, key):
+        return "invalid option '{0}'".format(key)
+
+class ConfigMissingError(ConfigError):
+    def format(self, missing):
+        return "missing required options: {0}".format(missing)
+        super().__init__(module)
+
+class ConfigAmbigiousClassesError(ConfigError):
+    def format(self, ambigious_classes):
+        return "ambigious module specification, found multiple classes: {0}".format(ambigious_classes)
+
+class ConfigInvalidModuleError(ConfigError):
+    def format(self):
+        return "no class found"
 
 def get_path():
     return __path__
@@ -71,7 +81,6 @@ class SettingsBase:
         if len(args) == 1 and not kwargs:
             # User can also pass in a dict for their settings
             # Note: you could do that anyway, with the ** syntax
-            # Note2: just for backwards compatibility
             kwargs = args[0]
 
         for key, value in kwargs.items():
@@ -79,12 +88,12 @@ class SettingsBase:
                 setattr(self, key, value)
                 required.add(key)
             else:
-                raise ConfigurationError(type(self).__name__, key=key)
+                raise ConfigKeyError(type(self).__name__, key=key)
 
-        # Some nice set magic :-)
+        # Some nice set magic :-) [that's more efficient if we have classes with a few thousand settings]
         required &= set(self.required)
         if len(required) != len(self.required):
-            raise ConfigurationError(type(self).__name__, missing=self.required-required)
+            raise ConfigMissingError(type(self).__name__, self.required-required)
 
         self.init()
 
@@ -140,13 +149,13 @@ class ClassFinder:
         if len(classes) > 1:
             # If there are multiple Module clases bundled in one module,
             # well, we can't decide for the user.
-            raise ConfigurationError(module.__name__, ambigious_classes=classes)
+            raise ConfigAmbigiousClassesError(module.__name__, classes)
         elif not classes:
-            raise ConfigurationError(module.__name__, invalid=True)
+            raise ConfigInvalidModuleError(module.__name__)
 
         return classes[0]
 
-    def instanciate_class(self, module, *args, **kwargs):
+    def instanciate_class_from_module(self, module, *args, **kwargs):
         return self.get_class(module)(*args, **kwargs)
 
 ModuleFinder = functools.partial(ClassFinder, baseclass=Module, exclude=[Module, IntervalModule, AsyncModule])
@@ -271,7 +280,7 @@ class i3pystatus:
                 args = (position,)
                 position = 0
 
-            module = self.finder.instanciate_class(module, *args, **kwargs)
+            module = self.finder.instanciate_class_from_module(module, *args, **kwargs)
         elif args or kwargs:
             raise ValueError("Additional arguments are invalid if 'module' is already an object")
 
