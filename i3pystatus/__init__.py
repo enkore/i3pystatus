@@ -15,7 +15,6 @@ __all__ = [
     "ConfigError", "ConfigKeyError", "ConfigMissingError", "ConfigAmbigiousClassesError", "ConfigInvalidModuleError",
     "Module", "AsyncModule", "IntervalModule",
     "i3pystatus", "I3statusHandler",
-    "get_path" # We need that for mkdocs
 ]
 
 class ConfigError(Exception):
@@ -41,9 +40,6 @@ class ConfigAmbigiousClassesError(ConfigError):
 class ConfigInvalidModuleError(ConfigError):
     def format(self):
         return "no class found"
-
-def get_path():
-    return __path__
 
 class KeyConstraintDict(collections.UserDict):
     class MissingKeys(Exception):

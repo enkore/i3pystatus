@@ -35,7 +35,7 @@ as you like.
 ## Modules
 
 
-### batterychecker
+### battery
 
 
 This class uses the /proc/acpi/battery interface to check for the
