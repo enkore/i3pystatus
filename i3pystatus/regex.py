@@ -5,17 +5,16 @@ from i3pystatus import IntervalModule
 class Regex(IntervalModule):
     """
     Simple regex file watcher
-
-    Settings:
-    * flags — Python.re flags
-    * regex — regular expression
-    * file — file to search for regex matches
-    * format — new-style format string used for output, default is "{0}"
     """
 
     flags = 0
     format = "{0}"
-    settings = ("format", "regex", "file")
+    settings = (
+        ("format", "format string used for output"),
+        "regex",
+        ("file", "file to search for regex matches"),
+        ("flags", "Python.re flags"),
+    )
     required = ("regex", "file")
 
     def init(self):

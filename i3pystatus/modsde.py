@@ -19,7 +19,8 @@ class ModsDeChecker(IntervalModule):
 
     settings = (
         ("format", """Use {unread} as the formatter for number of unread posts"""),
-        "color", "offset", "username", "password"
+        ("offset", """subtract number of posts before output"""),
+        "color", "username", "password"
     )
     required = ("username", "password")
 
