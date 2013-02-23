@@ -64,6 +64,7 @@ The output attribute should be set to a dictionary which represents your modules
 the protocol is documented [here](http://i3wm.org/docs/i3bar-protocol.html).
 
 Please add an example for how to configure it to `__main__.py.dist`. It should be
-a python class that can be registered with the `I3statusHandler` class.
+a python class that can be registered with the `I3statusHandler` class. Also don't
+forget to add yourself to the LICENSE file.
 
 **Patches and pull requests are very welcome :-)**
