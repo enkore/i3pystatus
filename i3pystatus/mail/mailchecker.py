@@ -6,32 +6,22 @@ import json
 from datetime import datetime,timedelta
 import imaplib
 
-from i3pystatus import IntervalModule
+from i3pystatus.mail import Backend
 
-class MailChecker(IntervalModule):
+class IMAP(Backend):
     """ 
-    This class handles mailservers and outputs i3status compatible
-    json data for the accumulated unread count. The mail server
-    functionality is implemented in the subclass MailChecker.MailServer
+    This class handles IMAP mailservers. The mail server
+    functionality is implemented in the subclass IMAP.MailServer
     """
     
-    settings = ("color", "servers")
-    required = ("servers",)
-    color = "#ff0000"
+    settings = required = ("servers",)
 
     def init(self):
-        self.server_list = list(map(MailChecker.MailServer, self.servers))
+        self.server_list = list(map(IMAP.MailServer, self.servers))
 
-    def run(self):
-        unread = sum(map(lambda server: server.get_unread_count(), self.server_list))
-
-        if unread:
-            self.output = {
-                "full_text" : "%d new email%s" % (unread, ("s" if unread > 1 else "")), 
-                "name" : "newmail",
-                "urgent" : "true",
-                "color" : self.color
-            }
+    @property
+    def unread(self):
+        return sum(map(lambda server: server.get_unread_count(), self.server_list))
 
     class MailServer:
         """ 
