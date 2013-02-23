@@ -8,6 +8,7 @@ from contextlib import contextmanager
 import types
 import inspect
 import functools
+import collections
 
 __all__ = [
     "SettingsBase", "ClassFinder", "ModuleFinder",
@@ -44,6 +45,34 @@ class ConfigInvalidModuleError(ConfigError):
 def get_path():
     return __path__
 
+class KeyConstraintDict(collections.UserDict):
+    class MissingKeys(Exception):
+        def __init__(self, keys):
+            self.keys = keys
+
+    def __init__(self, valid_keys, required_keys):
+        super().__init__()
+
+        self.valid_keys = valid_keys
+        self.required_keys = set(required_keys)
+        self.seen_keys = set()
+
+    def __setitem__(self, key, value):
+        if key in self.valid_keys:
+            self.seen_keys.add(key)
+            self.data[key] = value
+        else:
+            raise KeyError(key)
+
+    def missing(self):
+        return self.required_keys - (self.seen_keys & self.required_keys)
+
+    def __iter__(self):
+        if self.missing():
+            raise self.MissingKeys(self.missing())
+
+        return self.data.__iter__()
+
 class SettingsBase:
     """
     Support class for providing a nice and flexible settings interface
@@ -57,7 +86,7 @@ class SettingsBase:
     Settings are stored as attributes of self
     """
 
-    settings = tuple() # Can also be a tuple of two-tuples (setting, docstring)
+    settings = tuple()
     """settings should be tuple containing two types of elements:
     * bare strings, which must be valid identifiers.
     * two-tuples, the first element being a identifier (as above) and the second
@@ -67,33 +96,32 @@ class SettingsBase:
     """required can list settings which are required"""
 
     def __init__(self, *args, **kwargs):
-        def flatten_settings(settings):
-            return tuple((flatten_setting(setting) for setting in settings))
-
         def flatten_setting(setting):
             return setting[0] if isinstance(setting, tuple) else setting
+        def flatten_settings(settings):
+            return tuple(flatten_setting(setting) for setting in settings)
+
+        def get_argument_dict(args, kwargs):
+            if len(args) == 1 and not kwargs:
+                # User can also pass in a dict for their settings
+                # Note: you could do that anyway, with the ** syntax
+                return args[0]
+            return kwargs
 
         self.settings = flatten_settings(self.settings)
 
-        required = set()
-        self.required = set(self.required)
+        sm = KeyConstraintDict(self.settings, self.required)
+        settings_source = get_argument_dict(args, kwargs)
 
-        if len(args) == 1 and not kwargs:
-            # User can also pass in a dict for their settings
-            # Note: you could do that anyway, with the ** syntax
-            kwargs = args[0]
+        try:
+            sm.update(settings_source)
+        except KeyError as exc:
+           raise ConfigKeyError(type(self).__name__, key=exc.args[0]) from exc
 
-        for key, value in kwargs.items():
-            if key in self.settings:
-                setattr(self, key, value)
-                required.add(key)
-            else:
-                raise ConfigKeyError(type(self).__name__, key=key)
-
-        # Some nice set magic :-) [that's more efficient if we have classes with a few thousand settings]
-        required &= set(self.required)
-        if len(required) != len(self.required):
-            raise ConfigMissingError(type(self).__name__, self.required-required)
+        try:
+            self.__dict__.update(sm)
+        except KeyConstraintDict.MissingKeys as exc:
+            raise ConfigMissingError(type(self).__name__, missing=exc.keys) from exc
 
         self.__name__ = "{}.{}".format(self.__module__, self.__class__.__name__)
 
