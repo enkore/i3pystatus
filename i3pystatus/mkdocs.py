@@ -138,10 +138,6 @@ def write_mods(f, mods):
             settings=format_settings(mod.settings)
         ))
 
-# io.StringIO
-
-write_mods(sys.stdout, get_all())
-
 with open("template.md", "r") as template:
     tpl = template.read()
 

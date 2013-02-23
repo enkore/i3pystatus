@@ -34,26 +34,47 @@ as you like.
 
 ## Modules
 
-### thunderbirdnewmail
 
-Requires
+### batterychecker
 
-* python-dbus
-* python-gobject2
+This class uses the /proc/acpi/battery interface to check for the
+battery status
 
-Settings
+* battery_ident —  (default: BAT0)
 
-* format
+### clock
+
+This class shows a clock
+
+* format 
+
+### mail
+
+
+
+* backends —  (required)
+* color 
 
 ### modsde
 
-Settings
+This class returns i3status parsable output of the number of
+unread posts in any bookmark in the mods.de forums.
 
-* username
-* password
-* pause (delay between updates)
-* offset (subtract number of posts before output)
-* format
+* format — Use {unread} as the formatter for number of unread posts (default: {unread} new posts in bookmarks)
+* offset — subtract number of posts before output
+* color —  (default: #7181fe)
+* username —  (required)
+* password —  (required)
+
+### regex
+
+Simple regex file watcher
+
+* format — format string used for output (default: {0})
+* regex —  (required)
+* file — file to search for regex matches
+* flags — Python.re flags
+
 
 ## Contribute
 
@@ -68,3 +89,4 @@ a python class that can be registered with the `I3statusHandler` class. Also don
 forget to add yourself to the LICENSE file.
 
 **Patches and pull requests are very welcome :-)**
+
