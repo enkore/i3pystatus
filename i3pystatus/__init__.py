@@ -25,10 +25,13 @@ class ConfigurationError(Exception):
 class Module:
     output = None
     position = 0
-    settings = tuple()
+    settings = tuple() # Can also be a tuple of two-tuples (setting, docstring)
     required = tuple()
 
     def __init__(self, *args, **kwargs):
+        if len(self.settings) and isinstance(self.settings[0], tuple):
+            self.settings, docstrings = zip(*self.settings)
+
         required = set()
         self.required = set(self.required)
 
@@ -135,11 +138,11 @@ class StandaloneIO(IOHandler):
 
     def read(self):
         while True:
-            yield self.read_line()
             try:
                 time.sleep(self.interval)
             except KeyboardInterrupt:
                 return
+            yield self.read_line()
 
     def read_line(self):
         self.n += 1
@@ -175,6 +178,34 @@ class JSONIO:
         yield j
         self.io.write_line(prefix + json.dumps(j))
 
+class ClassFinder:
+    """
+    Support class to find classes of specific bases in a module
+    """
+
+    def __init__(self, baseclass, exclude=[]):
+        self.baseclass = baseclass
+        self.exclude = exclude
+
+    def predicate(self, obj):
+        return inspect.isclass(obj) and issubclass(obj, self.baseclass) and obj not in self.exclude
+
+    def search_module(self, module):
+        # Neat trick: [(x,y),(u,v)] becomes [(x,u),(y,v)]
+        return zip(*inspect.getmembers(module, self.predicate))[1]
+
+    def get_class(self, module):
+        classes = self.search_module(module)
+
+        if len(classes) > 1:
+            # If there are multiple Module clases bundled in one module,
+            # well, we can't decide for the user.
+            raise ConfigurationError(module.__name__, ambigious_classes=classes)
+        elif not classes:
+            raise ConfigurationError(module.__name__, invalid=True)
+
+        return classes[0]
+
 class i3pystatus:
     modules = []
 
@@ -184,29 +215,17 @@ class i3pystatus:
         else:
             self.io = IOHandler(input_stream)
 
-    @staticmethod
-    def _check_class(obj):
-        return inspect.isclass(obj) and issubclass(obj, Module) and obj not in [Module, IntervalModule, AsyncModule]
+        self.finder = ClassFinder(baseclass=Module, exclude=[Module, IntervalModule, AsyncModule])
 
-    def register(self, module, position=0, *args, **kwargs):
-        """Register a new module."""
-
+    @classmethod
+    def _make_instance(cls, module, position, args, kwargs):
         if isinstance(module, types.ModuleType):
             # Okay, we got a module, let's find the class
             # and create an instance
 
-            # Neat trick: [(x,y),(u,v)] becomes [(x,u),(y,v)]
-            names, classes = zip(*inspect.getmembers(module, self._check_class))
-
-            if len(classes) > 1:
-                # If there are multiple Module clases bundled in one module,
-                # well, we can't decide for the user.
-                raise ConfigurationError(module.__name__, ambigious_classes=classes)
-            elif not classes:
-                raise ConfigurationError(module.__name__, invalid=True)
+            cls = self.finder.get_class(module)
 
             if not isinstance(position, int) and not args:
-                # Small quirks:
                 # If the user does this: register(modsde, mdesettings) with mdesettings
                 # being a dict Python will put mdesettings into the position argument
                 # , and not into *args. Let's fix that.
@@ -214,7 +233,16 @@ class i3pystatus:
                 args = (position,)
                 position = 0
 
-            module = classes[0](*args, **kwargs)
+            module = cls(*args, **kwargs)
+        elif args or kwargs:
+            raise ValueError("Additional arguments are invalid if 'module' is already an object")
+
+        return (module, position)
+
+    def register(self, module, position=0, *args, **kwargs):
+        """Register a new module."""
+
+        module, position = self._make_instance(module, position, args, kwargs)
 
         self.modules.append(module)
         module.position = position
