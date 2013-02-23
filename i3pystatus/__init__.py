@@ -109,6 +109,10 @@ class Module(SettingsBase):
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
 
+    def inject(self, json):
+        if self.output:
+            json.insert(self.position, self.output)
+
 class AsyncModule(Module):
     def registered(self, status_handler):
         self.thread = Thread(target=self.mainloop)
@@ -205,7 +209,7 @@ class StandaloneIO(IOHandler):
 
     n = -1
     proto = (
-        '{"version": 1}',
+        '{"version":1}',
         "[",
         "[]",
         ",[]",
@@ -298,5 +302,5 @@ class i3pystatus:
     def run(self):
         for j in JSONIO(self.io).read():
             for module in self.modules:
-                j.insert(module.position, module.output)
+                module.inject(j)
 I3statusHandler = i3pystatus
