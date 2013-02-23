@@ -10,8 +10,11 @@ class Clock(IntervalModule):
     This class shows a clock
     """
 
-    settings = ("format",)
+    settings = (
+        ("format", "stftime format string"),
+    )
     format = None
+    interval = 1
 
     def init(self):
         if self.format is None:
@@ -38,9 +41,8 @@ class Clock(IntervalModule):
                 self.format = "%a %-d %b %X"
 
     def run(self):
-        full_text = datetime.datetime.now().strftime(self.format)
         self.output = {
-            "full_text": full_text,
+            "full_text": datetime.datetime.now().strftime(self.format),
             "name": "pyclock",
             "urgent": False,
             "color": "#ffffff"

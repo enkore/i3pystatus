@@ -46,7 +46,7 @@ battery status
 
 This class shows a clock
 
-* format 
+* format — stftime format string
 
 ### mail
 
