@@ -56,6 +56,16 @@ This class shows a clock
 
 
 
+### load
+
+
+Shows system load
+
+
+* format — format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: {avg1} {avg5})
+
+
+
 ### mail
 
 

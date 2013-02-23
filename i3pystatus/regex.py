@@ -23,6 +23,6 @@ class Regex(IntervalModule):
     def run(self):
         with open(self.file, "r") as f:
             match = self.re.search(f.read())
-            self.output = self.output = {
+            self.output = {
                 "full_text" : self.format.format(*match.groups()),
             }
