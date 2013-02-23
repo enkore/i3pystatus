@@ -95,6 +95,8 @@ class SettingsBase:
         if len(required) != len(self.required):
             raise ConfigMissingError(type(self).__name__, self.required-required)
 
+        self.__name__ = "{}.{}".format(self.__module__, self.__class__.__name__)
+
         self.init()
 
     def init(self):
@@ -111,6 +113,8 @@ class Module(SettingsBase):
 
     def inject(self, json):
         if self.output:
+            if "name" not in self.output:
+                self.output["name"] = self.__name__
             json.insert(self.position, self.output)
 
 class AsyncModule(Module):

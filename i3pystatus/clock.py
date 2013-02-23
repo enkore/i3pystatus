@@ -43,7 +43,6 @@ class Clock(IntervalModule):
     def run(self):
         self.output = {
             "full_text": datetime.datetime.now().strftime(self.format),
-            "name": "pyclock",
             "urgent": False,
             "color": "#ffffff"
         }

@@ -75,7 +75,6 @@ class BatteryChecker(IntervalModule):
 
         self.output = {
             "full_text": full_text,
-            "name": "pybattery",
             "instance": self.battery_ident,
             "urgent": urgent,
             "color": color

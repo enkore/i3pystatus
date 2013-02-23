@@ -46,7 +46,6 @@ class ModsDeChecker(IntervalModule):
         else:
             self.output = {
                 "full_text" : self.format.format(unread=unread),
-                "name" : "modsde",
                 "urgent" : "true",
                 "color" : self.color
             }

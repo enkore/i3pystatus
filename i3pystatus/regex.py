@@ -25,5 +25,4 @@ class Regex(IntervalModule):
             match = self.re.search(f.read())
             self.output = self.output = {
                 "full_text" : self.format.format(*match.groups()),
-                "name" : "regex",
             }
