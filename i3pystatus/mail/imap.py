@@ -12,6 +12,14 @@ class IMAP(Backend):
     """ 
     This class handles IMAP mailservers. The mail server
     functionality is implemented in the subclass IMAP.MailServer
+
+    The servers parameter should be a list of dicts containing the following
+    items:
+    * host
+    * port (optional, defaults to 143)
+    * username
+    * password
+    * ssl (optional, defaults to False)
     """
     
     settings = required = ("servers",)
@@ -33,6 +41,9 @@ class IMAP(Backend):
 
         imap_class = imaplib.IMAP4
         connection = None
+
+        ssl = False
+        port = 143
 
         def __init__(self, settings_dict):
             self.__dict__.update(settings_dict)

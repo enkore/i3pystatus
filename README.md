@@ -44,6 +44,8 @@ battery status
 
 * battery_ident —  (default: BAT0)
 
+
+
 ### clock
 
 
@@ -52,12 +54,72 @@ This class shows a clock
 
 * format — stftime format string
 
+
+
 ### mail
 
 
+Generic mail checker
 
-* backends —  (required)
-* color 
+The `backends` setting determines the backends to use. Currently available are:
+
+
+* backends — List of backends (instances of i3pystatus.mail.xxx)
+* color —  (default: #ffffff)
+* color_unread —  (default: #ff0000)
+* format —  (default: {unread} new email)
+* format_plural —  (default: {unread} new emails)
+
+
+    Currently available backends are:
+
+
+#### imap
+
+
+This class handles IMAP mailservers. The mail server
+functionality is implemented in the subclass IMAP.MailServer
+
+The servers parameter should be a list of dicts containing the following
+items:
+* host
+* port (optional, defaults to 143)
+* username
+* password
+* ssl (optional, defaults to False)
+
+
+* servers —  (required)
+
+
+
+#### notmuchmail
+
+
+This class uses the notmuch python bindings to check for the
+number of messages in the notmuch database with the tags "inbox"
+and "unread"
+
+
+* db_path —  (required)
+
+
+
+#### thunderbird
+
+
+This class listens for dbus signals emitted by
+the dbus-sender extension for thunderbird.
+
+Requires
+* python-dbus
+* python-gobject2
+
+
+
+
+
+
 
 ### modsde
 
@@ -72,6 +134,8 @@ unread posts in any bookmark in the mods.de forums.
 * username —  (required)
 * password —  (required)
 
+
+
 ### regex
 
 
@@ -82,6 +146,8 @@ Simple regex file watcher
 * regex —  (required)
 * file — file to search for regex matches
 * flags — Python.re flags
+
+
 
 
 ## Contribute

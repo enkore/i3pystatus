@@ -7,22 +7,27 @@ from collections import namedtuple
 import textwrap
 
 import i3pystatus
+import i3pystatus.mail
 
 IGNORE = ("__main__", "mkdocs")
 MODULE_FORMAT = """
-### {name}
+{heading} {name}
 
 {doc}
 
-{settings}\n"""
+{settings}
+
+{endstring}\n"""
 
 class Module:
     name = ""
     doc = ""
+    endstring = ""
 
-    def __init__(self, cls, neighbours, module_name, module):
+    def __init__(self, cls, neighbours, module_name, module, heading):
         self.settings = []
         self.cls = cls
+        self.heading = heading
 
         if neighbours == 1:
             self.name = module_name
@@ -35,6 +40,10 @@ class Module:
             self.doc = module.__doc__
         else:
             self.doc = ""
+
+        if hasattr(self.cls, "_endstring"):
+            self.endstring = self.cls._endstring
+
         self.get_settings()
 
     def get_settings(self):
@@ -49,6 +58,8 @@ class Module:
             name=self.name,
             doc=textwrap.dedent(self.doc),
             settings=self.format_settings(),
+            heading=self.heading,
+            endstring=self.endstring
         )
 
 class Setting:
@@ -86,9 +97,12 @@ class Setting:
 
         return formatted
 
-def get_modules():
+def get_modules(path=None):
+    if path is None:
+        path = i3pystatus.get_path()
+
     modules = []
-    for finder, modname, ispkg in pkgutil.iter_modules(i3pystatus.get_path()):
+    for finder, modname, ispkg in pkgutil.iter_modules(path):
         if modname not in IGNORE:
             modules.append(get_module(finder, modname))
 
@@ -98,19 +112,27 @@ def get_module(finder, modname):
     fullname = "i3pystatus.{modname}".format(modname=modname)
     return (modname, finder.find_loader(fullname)[0].load_module(fullname))
 
-def get_all():
+def get_all(module_path, heading, finder=None):
     mods = []
-    finder = i3pystatus.ModuleFinder()
+    if finder is None:
+        finder = i3pystatus.ModuleFinder()
 
-    for name, module in get_modules():
+    for name, module in get_modules(module_path):
         classes = finder.search_module(module)
 
         for cls in classes:
-            mods.append(Module(cls, neighbours=len(classes), module_name=name, module=module))
+            mods.append(Module(cls, neighbours=len(classes), module_name=name, module=module, heading=heading))
 
     return sorted(mods, key=lambda module: module.name)
 
-with open("template.md", "r") as template:
-    moddoc = "".join(map(str, get_all()))
+def generate_doc_for_module(module_path, heading="###", finder=None):
+    return "".join(map(str, get_all(module_path, heading, finder)))
 
-    print(template.read().replace("!!module_doc!!", moddoc))
+with open("template.md", "r") as template:
+
+    tpl = template.read()
+    tpl = tpl.replace("!!module_doc!!", generate_doc_for_module(i3pystatus.__path__))
+    finder = i3pystatus.ClassFinder(baseclass=i3pystatus.mail.Backend, exclude=[i3pystatus.mail.Backend])
+    tpl = tpl.replace("!!i3pystatus.mail!!", generate_doc_for_module(i3pystatus.mail.__path__, "####", finder))
+
+    print(tpl)

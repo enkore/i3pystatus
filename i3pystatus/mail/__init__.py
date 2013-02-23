@@ -2,30 +2,56 @@
 from i3pystatus import SettingsBase, IntervalModule
 
 class Backend(SettingsBase):
-    """Handle the details of checking for mail"""
+    """Handles the details of checking for mail"""
 
     unread = 0
-    """Return number of unread mails
+    """Number of unread mails
 
     You'll probably implement that as a property"""
 
 class Mail(IntervalModule):
-    settings = ("backends", "color",)
+    """
+    Generic mail checker
+
+    The `backends` setting determines the backends to use. Currently available are:
+    """
+
+    _endstring = """
+    Currently available backends are:
+
+!!i3pystatus.mail!!"""
+
+    settings = (
+        ("backends", "List of backends (instances of i3pystatus.mail.xxx)"),
+        "color", "color_unread", "format", "format_plural"
+    )
     required = ("backends",)
 
-    def run(self):
-        unread = sum(lambda backend: backend.unread, self.backends)
+    color = "#ffffff"
+    color_unread  ="#ff0000"
+    format = "{unread} new email"
+    format_plural = "{unread} new emails"
 
-        if (unread == 0):
-            color = "#00FF00"
+    def init(self):
+        for backend in self.backends:
+            pass
+
+    def run(self):
+        unread = sum(map(lambda backend: backend.unread, self.backends))
+
+        if not unread:
+            color = self.color
             urgent = "false"
         else:
-            color = "#ff0000"
+            color = self.color_unread
             urgent = "true"
 
+        format = self.format
+        if unread > 1:
+            format = self.format_plural
+
         self.output = {
-            "full_text" : "%d new email%s" % (unread, ("s" if unread > 1 else "")),
-            "name" : "newmail",
+            "full_text" : format.format(unread=unread),
             "urgent" : urgent,
-            "color" : color
+            "color" : color,
         }
