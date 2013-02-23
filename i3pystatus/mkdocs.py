@@ -8,20 +8,12 @@ from collections import namedtuple
 import i3pystatus
 
 IGNORE = ("__main__", "mkdocs")
+MODULE_FORMAT = """
+### {name}
 
-class Module:
-    name = ""
-    doc = ""
-    settings = []
+{doc}
 
-class Setting:
-    name = ""
-    doc = ""
-    required = False
-    default = None
-
-#finder = ClassFinder(baseclass=Module, exclude=[Module, IntervalModule, AsyncModule])
-finder = i3pystatus.ModuleFinder()
+{settings}\n"""
 
 def trim(docstring):
     if not docstring:
@@ -48,6 +40,75 @@ def trim(docstring):
     # Return a single string:
     return '\n'.join(trimmed)
 
+class Module:
+    name = ""
+    doc = ""
+
+    def __init__(self, cls, neighbours, module_name, module):
+        self.settings = []
+        self.cls = cls
+
+        if neighbours == 1:
+            self.name = module_name
+        else:
+            self.name = "{module}.{cls}".format(module=module_name, cls=self.cls.__name__)
+
+        if hasattr(self.cls, "__doc__"):
+            self.doc = self.cls.__doc__
+        elif hasattr(module, "__doc__"):
+            self.doc = module.__doc__
+
+        self.get_settings()
+
+    def get_settings(self):
+        for setting in self.cls.settings:
+            self.settings.append(Setting(self, setting))
+
+    def format_settings(self):
+        return "\n".join(map(lambda setting: setting.format(), self.settings))
+
+    def format(self):
+        return MODULE_FORMAT.format(
+            name=self.name,
+            doc=trim(self.doc),
+            settings=self.format_settings(),
+        )
+
+class Setting:
+    name = ""
+    doc = ""
+    required = False
+    default = None
+
+    def __init__(self, mod, setting):
+        if isinstance(setting, tuple):
+            self.name = setting[0]
+            self.doc = setting[1]
+        else:
+            self.name = setting
+
+        if setting in mod.cls.required:
+            self.required = True
+        elif hasattr(mod.cls, self.name):
+            self.default = getattr(mod.cls, self.name)
+
+    def format(self):
+        attrs = []
+        if self.required:
+            attrs.append("required")
+        if self.default:
+            attrs.append("default: {default}".format(default=self.default))
+
+        formatted = "* {name} ".format(name=self.name)
+        if self.doc or attrs:
+            formatted += "— "
+            if self.doc:
+                formatted += self.doc
+            if attrs:
+                formatted += " ({attrs})".format(attrs=", ".join(attrs))
+
+        return formatted
+
 def get_modules():
     modules = []
     for finder, modname, ispkg in pkgutil.iter_modules(i3pystatus.get_path()):
@@ -60,104 +121,21 @@ def get_module(finder, modname):
     fullname = "i3pystatus.{modname}".format(modname=modname)
     return (modname, finder.find_loader(fullname)[0].load_module(fullname))
 
-def get_settings(cls):
-    settings = []
-
-    for setting in cls.settings:
-        s = Setting()
-        if isinstance(setting, tuple):
-            s.name = setting[0]
-            s.doc = setting[1]
-        else:
-            s.name = setting
-
-        if setting in cls.required:
-            s.required = True
-        elif hasattr(cls, s.name):
-            s.default = getattr(cls, s.name)
-
-        settings.append(s)
-
-    return settings
-
 def get_all():
     mods = []
+    finder = i3pystatus.ModuleFinder()
 
     for name, module in get_modules():
         classes = finder.search_module(module)
 
         for cls in classes:
-            m = Module()
-
-            if len(classes) == 1:
-                m.name = name
-            else:
-                m.name = "{module}.{cls}".format(module=name, cls=cls.__name__)
-
-            if hasattr(cls, "__doc__"):
-                m.doc = cls.__doc__
-            elif hasattr(module, "__doc__"):
-                m.doc = module.__doc__
-
-            m.settings = get_settings(cls)
-
-            mods.append(m)
+            mods.append(Module(cls, neighbours=len(classes), module_name=name, module=module))
 
     return mods
-
-def format_settings(settings):
-    return "\n".join((format_setting(setting) for setting in settings))
-
-def format_setting(setting):
-    attrs = []
-    if setting.required:
-        attrs.append("required")
-    if setting.default:
-        attrs.append("default: {default}".format(default=setting.default))
-
-    formatted = "* {name} ".format(name=setting.name)
-    if setting.doc or attrs:
-        formatted += "— "
-        if setting.doc:
-            formatted += setting.doc
-        if attrs:
-            formatted += " ({attrs})".format(attrs=", ".join(attrs))
-
-    return formatted
-
-def write_mods(f, mods):
-    for mod in mods:
-        f.write("""
-### {name}
-
-{doc}
-
-{settings}\n""".format(
-            name=mod.name,
-            doc=trim(mod.doc),
-            settings=format_settings(mod.settings)
-        ))
 
 with open("template.md", "r") as template:
     tpl = template.read()
 
-    f = io.StringIO()
-    write_mods(f, get_all())
+    moddoc = "".join(map(lambda module: module.format(), get_all()))    
 
-    print(tpl.replace("!!module_doc!!", f.getvalue()))
-
-
-#    return [finder.search_module]
-#    mods = []
-#
- #   for modname, module in modules:
-  #      classes = finder.search_module(module)
-#
-#
-#
- #       mods.append(get_mod(modname))
-  #      mods.append(mod(
-   #         name=modname,
-    #        docstring=module.__doc__ if hasattr(module, "__doc__") else "",
-     #       settings=get_settings(module)
-      #  ))
+    print(tpl.replace("!!module_doc!!", moddoc))
