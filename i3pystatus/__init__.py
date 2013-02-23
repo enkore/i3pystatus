@@ -139,6 +139,8 @@ class StandaloneIO(IOHandler):
             return '{"version": 1}'
         elif self.n == 1:
             return "["
+        elif self.n == 2:
+            return "[]"
         else:
             return  ",[]"
 
