@@ -7,6 +7,15 @@ import time
 from contextlib import contextmanager
 import types
 import inspect
+import functools
+
+__all__ = [
+    "SettingsBase", "ClassFinder", "ModuleFinder",
+    "ConfigurationError",
+    "Module", "AsyncModule", "IntervalModule",
+    "i3pystatus", "I3statusHandler",
+    "get_path" # We need that for mkdocs
+]
 
 class ConfigurationError(Exception):
     def __init__(self, module, key=None, missing=None, ambigious_classes=None, invalid=False):
@@ -21,6 +30,9 @@ class ConfigurationError(Exception):
             message += ": no class found"
 
         super().__init__(message)
+
+def get_path():
+    return __path__
 
 class SettingsBase:
     """
@@ -107,6 +119,37 @@ class IntervalModule(AsyncModule):
         while True:
             self.run()
             time.sleep(self.interval)
+
+class ClassFinder:
+    """Support class to find classes of specific bases in a module"""
+
+    def __init__(self, baseclass, exclude=[]):
+        self.baseclass = baseclass
+        self.exclude = exclude
+
+    def predicate(self, obj):
+        return inspect.isclass(obj) and issubclass(obj, self.baseclass) and obj not in self.exclude
+
+    def search_module(self, module):
+        # Neat trick: [(x,y),(u,v)] becomes [(x,u),(y,v)]
+        return list(zip(*inspect.getmembers(module, self.predicate)))[1]
+
+    def get_class(self, module):
+        classes = self.search_module(module)
+
+        if len(classes) > 1:
+            # If there are multiple Module clases bundled in one module,
+            # well, we can't decide for the user.
+            raise ConfigurationError(module.__name__, ambigious_classes=classes)
+        elif not classes:
+            raise ConfigurationError(module.__name__, invalid=True)
+
+        return classes[0]
+
+    def instanciate_class(self, module, *args, **kwargs):
+        return self.get_class(module)(*args, **kwargs)
+
+ModuleFinder = functools.partial(ClassFinder, baseclass=Module, exclude=[Module, IntervalModule, AsyncModule])
 
 class IOHandler:
     def __init__(self, inp=sys.stdin, out=sys.stdout):
@@ -207,35 +250,6 @@ class JSONIO:
         yield j
         self.io.write_line(prefix + json.dumps(j))
 
-class ClassFinder:
-    """Support class to find classes of specific bases in a module"""
-
-    def __init__(self, baseclass, exclude=[]):
-        self.baseclass = baseclass
-        self.exclude = exclude
-
-    def predicate(self, obj):
-        return inspect.isclass(obj) and issubclass(obj, self.baseclass) and obj not in self.exclude
-
-    def search_module(self, module):
-        # Neat trick: [(x,y),(u,v)] becomes [(x,u),(y,v)]
-        return list(zip(*inspect.getmembers(module, self.predicate)))[1]
-
-    def get_class(self, module):
-        classes = self.search_module(module)
-
-        if len(classes) > 1:
-            # If there are multiple Module clases bundled in one module,
-            # well, we can't decide for the user.
-            raise ConfigurationError(module.__name__, ambigious_classes=classes)
-        elif not classes:
-            raise ConfigurationError(module.__name__, invalid=True)
-
-        return classes[0]
-
-    def instanciate_class(self, module, *args, **kwargs):
-        return self.get_class(module)(*args, **kwargs)
-
 class i3pystatus:
     modules = []
 
@@ -245,7 +259,7 @@ class i3pystatus:
         else:
             self.io = IOHandler(input_stream)
 
-        self.finder = ClassFinder(baseclass=Module, exclude=[Module, IntervalModule, AsyncModule])
+        self.finder = ModuleFinder()
 
     def get_instance_for_module(self, module, position, args, kwargs):
         if isinstance(module, types.ModuleType):
