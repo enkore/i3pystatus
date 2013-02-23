@@ -4,6 +4,7 @@ import sys
 import io
 import pkgutil
 from collections import namedtuple
+import textwrap
 
 import i3pystatus
 
@@ -14,31 +15,6 @@ MODULE_FORMAT = """
 {doc}
 
 {settings}\n"""
-
-def trim(docstring):
-    if not docstring:
-        return ''
-    # Convert tabs to spaces (following the normal Python rules)
-    # and split into a list of lines:
-    lines = docstring.expandtabs().splitlines()
-    # Determine minimum indentation (first line doesn't count):
-    indent = sys.maxsize
-    for line in lines[1:]:
-        stripped = line.lstrip()
-        if stripped:
-            indent = min(indent, len(line) - len(stripped))
-    # Remove indentation (first line is special):
-    trimmed = [lines[0].strip()]
-    if indent < sys.maxsize:
-        for line in lines[1:]:
-            trimmed.append(line[indent:].rstrip())
-    # Strip off trailing and leading blank lines:
-    while trimmed and not trimmed[-1]:
-        trimmed.pop()
-    while trimmed and not trimmed[0]:
-        trimmed.pop(0)
-    # Return a single string:
-    return '\n'.join(trimmed)
 
 class Module:
     name = ""
@@ -53,11 +29,12 @@ class Module:
         else:
             self.name = "{module}.{cls}".format(module=module_name, cls=self.cls.__name__)
 
-        if hasattr(self.cls, "__doc__"):
+        if self.cls.__doc__ is not None:
             self.doc = self.cls.__doc__
-        elif hasattr(module, "__doc__"):
+        elif module.__doc__ is not None:
             self.doc = module.__doc__
-
+        else:
+            self.doc = ""
         self.get_settings()
 
     def get_settings(self):
@@ -65,12 +42,12 @@ class Module:
             self.settings.append(Setting(self, setting))
 
     def format_settings(self):
-        return "\n".join(map(lambda setting: setting.format(), self.settings))
+        return "\n".join(map(str, self.settings))
 
-    def format(self):
+    def __str__(self):
         return MODULE_FORMAT.format(
             name=self.name,
-            doc=trim(self.doc),
+            doc=textwrap.dedent(self.doc),
             settings=self.format_settings(),
         )
 
@@ -92,7 +69,7 @@ class Setting:
         elif hasattr(mod.cls, self.name):
             self.default = getattr(mod.cls, self.name)
 
-    def format(self):
+    def __str__(self):
         attrs = []
         if self.required:
             attrs.append("required")
@@ -134,6 +111,6 @@ def get_all():
     return sorted(mods, key=lambda module: module.name)
 
 with open("template.md", "r") as template:
-    moddoc = "".join(map(lambda module: module.format(), get_all()))    
+    moddoc = "".join(map(str, get_all()))
 
     print(template.read().replace("!!module_doc!!", moddoc))

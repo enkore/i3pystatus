@@ -37,14 +37,18 @@ as you like.
 
 ### batterychecker
 
+
 This class uses the /proc/acpi/battery interface to check for the
 battery status
+
 
 * battery_ident —  (default: BAT0)
 
 ### clock
 
+
 This class shows a clock
+
 
 * format — stftime format string
 
@@ -57,8 +61,10 @@ This class shows a clock
 
 ### modsde
 
+
 This class returns i3status parsable output of the number of
 unread posts in any bookmark in the mods.de forums.
+
 
 * format — Use {unread} as the formatter for number of unread posts (default: {unread} new posts in bookmarks)
 * offset — subtract number of posts before output
@@ -68,7 +74,9 @@ unread posts in any bookmark in the mods.de forums.
 
 ### regex
 
+
 Simple regex file watcher
+
 
 * format — format string used for output (default: {0})
 * regex —  (required)
