@@ -123,6 +123,12 @@ class StandaloneIO(IOHandler):
     """
 
     n = -1
+    proto = (
+        '{"version": 1}',
+        "[",
+        "[]",
+        ",[]",
+    )
     def __init__(self, interval=1):
         super().__init__()
         self.interval = interval
@@ -138,14 +144,7 @@ class StandaloneIO(IOHandler):
     def read_line(self):
         self.n += 1
 
-        if self.n == 0:
-            return '{"version": 1}'
-        elif self.n == 1:
-            return "["
-        elif self.n == 2:
-            return "[]"
-        else:
-            return  ",[]"
+        return self.proto[min(self.n, len(self.proto)-1)]
 
 class JSONIO:
     def __init__(self, io):
