@@ -27,7 +27,7 @@ class Thunderbird(Backend):
     * python-gobject2
     """
 
-    unread = set()
+    _unread = set()
 
     def init(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -45,14 +45,14 @@ class Thunderbird(Backend):
         self.run = partial(self.context.iteration, False)
 
     def new_msg(self, id, author, subject):
-        if id not in self.unread:
-            self.unread.add(id)
+        if id not in self._unread:
+            self._unread.add(id)
 
     def changed_msg(self, id, event):
-        if event == "read" and id in self.unread:
-            self.unread.remove(id)
+        if event == "read" and id in self._unread:
+            self._unread.remove(id)
 
     @property
     def unread(self):
         self.run()
-        return len(self.unread)
+        return len(self._unread)
