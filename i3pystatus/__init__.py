@@ -130,7 +130,10 @@ class StandaloneIO(IOHandler):
     def read(self):
         while True:
             yield self.read_line()
-            time.sleep(self.interval)
+            try:
+                time.sleep(self.interval)
+            except KeyboardInterrupt:
+                return
 
     def read_line(self):
         self.n += 1
@@ -208,7 +211,7 @@ class i3pystatus:
                 # If the user does this: register(modsde, mdesettings) with mdesettings
                 # being a dict Python will put mdesettings into the position argument
                 # , and not into *args. Let's fix that.
-                # If she uses keyword arguments, everything is fine right from the beginning :-)
+                # If she uses keyword arguments, everything is fine :-)
                 args = (position,)
                 position = 0
 
