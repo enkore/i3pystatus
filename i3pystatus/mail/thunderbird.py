@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# This plugin listens for dbus signals emitted by the 
-# thunderbird-dbus-sender extension for TB: 
+# This plugin listens for dbus signals emitted by the
+# thunderbird-dbus-sender extension for TB:
 # https://github.com/janoliver/thunderbird-dbus-sender
 # The plugin must be active and thunderbird running for the module to work
 # properly.
@@ -15,19 +15,15 @@ from functools import partial
 import dbus, gobject
 from dbus.mainloop.glib import DBusGMainLoop
 
-from i3pystatus import IntervalModule
+from i3pystatus.mail import Backend
 
-class ThunderbirdMailChecker(IntervalModule):
-    """ 
+class Thunderbird(Backend):
+    """
     This class listens for dbus signals emitted by
-    the dbus-sender extension for thunderbird. 
+    the dbus-sender extension for thunderbird.
     """
 
-    settings = ("format",)
-
     unread = set()
-    interval = 1
-    format = "%d new mail"
 
     def init(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
@@ -47,23 +43,12 @@ class ThunderbirdMailChecker(IntervalModule):
     def new_msg(self, id, author, subject):
         if id not in self.unread:
             self.unread.add(id)
-            self._output()
 
     def changed_msg(self, id, event):
         if event == "read" and id in self.unread:
             self.unread.remove(id)
-            self._output()
 
-    def _output(self):
+    @property
+    def unread(self):
         self.run()
-
-        unread = len(self.unread)
-        if unread:
-            self.output = {
-                "full_text": self.settings["format"] % unread, 
-                "name": "newmail-tb",
-                "urgent": True,
-                "color": "#ff0000",
-            }
-        else:
-            self.output = None
+        return len(self.unread)
