@@ -321,6 +321,9 @@ class i3pystatus:
     def register(self, module, position=0, *args, **kwargs):
         """Register a new module."""
 
+        if not module: # One can pass in False or None, if he wishes to temporarily disable a module
+            return
+
         module, position = self.get_instance_for_module(module, position, args, kwargs)
 
         self.modules.append(module)

@@ -159,6 +159,19 @@ Simple regex file watcher
 
 
 
+### temp
+
+
+Shows CPU temperature
+
+
+* format — format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps. (default: {temp} °C)
+* color —  (default: #FFFFFF)
+* color_critical —  (default: #FF0000)
+* high_factor —  (default: 0.7)
+
+
+
 
 ## Contribute
 
