@@ -22,20 +22,41 @@ class ConfigurationError(Exception):
 
         super().__init__(message)
 
-class Module:
-    output = None
-    position = 0
+class SettingsBase:
+    """
+    Support class for providing a nice and flexible settings interface
+
+    Classes inherit from this class and define what settings they provide and
+    which are required.
+
+    The constructor is either passed a dictionary containing these settings, or
+    keyword arguments specifying the same.
+
+    Settings are stored as attributes of self
+    """
+
     settings = tuple() # Can also be a tuple of two-tuples (setting, docstring)
+    """settings should be tuple containing two types of elements:
+    * bare strings, which must be valid identifiers.
+    * two-tuples, the first element being a identifier (as above) and the second
+    a docstring for the particular setting"""
+
     required = tuple()
+    """required can list settings which are required"""
 
     def __init__(self, *args, **kwargs):
-        if len(self.settings) and isinstance(self.settings[0], tuple):
-            self.settings, docstrings = zip(*self.settings)
+        def flatten_settings(settings):
+            return tuple((flatten_setting(setting) for setting in settings))
+
+        def flatten_setting(setting):
+            return setting[0] if isinstance(setting, tuple) else setting
+
+        self.settings = flatten_settings(self.settings)
 
         required = set()
         self.required = set(self.required)
 
-        if len(args) == 1 and not len(kwargs):
+        if len(args) == 1 and not kwargs:
             # User can also pass in a dict for their settings
             # Note: you could do that anyway, with the ** syntax
             # Note2: just for backwards compatibility
@@ -48,6 +69,7 @@ class Module:
             else:
                 raise ConfigurationError(type(self).__name__, key=key)
 
+        # Some nice set magic :-)
         required &= set(self.required)
         if len(required) != len(self.required):
             raise ConfigurationError(type(self).__name__, missing=self.required-required)
@@ -58,6 +80,10 @@ class Module:
         """Convenience method which is called after all settings are set
 
         In case you don't want to type that super()…blabla :-)"""
+
+class Module(SettingsBase):
+    output = None
+    position = 0
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
@@ -121,7 +147,7 @@ class StandaloneIO(IOHandler):
     """
     I/O handler for standalone usage of i3pystatus (w/o i3status)
 
-    writing as usual, reading will always return a empty JSON array,
+    Writing works as usual, but reading will always return a empty JSON array,
     and the i3bar protocol header
     """
 
@@ -132,6 +158,7 @@ class StandaloneIO(IOHandler):
         "[]",
         ",[]",
     )
+
     def __init__(self, interval=1):
         super().__init__()
         self.interval = interval
@@ -164,9 +191,11 @@ class JSONIO:
 
     @contextmanager
     def parse_line(self, line):
-        """Parse a single line of JSON and write modified JSON back.
+        """
+        Parse a single line of JSON and write modified JSON back.
 
-        Usage is quite simple using the usual with-Syntax."""
+        Usage is quite simple using the usual with-Syntax.
+        """
 
         prefix = ""
 
@@ -179,9 +208,7 @@ class JSONIO:
         self.io.write_line(prefix + json.dumps(j))
 
 class ClassFinder:
-    """
-    Support class to find classes of specific bases in a module
-    """
+    """Support class to find classes of specific bases in a module"""
 
     def __init__(self, baseclass, exclude=[]):
         self.baseclass = baseclass
@@ -192,7 +219,7 @@ class ClassFinder:
 
     def search_module(self, module):
         # Neat trick: [(x,y),(u,v)] becomes [(x,u),(y,v)]
-        return zip(*inspect.getmembers(module, self.predicate))[1]
+        return list(zip(*inspect.getmembers(module, self.predicate)))[1]
 
     def get_class(self, module):
         classes = self.search_module(module)
@@ -206,6 +233,9 @@ class ClassFinder:
 
         return classes[0]
 
+    def instanciate_class(self, module, *args, **kwargs):
+        return self.get_class(module)(*args, **kwargs)
+
 class i3pystatus:
     modules = []
 
@@ -217,14 +247,8 @@ class i3pystatus:
 
         self.finder = ClassFinder(baseclass=Module, exclude=[Module, IntervalModule, AsyncModule])
 
-    @classmethod
-    def _make_instance(cls, module, position, args, kwargs):
+    def get_instance_for_module(self, module, position, args, kwargs):
         if isinstance(module, types.ModuleType):
-            # Okay, we got a module, let's find the class
-            # and create an instance
-
-            cls = self.finder.get_class(module)
-
             if not isinstance(position, int) and not args:
                 # If the user does this: register(modsde, mdesettings) with mdesettings
                 # being a dict Python will put mdesettings into the position argument
@@ -233,7 +257,7 @@ class i3pystatus:
                 args = (position,)
                 position = 0
 
-            module = cls(*args, **kwargs)
+            module = self.finder.instanciate_class(module, *args, **kwargs)
         elif args or kwargs:
             raise ValueError("Additional arguments are invalid if 'module' is already an object")
 
@@ -242,7 +266,7 @@ class i3pystatus:
     def register(self, module, position=0, *args, **kwargs):
         """Register a new module."""
 
-        module, position = self._make_instance(module, position, args, kwargs)
+        module, position = self.get_instance_for_module(module, position, args, kwargs)
 
         self.modules.append(module)
         module.position = position
