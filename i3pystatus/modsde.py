@@ -17,12 +17,15 @@ class ModsDeChecker(IntervalModule):
     unread posts in any bookmark in the mods.de forums.
     """
 
-    settings = ("color", "offset", "format", "username", "password")
+    settings = (
+        ("format", """Use {unread} as the formatter for number of unread posts"""),
+        "color", "offset", "username", "password"
+    )
     required = ("username", "password")
 
     color = "#7181fe"
     offset = 0
-    format = "%d new posts in bookmarks"
+    format = "{unread} new posts in bookmarks"
 
     login_url = "http://login.mods.de/"
     bookmark_url = "http://forum.mods.de/bb/xml/bookmarks.php"
@@ -41,7 +44,7 @@ class ModsDeChecker(IntervalModule):
             self.output = None
         else:
             self.output = {
-                "full_text" : self.format % unread, 
+                "full_text" : self.format.format(unread=unread),
                 "name" : "modsde",
                 "urgent" : "true",
                 "color" : self.color
