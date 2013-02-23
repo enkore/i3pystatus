@@ -5,14 +5,20 @@ import json
 from threading import Thread
 import time
 from contextlib import contextmanager
+import types
+import inspect
 
 class ConfigurationError(Exception):
-    def __init__(self, module, key=None, missing=None):
+    def __init__(self, module, key=None, missing=None, ambigious_classes=None, invalid=False):
         message = "Module '{0}'".format(module)
         if key is not None:
             message += ": invalid option '{0}'".format(key)
         if missing is not None:
             message += ": missing required options: {0}".format(missing)
+        if ambigious_classes is not None:
+            message += ": ambigious module specification, found multiple classes: {0}".format(ambigious_classes)
+        if invalid:
+            message += ": no class found"
 
         super().__init__(message)
 
@@ -174,8 +180,37 @@ class i3pystatus:
         else:
             self.io = IOHandler(input_stream)
 
-    def register(self, module, position=0):
+    @staticmethod
+    def _check_class(obj):
+        return inspect.isclass(obj) and issubclass(obj, Module) and obj not in [Module, IntervalModule, AsyncModule]
+
+    def register(self, module, position=0, *args, **kwargs):
         """Register a new module."""
+
+        if isinstance(module, types.ModuleType):
+            # Okay, we got a module, let's find the class
+            # and create an instance
+
+            # Neat trick: [(x,y),(u,v)] becomes [(x,u),(y,v)]
+            names, classes = zip(*inspect.getmembers(module, self._check_class))
+
+            if len(classes) > 1:
+                # If there are multiple Module clases bundled in one module,
+                # well, we can't decide for the user.
+                raise ConfigurationError(module.__name__, ambigious_classes=classes)
+            elif not classes:
+                raise ConfigurationError(module.__name__, invalid=True)
+
+            if not isinstance(position, int) and not args:
+                # Small quirks:
+                # If the user does this: register(modsde, mdesettings) with mdesettings
+                # being a dict Python will put mdesettings into the position argument
+                # , and not into *args. Let's fix that.
+                # If she uses keyword arguments, everything is fine right from the beginning :-)
+                args = (position,)
+                position = 0
+
+            module = classes[0](*args, **kwargs)
 
         self.modules.append(module)
         module.position = position
@@ -185,5 +220,4 @@ class i3pystatus:
         for j in JSONIO(self.io).read():
             for module in self.modules:
                 j.insert(module.position, module.output)
-
 I3statusHandler = i3pystatus
