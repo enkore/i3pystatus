@@ -8,7 +8,17 @@ from .exceptions import *
 __all__ = [
     "SettingsBase",
     "ClassFinder",
+    "ModuleList",
 ]
+
+class ModuleList(collections.UserList):
+    def __init__(self, status_handler):
+        self.status_handler = status_handler
+        super().__init__()
+
+    def append(self, module):
+        module.registered(self.status_handler)
+        super().append(module)
 
 class KeyConstraintDict(collections.UserDict):
     class MissingKeys(Exception):

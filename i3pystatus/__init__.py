@@ -48,8 +48,6 @@ class IntervalModule(AsyncModule):
             time.sleep(self.interval)
 
 class i3pystatus:
-    modules = []
-
     def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
         if standalone:
             self.io = core.io.StandaloneIO(interval)
@@ -57,17 +55,13 @@ class i3pystatus:
             self.io = core.io.IOHandler(input_stream)
 
         self.finder = ClassFinder(Module)
+        self.modules = ModuleList(self)
 
     def register(self, module, *args, **kwargs):
         """Register a new module."""
 
-        if not module: # One can pass in False or None, if he wishes to temporarily disable a module
-            return
-
-        module = self.finder.instanciate_class_from_module(module, *args, **kwargs)
-
-        self.modules.append(module)
-        module.registered(self)
+        if module:
+            self.modules.append(self.finder.instanciate_class_from_module(module, *args, **kwargs))
 
     def run(self):
         for j in core.io.JSONIO(self.io).read():
