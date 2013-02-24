@@ -35,6 +35,18 @@ as you like.
 ## Modules
 
 
+### backlight
+
+
+Shows backlight brightness
+
+
+* format — format string used for output. {brightness}, {max_brightness}, {percentage} are available (default: {brightness}/{max_brightness})
+* backlight — backlight. See /sys/class/backlight/ (default: acpi_video0)
+* color —  (default: #FFFFFF)
+
+
+
 ### battery
 
 
@@ -43,6 +55,7 @@ battery status
 
 
 * battery_ident —  (default: BAT0)
+* format —  (default: {status} {remaining})
 
 
 
@@ -79,6 +92,7 @@ The `backends` setting determines the backends to use. Currently available are:
 * color_unread —  (default: #ff0000)
 * format —  (default: {unread} new email)
 * format_plural —  (default: {unread} new emails)
+* hide_if_null — Don't output anything if there are no new mails (default: True)
 
 
     Currently available backends are:

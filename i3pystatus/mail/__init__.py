@@ -23,7 +23,8 @@ class Mail(IntervalModule):
 
     settings = (
         ("backends", "List of backends (instances of i3pystatus.mail.xxx)"),
-        "color", "color_unread", "format", "format_plural"
+        "color", "color_unread", "format", "format_plural",
+        ("hide_if_null", "Don't output anything if there are no new mails"),
     )
     required = ("backends",)
 
@@ -31,6 +32,7 @@ class Mail(IntervalModule):
     color_unread  ="#ff0000"
     format = "{unread} new email"
     format_plural = "{unread} new emails"
+    hide_if_null = True
 
     def init(self):
         for backend in self.backends:
@@ -42,6 +44,9 @@ class Mail(IntervalModule):
         if not unread:
             color = self.color
             urgent = "false"
+            if self.hide_if_null:
+                self.output = None
+                return
         else:
             color = self.color_unread
             urgent = "true"
