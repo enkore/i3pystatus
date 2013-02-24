@@ -100,16 +100,14 @@ class SettingsBase:
 class ClassFinder:
     """Support class to find classes of specific bases in a module"""
 
-    def __init__(self, baseclass, exclude=[]):
+    def __init__(self, baseclass):
         self.baseclass = baseclass
-        self.exclude = exclude
 
     def predicate_factory(self, module):
         def predicate(obj):
             return (
                 inspect.isclass(obj) and
                 issubclass(obj, self.baseclass) and
-                obj not in self.exclude and
                 obj.__module__ == module.__name__
             )
         return predicate

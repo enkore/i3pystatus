@@ -115,7 +115,7 @@ def get_module(finder, modname):
 def get_all(module_path, heading, finder=None):
     mods = []
     if finder is None:
-        finder = i3pystatus.ModuleFinder()
+        finder = i3pystatus.ClassFinder(i3pystatus.Module)
 
     for name, module in get_modules(module_path):
         classes = finder.search_module(module)

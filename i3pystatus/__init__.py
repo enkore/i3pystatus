@@ -10,7 +10,7 @@ from .core.util import *
 
 __all__ = [
     "SettingsBase",
-    "ClassFinder", "ModuleFinder",
+    "ClassFinder",
     "Module", "AsyncModule", "IntervalModule",
     "i3pystatus", "I3statusHandler",
 ]
@@ -56,7 +56,7 @@ class i3pystatus:
         else:
             self.io = core.io.IOHandler(input_stream)
 
-        self.finder = ModuleFinder()
+        self.finder = ClassFinder(Module)
 
     def register(self, module, *args, **kwargs):
         """Register a new module."""
@@ -74,5 +74,3 @@ class i3pystatus:
             for module in self.modules:
                 module.inject(j)
 I3statusHandler = i3pystatus
-
-ModuleFinder = functools.partial(ClassFinder, baseclass=Module, exclude=[Module, IntervalModule, AsyncModule])
