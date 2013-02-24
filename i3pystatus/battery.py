@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from i3pystatus import IntervalModule
+from .core.util import PrefixedKeyDict
 
 class Battery:
     """
@@ -36,6 +37,21 @@ class Battery:
 
         setattr(self, self.lchop(key), self.convert(value))
 
+class RemainingCalculator:
+    def __init__(self, energy, power):
+        self.remaining_time = (energy / power) * 60
+        self.hours, self.minutes = map(int, divmod(self.remaining_time, 60))
+
+    def get_dict(self, prefix):
+        d = PrefixedKeyDict(prefix)
+        d.update({
+            "str": "{}:{:02}".format(self.hours, self.minutes),
+            "hm": "{}h:{:02}m".format(self.hours, self.minutes),
+            "hours": self.hours,
+            "mins": self.minutes,
+        })
+        return d
+
 class BatteryChecker(IntervalModule):
     """ 
     This class uses the /proc/acpi/battery interface to check for the
@@ -54,7 +70,7 @@ class BatteryChecker(IntervalModule):
         color = "#ffffff"
 
         battery = Battery(self.base_path)
-        fdict = dict.fromkeys(("remaining", "remaining_hm"), "")
+        fdict = dict.fromkeys(("remaining_str", "remaining_hm"), "")
 
         status = battery.STATUS
         energy_now = battery.ENERGY_NOW
@@ -65,23 +81,23 @@ class BatteryChecker(IntervalModule):
         fdict["percentage_design"] = (energy_now / battery.ENERGY_FULL_DESIGN) * 100
         fdict["consumption"] = power_now / 1000000
 
+        if not power_now:
+            return
+
         if status == "Full":
             fdict["status"] = "FULL"
-        elif status == "Discharging":
-            fdict["status"] = "DIS"
-            remaining_time = (energy_now / power_now) * 60
-            hours, minutes = map(int, divmod(remaining_time, 60))
+        else:
+            if status == "Discharging":
+                fdict["status"] = "DIS"
+                remaining = RemainingCalculator(energy_now, power_now)
 
-            fdict["remaining"] = "{}:{:02}".format(hours, minutes)
-            fdict["remaining_hm"] = "{}h {:02}m".format(hours, minutes)
-            fdict["remaining_hours"] = hours
-            fdict["remaining_mins"] = minutes
-
-            if remaining_time < 15:
-                urgent = True
-                color = "#ff0000"
-        else: # Charging, Unknown etc. (My thinkpad says Unknown if close to fully charged)
-            fdict["status"] = "CHR"
+                if remaining.remaining_time < 15:
+                    urgent = True
+                    color = "#ff0000"
+            else: # Charging, Unknown etc. (My thinkpad says Unknown if close to fully charged)
+                fdict["status"] = "CHR"
+                remaining = RemainingCalculator(energy_full-energy_now, power_now)
+            fdict.update(remaining.get_dict("remaining_"))
 
         self.output = {
             "full_text": self.format.format(**fdict).strip(),

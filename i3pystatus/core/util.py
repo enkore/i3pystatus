@@ -9,6 +9,7 @@ __all__ = [
     "SettingsBase",
     "ClassFinder",
     "ModuleList",
+    "KeyConstraintDict", "PrefixedKeyDict",
 ]
 
 class ModuleList(collections.UserList):
@@ -21,6 +22,15 @@ class ModuleList(collections.UserList):
         module = self.finder.instanciate_class_from_module(module, *args, **kwargs)
         module.registered(self.status_handler)
         super().append(module)
+
+class PrefixedKeyDict(collections.UserDict):
+    def __init__(self, prefix):
+        super().__init__()
+
+        self.prefix = prefix
+
+    def __setitem__(self, key, value):
+        super().__setitem__(self.prefix + key, value)
 
 class KeyConstraintDict(collections.UserDict):
     class MissingKeys(Exception):
@@ -41,14 +51,14 @@ class KeyConstraintDict(collections.UserDict):
         else:
             raise KeyError(key)
 
-    def missing(self):
-        return self.required_keys - (self.seen_keys & self.required_keys)
-
     def __iter__(self):
         if self.missing():
             raise self.MissingKeys(self.missing())
 
         return self.data.__iter__()
+
+    def missing(self):
+        return self.required_keys - (self.seen_keys & self.required_keys)
 
 class SettingsBase:
     """
@@ -125,7 +135,6 @@ class ClassFinder:
         return predicate
 
     def search_module(self, module):
-        # Neat trick: [(x,y),(u,v)] becomes [(x,u),(y,v)]
         return list(zip(*inspect.getmembers(module, self.predicate_factory(module))))[1]
 
     def get_class(self, module):

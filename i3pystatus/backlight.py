@@ -1,7 +1,5 @@
 from i3pystatus.file import File
 
-__imported__ = [File]
-
 class Backlight(File):
     """
     Screen backlight info
@@ -22,7 +20,7 @@ class Backlight(File):
     backlight="acpi_video0"
     format="{brightness}/{max_brightness}"
 
-    interval=1
+    interval=5
     base_path = "/sys/class/backlight/{backlight}/"
     components={
         "brightness": (int, "brightness"),
