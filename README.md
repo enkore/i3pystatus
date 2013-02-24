@@ -3,7 +3,7 @@
 i3pystatus is a (hopefully growing) collection of python scripts for 
 status output compatible to i3status / i3bar of the i3 window manager.
 
-** the ver3 branch is undergoing heavy dev as of Feb 24 **
+*the ver3 branch is undergoing heavy development at the time*
 
 ## Installation
 
@@ -37,18 +37,6 @@ as you like.
 ## Modules
 
 
-### backlight
-
-
-Shows backlight brightness
-
-
-* format — format string used for output. {brightness}, {max_brightness}, {percentage} are available (default: {brightness}/{max_brightness})
-* backlight — backlight. See /sys/class/backlight/ (default: acpi_video0)
-* color —  (default: #FFFFFF)
-
-
-
 ### battery
 
 
@@ -56,8 +44,8 @@ This class uses the /proc/acpi/battery interface to check for the
 battery status
 
 
-* battery_ident —  (default: BAT0)
-* format —  (default: {status} {remaining})
+* `battery_ident` —  (default: `BAT0`)
+* `format` —  (default: `{status} {remaining}`)
 
 
 
@@ -67,7 +55,35 @@ battery status
 This class shows a clock
 
 
-* format — stftime format string
+* `format` — stftime format string
+
+
+
+### file
+
+
+Rip information from text files
+
+components is a dict of pairs of the form:
+
+    name => (callable, file)
+
+* Where `name` is a valid identifier, which is used in the format string to access
+the value of that component.
+* `callable` is some callable to convert the contents of `file`. A common choice is
+float or int.
+* `file` names a file, relative to `base_path`.
+
+transform is a optional dict of callables taking a single argument, a dictionary containing the values
+of all components. The return value is bound to `name`
+
+
+* `format` — format string
+* `components` — List of tripels
+* `transforms` — List of pairs
+* `base_path` —  (default: `/`)
+* `color` —  (default: `#FFFFFF`)
+* `interval` —  (default: `5`)
 
 
 
@@ -77,7 +93,7 @@ This class shows a clock
 Shows system load
 
 
-* format — format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: {avg1} {avg5})
+* `format` — format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: `{avg1} {avg5}`)
 
 
 
@@ -89,63 +105,63 @@ Generic mail checker
 The `backends` setting determines the backends to use. Currently available are:
 
 
-* backends — List of backends (instances of i3pystatus.mail.xxx)
-* color —  (default: #ffffff)
-* color_unread —  (default: #ff0000)
-* format —  (default: {unread} new email)
-* format_plural —  (default: {unread} new emails)
-* hide_if_null — Don't output anything if there are no new mails (default: True)
+* `backends` — List of backends (instances of i3pystatus.mail.xxx)
+* `color` —  (default: `#ffffff`)
+* `color_unread` —  (default: `#ff0000`)
+* `format` —  (default: `{unread} new email`)
+* `format_plural` —  (default: `{unread} new emails`)
+* `hide_if_null` — Don't output anything if there are no new mails (default: `True`)
 
 
     Currently available backends are:
 
 
-#### imap
-
-
-This class handles IMAP mailservers. The mail server
-functionality is implemented in the subclass IMAP.MailServer
-
-The servers parameter should be a list of dicts containing the following
-items:
-* host
-* port (optional, defaults to 143)
-* username
-* password
-* ssl (optional, defaults to False)
-
-
-* servers —  (required)
-
-
-
-#### notmuchmail
-
-
-This class uses the notmuch python bindings to check for the
-number of messages in the notmuch database with the tags "inbox"
-and "unread"
-
-
-* db_path —  (required)
-
-
-
-#### thunderbird
-
-
-This class listens for dbus signals emitted by
-the dbus-sender extension for thunderbird.
-
-Requires
-* python-dbus
-* python-gobject2
-
-
-
-
-
-
+> ### imap
+> 
+> 
+> This class handles IMAP mailservers. The mail server
+> functionality is implemented in the subclass IMAP.MailServer
+> 
+> The servers parameter should be a list of dicts containing the following
+> items:
+> * host
+> * port (optional, defaults to 143)
+> * username
+> * password
+> * ssl (optional, defaults to False)
+> 
+> 
+> * `servers` —  (required)
+> 
+> 
+> 
+> ### notmuchmail
+> 
+> 
+> This class uses the notmuch python bindings to check for the
+> number of messages in the notmuch database with the tags "inbox"
+> and "unread"
+> 
+> 
+> * `db_path` —  (required)
+> 
+> 
+> 
+> ### thunderbird
+> 
+> 
+> This class listens for dbus signals emitted by
+> the dbus-sender extension for thunderbird.
+> 
+> Requires
+> * python-dbus
+> * python-gobject2
+> 
+> 
+> 
+> 
+> 
+> 
 
 ### modsde
 
@@ -154,11 +170,11 @@ This class returns i3status parsable output of the number of
 unread posts in any bookmark in the mods.de forums.
 
 
-* format — Use {unread} as the formatter for number of unread posts (default: {unread} new posts in bookmarks)
-* offset — subtract number of posts before output
-* color —  (default: #7181fe)
-* username —  (required)
-* password —  (required)
+* `format` — Use {unread} as the formatter for number of unread posts (default: `{unread} new posts in bookmarks`)
+* `offset` — subtract number of posts before output
+* `color` —  (default: `#7181fe`)
+* `username` —  (required)
+* `password` —  (required)
 
 
 
@@ -168,10 +184,10 @@ unread posts in any bookmark in the mods.de forums.
 Simple regex file watcher
 
 
-* format — format string used for output (default: {0})
-* regex —  (required)
-* file — file to search for regex matches
-* flags — Python.re flags
+* `format` — format string used for output (default: `{0}`)
+* `regex` —  (required)
+* `file` — file to search for regex matches
+* `flags` — Python.re flags
 
 
 
@@ -181,10 +197,10 @@ Simple regex file watcher
 Shows CPU temperature
 
 
-* format — format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps. (default: {temp} °C)
-* color —  (default: #FFFFFF)
-* color_critical —  (default: #FF0000)
-* high_factor —  (default: 0.7)
+* `format` — format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps. (default: `{temp} °C`)
+* `color` —  (default: `#FFFFFF`)
+* `color_critical` —  (default: `#FF0000`)
+* `high_factor` —  (default: `0.7`)
 
 
 

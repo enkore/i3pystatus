@@ -85,9 +85,9 @@ class Setting:
         if self.required:
             attrs.append("required")
         if self.default:
-            attrs.append("default: {default}".format(default=self.default))
+            attrs.append("default: `{default}`".format(default=self.default))
 
-        formatted = "* {name} ".format(name=self.name)
+        formatted = "* `{name}` ".format(name=self.name)
         if self.doc or attrs:
             formatted += "— "
             if self.doc:
@@ -133,6 +133,6 @@ with open("template.md", "r") as template:
     tpl = template.read()
     tpl = tpl.replace("!!module_doc!!", generate_doc_for_module(i3pystatus.__path__))
     finder = i3pystatus.ClassFinder(baseclass=i3pystatus.mail.Backend, exclude=[i3pystatus.mail.Backend])
-    tpl = tpl.replace("!!i3pystatus.mail!!", generate_doc_for_module(i3pystatus.mail.__path__, "####", finder))
+    tpl = tpl.replace("!!i3pystatus.mail!!", generate_doc_for_module(i3pystatus.mail.__path__, "###", finder).replace("\n", "\n> "))
 
     print(tpl)
