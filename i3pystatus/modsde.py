@@ -4,7 +4,7 @@ import sys
 import json
 import time
 import threading
-import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
+import urllib.request, urllib.parse, urllib.error
 import re
 import http.cookiejar
 import xml.etree.ElementTree as ET
@@ -70,7 +70,10 @@ class ModsDeChecker(IntervalModule):
             "login_lifetime": "31536000"
         })
 
-        response = self.opener.open(self.login_url, data.encode("ascii"))
+        try:
+            response = self.opener.open(self.login_url, data.encode("ascii"))
+        except Exception:
+            return
         m = re.search("http://forum.mods.de/SSO.php[^']*", response.read().decode("ISO-8859-15"))
         self.cj.clear()
 
