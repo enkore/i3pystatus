@@ -68,7 +68,7 @@ class Setting:
     name = ""
     doc = ""
     required = False
-    default = None
+    default = sentinel = object()
 
     def __init__(self, mod, setting):
         if isinstance(setting, tuple):
@@ -86,7 +86,7 @@ class Setting:
         attrs = []
         if self.required:
             attrs.append("required")
-        if self.default:
+        if self.default is not self.sentinel:
             attrs.append("default: `{default}`".format(default=self.default))
 
         formatted = "* `{name}` ".format(name=self.name)

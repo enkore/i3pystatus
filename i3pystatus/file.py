@@ -29,7 +29,7 @@ class File(IntervalModule):
     )
     required = ("format", "components")
     base_path = "/"
-    transforms = tuple()
+    transforms = {}
     color = "#FFFFFF"
 
     def run(self):

@@ -75,7 +75,7 @@ battery status
 This class shows a clock
 
 
-* `format` — stftime format string
+* `format` — stftime format string (default: `None`)
 
 
 
@@ -100,7 +100,7 @@ of all components). The return value is bound to the key.
 
 * `format` —  (required)
 * `components` —  (required)
-* `transforms` 
+* `transforms` —  (default: `{}`)
 * `base_path` —  (default: `/`)
 * `color` —  (default: `#FFFFFF`)
 * `interval` —  (default: `5`)
@@ -139,19 +139,14 @@ The `backends` setting determines the backends to use. Currently available are:
 > ### imap
 > 
 > 
-> This class handles IMAP mailservers. The mail server
-> functionality is implemented in the subclass IMAP.MailServer
-> 
-> The servers parameter should be a list of dicts containing the following
-> items:
-> * host
-> * port (optional, defaults to 143)
-> * username
-> * password
-> * ssl (optional, defaults to False)
+> Checks for mail on a IMAP server
 > 
 > 
-> * `servers` —  (required)
+> * `host` —  (required)
+> * `port` —  (default: `143`)
+> * `username` —  (required)
+> * `password` —  (required)
+> * `ssl` —  (default: `False`)
 > 
 > 
 > 
@@ -191,7 +186,7 @@ unread posts in any bookmark in the mods.de forums.
 
 
 * `format` — Use {unread} as the formatter for number of unread posts (default: `{unread} new posts in bookmarks`)
-* `offset` — subtract number of posts before output
+* `offset` — subtract number of posts before output (default: `0`)
 * `color` —  (default: `#7181fe`)
 * `username` —  (required)
 * `password` —  (required)
@@ -207,7 +202,7 @@ Simple regex file watcher
 * `format` — format string used for output (default: `{0}`)
 * `regex` —  (required)
 * `file` — file to search for regex matches
-* `flags` — Python.re flags
+* `flags` — Python.re flags (default: `0`)
 
 
 
