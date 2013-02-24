@@ -54,7 +54,7 @@ class BatteryChecker(IntervalModule):
         color = "#ffffff"
 
         battery = Battery(self.base_path)
-        fdict = dict.fromkeys(("remaining", "remaining_hms"), "")
+        fdict = dict.fromkeys(("remaining", "remaining_hm"), "")
 
         status = battery.STATUS
         energy_now = battery.ENERGY_NOW
