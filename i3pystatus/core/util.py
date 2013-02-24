@@ -12,11 +12,13 @@ __all__ = [
 ]
 
 class ModuleList(collections.UserList):
-    def __init__(self, status_handler):
+    def __init__(self, status_handler, module_base):
         self.status_handler = status_handler
+        self.finder = ClassFinder(module_base)
         super().__init__()
 
-    def append(self, module):
+    def append(self, module, *args, **kwargs):
+        module = self.finder.instanciate_class_from_module(module, *args, **kwargs)
         module.registered(self.status_handler)
         super().append(module)
 

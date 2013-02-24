@@ -9,6 +9,8 @@ import textwrap
 import i3pystatus
 import i3pystatus.mail
 
+from .core.util import ClassFinder
+
 IGNORE = ("__main__", "mkdocs")
 MODULE_FORMAT = """
 {heading} {name}
@@ -132,7 +134,7 @@ with open("template.md", "r") as template:
 
     tpl = template.read()
     tpl = tpl.replace("!!module_doc!!", generate_doc_for_module(i3pystatus.__path__))
-    finder = i3pystatus.ClassFinder(baseclass=i3pystatus.mail.Backend, exclude=[i3pystatus.mail.Backend])
+    finder = i3pystatus.ClassFinder(baseclass=i3pystatus.mail.Backend)
     tpl = tpl.replace("!!i3pystatus.mail!!", generate_doc_for_module(i3pystatus.mail.__path__, "###", finder).replace("\n", "\n> "))
 
     print(tpl)
