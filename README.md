@@ -36,6 +36,9 @@ as you like.
 
 ## Modules
 
+Many modules let you modify the output via a
+[format string](http://docs.python.org/3/library/string.html#formatstrings).
+
 
 ### backlight
 
@@ -57,7 +60,7 @@ Available formatters:
 ### battery
 
 
-This class uses the /proc/acpi/battery interface to check for the
+This class uses the /sys/class/power_supply/…/uevent interface to check for the
 battery status
 
 
@@ -95,9 +98,9 @@ transforms is a optional dict of callables taking a single argument (a dictionar
 of all components). The return value is bound to the key.
 
 
-* `format` — format string
-* `components` — List of tripels
-* `transforms` — List of pairs
+* `format` —  (required)
+* `components` —  (required)
+* `transforms` 
 * `base_path` —  (default: `/`)
 * `color` —  (default: `#FFFFFF`)
 * `interval` —  (default: `5`)

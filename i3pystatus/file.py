@@ -21,10 +21,10 @@ class File(IntervalModule):
     """
 
     settings = (
-        ("format", "format string"),
-        ("components", "List of tripels"),
-        ("transforms", "List of pairs"),
-        ("base_path", ""),
+        "format",
+        "components",
+        "transforms",
+        "base_path",
         "color", "interval",
     )
     required = ("format", "components")

@@ -36,6 +36,9 @@ as you like.
 
 ## Modules
 
+Many modules let you modify the output via a
+[format string](http://docs.python.org/3/library/string.html#formatstrings).
+
 !!module_doc!!
 
 ## Contribute

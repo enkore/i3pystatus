@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from i3pystatus import IntervalModule
+from . import IntervalModule
 from .core.util import PrefixedKeyDict
 
 class Battery:
@@ -54,7 +54,7 @@ class RemainingCalculator:
 
 class BatteryChecker(IntervalModule):
     """ 
-    This class uses the /proc/acpi/battery interface to check for the
+    This class uses the /sys/class/power_supply/…/uevent interface to check for the
     battery status
     """
     

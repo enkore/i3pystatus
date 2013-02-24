@@ -130,7 +130,7 @@ def get_all(module_path, heading, finder=None):
 def generate_doc_for_module(module_path, heading="###", finder=None):
     return "".join(map(str, get_all(module_path, heading, finder)))
 
-with open("template.md", "r") as template:
+with open("README.tpl.md", "r") as template:
 
     tpl = template.read()
     tpl = tpl.replace("!!module_doc!!", generate_doc_for_module(i3pystatus.__path__))
