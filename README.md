@@ -3,6 +3,8 @@
 i3pystatus is a (hopefully growing) collection of python scripts for 
 status output compatible to i3status / i3bar of the i3 window manager.
 
+** the ver3 branch is undergoing heavy dev as of Feb 24 **
+
 ## Installation
 
 To install it, follow these steps:
