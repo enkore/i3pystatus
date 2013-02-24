@@ -37,6 +37,23 @@ as you like.
 ## Modules
 
 
+### backlight
+
+
+Screen backlight info
+
+Available formatters:
+* brightness
+* max_brightness
+* percentage
+
+
+* `format` — format string (default: `{brightness}/{max_brightness}`)
+* `backlight` — backlight, see `/sys/class/backlight/` (default: `acpi_video0`)
+* `color` —  (default: `#FFFFFF`)
+
+
+
 ### battery
 
 
@@ -59,24 +76,7 @@ This class shows a clock
 
 
 
-### file.Backlight
-
-
-Screen backlight info
-
-Available formatters:
-* brightness
-* max_brightness
-* percentage
-
-
-* `format` — format string (default: `{brightness}/{max_brightness}`)
-* `backlight` — backlight, see `/sys/class/backlight/` (default: `acpi_video0`)
-* `color` —  (default: `#FFFFFF`)
-
-
-
-### file.File
+### file
 
 
 Rip information from text files
@@ -91,8 +91,8 @@ the value of that component.
 float or int.
 * `file` names a file, relative to `base_path`.
 
-transform is a optional dict of callables taking a single argument, a dictionary containing the values
-of all components. The return value is bound to `name`
+transforms is a optional dict of callables taking a single argument (a dictionary containing the values
+of all components). The return value is bound to the key.
 
 
 * `format` — format string

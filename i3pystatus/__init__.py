@@ -168,12 +168,19 @@ class ClassFinder:
         self.baseclass = baseclass
         self.exclude = exclude
 
-    def predicate(self, obj):
-        return inspect.isclass(obj) and issubclass(obj, self.baseclass) and obj not in self.exclude
+    def predicate_factory(self, module):
+        def predicate(obj):
+            return (
+                inspect.isclass(obj) and
+                issubclass(obj, self.baseclass) and
+                obj not in self.exclude and
+                obj.__module__ == module.__name__
+            )
+        return predicate
 
     def search_module(self, module):
         # Neat trick: [(x,y),(u,v)] becomes [(x,u),(y,v)]
-        return list(zip(*inspect.getmembers(module, self.predicate)))[1]
+        return list(zip(*inspect.getmembers(module, self.predicate_factory(module))))[1]
 
     def get_class(self, module):
         classes = self.search_module(module)
