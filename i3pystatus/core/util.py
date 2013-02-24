@@ -131,4 +131,8 @@ class ClassFinder:
         return classes[0]
 
     def instanciate_class_from_module(self, module, *args, **kwargs):
-        return self.get_class(module)(*args, **kwargs)
+        if isinstance(module, types.ModuleType):
+            return self.get_class(module)(*args, **kwargs)
+        elif args or kwargs:
+            raise ValueError("Additional arguments are invalid if 'module' is already an object")
+        return module

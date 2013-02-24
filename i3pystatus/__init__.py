@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
 import sys
-import types
 from threading import Thread
 import time
 import functools
-import collections
 
 from .core import io
 from .core.util import *
@@ -19,7 +17,6 @@ __all__ = [
 
 class Module(SettingsBase):
     output = None
-    position = 0
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
@@ -28,7 +25,7 @@ class Module(SettingsBase):
         if self.output:
             if "name" not in self.output:
                 self.output["name"] = self.__name__
-            json.insert(self.position, self.output)
+            json.insert(0, self.output)
 
 class AsyncModule(Module):
     def registered(self, status_handler):
@@ -61,32 +58,15 @@ class i3pystatus:
 
         self.finder = ModuleFinder()
 
-    def get_instance_for_module(self, module, position, args, kwargs):
-        if isinstance(module, types.ModuleType):
-            if not isinstance(position, int) and not args:
-                # If the user does this: register(modsde, mdesettings) with mdesettings
-                # being a dict Python will put mdesettings into the position argument
-                # , and not into *args. Let's fix that.
-                # If she uses keyword arguments, everything is fine :-)
-                args = (position,)
-                position = 0
-
-            module = self.finder.instanciate_class_from_module(module, *args, **kwargs)
-        elif args or kwargs:
-            raise ValueError("Additional arguments are invalid if 'module' is already an object")
-
-        return (module, position)
-
-    def register(self, module, position=0, *args, **kwargs):
+    def register(self, module, *args, **kwargs):
         """Register a new module."""
 
         if not module: # One can pass in False or None, if he wishes to temporarily disable a module
             return
 
-        module, position = self.get_instance_for_module(module, position, args, kwargs)
+        module = self.finder.instanciate_class_from_module(module, *args, **kwargs)
 
         self.modules.append(module)
-        module.position = position
         module.registered(self)
 
     def run(self):
