@@ -47,9 +47,9 @@ class File(IntervalModule):
             "color": self.color
         }
 
-def backlight(backlight="acpi_video0", format="{brightness}/{max_brightness}"):
+class Backlight(File):
     """
-    Backlight info template
+    Screen backlight info
 
     Available formatters:
     * brightness
@@ -57,15 +57,27 @@ def backlight(backlight="acpi_video0", format="{brightness}/{max_brightness}"):
     * percentage
     """
 
-    return File(
-        base_path="/sys/class/backlight/{backlight}/".format(backlight=backlight),
-        components={
-            "brightness": (int, "brightness"),
-            "max_brightness": (int, "max_brightness"),
-        },
-        transforms={
-            "percentage": lambda cdict: (cdict["brightness"] / cdict["max_brightness"]) * 100,
-        },
-        format="{brightness}/{max_brightness}",
-        interval=1
+    settings = (
+        ("format", "format string"),
+        ("backlight", "backlight, see `/sys/class/backlight/`"),
+        "color",
     )
+    required = ()
+
+    backlight="acpi_video0"
+    format="{brightness}/{max_brightness}"
+
+    interval=1
+    base_path = "/sys/class/backlight/{backlight}/"
+    components={
+        "brightness": (int, "brightness"),
+        "max_brightness": (int, "max_brightness"),
+    }
+    transforms={
+        "percentage": lambda cdict: (cdict["brightness"] / cdict["max_brightness"]) * 100,
+    }
+
+    def init(self):
+        self.base_path = self.base_path.format(backlight=self.backlight)
+
+        super().init()

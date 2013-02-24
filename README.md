@@ -59,7 +59,24 @@ This class shows a clock
 
 
 
-### file
+### file.Backlight
+
+
+Screen backlight info
+
+Available formatters:
+* brightness
+* max_brightness
+* percentage
+
+
+* `format` — format string (default: `{brightness}/{max_brightness}`)
+* `backlight` — backlight, see `/sys/class/backlight/` (default: `acpi_video0`)
+* `color` —  (default: `#FFFFFF`)
+
+
+
+### file.File
 
 
 Rip information from text files
