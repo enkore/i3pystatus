@@ -19,12 +19,13 @@ class File(IntervalModule):
     transform is a optional dict of callables taking a single argument, a dictionary containing the values
     of all components. The return value is bound to `name`
     """
+
     settings = (
         ("format", "format string"),
         ("components", "List of tripels"),
         ("transforms", "List of pairs"),
         ("base_path", ""),
-        "color"
+        "color", "interval",
     )
     required = ("format", "components")
     base_path = "/"
@@ -45,3 +46,26 @@ class File(IntervalModule):
             "full_text": self.format.format(**cdict),
             "color": self.color
         }
+
+def backlight(backlight="acpi_video0", format="{brightness}/{max_brightness}"):
+    """
+    Backlight info template
+
+    Available formatters:
+    * brightness
+    * max_brightness
+    * percentage
+    """
+
+    return File(
+        base_path="/sys/class/backlight/{backlight}/".format(backlight=backlight),
+        components={
+            "brightness": (int, "brightness"),
+            "max_brightness": (int, "max_brightness"),
+        },
+        transforms={
+            "percentage": lambda cdict: (cdict["brightness"] / cdict["max_brightness"]) * 100,
+        },
+        format="{brightness}/{max_brightness}",
+        interval=1
+    )
