@@ -42,8 +42,9 @@ class BatteryChecker(IntervalModule):
     battery status
     """
     
-    settings = ("battery_ident",)
+    settings = ("battery_ident", "format")
     battery_ident = "BAT0"
+    format = "{status} {remaining}"
 
     def init(self):
         self.base_path = "/sys/class/power_supply/{0}/uevent".format(self.battery_ident)
@@ -53,29 +54,39 @@ class BatteryChecker(IntervalModule):
         color = "#ffffff"
 
         battery = Battery(self.base_path)
+        fdict = dict.fromkeys(("remaining", "remaining_hms"), "")
 
         status = battery.STATUS
         energy_now = battery.ENERGY_NOW
+        energy_full = battery.ENERGY_FULL
+        power_now = battery.POWER_NOW
+
+        fdict["percentage"] = (energy_now / energy_full) * 100
+        fdict["percentage_design"] = (energy_now / battery.ENERGY_FULL_DESIGN) * 100
+        fdict["consumption"] = power_now / 1000000
 
         if status == "Full":
-            full_text = "fully charged"
+            fdict["status"] = "FULL"
         elif status == "Discharging":
-            power_now = battery.POWER_NOW
-            remaining_time_secs = (energy_now / power_now) * 3600
-            hours, remainder = divmod(remaining_time_secs, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            full_text = "%ih %im %is remaining" % (hours, minutes, seconds)
-            if remaining_time_secs < (15*60):
+            fdict["status"] = "DIS"
+            remaining_time = (energy_now / power_now) * 60
+            hours, minutes = map(int, divmod(remaining_time, 60))
+
+            fdict["remaining"] = "{}:{:02}".format(hours, minutes)
+            fdict["remaining_hm"] = "{}h {:02}m".format(hours, minutes)
+            fdict["remaining_hours"] = hours
+            fdict["remaining_mins"] = minutes
+
+            if remaining_time < 15:
                 urgent = True
                 color = "#ff0000"
         else: # Charging, Unknown etc. (My thinkpad says Unknown if close to fully charged)
-            energy_full = battery.ENERGY_FULL
-            percentage = (energy_now / energy_full) * 100
-            full_text = "%.2f%% charged" % percentage
+            fdict["status"] = "CHR"
 
         self.output = {
-            "full_text": full_text,
+            "full_text": self.format.format(**fdict).strip(),
             "instance": self.battery_ident,
             "urgent": urgent,
             "color": color
         }
+
