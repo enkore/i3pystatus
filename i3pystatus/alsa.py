@@ -29,14 +29,21 @@ class ALSA(IntervalModule):
     card = 0
     channel = 0
 
+    alsamixer = None
+
     def init(self):
-        self.alsamixer = Mixer(control=self.mixer, id=self.mixer_id, cardindex=self.card)
+        self.create_mixer()
         self.fdict = {
             "card": self.alsamixer.cardname(),
             "mixer": self.mixer,
         }
 
+    def create_mixer(self):
+        self.alsamixer = Mixer(control=self.mixer, id=self.mixer_id, cardindex=self.card)
+
     def run(self):
+        self.create_mixer()
+
         muted = self.alsamixer.getmute()[self.channel] == 1
         self.fdict["volume"] = self.alsamixer.getvolume()[self.channel]
         self.fdict["muted"] = self.muted if muted else self.muted
