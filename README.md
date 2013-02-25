@@ -40,6 +40,26 @@ Many modules let you modify the output via a
 [format string](http://docs.python.org/3/library/string.html#formatstrings).
 
 
+### alsa
+
+
+Shows volume of ALSA mixer. You can also use this for inputs, btw.
+
+Requires pyalsaaudio
+
+
+* `format` — {volume} is the current volume, {muted} is one of `muted` or `unmuted`. {card} is the sound card used; {mixer} the mixer. (default: `♪: {volume}`)
+* `mixer` — ALSA mixer (default: `Master`)
+* `mixer_id` — ALSA mixer id (default: `0`)
+* `card` — ALSA sound card (default: `0`)
+* `muted` —  (default: `M`)
+* `unmuted` —  (default: ``)
+* `color_muted` —  (default: `#AAAAAA`)
+* `color` —  (default: `#FFFFFF`)
+* `channel` —  (default: `0`)
+
+
+
 ### backlight
 
 

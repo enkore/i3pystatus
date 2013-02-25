@@ -20,7 +20,6 @@ class Backlight(File):
     backlight="acpi_video0"
     format="{brightness}/{max_brightness}"
 
-    interval=5
     base_path = "/sys/class/backlight/{backlight}/"
     components={
         "brightness": (int, "brightness"),
