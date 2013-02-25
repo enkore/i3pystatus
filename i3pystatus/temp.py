@@ -5,7 +5,9 @@ from i3pystatus import IntervalModule
 
 class Temperature(IntervalModule):
     """
-    Shows CPU temperature
+    Shows CPU temperature of Intel processors
+
+    AMD is currently not supported as they can only report a relative temperature, which is pretty useless
     """
 
     settings = (

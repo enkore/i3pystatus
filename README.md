@@ -226,10 +226,31 @@ Simple regex file watcher
 
 
 
+### runwatch
+
+
+Expands the given path using glob to a pidfile and checks if the process ID found inside is valid
+(that is, if the process is running).
+You can use this to check if a specific application, such as a VPN client or your DHCP client is running.
+
+Available formatters are {pid} and {name}.
+
+
+* `format_up` —  (default: `{name}`)
+* `format_down` —  (default: `{name}`)
+* `color_up` —  (default: `#00FF00`)
+* `color_down` —  (default: `#FF0000`)
+* `path` —  (required)
+* `name` —  (required)
+
+
+
 ### temp
 
 
-Shows CPU temperature
+Shows CPU temperature of Intel processors
+
+AMD is currently not supported as they can only report a relative temperature, which is pretty useless
 
 
 * `format` — format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps. (default: `{temp} °C`)
