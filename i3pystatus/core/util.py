@@ -149,9 +149,14 @@ class ClassFinder:
 
         return classes[0]
 
+    def get_module(self, module):
+        return getattr(__import__("i3pystatus.{module}".format(module=module), globals(), {}, []), module)
+
     def instanciate_class_from_module(self, module, *args, **kwargs):
         if isinstance(module, types.ModuleType):
             return self.get_class(module)(*args, **kwargs)
+        elif isinstance(module, str):
+            return self.instanciate_class_from_module(self.get_module(module), *args, **kwargs)
         elif args or kwargs:
             raise ValueError("Additional arguments are invalid if 'module' is already an object")
         return module
