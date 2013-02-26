@@ -12,6 +12,10 @@ __all__ = [
     "KeyConstraintDict", "PrefixedKeyDict",
 ]
 
+def round_dict(dic, places):
+    for key, value in dic.items():
+        dic[key] = round(value, places)
+
 class ModuleList(collections.UserList):
     def __init__(self, status_handler, module_base):
         self.status_handler = status_handler
