@@ -1,5 +1,5 @@
 
-from i3pystatus import SettingsBase, IntervalModule
+from i3pystatus import SettingsBase, IndependentIntervalModule
 
 class Backend(SettingsBase):
     """Handles the details of checking for mail"""
@@ -9,7 +9,7 @@ class Backend(SettingsBase):
 
     You'll probably implement that as a property"""
 
-class Mail(IntervalModule):
+class Mail(IndependentIntervalModule):
     """
     Generic mail checker
 

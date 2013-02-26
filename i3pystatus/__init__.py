@@ -8,7 +8,7 @@ from .core.modules import *
 
 __all__ = [
     "SettingsBase",
-    "Module", "AsyncModule", "IntervalModule",
+    "Module", "AsyncModule", "IntervalModule", "IndependentIntervalModule"
     "Status", "I3statusHandler",
 ]
 

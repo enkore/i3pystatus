@@ -9,9 +9,9 @@ import re
 import http.cookiejar
 import xml.etree.ElementTree as ET
 
-from i3pystatus import IntervalModule
+from i3pystatus import IndependentIntervalModule
 
-class ModsDeChecker(IntervalModule):
+class ModsDeChecker(IndependentIntervalModule):
     """ 
     This class returns i3status parsable output of the number of
     unread posts in any bookmark in the mods.de forums.
@@ -23,6 +23,8 @@ class ModsDeChecker(IntervalModule):
         "color", "username", "password"
     )
     required = ("username", "password")
+
+    schedule = "alone"
 
     color = "#7181fe"
     offset = 0

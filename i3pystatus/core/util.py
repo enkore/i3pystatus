@@ -2,6 +2,8 @@
 import inspect
 import types
 import collections
+from threading import Thread
+import time
 
 from .exceptions import *
 
@@ -10,6 +12,7 @@ __all__ = [
     "ClassFinder",
     "ModuleList",
     "KeyConstraintDict", "PrefixedKeyDict",
+    "WorkerPool", "IntervalWorkerPool",
 ]
 
 class ModuleList(collections.UserList):
@@ -160,3 +163,25 @@ class ClassFinder:
         elif args or kwargs:
             raise ValueError("Additional arguments are invalid if 'module' is already an object")
         return module
+
+class WorkerPool:
+    def __init__(self):
+        self.items = []
+
+    def __call__(self):
+        for item in self.items:
+            item()
+
+    def start(self):
+        self.thread = Thread(target=self)
+        self.thread.daemon = True
+        self.thread.start()
+
+class IntervalWorkerPool(WorkerPool):
+    def __init__(self, interval):
+        super().__init__()
+        self.interval = interval
+
+    def __call__(self):
+        super().__call__()
+        time.sleep(self.interval)
