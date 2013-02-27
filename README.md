@@ -103,6 +103,21 @@ This class shows a clock
 
 
 
+### disk
+
+
+Gets used, free, available and total amount of bytes on the given mounted filesystem.
+
+These values can also be expressed in percentages with the percentage_used, percentage_free
+and percentage_avail formats.
+
+
+* `format` —  (default: `{free}/{avail}`)
+* `path` —  (required)
+* `divisor` — divide all byte values by this value, commonly 1024**3 (gigabyte) (default: `1073741824`)
+
+
+
 ### file
 
 
