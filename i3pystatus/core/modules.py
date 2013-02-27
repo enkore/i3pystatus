@@ -2,6 +2,7 @@ from threading import Thread
 import time
 
 from .util import SettingsBase
+from .threads import AutomagicManager
 
 __all__ = [
     "Module", "AsyncModule", "IntervalModule",
@@ -28,13 +29,23 @@ class AsyncModule(Module):
     def mainloop(self):
         """This is run in a separate daemon-thread"""
 
-class IntervalModule(AsyncModule):
+class IntervalModule(Module):
     interval = 5 # seconds
+    managers = {}
+
+    def registered(self, status_handler):
+        if self.interval in IntervalModule.managers:
+            IntervalModule.managers[self.interval].add(self)
+        else:
+            am = AutomagicManager(self.interval)
+            am.add(self)
+            IntervalModule.managers[self.interval] = am
+
+    def __call__(self):
+        self.run()
 
     def run(self):
-        """Called every self.interval seconds"""
+        """Called approximately every self.interval seconds
 
-    def mainloop(self):
-        while True:
-            self.run()
-            time.sleep(self.interval)
+        Do not rely on this being called from the same thread at all times.
+        If you need to always have the same thread context, subclass AsyncModule."""
