@@ -35,10 +35,10 @@ class IntervalModule(Module):
 
     def registered(self, status_handler):
         if self.interval in IntervalModule.managers:
-            IntervalModule.managers[self.interval].add(self)
+            IntervalModule.managers[self.interval].append(self)
         else:
             am = AutomagicManager(self.interval)
-            am.add(self)
+            am.append(self)
             IntervalModule.managers[self.interval] = am
 
     def __call__(self):

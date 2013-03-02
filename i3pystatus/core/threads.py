@@ -3,26 +3,22 @@ import sys
 import threading
 import time
 import traceback
+import collections
 
 if hasattr(time, "perf_counter"):
     timer = time.perf_counter
 else:
     timer = time.clock
 
-class StderrExcDelegate:
-    def __call__(self, exc):
-        traceback.print_exception(*sys.exc_info(), file=sys.stderr)
-
 class ExceptionWrapper:
-    def __init__(self, workload, exc_delegate):
+    def __init__(self, workload):
         self.workload = workload
-        self.exc_delegate = exc_delegate
 
     def __call__(self):
         try:
             self.workload()
         except Exception as exc:
-            self.exc_delegate(exc)
+            traceback.print_exception(*sys.exc_info(), file=sys.stderr)
 
     def __repr__(self):
         return repr(self.workload)
@@ -41,30 +37,30 @@ class WorkloadWrapper:
         return repr(self.workload)
 
 class Thread(threading.Thread):
-    def __init__(self, target_interval, workloads=None):
+    def __init__(self, target_interval, workloads=None, start_barrier=1):
         super().__init__()
 
         self.workloads = workloads if workloads is not None else []
         self.target_interval = target_interval
+        self.start_barrier = start_barrier
         self.daemon = True
 
     def __iter__(self):
         return iter(self.workloads)
-
     def __len__(self):
         return len(self.workloads)
-
     def pop(self):
         return self.workloads.pop()
-
-    def push(self, workload):
+    def append(self, workload):
         self.workloads.append(workload)
 
     def run(self):
-        while self.workloads:
-            for workload in self.workloads:
-                workload()
+        while len(self) <= self.start_barrier:
+            time.sleep(0.3)
 
+        while self:
+            for workload in self:
+                workload()
             self.workloads.sort(key=lambda workload: workload.time)
 
             filltime = self.target_interval - self.time
@@ -73,7 +69,7 @@ class Thread(threading.Thread):
 
     @property
     def time(self):
-        return sum(map(lambda workload: workload.time, self.workloads))
+        return sum(map(lambda workload: workload.time, self))
 
 class AutomagicManager:
     def __init__(self, target_interval):
@@ -83,7 +79,6 @@ class AutomagicManager:
 
         initial_thread = Thread(target_interval, [self.wrap(self)])
         self.threads = [initial_thread]
-
         initial_thread.start()
 
     def __call__(self):
@@ -95,7 +90,7 @@ class AutomagicManager:
         self.create_threads(self.partition(separate))
 
     def wrap(self, workload):
-        return WorkloadWrapper(ExceptionWrapper(workload, exc_delegate=StderrExcDelegate()))
+        return WorkloadWrapper(ExceptionWrapper(workload))
 
     def optimize(self, thread, vtime):
         if len(thread) > 1 and vtime > self.upper_bound:
@@ -110,12 +105,10 @@ class AutomagicManager:
         for workload in workloads:
             current_thread.append(workload)
             timesum += workload.time
-
             if timesum > self.lower_bound:
                 new_threads.append(current_thread)
                 current_thread = []
                 timesum = 0
-
         return new_threads
 
     def create_threads(self, threads):
@@ -123,9 +116,9 @@ class AutomagicManager:
             self.create_thread(workloads)
 
     def create_thread(self, workloads):
-        thread = Thread(self.target_interval, workloads)
+        thread = Thread(self.target_interval, workloads, start_barrier=0)
         thread.start()
         self.threads.append(thread)
 
-    def add(self, workload):
-        self.threads[0].push(self.wrap(workload))
+    def append(self, workload):
+        self.threads[0].append(self.wrap(workload))
