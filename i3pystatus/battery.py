@@ -5,15 +5,6 @@ from . import IntervalModule
 from .core.util import PrefixedKeyDict
 
 class Battery:
-    """
-    Simple interface to /sys/class/power_supply/BATx/uevent
-
-    The data from uevent is transformed into attributes of this class, stripping
-    their prefix. (i.e. POWER_SUPPLY_NAME becomes the NAME attribute).
-
-    Numbers are automatically converted to floats. Strings are stripped.
-    """
-
     @staticmethod
     def lchop(string, prefix="POWER_SUPPLY_"):
         if string.startswith(prefix):
@@ -81,16 +72,12 @@ class BatteryChecker(IntervalModule):
         fdict["percentage_design"] = (energy_now / battery.ENERGY_FULL_DESIGN) * 100
         fdict["consumption"] = power_now / 1000000
 
-        if not power_now:
-            return
-
         if status == "Full":
             fdict["status"] = "FULL"
-        else:
+        elif power_now:
             if status == "Discharging":
                 fdict["status"] = "DIS"
                 remaining = RemainingCalculator(energy_now, power_now)
-
                 if remaining.remaining_time < 15:
                     urgent = True
                     color = "#ff0000"
@@ -105,4 +92,3 @@ class BatteryChecker(IntervalModule):
             "urgent": urgent,
             "color": color
         }
-
