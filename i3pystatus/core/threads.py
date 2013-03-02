@@ -5,6 +5,12 @@ import time
 import traceback
 import collections
 
+try:
+    from setproctitle import setproctitle
+except ImportError:
+    def setproctitle(title):
+        pass
+
 if hasattr(time, "perf_counter"):
     timer = time.perf_counter
 else:
@@ -57,6 +63,8 @@ class Thread(threading.Thread):
     def run(self):
         while len(self) <= self.start_barrier:
             time.sleep(0.3)
+
+        setproctitle("i3pystatus: {name}/{workloads}".format(name=self.name, workloads=list(map(repr, self.workloads))))
 
         while self:
             for workload in self:

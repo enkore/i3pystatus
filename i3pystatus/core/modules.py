@@ -20,6 +20,9 @@ class Module(SettingsBase):
                 self.output["name"] = self.__name__
             json.insert(0, self.output)
 
+    def __repr__(self):
+        return self.__class__.__name__
+
 class AsyncModule(Module):
     def registered(self, status_handler):
         self.thread = Thread(target=self.mainloop)
