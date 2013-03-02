@@ -25,9 +25,11 @@ class IOHandler:
                 return
 
     def read_line(self):
-        """Interrupted respecting reader for stdin.
+        """
+        Interrupted respecting reader for stdin.
 
-        Raises EOFError if the end of stream has been reached"""
+        Raises EOFError if the end of stream has been reached
+        """
 
         try:
             line = self.inp.readline().strip()
@@ -48,12 +50,7 @@ class StandaloneIO(IOHandler):
     """
 
     n = -1
-    proto = (
-        '{"version":1}',
-        "[",
-        "[]",
-        ",[]",
-    )
+    proto = ('{"version":1}', "[", "[]", ",[]", )
 
     def __init__(self, interval=1):
         super().__init__()
@@ -87,14 +84,9 @@ class JSONIO:
 
     @contextmanager
     def parse_line(self, line):
-        """
-        Parse a single line of JSON and write modified JSON back.
-
-        Usage is quite simple using the usual with-Syntax.
-        """
+        """Parse a single line of JSON and write modified JSON back."""
 
         prefix = ""
-
         # ignore comma at start of lines
         if line.startswith(","):
             line, prefix = line[1:], ","
