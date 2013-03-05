@@ -9,7 +9,7 @@ import textwrap
 import i3pystatus
 import i3pystatus.mail
 
-from .core.util import ClassFinder
+from .core.imputil import ClassFinder
 
 IGNORE = ("__main__", "mkdocs")
 MODULE_FORMAT = """
@@ -36,21 +36,16 @@ class Module:
         else:
             self.name = "{module}.{cls}".format(module=module_name, cls=self.cls.__name__)
 
-        if self.cls.__doc__ is not None:
-            self.doc = self.cls.__doc__
-        elif module.__doc__ is not None:
-            self.doc = module.__doc__
-        else:
-            self.doc = ""
+        self.doc = self.cls.__doc__ or module.__doc__ or ""
 
         if hasattr(self.cls, "_endstring"):
             self.endstring = self.cls._endstring
 
-        self.get_settings()
+        self.read_settings()
 
-    def get_settings(self):
+    def read_settings(self):
         for setting in self.cls.settings:
-            self.settings.append(Setting(self, setting))
+            self.settings.append(Setting(self.cls, setting))
 
     def format_settings(self):
         return "\n".join(map(str, self.settings))
@@ -65,22 +60,21 @@ class Module:
         )
 
 class Setting:
-    name = ""
     doc = ""
     required = False
     default = sentinel = object()
 
-    def __init__(self, mod, setting):
+    def __init__(self, cls, setting):
         if isinstance(setting, tuple):
             self.name = setting[0]
             self.doc = setting[1]
         else:
             self.name = setting
 
-        if setting in mod.cls.required:
+        if setting in cls.required:
             self.required = True
-        elif hasattr(mod.cls, self.name):
-            self.default = getattr(mod.cls, self.name)
+        elif hasattr(cls, self.name):
+            self.default = getattr(cls, self.name)
 
     def __str__(self):
         attrs = []
@@ -99,15 +93,11 @@ class Setting:
 
         return formatted
 
-def get_modules(path=None):
-    if path is None:
-        path = i3pystatus.get_path()
-
+def get_modules(path):
     modules = []
     for finder, modname, ispkg in pkgutil.iter_modules(path):
         if modname not in IGNORE:
             modules.append(get_module(finder, modname))
-
     return modules
 
 def get_module(finder, modname):
@@ -116,12 +106,11 @@ def get_module(finder, modname):
 
 def get_all(module_path, heading, finder=None):
     mods = []
-    if finder is None:
-        finder = i3pystatus.ClassFinder(i3pystatus.Module)
+    if not finder:
+        finder = ClassFinder(i3pystatus.Module)
 
     for name, module in get_modules(module_path):
         classes = finder.search_module(module)
-
         for cls in classes:
             mods.append(Module(cls, neighbours=len(classes), module_name=name, module=module, heading=heading))
 
@@ -131,10 +120,9 @@ def generate_doc_for_module(module_path, heading="###", finder=None):
     return "".join(map(str, get_all(module_path, heading, finder)))
 
 with open("README.tpl.md", "r") as template:
-
     tpl = template.read()
     tpl = tpl.replace("!!module_doc!!", generate_doc_for_module(i3pystatus.__path__))
-    finder = i3pystatus.ClassFinder(baseclass=i3pystatus.mail.Backend)
+    finder = ClassFinder(baseclass=i3pystatus.mail.Backend)
     tpl = tpl.replace("!!i3pystatus.mail!!", generate_doc_for_module(i3pystatus.mail.__path__, "###", finder).replace("\n", "\n> "))
-
-    print(tpl)
+    with open("README.md", "w") as output:
+        output.write(tpl + "\n")

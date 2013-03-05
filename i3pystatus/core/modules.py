@@ -1,7 +1,7 @@
 from threading import Thread
 import time
 
-from .util import SettingsBase
+from .settings import SettingsBase
 from .threads import AutomagicManager
 
 __all__ = [
