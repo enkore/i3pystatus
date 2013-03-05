@@ -87,9 +87,24 @@ Available formatters:
 This class uses the /sys/class/power_supply/…/uevent interface to check for the
 battery status
 
+Available formatters for format and alert_format_\*:
+
+* remaining_str
+* remaining_hm
+* percentage
+* percentage_design
+* consumption (Watts)
+* status
+* battery_ident
+
 
 * `battery_ident` —  (default: `BAT0`)
 * `format` —  (default: `{status} {remaining}`)
+* `alert` — Display a libnotify-notification on low battery (default: `False`)
+* `alert_percentage` —  (default: `10`)
+* `alert_format_title` —  (default: `Low battery`)
+* `alert_format_body` —  (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
+* `alert_percentage` —  (default: `10`)
 
 
 

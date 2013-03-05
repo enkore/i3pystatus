@@ -71,7 +71,7 @@ class BatteryChecker(IntervalModule):
     alert = False
     alert_percentage = 10
     alert_format_title = "Low battery"
-    alert_format_body = "Battery {battery_ident} has only {percentage} % ({remaining_hm}) remaining!"
+    alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!"
 
     def init(self):
         self.base_path = "/sys/class/power_supply/{0}/uevent".format(self.battery_ident)
