@@ -3,10 +3,7 @@
 
 from . import (
     Status
-    mailchecker,
     modsde,
-    notmuchmail,
-    thunderbird,
     regex,
 )
 
