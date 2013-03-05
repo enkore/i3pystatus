@@ -2,9 +2,9 @@
 
 import sys
 
-from .core import io
-from .core.util import *
+from .core import util, io
 from .core.modules import *
+from .core.settings import SettingsBase
 
 __all__ = [
     "SettingsBase",
@@ -15,11 +15,11 @@ __all__ = [
 class Status:
     def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
         if standalone:
-            self.io = core.io.StandaloneIO(interval)
+            self.io = io.StandaloneIO(interval)
         else:
-            self.io = core.io.IOHandler(input_stream)
+            self.io = io.IOHandler(input_stream)
 
-        self.modules = ModuleList(self, Module)
+        self.modules = util.ModuleList(self, Module)
 
     def register(self, module, *args, **kwargs):
         """Register a new module."""
@@ -28,7 +28,7 @@ class Status:
             self.modules.append(module, *args, **kwargs)
 
     def run(self):
-        for j in core.io.JSONIO(self.io).read():
+        for j in io.JSONIO(self.io).read():
             for module in self.modules:
                 module.inject(j)
 I3statusHandler = Status
