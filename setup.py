@@ -21,9 +21,9 @@ setup(name="i3pystatus",
         "console_scripts": ["i3pystatus = i3pystatus:main"],
       },
 
-      install_requires=[
-        "gobject",
-      ],
+#      install_requires=[
+ #       "gobject",
+ #     ],
 #      install_requires=[
 #        "Jinja2",
  #       "lxml",

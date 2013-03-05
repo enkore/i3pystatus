@@ -5,12 +5,16 @@ import sys
 from .core import util, io
 from .core.modules import *
 from .core.settings import SettingsBase
+from .core.config import ConfigFinder
 
 __all__ = [
     "SettingsBase",
     "Module", "AsyncModule", "IntervalModule",
     "Status", "I3statusHandler",
 ]
+
+def main():
+    ConfigFinder().run_config()
 
 class Status:
     def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
