@@ -40,4 +40,4 @@ class ConfigFinder:
         if path:
             runpy.run_path(path, run_name="i3pystatus._config")
         else:
-            raise ImportError("Didn't find a config module, tried\n {mods}".format(mods="\n".join(failed)))
+            raise ImportError("Didn't find a config module, tried\n * {mods}".format(mods="\n * ".join(failed)))
