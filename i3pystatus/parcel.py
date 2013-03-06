@@ -19,7 +19,7 @@ class DHL(TrackerAPI):
         self.idcode = idcode
         self.url = self.URL.format(idcode=self.idcode)
 
-        self.progress_selector = CSSSelector(".greyprogressbar > span")
+        self.progress_selector = CSSSelector(".greyprogressbar > span, .greenprogressbar > span")
         self.last_status_selector = CSSSelector(".events .eventList tr")
         self.intrarow_status_selector = CSSSelector("td.status div")
 
