@@ -19,6 +19,8 @@ class DHL(TrackerAPI):
         self.idcode = idcode
         self.url = self.URL.format(idcode=self.idcode)
 
+        error_selector = CSSSelector("#set_identcodes .error")
+        self.error = lambda page: len(error_selector(page)) >= 1
         self.progress_selector = CSSSelector(".greyprogressbar > span, .greenprogressbar > span")
         self.last_status_selector = CSSSelector(".events .eventList tr")
         self.intrarow_status_selector = CSSSelector("td.status div")
@@ -27,9 +29,12 @@ class DHL(TrackerAPI):
         ret = {}
         with urlopen(self.url) as page:
             page = lxml.html.fromstring(page.read())
-            ret["progress"] = self.progress_selector(page)[0].text.strip()
-            last_row = self.last_status_selector(page)[-1]
-            ret["status"] = self.intrarow_status_selector(last_row)[0].text.strip()
+            if self.error(page):
+                ret["progress"] = ret["status"] = "n/a"
+            else:
+                ret["progress"] = self.progress_selector(page)[0].text.strip()
+                last_row = self.last_status_selector(page)[-1]
+                ret["status"] = self.intrarow_status_selector(last_row)[0].text.strip()
         return ret
 
 class ParcelTracker(IntervalModule):
