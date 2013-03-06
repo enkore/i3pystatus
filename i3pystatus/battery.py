@@ -70,7 +70,7 @@ class BatteryChecker(IntervalModule):
         "alert_percentage", "alert_format_title", "alert_format_body", "alert_percentage",
     )
     battery_ident = "BAT0"
-    format = "{status} {remaining}"
+    format = "{status} {remaining_hm}"
     
     alert = False
     alert_percentage = 10
