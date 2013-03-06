@@ -13,6 +13,10 @@ class Battery:
         return string
 
     @staticmethod
+    def map_key(key):
+        return Battery.lchop(key).replace("CHARGE", "ENERGY")
+
+    @staticmethod
     def convert(value):
         return float(value) if value.isdecimal() else value.strip()
 
@@ -27,7 +31,7 @@ class Battery:
     def parse_line(self, line):
         key, value = line.split("=", 2)
 
-        setattr(self, self.lchop(key), self.convert(value))
+        setattr(self, self.map_key(key), self.convert(value))
 
 class RemainingCalculator:
     def __init__(self, energy, power):
@@ -85,6 +89,8 @@ class BatteryChecker(IntervalModule):
         status = battery.STATUS
         energy_now = battery.ENERGY_NOW
         energy_full = battery.ENERGY_FULL
+        if not hasattr(battery, "POWER_NOW"):
+            battery.POWER_NOW = battery.VOLTAGE_NOW * battery.CURRENT_NOW
         power_now = battery.POWER_NOW
 
         fdict = {
