@@ -33,7 +33,7 @@ class ClassFinder:
         return classes[0]
 
     def get_module(self, module):
-        return import_module("i3pystatus.{module}".format(module=module))
+        return import_module("i3pystatus.{mod}".format(mod=module))
 
     def instanciate_class_from_module(self, module, *args, **kwargs):
         if isinstance(module, types.ModuleType):

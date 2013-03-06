@@ -12,8 +12,9 @@ import threading
 import time
 from functools import partial
 
-import dbus, gobject
+import dbus
 from dbus.mainloop.glib import DBusGMainLoop
+from gi.repository import GObject
 
 from i3pystatus.mail import Backend
 
@@ -24,7 +25,6 @@ class Thunderbird(Backend):
 
     Requires
     * python-dbus
-    * python-gobject2
     """
 
     _unread = set()
@@ -38,7 +38,7 @@ class Thunderbird(Backend):
         bus.add_signal_receiver(self.changed_msg,
                                 dbus_interface="org.mozilla.thunderbird.DBus",
                                 signal_name="ChangedMessageSignal")
-        loop = gobject.MainLoop()
+        loop = GObject.MainLoop()
         dbus.mainloop.glib.threads_init()
         self.context = loop.get_context()
 
