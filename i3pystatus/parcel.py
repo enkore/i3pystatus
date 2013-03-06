@@ -6,7 +6,14 @@ from lxml.cssselect import CSSSelector
 
 from i3pystatus import IntervalModule
 
-class DHL:
+class TrackerAPI:
+    def __init__(self, idcode):
+        pass
+
+    def status(self):
+        return {}
+
+class DHL(TrackerAPI):
     URL="http://nolp.dhl.de/nextt-online-public/set_identcodes.do?lang=en&idc={idcode}"
     def __init__(self, idcode):
         self.idcode = idcode
@@ -26,6 +33,8 @@ class DHL:
         return ret
 
 class ParcelTracker(IntervalModule):
+    interval = 20
+
     settings = (
         ("instance", "Tracker instance"),
         "format",
