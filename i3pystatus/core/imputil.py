@@ -1,5 +1,6 @@
 import inspect
 import types
+from importlib import import_module
 
 class ClassFinder:
     """Support class to find classes of specific bases in a module"""
@@ -32,7 +33,7 @@ class ClassFinder:
         return classes[0]
 
     def get_module(self, module):
-        return getattr(__import__("i3pystatus.{module}".format(module=module), globals(), {}, []), module)
+        return import_module("i3pystatus.{module}".format(module=module))
 
     def instanciate_class_from_module(self, module, *args, **kwargs):
         if isinstance(module, types.ModuleType):
