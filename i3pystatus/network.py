@@ -83,7 +83,7 @@ class Network(IntervalModule):
     def run(self):
         info = netifaces.ifaddresses(self.interface)
         up = netifaces.AF_INET in info or netifaces.AF_INET6 in info
-        fdict = dict(zip_longest(["v4", "v4mask", "v6", "v6mask"], [], fillvalue=""))
+        fdict = dict(zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
         fdict.update(self.baseinfo)
 
         if up:
