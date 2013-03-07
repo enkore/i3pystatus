@@ -68,6 +68,7 @@ class BatteryChecker(IntervalModule):
         "battery_ident", "format",
         ("alert", "Display a libnotify-notification on low battery"),
         "alert_percentage", "alert_format_title", "alert_format_body", "alert_percentage",
+        "path",
     )
     battery_ident = "BAT0"
     format = "{status} {remaining_hm}"
@@ -77,14 +78,17 @@ class BatteryChecker(IntervalModule):
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!"
 
+    path = None
+
     def init(self):
-        self.base_path = "/sys/class/power_supply/{0}/uevent".format(self.battery_ident)
+        if not self.path:
+            self.path = "/sys/class/power_supply/{0}/uevent".format(self.battery_ident)
 
     def run(self):
         urgent = False
         color = "#ffffff"
 
-        battery = Battery(self.base_path)
+        battery = Battery(self.path)
 
         status = battery.STATUS
         energy_now = battery.ENERGY_NOW
@@ -101,10 +105,7 @@ class BatteryChecker(IntervalModule):
             "percentage_design": (energy_now / battery.ENERGY_FULL_DESIGN) * 100,
             "consumption": power_now / 1000000,
         }
-
-        if status == "Full" or fdict["percentage"] > 99:
-            fdict["status"] = "FULL"
-        elif power_now:
+        if power_now:
             if status == "Discharging":
                 fdict["status"] = "DIS"
                 remaining = RemainingCalculator(energy_now, power_now)
@@ -115,6 +116,8 @@ class BatteryChecker(IntervalModule):
                 fdict["status"] = "CHR"
                 remaining = RemainingCalculator(energy_full-energy_now, power_now)
             fdict.update(remaining.get_dict("remaining_"))
+        else:
+            fdict["status"] = "FULL"
 
         if self.alert and fdict["percentage"] <= self.alert_percentage:
             display_notification(
