@@ -258,8 +258,10 @@ Available formatters:
 * {name} same as setting
 * {v4} IPv4 address
 * {v4mask} subnet mask
+* {v4cidr} IPv4 address in cidr notation (i.e. 192.168.2.204/24)
 * {v6} IPv6 address
 * {v6mask} subnet mask
+* {v6cidr} IPv6 address in cidr notation
 * {mac} MAC of interface
 
 Not available addresses (i.e. no IPv6 connectivity) are replaced with empty strings.

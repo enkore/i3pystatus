@@ -48,6 +48,7 @@ class Network(IntervalModule):
     * {name} same as setting
     * {v4} IPv4 address
     * {v4mask} subnet mask
+    * {v4cidr} IPv4 address in cidr notation (i.e. 192.168.2.204/24)
     * {v6} IPv6 address
     * {v6mask} subnet mask
     * {v6cidr} IPv6 address in cidr notation
