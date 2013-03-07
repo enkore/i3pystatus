@@ -99,7 +99,7 @@ Available formatters for format and alert_format_\*:
 
 
 * `battery_ident` —  (default: `BAT0`)
-* `format` —  (default: `{status} {remaining}`)
+* `format` —  (default: `{status} {remaining_hm}`)
 * `alert` — Display a libnotify-notification on low battery (default: `False`)
 * `alert_percentage` —  (default: `10`)
 * `alert_format_title` —  (default: `Low battery`)
@@ -224,7 +224,6 @@ The `backends` setting determines the backends to use. Currently available are:
 > 
 > Requires
 > * python-dbus
-> * python-gobject2
 > 
 > 
 > 
@@ -244,6 +243,44 @@ unread posts in any bookmark in the mods.de forums.
 * `color` —  (default: `#7181fe`)
 * `username` —  (required)
 * `password` —  (required)
+
+
+
+### network
+
+
+Display network information about a interface.
+
+Requires the PyPI package `netifaces-py3`.
+
+Available formatters:
+* {inteface} same as setting
+* {name} same as setting
+* {v4} IPv4 address
+* {v4mask} subnet mask
+* {v6} IPv6 address
+* {v6mask} subnet mask
+* {mac} MAC of interface
+
+Not available addresses (i.e. no IPv6 connectivity) are replaced with empty strings.
+
+
+* `interface` — Interface to obtain information for, i.e. eth0 (default: `eth0`)
+* `format_up` —  (default: `{interface}: {v4}`)
+* `color_up` —  (default: `#00FF00`)
+* `format_down` —  (default: `{interface}`)
+* `color_down` —  (default: `#FF0000`)
+* `name` —  (default: `eth0`)
+
+
+
+### parcel
+
+
+
+* `instance` — Tracker instance
+* `format` —  (default: `{name}:{progress}`)
+* `name` 
 
 
 
