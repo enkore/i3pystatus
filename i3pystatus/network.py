@@ -6,6 +6,37 @@ import netifaces
 
 from i3pystatus import IntervalModule
 
+# Remainder: if we raise minimum Python version to 3.3, use ipaddress module
+def count_bits(integer):
+    bits = 0
+    while(integer):
+        integer &= integer - 1
+        bits += 1
+    return bits
+
+def v6_to_int(v6):
+    return int(v6.replace(":", ""), 16)
+
+def prefix6(mask):
+    return count_bits(v6_to_int(mask))
+
+def cidr6(addr, mask):
+    return "{addr}/{bits}".format(addr=addr, bits=prefix6(mask))
+
+def v4_to_int(v4):
+    sum = 0
+    mul = 1
+    for part in reversed(v4.split(".")):
+        sum += int(part) * mul
+        mul *= 2**8
+    return sum
+
+def prefix4(mask):
+    return count_bits(v4_to_int(mask))
+
+def cidr4(addr, mask):
+    return "{addr}/{bits}".format(addr=addr, bits=prefix4(mask))
+
 class Network(IntervalModule):
     """
     Display network information about a interface.
@@ -19,6 +50,7 @@ class Network(IntervalModule):
     * {v4mask} subnet mask
     * {v6} IPv6 address
     * {v6mask} subnet mask
+    * {v6cidr} IPv6 address in cidr notation
     * {mac} MAC of interface
 
     Not available addresses (i.e. no IPv6 connectivity) are replaced with empty strings.
@@ -60,10 +92,12 @@ class Network(IntervalModule):
                 v4 = info[netifaces.AF_INET][0]
                 fdict["v4"] = v4["addr"]
                 fdict["v4mask"] = v4["netmask"]
+                fdict["v4cidr"] = cidr4(v4["addr"], v4["netmask"])
             if netifaces.AF_INET6 in info:
                 v6 = info[netifaces.AF_INET6][0]
                 fdict["v6"] = v6["addr"]
                 fdict["v6mask"] = v6["netmask"]
+                fdict["v6cidr"] = cidr6(v6["addr"], v6["netmask"])
         else:
             format = self.format_down
             color = self.color_down
