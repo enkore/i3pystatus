@@ -1,27 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
+
 from . import IntervalModule
 from .core.util import PrefixedKeyDict
 from .core.desktop import display_notification
 
-class Battery:
+class UEventParser: # fun-fact: configparser doesn't provide a way to handle files w/o sections
     @staticmethod
-    def lchop(string, prefix="POWER_SUPPLY_"):
+    def lchop(string, prefix):
         if string.startswith(prefix):
             return string[len(prefix):]
         return string
 
-    @staticmethod
-    def map_key(key):
-        return Battery.lchop(key).replace("CHARGE", "ENERGY")
-
-    @staticmethod
-    def convert(value):
-        return float(value) if value.isdecimal() else value.strip()
-
-    def __init__(self, file):
+    def __init__(self, file, prefix="POWER_SUPPLY_"):
+        super().__init__()
+        self.prefix = prefix
+        self.data = {}
         self.parse(file)
+
+    def dict(self):
+        return self.data
+
+    def map_key(self, key):
+        return self.lchop(key, self.prefix)
+
+    def map_value(self, value):
+        return float(value) if value.isdecimal() else value.strip()
 
     def parse(self, file):
         with open(file, "r") as file:
@@ -30,23 +36,75 @@ class Battery:
 
     def parse_line(self, line):
         key, value = line.split("=", 2)
+        self.data[self.map_key(key)] = self.map_value(value)
 
-        setattr(self, self.map_key(key), self.convert(value))
+class Battery:
+    @staticmethod
+    def create(from_file):
+        batinfo = UEventParser(from_file).dict()
+        if "POWER_NOW" in batinfo:
+            return BatteryEnergy(batinfo)
+        else:
+            return BatteryCharge(batinfo)
 
-class RemainingCalculator:
-    def __init__(self, energy, power):
-        self.remaining_time = (energy / power) * 60
-        self.hours, self.minutes = map(int, divmod(self.remaining_time, 60))
+    def __init__(self, batinfo):
+        self.bat = batinfo
+        self.normalize_µ()
 
-    def get_dict(self, prefix):
-        d = PrefixedKeyDict(prefix)
-        d.update({
-            "str": "{}:{:02}".format(self.hours, self.minutes),
-            "hm": "{}h:{:02}m".format(self.hours, self.minutes),
-            "hours": self.hours,
-            "mins": self.minutes,
-        })
-        return d
+    def normalize_µ(self):
+        for key, µvalue in self.bat.items():
+            if re.match(r"(VOLTAGE|CHARGE|CURRENT|POWER|ENERGY)_(NOW|FULL|MIN)(_DESIGN)?", key):
+                self.bat[key] = µvalue / 1000000.0
+
+    def percentage(self, design=False):
+        return self._percentage("_DESIGN" if design else "") * 100
+
+    def status(self):
+        if self.consumption():
+            if self.bat["STATUS"] == "Discharging":
+                return "Discharging"
+            else:
+                return "Charging"
+        else:
+            return "Full"
+
+class BatteryCharge(Battery):
+    def consumption(self):
+        return self.bat["VOLTAGE_NOW"] * self.bat["CURRENT_NOW"] # V  * A = W
+
+    def _percentage(self, design):
+        return self.bat["CHARGE_NOW"] / self.bat["CHARGE_FULL"+design]
+
+    def remaining(self):
+        if self.status() == "Discharging":
+            return self.bat["CHARGE_NOW"] / self.bat["CURRENT_NOW"] * 60 # Ah / A = h * 60 min = min
+        else:
+            return (self.bat["CHARGE_FULL"] - self.bat["CHARGE_NOW"]) / self.bat["CURRENT_NOW"] * 60
+
+class BatteryEnergy(Battery):
+    def consumption(self):
+        return self.bat["POWER_NOW"]
+
+    def _percentage(self, design):
+        return self.bat["ENERGY_NOW"] / self.bat["ENERGY_FULL"+design]
+
+    def remaining(self):
+        if self.status() == "Discharging":
+            return self.bat["ENERGY_NOW"] / self.bat["POWER_NOW"] * 60 # Wh / W = h * 60 min = min
+        else:
+            return (self.bat["ENERGY_FULL"] - self.bat["ENERGY_NOW"]) / self.bat["POWER_NOW"] * 60
+
+def format_remaining(minutes, prefix):
+    hours, minutes = map(int, divmod(minutes, 60))
+
+    d = PrefixedKeyDict(prefix)
+    d.update({
+        "str": "{}:{:02}".format(hours, minutes),
+        "hm": "{}h:{:02}m".format(hours, minutes),
+        "hours": hours,
+        "mins": minutes,
+    })
+    return d
 
 class BatteryChecker(IntervalModule):
     """ 
@@ -63,7 +121,7 @@ class BatteryChecker(IntervalModule):
     * status
     * battery_ident
     """
-    
+    interval=1
     settings = (
         "battery_ident", "format",
         ("alert", "Display a libnotify-notification on low battery"),
@@ -88,34 +146,26 @@ class BatteryChecker(IntervalModule):
         urgent = False
         color = "#ffffff"
 
-        battery = Battery(self.path)
-
-        status = battery.STATUS
-        energy_now = battery.ENERGY_NOW
-        energy_full = battery.ENERGY_FULL
-        if not hasattr(battery, "POWER_NOW"):
-            battery.POWER_NOW = battery.VOLTAGE_NOW * battery.CURRENT_NOW
-        power_now = battery.POWER_NOW
+        battery = Battery.create(self.path)
 
         fdict = {
             "battery_ident": self.battery_ident,
             "remaining_str": "",
             "remaining_hm": "",
-            "percentage": (energy_now / energy_full) * 100,
-            "percentage_design": (energy_now / battery.ENERGY_FULL_DESIGN) * 100,
-            "consumption": power_now / 1000000,
+            "percentage": battery.percentage(),
+            "percentage_design": battery.percentage(design=True),
+            "consumption": battery.consumption(),
         }
-        if power_now:
+
+        status = battery.status()
+        if status in ["Discharging", "Charging"]:
+            remaining = battery.remaining()
+            fdict.update(format_remaining(remaining, "remaining_"))
             if status == "Discharging":
                 fdict["status"] = "DIS"
-                remaining = RemainingCalculator(energy_now, power_now)
-                if remaining.remaining_time < 15:
+                if remaining < 15:
                     urgent = True
                     color = "#ff0000"
-            else: # Charging, Unknown etc. (My thinkpad says Unknown if close to fully charged)
-                fdict["status"] = "CHR"
-                remaining = RemainingCalculator(energy_full-energy_now, power_now)
-            fdict.update(remaining.get_dict("remaining_"))
         else:
             fdict["status"] = "FULL"
 
