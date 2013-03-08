@@ -105,6 +105,7 @@ Available formatters for format and alert_format_\*:
 * `alert_format_title` —  (default: `Low battery`)
 * `alert_format_body` —  (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
 * `alert_percentage` —  (default: `10`)
+* `path` —  (default: `None`)
 
 
 
@@ -330,6 +331,29 @@ AMD is currently not supported as they can only report a relative temperature, w
 * `color` —  (default: `#FFFFFF`)
 * `color_critical` —  (default: `#FF0000`)
 * `high_factor` —  (default: `0.7`)
+
+
+
+### wireless
+
+
+Display network information about a interface.
+
+Requires the PyPI packages `netifaces-py3` and `basiciw`.
+
+This is based on the network module, so all options and formatters are
+the same, except for these additional formatters:
+* {essid} ESSID of currently connected wifi
+* {freq} Current frequency
+* {quality} Link quality in percent
+
+
+* `interface` — Interface to obtain information for, i.e. eth0 (default: `eth0`)
+* `format_up` —  (default: `{interface}: {v4}`)
+* `color_up` —  (default: `#00FF00`)
+* `format_down` —  (default: `{interface}`)
+* `color_down` —  (default: `#FF0000`)
+* `name` —  (default: `eth0`)
 
 
 

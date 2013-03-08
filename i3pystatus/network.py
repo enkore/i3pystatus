@@ -80,7 +80,7 @@ class Network(IntervalModule):
             "mac": netifaces.ifaddresses(self.interface)[netifaces.AF_PACKET][0]["addr"],
         }
 
-    def run(self):
+    def collect(self):
         info = netifaces.ifaddresses(self.interface)
         up = netifaces.AF_INET in info or netifaces.AF_INET6 in info
         fdict = dict(zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
@@ -102,6 +102,11 @@ class Network(IntervalModule):
         else:
             format = self.format_down
             color = self.color_down
+
+        return (color, format, fdict, up)
+
+    def run(self):
+        color, format, fdict, up = self.collect()
 
         self.output = {
             "full_text": format.format(**fdict),
