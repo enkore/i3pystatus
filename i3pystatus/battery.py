@@ -105,7 +105,7 @@ class BatteryChecker(IntervalModule):
     * status
     * battery_ident
     """
-    interval=1
+
     settings = (
         "battery_ident", "format",
         ("alert", "Display a libnotify-notification on low battery"),
