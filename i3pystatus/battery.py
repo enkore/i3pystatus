@@ -159,6 +159,8 @@ class BatteryChecker(IntervalModule):
                 if remaining < 15:
                     urgent = True
                     color = "#ff0000"
+            else:
+                fdict["status"] = "CHR"
         else:
             fdict["status"] = "FULL"
 
