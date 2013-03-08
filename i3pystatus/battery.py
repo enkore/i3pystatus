@@ -5,7 +5,7 @@ import re
 import configparser
 
 from . import IntervalModule
-from .core.util import PrefixedKeyDict
+from .core.util import PrefixedKeyDict, lchop
 from .core.desktop import display_notification
 
 class UEventParser(configparser.ConfigParser):
@@ -16,17 +16,11 @@ class UEventParser(configparser.ConfigParser):
             parser.read_string(file.read())
         return dict(parser.items("id10t"))
 
-    @staticmethod
-    def lchop(string, prefix):
-        if string.startswith(prefix):
-            return string[len(prefix):]
-        return string
-
     def __init__(self):
         super().__init__(default_section="id10t")
 
     def optionxform(self, key):
-        return self.lchop(key, "POWER_SUPPLY_")
+        return lchop(key, "POWER_SUPPLY_")
 
     def read_string(self, string):
         super().read_string("[id10t]\n" + string)
@@ -54,10 +48,7 @@ class Battery:
 
     def status(self):
         if self.consumption():
-            if self.bat["STATUS"] == "Discharging":
-                return "Discharging"
-            else:
-                return "Charging"
+            return "Discharging" if self.bat["STATUS"] == "Discharging" else "Charging"
         else:
             return "Full"
 

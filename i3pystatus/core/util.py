@@ -8,6 +8,11 @@ __all__ = [
     "ModuleList", "KeyConstraintDict", "PrefixedKeyDict",
 ]
 
+def lchop(string, prefix):
+    if string.startswith(prefix):
+        return string[len(prefix):]
+    return string
+
 def popwhile(predicate, iterable):
     while iterable:
         item = iterable.pop()
