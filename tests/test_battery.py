@@ -27,7 +27,3 @@ def basic_test_generator():
         yield factory(path, "{status}", status)
         yield factory(path, "{consumption:.3f}", consumption)
         yield factory(path, "{remaining_hm}", remaining)
-
-
-#suite = unittest.TestLoader().loadTestsFromName(__name__)
-#unittest.TextTestRunner(verbosity=2).run(suite)
