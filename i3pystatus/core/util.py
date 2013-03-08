@@ -1,5 +1,6 @@
 
 import collections
+import itertools
 
 from .exceptions import *
 from .imputil import ClassFinder
@@ -21,14 +22,18 @@ def popwhile(predicate, iterable):
         else:
             break
 
-def partition(iterable, limit, key=None):
-    key = key or (lambda x: x)
-    partitions = []
-    while iterable:
+def partition(iterable, limit, key=lambda x: x):
+    def pop_partition():
         sum = 0.0
-        partitions.append(list(
-            popwhile(lambda x: sum + key(x) or sum < limit, iterable)
-        ))
+        while sum < limit and iterable:
+            sum += key(iterable[-1])
+            yield iterable.pop()
+
+    partitions = []
+    iterable.sort(reverse=True)
+    while iterable:
+        partitions.append(list(pop_partition()))
+
     return partitions
 
 def round_dict(dic, places):
