@@ -17,7 +17,6 @@ def lchop(prefix, string):
     if prefix:
         assert not chopped.startswith(prefix)
 
-
 def lchop_test_generator():
     cases = [
         ('\x0b,S0I', "=t5Bk+\x0b'_;duq=9"),
@@ -91,3 +90,52 @@ def popwhile_test_generator():
 
     for iterable, predicate, assrt in cases:
         yield popwhile, iterable, predicate, assrt
+
+def keyconstraintdict_missing(valid, required, feedkeys, assrt_missing):
+    kcd = util.KeyConstraintDict(valid_keys=valid, required_keys=required)
+    kcd.update(dict.fromkeys(feedkeys))
+
+    assert kcd.missing() == set(assrt_missing)
+
+def keyconstraintdict_missing_test_generator():
+    cases = [
+        # ( valid,              required, feed,      missing )
+        (("foo", "bar", "baz"), ("foo",), ("bar",), ("foo",)),
+        (("foo", "bar", "baz"), ("foo",), tuple(), ("foo",)),
+        (("foo", "bar", "baz"), ("bar", "baz"), ("bar", "baz"), tuple()),
+        (("foo", "bar", "baz"), ("bar", "baz"), ("bar", "foo", "baz"), tuple()),
+    ]
+
+    for valid, required, feed, missing in cases:
+        yield keyconstraintdict_missing, valid, required, feed, missing
+
+class KeyConstraintDictAdvancedTests(unittest.TestCase):
+    def test_invalid_1(self):
+        kcd = util.KeyConstraintDict(valid_keys=tuple(), required_keys=tuple())
+        with self.assertRaises(KeyError):
+            kcd["invalid"] = True
+
+    def test_invalid_2(self):
+        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=tuple())
+        with self.assertRaises(KeyError):
+            kcd["invalid"] = True
+
+    def test_incomplete_iteration(self):
+        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
+        with self.assertRaises(util.KeyConstraintDict.MissingKeys):
+            for x in kcd:
+                pass
+
+    def test_completeness(self):
+        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
+        kcd["foo"] = False
+        for x in kcd:
+            pass
+        assert kcd.missing() == set()
+
+    def test_remove_required(self):
+        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
+        kcd["foo"] = None
+        assert kcd.missing() == set()
+        del kcd["foo"]
+        assert kcd.missing() == set(["foo"])

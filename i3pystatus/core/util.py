@@ -79,6 +79,10 @@ class KeyConstraintDict(collections.UserDict):
         else:
             raise KeyError(key)
 
+    def __delitem__(self, key):
+        self.seen_keys.remove(key)
+        del self.data[key]
+
     def __iter__(self):
         if self.missing():
             raise self.MissingKeys(self.missing())
