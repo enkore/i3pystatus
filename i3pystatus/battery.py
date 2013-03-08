@@ -2,46 +2,39 @@
 # -*- coding: utf-8 -*-
 
 import re
+import configparser
 
 from . import IntervalModule
 from .core.util import PrefixedKeyDict
 from .core.desktop import display_notification
 
-class UEventParser: # fun-fact: configparser doesn't provide a way to handle files w/o sections
+class UEventParser(configparser.ConfigParser):
+    @staticmethod
+    def parse_file(file):
+        parser = UEventParser()
+        with open(file, "r") as file:
+            parser.read_string(file.read())
+        return dict(parser.items("id10t"))
+
     @staticmethod
     def lchop(string, prefix):
         if string.startswith(prefix):
             return string[len(prefix):]
         return string
 
-    def __init__(self, file, prefix="POWER_SUPPLY_"):
-        super().__init__()
-        self.prefix = prefix
-        self.data = {}
-        self.parse(file)
+    def __init__(self):
+        super().__init__(default_section="id10t")
 
-    def dict(self):
-        return self.data
+    def optionxform(self, key):
+        return self.lchop(key, "POWER_SUPPLY_")
 
-    def map_key(self, key):
-        return self.lchop(key, self.prefix)
-
-    def map_value(self, value):
-        return float(value) if value.isdecimal() else value.strip()
-
-    def parse(self, file):
-        with open(file, "r") as file:
-            for line in file:
-                self.parse_line(line.strip())
-
-    def parse_line(self, line):
-        key, value = line.split("=", 2)
-        self.data[self.map_key(key)] = self.map_value(value)
+    def read_string(self, string):
+        super().read_string("[id10t]\n" + string)
 
 class Battery:
     @staticmethod
     def create(from_file):
-        batinfo = UEventParser(from_file).dict()
+        batinfo = UEventParser.parse_file(from_file)
         if "POWER_NOW" in batinfo:
             return BatteryEnergy(batinfo)
         else:
@@ -54,7 +47,7 @@ class Battery:
     def normalize_µ(self):
         for key, µvalue in self.bat.items():
             if re.match(r"(VOLTAGE|CHARGE|CURRENT|POWER|ENERGY)_(NOW|FULL|MIN)(_DESIGN)?", key):
-                self.bat[key] = µvalue / 1000000.0
+                self.bat[key] = float(µvalue) / 1000000.0
 
     def percentage(self, design=False):
         return self._percentage("_DESIGN" if design else "") * 100
