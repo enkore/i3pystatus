@@ -10,15 +10,13 @@ from i3pystatus.core import util
 def get_random_string(length=6, chars=string.printable):
     return ''.join(random.choice(chars) for x in range(length))
 
-def lchop_factory(prefix, string):
-    def test():
-        chopped = util.lchop(string, prefix)
-        if string.startswith(prefix):
-            assert len(chopped) == len(string) - len(prefix)
-        if prefix:
-            assert not chopped.startswith(prefix)
-    test.description = "lchop_test:prefix={}:string={}".format(prefix, string)
-    return test
+def lchop(prefix, string):
+    chopped = util.lchop(string, prefix)
+    if string.startswith(prefix):
+        assert len(chopped) == len(string) - len(prefix)
+    if prefix:
+        assert not chopped.startswith(prefix)
+
 
 def lchop_test_generator():
     cases = [
@@ -54,21 +52,19 @@ def lchop_test_generator():
         ('^|j7N!mV0o(?*1>p?dy', '\\ZdA&:\t\x0b:8\t|7.Kl,oHw-\x0cS\nwZlND~uC@le`Sm'),
     ]
     for prefix, string in cases:
-        yield lchop_factory(prefix, prefix+string)
-        yield lchop_factory(prefix, string)
-        yield lchop_factory(string, string)
-        yield lchop_factory(string, prefix)
-        yield lchop_factory("", string)
-        yield lchop_factory(prefix, "")
+        yield lchop, prefix, prefix+string
+        yield lchop, prefix, string
+        yield lchop, string, string
+        yield lchop, string, prefix
+        yield lchop, "", string
+        yield lchop, prefix, ""
 
-def partition_factory(iterable, limit, assrt):
-    def test():
-        partitions = util.partition(iterable, limit)
-        partitions = [sorted(partition) for partition in partitions]
-        for item in assrt:
-            assert sorted(item) in partitions
-    test.description = "partition_test:iterable={}:limit={}:expected={}".format(iterable, limit, assrt)
-    return test
+def partition(iterable, limit, assrt):
+    partitions = util.partition(iterable, limit)
+    partitions = [sorted(partition) for partition in partitions]
+    for item in assrt:
+        assert sorted(item) in partitions
+
 
 def partition_test_generator():
     cases = [
@@ -79,4 +75,19 @@ def partition_test_generator():
     ]
 
     for iterable, limit, assrt in cases:
-        yield partition_factory(iterable, limit, assrt)
+        yield partition, iterable, limit, assrt
+
+def popwhile(iterable, predicate, assrt):
+    assert list(util.popwhile(predicate, iterable)) == assrt
+
+def popwhile_test_generator():
+    cases = [
+        ([1, 2, 3, 4], lambda x: x < 2, []),
+        ([1, 2, 3, 4], lambda x: x < 5 and x > 2, [4, 3]),
+        ([1, 2, 3, 4], lambda x: x == 4, [4]),
+        ([1, 2, 3, 4], lambda x: True, [4, 3, 2, 1]),
+        ([1, 2], lambda x: False, []),
+    ]
+
+    for iterable, predicate, assrt in cases:
+        yield popwhile, iterable, predicate, assrt
