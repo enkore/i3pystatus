@@ -21,6 +21,7 @@ def basic_test_generator():
         ("test_battery_basic4", "DIS", "17.510", "1h:46m"),
         ("test_battery_basic5", "DIS", "11.453", "4h:52m"),
         ("test_battery_basic6", "CHR", "30.764", "0h:20m"),
+        ("test_battery_basic7", "DIS", "27.303", "1h:44m"),
     ]
     for path, status, consumption, remaining in cases:
         yield factory(path, "{status}", status)
