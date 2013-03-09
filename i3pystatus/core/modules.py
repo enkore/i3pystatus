@@ -18,7 +18,11 @@ class Module(SettingsBase):
         if self.output:
             if "name" not in self.output:
                 self.output["name"] = self.__name__
+            self.output["instance"] = str(id(self))
             json.insert(0, self.output)
+
+    def on_click(self):
+        pass
 
     def __repr__(self):
         return self.__class__.__name__

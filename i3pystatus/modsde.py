@@ -8,6 +8,7 @@ import urllib.request, urllib.parse, urllib.error
 import re
 import http.cookiejar
 import xml.etree.ElementTree as ET
+import webbrowser
 
 from i3pystatus import IntervalModule
 
@@ -85,3 +86,6 @@ class ModsDeChecker(IntervalModule):
                 self.logged_in = True
                 self.opener.addheaders.append(("Cookie", "{}={}".format(cookie.name, cookie.value)))
                 return True
+
+    def on_click(self):
+        webbrowser.open_new_tab("http://forum.mods.de/bb/")

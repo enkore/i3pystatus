@@ -1,5 +1,6 @@
 
 from urllib.request import urlopen
+import webbrowser
 
 import lxml.html
 from lxml.cssselect import CSSSelector
@@ -37,6 +38,9 @@ class DHL(TrackerAPI):
                 ret["status"] = self.intrarow_status_selector(last_row)[0].text.strip()
         return ret
 
+    def get_url(self):
+        return self.url
+
 class ParcelTracker(IntervalModule):
     interval = 20
 
@@ -59,3 +63,6 @@ class ParcelTracker(IntervalModule):
             "full_text": self.format.format(**fdict).strip(),
             "instance": self.name,
         }
+
+    def on_click(self):
+        webbrowser.open_new_tab(self.instance.get_url())

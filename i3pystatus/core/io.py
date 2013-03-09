@@ -2,7 +2,13 @@
 import time
 import json
 import sys
+import threading
 from contextlib import contextmanager
+import io
+
+class DevNull(io.TextIOBase):
+    def write(self, string):
+        pass
 
 class IOHandler:
     def __init__(self, inp=sys.stdin, out=sys.stdout):
@@ -50,7 +56,7 @@ class StandaloneIO(IOHandler):
     """
 
     n = -1
-    proto = ('{"version":1}', "[", "[]", ",[]", )
+    proto = ('{"version":1,"bidirectional":1}', "[", "[]", ",[]", )
 
     def __init__(self, interval=1):
         super().__init__()
@@ -62,6 +68,7 @@ class StandaloneIO(IOHandler):
                 time.sleep(self.interval)
             except KeyboardInterrupt:
                 return
+
             yield self.read_line()
 
     def read_line(self):
@@ -70,10 +77,10 @@ class StandaloneIO(IOHandler):
         return self.proto[min(self.n, len(self.proto)-1)]
 
 class JSONIO:
-    def __init__(self, io):
+    def __init__(self, io, skiplines=2):
         self.io = io
-        self.io.write_line(self.io.read_line())
-        self.io.write_line(self.io.read_line())
+        for i in range(skiplines):
+            self.io.write_line(self.io.read_line())
 
     def read(self):
         """Iterate over all JSON input (Generator)"""
