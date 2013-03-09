@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 import unittest
+from unittest.mock import MagicMock
 import string
 import random
 import sys
+import types
 
 from i3pystatus.core import util
 
@@ -14,8 +16,7 @@ def lchop(prefix, string):
     chopped = util.lchop(string, prefix)
     if string.startswith(prefix):
         assert len(chopped) == len(string) - len(prefix)
-    if prefix:
-        assert not chopped.startswith(prefix)
+    assert not (prefix and chopped.startswith(prefix))
 
 def lchop_test_generator():
     cases = [
@@ -50,6 +51,7 @@ def lchop_test_generator():
         ('T\r~bGV^@JC?P@Pa66.', "9,q>VI,[}pHM\nB65@LfE16VJPw=r'zU\x0bzWj@"),
         ('^|j7N!mV0o(?*1>p?dy', '\\ZdA&:\t\x0b:8\t|7.Kl,oHw-\x0cS\nwZlND~uC@le`Sm'),
     ]
+
     for prefix, string in cases:
         yield lchop, prefix, prefix+string
         yield lchop, prefix, string
@@ -57,6 +59,7 @@ def lchop_test_generator():
         yield lchop, string, prefix
         yield lchop, "", string
         yield lchop, prefix, ""
+        yield lchop, prefix+prefix, prefix+prefix+prefix+string
 
 def partition(iterable, limit, assrt):
     partitions = util.partition(iterable, limit)
@@ -109,6 +112,47 @@ def keyconstraintdict_missing_test_generator():
     for valid, required, feed, missing in cases:
         yield keyconstraintdict_missing, valid, required, feed, missing
 
+class ModuleListTests(unittest.TestCase):
+    def setUp(self):
+        self.status_handler = MagicMock()
+        self.module_base = MagicMock()
+        self.module_base.registered = MagicMock()
+        self.ml = util.ModuleList(self.status_handler, self.module_base)
+
+    def test_append_simple(self):
+        module = MagicMock()
+        self.module_base.registered = MagicMock()
+
+        self.ml.append(module)
+        module.registered.assert_called_with(self.status_handler)
+
+class PrefixedKeyDictTests(unittest.TestCase):
+    def test_no_prefix(self):
+        dict = util.PrefixedKeyDict("")
+        dict["foo"] = None
+        dict["bar"] = 42
+
+        assert dict["foo"] == None
+        assert dict["bar"] == 42
+
+    def test_prefix(self):
+        dict = util.PrefixedKeyDict("pfx_")
+        dict["foo"] = None
+        dict["bar"] = 42
+
+        assert dict["pfx_foo"] == None
+        assert dict["pfx_bar"] == 42
+
+    def test_dict(self):
+        d = util.PrefixedKeyDict("pfx_")
+        d["foo"] = None
+        d["bar"] = 42
+
+        realdict = dict(d)
+
+        assert realdict["pfx_foo"] == None
+        assert realdict["pfx_bar"] == 42
+
 class KeyConstraintDictAdvancedTests(unittest.TestCase):
     def test_invalid_1(self):
         kcd = util.KeyConstraintDict(valid_keys=tuple(), required_keys=tuple())
@@ -136,6 +180,14 @@ class KeyConstraintDictAdvancedTests(unittest.TestCase):
     def test_remove_required(self):
         kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
         kcd["foo"] = None
+        assert kcd.missing() == set()
+        del kcd["foo"]
+        assert kcd.missing() == set(["foo"])
+
+    def test_set_twice(self):
+        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
+        kcd["foo"] = 1
+        kcd["foo"] = 2
         assert kcd.missing() == set()
         del kcd["foo"]
         assert kcd.missing() == set(["foo"])
