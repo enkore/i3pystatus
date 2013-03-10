@@ -16,7 +16,7 @@ class ExceptionWrapper(Wrapper):
     def __call__(self):
         try:
             self.workload()
-        except Exception as exc:
+        except BaseException as exc:
             sys.stderr.write("Exception in {thread}".format(thread=threading.current_thread().name))
             traceback.print_exception(*sys.exc_info(), file=sys.stderr)
             sys.stderr.flush()

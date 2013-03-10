@@ -14,7 +14,7 @@ class Manager:
     def __call__(self):
         separate = []
         for thread in self.threads:
-            separate.extend(self.branch(thread, thread.time))
+            separate.extend(thread.branch(thread.time, self.upper_bound))
         self.create_threads(self.partition(separate))
 
     def __repr__(self):
@@ -22,12 +22,6 @@ class Manager:
 
     def wrap(self, workload):
         return wrapper.WorkloadWrapper(wrapper.ExceptionWrapper(workload))
-
-    def branch(self, thread, vtime):
-        if len(thread) > 1 and vtime > self.upper_bound:
-            remove = thread.pop()
-            return [remove] + self.branch(thread, vtime - remove.time)
-        return []
 
     def partition(self, workloads):
         return partition(workloads, self.lower_bound, lambda workload: workload.time)

@@ -51,3 +51,9 @@ class Thread(threading.Thread):
             filltime = self.target_interval - self.time
             if filltime > 0:
                 time.sleep(filltime)
+
+    def branch(self, vtime, bound):
+        if len(self) > 1 and vtime > bound:
+            remove = self.pop()
+            return [remove] + self.branch(vtime - remove.time, bound)
+        return []
