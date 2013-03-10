@@ -51,7 +51,7 @@ class StandaloneIO(IOHandler):
     """
 
     n = -1
-    proto = ('{"version":1,"bidirectional":true}', "[", "[]", ",[]", )
+    proto = ('{"version":1,"bidirectional":true}', "[", "[]", ",[]",)
 
     def __init__(self, interval=1):
         super().__init__()

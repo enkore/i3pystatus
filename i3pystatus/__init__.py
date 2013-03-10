@@ -3,14 +3,14 @@
 import sys
 
 from .core import Status
-from .core.modules import Module, AsyncModule, IntervalModule
+from .core.modules import Module, IntervalModule
 from .core.settings import SettingsBase
 from .core.config import ConfigFinder
 from .core.render import render_json
 
 __all__ = [
     "SettingsBase",
-    "Module", "AsyncModule", "IntervalModule",
+    "Module", "IntervalModule",
     "Status",
 ]
 
@@ -25,7 +25,6 @@ def test_config():
             def run(self):
                 self.call_start_hooks()
                 for module in self.modules:
-
                     sys.stdout.write("{module}: ".format(module=module.__name__))
                     sys.stdout.flush()
                     module.run()

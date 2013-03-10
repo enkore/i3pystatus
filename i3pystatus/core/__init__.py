@@ -1,7 +1,7 @@
 
 import sys
-import threading
 import os
+from threading import Thread
 
 from . import io, util
 from .modules import Module, START_HOOKS
@@ -11,7 +11,7 @@ class Status:
         self.standalone = standalone
         if standalone:
             self.io = io.StandaloneIO(interval)
-            self.ce_thread = threading.Thread(target=self.run_command_endpoint)
+            self.ce_thread = Thread(target=self.run_command_endpoint)
             self.ce_thread.daemon = True
             self.ce_thread.start()
         else:

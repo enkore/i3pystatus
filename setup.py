@@ -16,7 +16,12 @@ setup(name="i3pystatus",
         "Topic :: Desktop Environment :: Window Managers",
       ],
 
-      packages=["i3pystatus", "i3pystatus.core", "i3pystatus.mail"],
+      packages=[
+        "i3pystatus",
+        "i3pystatus.core",
+        "i3pystatus.core.threading",
+        "i3pystatus.mail"
+      ],
       entry_points={
         "console_scripts": ["i3pystatus = i3pystatus:main"],
       },

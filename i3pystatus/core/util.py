@@ -5,10 +5,6 @@ import itertools
 from .exceptions import *
 from .imputil import ClassFinder
 
-__all__ = [
-    "ModuleList", "KeyConstraintDict", "PrefixedKeyDict",
-]
-
 def lchop(string, prefix):
     if string.startswith(prefix):
         return string[len(prefix):]

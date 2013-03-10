@@ -1,8 +1,8 @@
-from threading import Thread
+
 import time
 
 from .settings import SettingsBase
-from .threads import AutomagicManager
+from .threading import Manager
 
 __all__ = [
     "Module", "AsyncModule", "IntervalModule",
@@ -36,15 +36,6 @@ class Module(SettingsBase):
     def __repr__(self):
         return self.__class__.__name__
 
-class AsyncModule(Module):
-    def registered(self, status_handler):
-        self.thread = Thread(target=self.mainloop)
-        self.thread.daemon = True
-        self.thread.start()
-
-    def mainloop(self):
-        """This is run in a separate daemon-thread"""
-
 class IntervalModule(Module):
     interval = 5 # seconds
     managers = {}
@@ -53,7 +44,7 @@ class IntervalModule(Module):
         if self.interval in IntervalModule.managers:
             IntervalModule.managers[self.interval].append(self)
         else:
-            am = AutomagicManager(self.interval)
+            am = Manager(self.interval)
             am.append(self)
             IntervalModule.managers[self.interval] = am
 
