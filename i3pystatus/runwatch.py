@@ -28,10 +28,16 @@ class RunWatch(IntervalModule):
         return os.path.exists("/proc/{pid}/".format(pid=pid))
 
     def run(self):
-        with open(glob.glob(self.path)[0], "r") as f:
-            pid = int(f.read().strip())
+        alive = False
+        pid = 0
+        try:
+            with open(glob.glob(self.path)[0], "r") as f:
+                pid = int(f.read().strip())
+            alive = self.is_process_alive(pid)
+        except Exception:
+            pass
 
-        if self.is_process_alive(pid):
+        if alive:
             fmt = self.format_up
             color = self.color_up
         else:
