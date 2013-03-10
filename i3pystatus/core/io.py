@@ -4,11 +4,6 @@ import json
 import sys
 import threading
 from contextlib import contextmanager
-import io
-
-class DevNull(io.TextIOBase):
-    def write(self, string):
-        pass
 
 class IOHandler:
     def __init__(self, inp=sys.stdin, out=sys.stdout):
@@ -56,7 +51,7 @@ class StandaloneIO(IOHandler):
     """
 
     n = -1
-    proto = ('{"version":1,"bidirectional":1}', "[", "[]", ",[]", )
+    proto = ('{"version":1,"bidirectional":true}', "[", "[]", ",[]", )
 
     def __init__(self, interval=1):
         super().__init__()
