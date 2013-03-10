@@ -15,7 +15,7 @@ class Manager:
         separate = []
         for thread in self.threads:
             separate.extend(thread.branch(thread.time, self.upper_bound))
-        self.create_threads(self.partition(separate))
+        self.create_threads(self.partition_workloads(separate))
 
     def __repr__(self):
         return "Manager"
@@ -23,12 +23,11 @@ class Manager:
     def wrap(self, workload):
         return wrapper.WorkloadWrapper(wrapper.ExceptionWrapper(workload))
 
-    def partition(self, workloads):
+    def partition_workloads(self, workloads):
         return partition(workloads, self.lower_bound, lambda workload: workload.time)
 
     def create_threads(self, threads):
-        for workloads in threads:
-            self.create_thread(workloads)
+        for workloads in threads: self.create_thread(workloads)
 
     def create_thread(self, workloads):
         thread = threads.Thread(self.target_interval, workloads, start_barrier=0)
@@ -39,5 +38,4 @@ class Manager:
         self.threads[0].append(self.wrap(workload))
 
     def start(self):
-        for thread in self.threads:
-            thread.start()
+        for thread in self.threads: thread.start()

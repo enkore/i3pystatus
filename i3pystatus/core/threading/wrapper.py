@@ -17,7 +17,10 @@ class ExceptionWrapper(Wrapper):
         try:
             self.workload()
         except BaseException as exc:
-            sys.stderr.write("Exception in {thread}".format(thread=threading.current_thread().name))
+            sys.stderr.write("Exception in {thread} at {time}\n".format(
+                thread=threading.current_thread().name,
+                time=time.strftime("%c")
+            ))
             traceback.print_exception(*sys.exc_info(), file=sys.stderr)
             sys.stderr.flush()
 

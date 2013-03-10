@@ -36,16 +36,18 @@ class Thread(threading.Thread):
         while len(self) <= self.start_barrier:
             time.sleep(0.4)
 
-    def setproctitle(self):
-        setproctitle("i3pystatus {name}: {workloads}".format(name=self.name, workloads=list(map(repr, self.workloads))))
+    def set_thread_title(self):
+        setproctitle("i3pystatus {name}: {workloads}".format(
+            name=self.name,
+            workloads=list(map(repr, self.workloads))
+        ))
 
     def execute_workloads(self):
-        for workload in self:
-            workload()
+        for workload in self: workload()
         self.workloads.sort(key=lambda workload: workload.time)
 
     def run(self):
-        self.setproctitle()
+        self.set_thread_title()
         while self:
             self.execute_workloads()
             filltime = self.target_interval - self.time
