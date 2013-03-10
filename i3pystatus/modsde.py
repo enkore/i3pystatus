@@ -87,5 +87,5 @@ class ModsDeChecker(IntervalModule):
                 self.opener.addheaders.append(("Cookie", "{}={}".format(cookie.name, cookie.value)))
                 return True
 
-    def on_click(self):
+    def on_leftclick(self):
         webbrowser.open_new_tab("http://forum.mods.de/bb/")

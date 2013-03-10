@@ -41,7 +41,7 @@ class Status:
             if j["command"] == "block_clicked":
                 module = self.modules.get_by_id(j["instance"])
                 if module:
-                    module.on_click()
+                    module.on_click(j["button"])
 
     def run(self):
         for j in io.JSONIO(self.io).read():

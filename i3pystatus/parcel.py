@@ -64,5 +64,5 @@ class ParcelTracker(IntervalModule):
             "instance": self.name,
         }
 
-    def on_click(self):
+    def on_leftclick(self):
         webbrowser.open_new_tab(self.instance.get_url())

@@ -21,7 +21,16 @@ class Module(SettingsBase):
             self.output["instance"] = str(id(self))
             json.insert(0, self.output)
 
-    def on_click(self):
+    def on_click(self, button):
+        if button == 1: # Left mouse button
+            self.on_leftclick()
+        elif button == 3: # Right mouse button
+            self.on_rightclick()
+
+    def on_leftclick(self):
+        pass
+
+    def on_rightclick(self):
         pass
 
     def __repr__(self):

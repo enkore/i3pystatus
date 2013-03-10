@@ -1,5 +1,6 @@
 
 from itertools import zip_longest
+import subprocess
 
 # PyPI: netifaces-py3
 import netifaces
@@ -61,7 +62,7 @@ class Network(IntervalModule):
         ("interface", "Interface to obtain information for, i.e. eth0"),
         "format_up", "color_up",
         "format_down", "color_down",
-        "name"
+        "name",
     )
 
     name = interface = "eth0"
@@ -113,3 +114,6 @@ class Network(IntervalModule):
             "color": color,
             "instance": self.interface
         }
+
+    def on_leftclick(self):
+        subprocess.Popen(["nm-connection-editor"])
