@@ -89,7 +89,6 @@ class AutomagicManager:
 
         initial_thread = Thread(target_interval, [self.wrap(self)])
         self.threads = [initial_thread]
-        initial_thread.start()
 
     def __call__(self):
         separate = []
@@ -126,3 +125,7 @@ class AutomagicManager:
 
     def append(self, workload):
         self.threads[0].append(self.wrap(workload))
+
+    def start(self):
+        for thread in self.threads:
+            thread.start()

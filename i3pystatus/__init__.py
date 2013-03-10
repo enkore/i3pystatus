@@ -4,7 +4,7 @@ import sys
 import threading
 
 from .core import util, io
-from .core.modules import *
+from .core.modules import Module, AsyncModule, IntervalModule, START_HOOKS
 from .core.settings import SettingsBase
 from .core.config import ConfigFinder
 
@@ -43,7 +43,12 @@ class Status:
                 if module:
                     module.on_click(j["button"])
 
+    def call_start_hooks(self):
+        for hook in START_HOOKS:
+            hook()
+
     def run(self):
+        self.call_start_hooks()
         for j in io.JSONIO(self.io).read():
             for module in self.modules:
                 module.inject(j)
