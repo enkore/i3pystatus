@@ -1,6 +1,9 @@
 
 import os.path
 import runpy
+import sys
+
+from .render import render_json
 
 SEARCHPATH = (
     "~/.i3pystatus.py",
@@ -24,19 +27,41 @@ class ConfigFinder:
     def exists(path):
         return os.path.isfile(path)
 
-    def get_config_path(self):
+    def find_config_file(self):
         failed = []
         for path in map(self.expand, self.searchpath):
             if self.exists(path):
-                return failed, path
+                return path
             else:
                 failed.append(path)
 
-        return failed, None
+        raise RuntimeError("Didn't find a config file, tried\n * {mods}".format(mods="\n * ".join(failed)))
 
-    def run_config(self):
-        failed, path = self.get_config_path()
-        if path:
-            runpy.run_path(path, run_name="i3pystatus._config")
-        else:
-            raise RuntimeError("Didn't find a config file, tried\n * {mods}".format(mods="\n * ".join(failed)))
+class Config:
+    def __init__(self):
+        self.finder = ConfigFinder()
+        self.config_file = self.finder.find_config_file()
+
+    def run(self):
+        runpy.run_path(self.config_file, run_name="i3pystatus._config")
+
+    def test(self):
+        def setup():
+            """This is a wrapped method so no one ever tries to use it outside of this"""
+            import i3pystatus
+            class TestStatus(i3pystatus.Status):
+                def run(self):
+                    self.call_start_hooks()
+                    for module in self.modules:
+                        sys.stdout.write("{module}: ".format(module=module.__name__))
+                        sys.stdout.flush()
+                        module.run()
+                        output = module.output or {"full_text": "(no output)"}
+                        print(render_json(output))
+
+            i3pystatus.Status = TestStatus
+        setup()
+        print("Using configuration file {file}".format(file=self.config_file))
+        print("Output, would be displayed right to left in i3bar")
+        self.run()
+        sys.exit(0) # Exit program, kill any state left behind by TestStatus
