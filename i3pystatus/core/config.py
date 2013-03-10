@@ -2,6 +2,7 @@
 import os.path
 import runpy
 import sys
+import contextlib
 
 from .render import render_json
 
@@ -46,8 +47,8 @@ class Config:
         runpy.run_path(self.config_file, run_name="i3pystatus._config")
 
     def test(self):
+        @contextlib.contextmanager
         def setup():
-            """This is a wrapped method so no one ever tries to use it outside of this"""
             import i3pystatus
             class TestStatus(i3pystatus.Status):
                 def run(self):
@@ -60,8 +61,10 @@ class Config:
                         print(render_json(output))
 
             i3pystatus.Status = TestStatus
-        setup()
-        print("Using configuration file {file}".format(file=self.config_file))
-        print("Output, would be displayed right to left in i3bar")
-        self.run()
-        sys.exit(0) # Exit program, kill any state left behind by TestStatus
+            yield
+            i3pystatus.Status = i3pystatus.Status.__bases__[0]
+
+        with setup():
+            print("Using configuration file {file}".format(file=self.config_file))
+            print("Output, would be displayed right to left in i3bar")
+            self.run()
