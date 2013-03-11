@@ -113,18 +113,65 @@ def keyconstraintdict_missing_test_generator():
         yield keyconstraintdict_missing, valid, required, feed, missing
 
 class ModuleListTests(unittest.TestCase):
+    class ModuleBase:
+        pass
+
     def setUp(self):
         self.status_handler = MagicMock()
-        self.module_base = MagicMock()
-        self.module_base.registered = MagicMock()
-        self.ml = util.ModuleList(self.status_handler, self.module_base)
+        self.ml = util.ModuleList(self.status_handler, self.ModuleBase)
 
     def test_append_simple(self):
-        module = MagicMock()
-        self.module_base.registered = MagicMock()
+        module = self.ModuleBase()
+        module.registered = MagicMock()
 
         self.ml.append(module)
         module.registered.assert_called_with(self.status_handler)
+
+    def _create_module_class(self, name, bases=None):
+        if not bases: bases = (self.ModuleBase,)
+        return type(name, bases, {
+            "registered": MagicMock(),
+            "__init__": MagicMock(return_value=None),
+        })
+
+    def test_append_class_instanciation(self):
+        module_class = self._create_module_class("module_class")
+
+        self.ml.append(module_class)
+
+        module_class.__init__.assert_called_with()
+        module_class.registered.assert_called_with(self.status_handler)
+
+    def test_append_module(self):
+        pymod = types.ModuleType("test_mod")
+        pymod.some_class = self._create_module_class("some_class")
+        pymod.some_class.__module__ = "test_mod"
+
+        self.ml.append(pymod)
+
+        pymod.some_class.__init__.assert_called_with()
+        pymod.some_class.registered.assert_called_with(self.status_handler)
+
+    def test_append_module2(self):
+        # Here we test if imported classes are ignored as they should
+        pymod = types.ModuleType("test_mod")
+        pymod.some_class = self._create_module_class("some_class")
+        pymod.some_class.__module__ = "other_module"
+
+        with self.assertRaises(IndexError):
+            self.ml.append(pymod)
+
+        assert not pymod.some_class.__init__.called
+        assert not pymod.some_class.registered.called
+
+    def test_append_class_inheritance(self):
+        in_between = self._create_module_class("in_between")
+        cls = self._create_module_class("cls", (in_between,))
+
+        self.ml.append(cls)
+
+        cls.__init__.assert_called_with()
+        cls.registered.assert_called_with(self.status_handler)
 
 class PrefixedKeyDictTests(unittest.TestCase):
     def test_no_prefix(self):
