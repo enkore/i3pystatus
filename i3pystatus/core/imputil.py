@@ -40,6 +40,8 @@ class ClassFinder:
             return self.get_class(module)(*args, **kwargs)
         elif isinstance(module, str):
             return self.instanciate_class_from_module(self.get_module(module), *args, **kwargs)
+        elif inspect.isclass(module) and issubclass(module, self.baseclass):
+            return module(*args, **kwargs)
         elif args or kwargs:
             raise ValueError("Additional arguments are invalid if 'module' is already an object")
         return module
