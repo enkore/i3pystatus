@@ -14,7 +14,7 @@ For examples how it works, take a look at the __main__.py.dist file with some ex
 To install it, follow these steps:
 
     cd ~/.config/i3status/
-    git clone git@github.com:janoliver/i3pystatus contrib
+    git clone git@github.com:enkore/i3pystatus contrib
     cd contrib/i3pystatus
     cp __main__.py.dist __main__.py
 
