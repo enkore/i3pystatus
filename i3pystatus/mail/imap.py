@@ -20,7 +20,7 @@ class IMAP(Backend):
     )
     required = ("host", "username", "password")
 
-    port = 143
+    port = 993
     ssl = False
 
     imap_class = imaplib.IMAP4
