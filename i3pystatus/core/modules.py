@@ -25,12 +25,10 @@ class Module(SettingsBase):
 
     def test(self):
         """
-        Return None* if settings seem ok (i.e. login credentials and such are valid)
+        Return True if settings seem ok (i.e. login credentials and such are valid)
         or a string describing the problem
-
-        * or some other value evaluating to false in a boolean context
         """
-        return 
+        return True
 
     def on_click(self, button):
         if button == 1: # Left mouse button
