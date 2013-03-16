@@ -20,8 +20,8 @@ class IMAP(Backend):
     )
     required = ("host", "username", "password")
 
-    port = 143
-    ssl = False
+    port = 993
+    ssl = True
 
     imap_class = imaplib.IMAP4
     connection = None
@@ -51,3 +51,5 @@ class IMAP(Backend):
         conn = self.get_connection()
         if conn:
             return len(conn.search(None,"UnSeen")[1][0].split())
+        else:
+            sys.stderr.write("no connection")
