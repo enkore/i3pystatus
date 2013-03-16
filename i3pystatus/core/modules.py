@@ -10,6 +10,7 @@ __all__ = [
 
 class Module(SettingsBase):
     output = None
+    position = 0
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
@@ -19,13 +20,16 @@ class Module(SettingsBase):
             if "name" not in self.output:
                 self.output["name"] = self.__name__
             self.output["instance"] = str(id(self))
-            json.insert(0, self.output)
+            json.insert(self.position, self.output)
 
     def on_click(self, button):
         if button == 1: # Left mouse button
             self.on_leftclick()
         elif button == 3: # Right mouse button
             self.on_rightclick()
+
+    def move(self, position):
+        self.position = position
 
     def on_leftclick(self):
         pass
