@@ -52,10 +52,15 @@ class Config:
             import i3pystatus
             class TestStatus(i3pystatus.Status):
                 def run(self):
+                    self.modules.reverse()
                     self.call_start_hooks()
                     for module in self.modules:
                         sys.stdout.write("{module}: ".format(module=module.__name__))
                         sys.stdout.flush()
+                        test = module.test()
+                        if test:
+                            print("\n\t", test)
+                            continue
                         module.run()
                         output = module.output or {"full_text": "(no output)"}
                         print(render_json(output))
@@ -65,6 +70,5 @@ class Config:
             i3pystatus.Status = i3pystatus.Status.__bases__[0]
 
         with setup():
-            print("Using configuration file {file}".format(file=self.config_file))
-            print("Output, would be displayed right to left in i3bar")
+            print("Using configuration file {file}\n".format(file=self.config_file))
             self.run()

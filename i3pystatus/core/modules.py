@@ -21,6 +21,15 @@ class Module(SettingsBase):
             self.output["instance"] = str(id(self))
             json.insert(0, self.output)
 
+    def test(self):
+        """
+        Return None* if settings seem ok (i.e. login credentials and such are valid)
+        or a string describing the problem
+
+        * or some other value evaluating to false in a boolean context
+        """
+        return 
+
     def on_click(self, button):
         if button == 1: # Left mouse button
             self.on_leftclick()
