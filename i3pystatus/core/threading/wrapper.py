@@ -2,6 +2,7 @@
 import sys
 import time
 import traceback
+import threading
 
 timer = time.perf_counter if hasattr(time, "perf_counter") else time.clock
 
@@ -16,12 +17,12 @@ class ExceptionWrapper(Wrapper):
     def __call__(self):
         try:
             self.workload()
-        except BaseException as exc:
+        except:
             sys.stderr.write("Exception in {thread} at {time}\n".format(
                 thread=threading.current_thread().name,
                 time=time.strftime("%c")
             ))
-            traceback.print_exception(*sys.exc_info(), file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
             sys.stderr.flush()
 
 class WorkloadWrapper(Wrapper):
