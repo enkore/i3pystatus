@@ -3,6 +3,7 @@ import time
 
 from .settings import SettingsBase
 from .threading import Manager
+from .util import convert_position
 
 __all__ = [
     "Module", "AsyncModule", "IntervalModule",
@@ -20,7 +21,7 @@ class Module(SettingsBase):
             if "name" not in self.output:
                 self.output["name"] = self.__name__
             self.output["instance"] = str(id(self))
-            json.insert(self.position, self.output)
+            json.insert(convert_position(self.position, json), self.output)
 
     def on_click(self, button):
         if button == 1: # Left mouse button

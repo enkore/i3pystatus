@@ -95,3 +95,8 @@ class KeyConstraintDict(collections.UserDict):
 
     def missing(self):
         return self.required_keys - (self.seen_keys & self.required_keys)
+
+def convert_position(pos, json):
+    if pos < 0:
+        pos = len(json) + (pos+1)
+    return pos
