@@ -23,7 +23,9 @@ class Status:
         """Register a new module."""
 
         if module:
-            self.modules.append(module, *args, **kwargs)
+            return self.modules.append(module, *args, **kwargs)
+        else:
+            return None
 
     def run_command_endpoint(self):
         for command in io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull,"w")), skiplines=1).read():

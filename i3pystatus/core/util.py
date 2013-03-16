@@ -46,6 +46,7 @@ class ModuleList(collections.UserList):
         module = self.finder.instanciate_class_from_module(module, *args, **kwargs)
         module.registered(self.status_handler)
         super().append(module)
+        return module
 
     def get_by_id(self, find_id):
         find_id = int(find_id)
@@ -94,3 +95,8 @@ class KeyConstraintDict(collections.UserDict):
 
     def missing(self):
         return self.required_keys - (self.seen_keys & self.required_keys)
+
+def convert_position(pos, json):
+    if pos < 0:
+        pos = len(json) + (pos+1)
+    return pos
