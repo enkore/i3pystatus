@@ -64,6 +64,11 @@ class ModsDeChecker(IntervalModule):
             self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
             self.logged_in = False
 
+    def test(self):
+        if not self.login():
+            return "Wrong credentials or no internet connection"
+        return True
+
     def login(self):
         data = urllib.parse.urlencode({
             "login_username": self.username,
@@ -75,7 +80,10 @@ class ModsDeChecker(IntervalModule):
             response = self.opener.open(self.login_url, data.encode("ascii"))
         except Exception:
             return
-        m = re.search("http://forum.mods.de/SSO.php[^']*", response.read().decode("ISO-8859-15"))
+
+        page = response.read().decode("ISO-8859-15")
+
+        m = re.search("http://forum.mods.de/SSO.php[^']*", page)
         self.cj.clear()
 
         if m and m.group(0):
@@ -85,7 +93,8 @@ class ModsDeChecker(IntervalModule):
                 self.cj.clear
                 self.logged_in = True
                 self.opener.addheaders.append(("Cookie", "{}={}".format(cookie.name, cookie.value)))
-                return True
+            return True
+        return False
 
     def on_leftclick(self):
         webbrowser.open_new_tab("http://forum.mods.de/bb/")
