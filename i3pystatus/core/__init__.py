@@ -29,10 +29,9 @@ class Status:
 
     def run_command_endpoint(self):
         for command in io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull,"w")), skiplines=1).read():
-            if command["command"] == "block_clicked":
-                module = self.modules.get_by_id(command["instance"])
-                if module:
-                    module.on_click(command["button"])
+            module = self.modules.get_by_id(command["instance"])
+            if module:
+                module.on_click(command["button"])
 
     def call_start_hooks(self):
         for hook in START_HOOKS:
