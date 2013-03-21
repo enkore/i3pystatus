@@ -11,7 +11,7 @@ import i3pystatus.mail
 
 from .core.imputil import ClassFinder
 
-IGNORE = ("__main__", "mkdocs")
+IGNORE = ("__main__", "mkdocs", "core")
 MODULE_FORMAT = """
 {heading} {name}
 

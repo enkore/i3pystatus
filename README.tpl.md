@@ -1,42 +1,47 @@
+<!--
+    Always edit README.tpl.md and create README.md by running
+    python -m i3pystatus.mkdocs
+    You can also let the maintainer do the latter :)
+-->
+
 # i3pystatus
 
 i3pystatus is a (hopefully growing) collection of python scripts for 
 status output compatible to i3status / i3bar of the i3 window manager.
 
-## Version 3
-
-Version 3 has been merged into master recently, please check out if your config still works,
-as many modules have been reworked (mostly added options) and the new settings system is in-place.
-For examples how it works, take a look at the __main__.py.dist file with some examples.
-
 ## Installation
 
-To install it, follow these steps:
+### From PyPI package [i3pystatus](https://pypi.python.org/pypi/i3pystatus)
 
-    cd ~/.config/i3status/
-    git clone git@github.com:enkore/i3pystatus contrib
-    cd contrib/i3pystatus
-    cp __main__.py.dist __main__.py
+    pip install i3pystatus
 
-Add the following to `~/.config/i3status/config`:
+### Packages for your OS
 
-    general {
-        output_format = "i3bar"
-        colors = true
-        interval = 5
-    }
+    * [Arch Linux](https://aur.archlinux.org/packages/i3pystatus-git/)
 
-Change your i3wm config to the following:
+## Configuration
+
+You can keep your config file at various places, i3pystatus will look
+for it in these places:
+
+    ~/.i3pystatus.py
+    ~/.i3/i3pystatus.py
+    ~/.config/i3pystatus.py
+    $XDG_CONFIG_HOME/i3pystatus.py
+    /etc/i3pystatus.py
+    /etc/xdg/i3pystatus.py
+    $XDG_CONFIG_DIRS/i3pystatus.py
+
+A sample configuration file is `i3pystatus/__main__.py.dist`
+
+Also change your i3wm config to the following:
 
     # i3bar
     bar {
-        status_command    cd ~/.config/i3status/contrib ; i3status | python -m i3pystatus
+        status_command    i3pystatus
         position          top
         workspace_buttons yes
     }
-
-And finally adjust the settings in `~/.config/i3status/contrib/i3pystatus/__main__.py`
-as you like. 
 
 ## Modules
 
