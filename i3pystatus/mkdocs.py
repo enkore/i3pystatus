@@ -17,7 +17,7 @@ MODULE_FORMAT = """
 
 {doc}
 
-&nbsp;
+__Settings:__
 
 {settings}
 
