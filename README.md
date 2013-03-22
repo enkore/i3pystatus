@@ -17,7 +17,7 @@ status output compatible to i3status / i3bar of the i3 window manager.
 
 ### Packages for your OS
 
-    * [Arch Linux](https://aur.archlinux.org/packages/i3pystatus-git/)
+* [Arch Linux](https://aur.archlinux.org/packages/i3pystatus-git/)
 
 ## Configuration
 
