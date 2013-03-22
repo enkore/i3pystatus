@@ -16,6 +16,8 @@ class Wireless(Network):
     * {quality} Link quality in percent
     """
 
+    interface = "wlan0"
+
     def collect(self):
         color, format, fdict, up = super().collect()
 
