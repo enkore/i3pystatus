@@ -279,7 +279,7 @@ Display network information about a interface.
 Requires the PyPI package `netifaces-py3`.
 
 Available formatters:
-* {inteface} same as setting
+* {interface} same as setting
 * {name} same as setting
 * {v4} IPv4 address
 * {v4mask} subnet mask
