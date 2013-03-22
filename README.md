@@ -57,6 +57,8 @@ Shows volume of ALSA mixer. You can also use this for inputs, btw.
 Requires pyalsaaudio
 
 
+&nbsp;
+
 * `format` — {volume} is the current volume, {muted} is one of `muted` or `unmuted`. {card} is the sound card used; {mixer} the mixer. (default: `♪: {volume}`)
 * `mixer` — ALSA mixer (default: `Master`)
 * `mixer_id` — ALSA mixer id (default: `0`)
@@ -74,13 +76,10 @@ Requires pyalsaaudio
 
 Screen backlight info
 
-Available formatters:
-* brightness
-* max_brightness
-* percentage
 
+&nbsp;
 
-* `format` — format string (default: `{brightness}/{max_brightness}`)
+* `format` — format string, formatters: brightness, max_brightness, percentage (default: `{brightness}/{max_brightness}`)
 * `backlight` — backlight, see `/sys/class/backlight/` (default: `acpi_video0`)
 * `color` —  (default: `#FFFFFF`)
 
@@ -103,6 +102,10 @@ Available formatters for format and alert_format_\*:
 * battery_ident
 
 
+
+
+&nbsp;
+
 * `battery_ident` —  (default: `BAT0`)
 * `format` —  (default: `{status} {remaining_hm}`)
 * `alert` — Display a libnotify-notification on low battery (default: `False`)
@@ -120,6 +123,8 @@ Available formatters for format and alert_format_\*:
 This class shows a clock
 
 
+&nbsp;
+
 * `format` — stftime format string (default: `None`)
 
 
@@ -132,6 +137,8 @@ Gets used, free, available and total amount of bytes on the given mounted filesy
 These values can also be expressed in percentages with the percentage_used, percentage_free
 and percentage_avail formats.
 
+
+&nbsp;
 
 * `format` —  (default: `{free}/{avail}`)
 * `path` —  (required)
@@ -158,6 +165,8 @@ transforms is a optional dict of callables taking a single argument (a dictionar
 of all components). The return value is bound to the key.
 
 
+&nbsp;
+
 * `format` —  (required)
 * `components` —  (required)
 * `transforms` —  (default: `{}`)
@@ -173,6 +182,8 @@ of all components). The return value is bound to the key.
 Shows system load
 
 
+&nbsp;
+
 * `format` — format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: `{avg1} {avg5}`)
 
 
@@ -184,6 +195,8 @@ Generic mail checker
 
 The `backends` setting determines the backends to use. Currently available are:
 
+
+&nbsp;
 
 * `backends` — List of backends (instances of i3pystatus.mail.xxx)
 * `color` —  (default: `#ffffff`)
@@ -202,6 +215,8 @@ The `backends` setting determines the backends to use. Currently available are:
 > Checks for mail on a IMAP server
 > 
 > 
+> &nbsp;
+> 
 > * `host` —  (required)
 > * `port` —  (default: `993`)
 > * `username` —  (required)
@@ -218,6 +233,8 @@ The `backends` setting determines the backends to use. Currently available are:
 > and "unread"
 > 
 > 
+> &nbsp;
+> 
 > * `db_path` —  (required)
 > 
 > 
@@ -232,6 +249,8 @@ The `backends` setting determines the backends to use. Currently available are:
 > * python-dbus
 > 
 > 
+> &nbsp;
+> 
 > 
 > 
 > 
@@ -243,6 +262,8 @@ The `backends` setting determines the backends to use. Currently available are:
 This class returns i3status parsable output of the number of
 unread posts in any bookmark in the mods.de forums.
 
+
+&nbsp;
 
 * `format` — Use {unread} as the formatter for number of unread posts (default: `{unread} new posts in bookmarks`)
 * `offset` — subtract number of posts before output (default: `0`)
@@ -273,6 +294,8 @@ Available formatters:
 Not available addresses (i.e. no IPv6 connectivity) are replaced with empty strings.
 
 
+&nbsp;
+
 * `interface` — Interface to obtain information for, i.e. eth0 (default: `eth0`)
 * `format_up` —  (default: `{interface}: {v4}`)
 * `color_up` —  (default: `#00FF00`)
@@ -286,6 +309,8 @@ Not available addresses (i.e. no IPv6 connectivity) are replaced with empty stri
 
 
 
+&nbsp;
+
 * `instance` — Tracker instance
 * `format` —  (default: `{name}:{progress}`)
 * `name` 
@@ -297,6 +322,8 @@ Not available addresses (i.e. no IPv6 connectivity) are replaced with empty stri
 
 Simple regex file watcher
 
+
+&nbsp;
 
 * `format` — format string used for output (default: `{0}`)
 * `regex` —  (required)
@@ -317,6 +344,8 @@ such as a VPN client or your DHCP client is running.
 Available formatters are {pid} and {name}.
 
 
+&nbsp;
+
 * `format_up` —  (default: `{name}`)
 * `format_down` —  (default: `{name}`)
 * `color_up` —  (default: `#00FF00`)
@@ -333,6 +362,8 @@ Shows CPU temperature of Intel processors
 
 AMD is currently not supported as they can only report a relative temperature, which is pretty useless
 
+
+&nbsp;
 
 * `format` — format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps. (default: `{temp} °C`)
 * `color` —  (default: `#FFFFFF`)
@@ -354,6 +385,8 @@ the same, except for these additional formatters:
 * {freq} Current frequency
 * {quality} Link quality in percent
 
+
+&nbsp;
 
 * `interface` — Interface to obtain information for, i.e. eth0 (default: `eth0`)
 * `format_up` —  (default: `{interface}: {v4}`)

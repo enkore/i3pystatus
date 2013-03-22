@@ -17,6 +17,8 @@ MODULE_FORMAT = """
 
 {doc}
 
+&nbsp;
+
 {settings}
 
 {endstring}\n"""

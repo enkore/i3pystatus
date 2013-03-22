@@ -3,15 +3,10 @@ from i3pystatus.file import File
 class Backlight(File):
     """
     Screen backlight info
-
-    Available formatters:
-    * brightness
-    * max_brightness
-    * percentage
     """
 
     settings = (
-        ("format", "format string"),
+        ("format", "format string, formatters: brightness, max_brightness, percentage"),
         ("backlight", "backlight, see `/sys/class/backlight/`"),
         "color",
     )
