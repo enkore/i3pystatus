@@ -279,22 +279,22 @@ Display network information about a interface.
 Requires the PyPI package `netifaces-py3`.
 
 Available formatters:
-* {interface} same as setting
-* {name} same as setting
-* {v4} IPv4 address
-* {v4mask} subnet mask
-* {v4cidr} IPv4 address in cidr notation (i.e. 192.168.2.204/24)
-* {v6} IPv6 address
-* {v6mask} subnet mask
-* {v6cidr} IPv6 address in cidr notation
-* {mac} MAC of interface
+* `{interface}` same as setting
+* `{name}` same as setting
+* `{v4}` IPv4 address
+* `{v4mask}` subnet mask
+* `{v4cidr}` IPv4 address in cidr notation (i.e. 192.168.2.204/24)
+* `{v6}` IPv6 address
+* `{v6mask}` subnet mask
+* `{v6cidr}` IPv6 address in cidr notation
+* `{mac}` MAC of interface
 
 Not available addresses (i.e. no IPv6 connectivity) are replaced with empty strings.
 
 
 __Settings:__
 
-* `interface` — Interface to obtain information for, i.e. eth0 (default: `eth0`)
+* `interface` — Interface to obtain information for (default: `eth0`)
 * `format_up` —  (default: `{interface}: {v4}`)
 * `color_up` —  (default: `#00FF00`)
 * `format_down` —  (default: `{interface}`)
@@ -386,7 +386,7 @@ the same, except for these additional formatters:
 
 __Settings:__
 
-* `interface` — Interface to obtain information for, i.e. eth0 (default: `eth0`)
+* `interface` — Interface to obtain information for (default: `eth0`)
 * `format_up` —  (default: `{interface}: {v4}`)
 * `color_up` —  (default: `#00FF00`)
 * `format_down` —  (default: `{interface}`)
