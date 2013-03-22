@@ -386,7 +386,7 @@ the same, except for these additional formatters:
 
 __Settings:__
 
-* `interface` — Interface to obtain information for (default: `eth0`)
+* `interface` — Interface to obtain information for (default: `wlan0`)
 * `format_up` —  (default: `{interface}: {v4}`)
 * `color_up` —  (default: `#00FF00`)
 * `format_down` —  (default: `{interface}`)
