@@ -58,7 +58,7 @@ class Config:
                         sys.stdout.write("{module}: ".format(module=module.__name__))
                         sys.stdout.flush()
                         test = module.test()
-                        if test:
+                        if test is not True:
                             print("\n\t", test)
                             continue
                         module.run()
