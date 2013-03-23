@@ -3,7 +3,7 @@ import time
 
 from .settings import SettingsBase
 from .threading import Manager
-from .util import convert_position
+from .util import convert_position, chain
 
 __all__ = [
     "Module", "AsyncModule", "IntervalModule",
@@ -36,6 +36,7 @@ class Module(SettingsBase):
         elif button == 3: # Right mouse button
             self.on_rightclick()
 
+    @chain
     def move(self, position):
         self.position = position
 

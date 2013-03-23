@@ -5,6 +5,12 @@ import itertools
 from .exceptions import *
 from .imputil import ClassFinder
 
+def chain(fun):
+    def chained(self, *args, **kwargs):
+        fun(self, *args, **kwargs)
+        return self
+    return chained
+
 def lchop(string, prefix):
     if string.startswith(prefix):
         return string[len(prefix):]
