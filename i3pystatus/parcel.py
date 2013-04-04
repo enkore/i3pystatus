@@ -16,6 +16,7 @@ class TrackerAPI:
 
 class DHL(TrackerAPI):
     URL="http://nolp.dhl.de/nextt-online-public/set_identcodes.do?lang=en&idc={idcode}"
+
     def __init__(self, idcode):
         self.idcode = idcode
         self.url = self.URL.format(idcode=self.idcode)
@@ -36,6 +37,33 @@ class DHL(TrackerAPI):
                 ret["progress"] = self.progress_selector(page)[0].text.strip()
                 last_row = self.last_status_selector(page)[-1]
                 ret["status"] = self.intrarow_status_selector(last_row)[0].text.strip()
+        return ret
+
+    def get_url(self):
+        return self.url
+
+class UPS(TrackerAPI):
+    URL="http://wwwapps.ups.com/WebTracking/processRequest?HTMLVersion=5.0&Requester=NES&AgreeToTermsAndConditions=yes&loc=en_US&tracknum={idcode}"
+
+    def __init__(self, idcode):
+        self.idcode = idcode
+        self.url = self.URL.format(idcode=self.idcode)
+
+        error_selector = CSSSelector(".secBody .error")
+        self.error = lambda page: len(error_selector(page)) >= 1
+        self.status_selector = CSSSelector("#tt_spStatus")
+        self.progress_selector = CSSSelector(".pkgProgress div")
+
+    def status(self):
+        ret = {}
+        with urlopen(self.url) as page:
+            page = lxml.html.fromstring(page.read())
+            if self.error(page):
+                ret["progress"] = ret["status"] = "n/a"
+            else:
+                ret["status"] = self.status_selector(page)[0].text.strip()
+                progress_cls = int((int(self.progress_selector(page)[0].get("class").strip("staus")) + 1) / 4 * 100)
+                ret["progress"]  = progress_cls
         return ret
 
     def get_url(self):
