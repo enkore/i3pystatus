@@ -62,7 +62,7 @@ class UPS(TrackerAPI):
                 ret["progress"] = ret["status"] = "n/a"
             else:
                 ret["status"] = self.status_selector(page)[0].text.strip()
-                progress_cls = int((int(self.progress_selector(page)[0].get("class").strip("staus")) + 1) / 4 * 100)
+                progress_cls = int(int(self.progress_selector(page)[0].get("class").strip("staus")) / 5 * 100)
                 ret["progress"]  = progress_cls
         return ret
 
