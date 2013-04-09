@@ -155,7 +155,7 @@ class BatteryChecker(IntervalModule):
         else:
             fdict["status"] = "FULL"
 
-        if self.alert and fdict["percentage"] <= self.alert_percentage:
+        if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
             display_notification(
                 title=self.alert_format_title.format(**fdict),
                 body=self.alert_format_body.format(**fdict),
