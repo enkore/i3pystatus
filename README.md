@@ -315,6 +315,34 @@ __Settings:__
 
 
 
+### pyload
+
+
+Shows pyLoad status
+
+Available formatters:
+* captcha (see captcha_true and captcha_false, which are the values filled in for this formatter)
+* progress (average over all running downloads)
+* progress_all (percentage of completed files/links in queue)
+* speed (kilobytes/s)
+* download (downloads enabled, also see download_true and download_false)
+* total (number of downloads)
+* free_space (free space in download directory in gigabytes)
+
+
+__Settings:__
+
+* `address` — Address of pyLoad webinterface (default: `http://127.0.0.1:8000`)
+* `format` —  (default: `{captcha} {progress_all:.1f}% {speed:.1f} kb/s`)
+* `captcha_true` —  (default: `Captcha waiting`)
+* `captcha_false` —  (default: ``)
+* `download_true` —  (default: `Downloads enabled`)
+* `download_false` —  (default: `Downloads disabled`)
+* `username` —  (required)
+* `password` —  (required)
+
+
+
 ### regex
 
 
@@ -392,6 +420,18 @@ __Settings:__
 * `format_down` —  (default: `{interface}`)
 * `color_down` —  (default: `#FF0000`)
 * `name` —  (default: `eth0`)
+
+
+
+### xrandr
+
+
+Do Not Publish, private hack of it's own
+
+
+__Settings:__
+
+
 
 
 
