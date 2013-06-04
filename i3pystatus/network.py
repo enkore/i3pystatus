@@ -1,4 +1,3 @@
-
 from itertools import zip_longest
 import subprocess
 
@@ -73,7 +72,7 @@ class Network(IntervalModule):
 
     def init(self):
         if self.interface not in netifaces.interfaces():
-            raise RuntimeError("Unknown inteface {iface}!".format(iface=self.inteface))
+            raise RuntimeError("Unknown interface {iface}!".format(iface=self.interface))
 
         self.baseinfo = {
             "interface": self.interface,
