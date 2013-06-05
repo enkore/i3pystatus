@@ -1,4 +1,3 @@
-
 import basiciw
 
 from i3pystatus.network import Network
@@ -27,9 +26,9 @@ class Wireless(Network):
             fdict["freq"] = iwi["freq"]
             quality = iwi["quality"]
             if quality["quality_max"] > 0:
-                fdict["quality"] = quality["quality"] / quality["quality_max"]
+                fdict["quality"] = round(quality["quality"] / quality["quality_max"],3)
             else:
-                fdict["quality"] = quality["quality"]
+                fdict["quality"] = round(quality["quality"],3)
             fdict["quality"] *= 100
         else:
             fdict["essid"] = ""
