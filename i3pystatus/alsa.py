@@ -1,4 +1,4 @@
-from alsaaudio import Mixer
+from alsaaudio import Mixer, ALSAAudioError
 
 from i3pystatus import IntervalModule
 
@@ -8,6 +8,8 @@ class ALSA(IntervalModule):
 
     Requires pyalsaaudio
     """
+
+    interval = 1
 
     settings = (
         ("format", "{volume} is the current volume, {muted} is one of `muted` or `unmuted`. {card} is the sound card used; {mixer} the mixer."),
@@ -30,9 +32,15 @@ class ALSA(IntervalModule):
     channel = 0
 
     alsamixer = None
+    has_mute = True
 
     def init(self):
         self.create_mixer()
+        try:
+            self.alsamixer.getmute()
+        except ALSAAudioError:
+            self.has_mute = False
+
         self.fdict = {
             "card": self.alsamixer.cardname(),
             "mixer": self.mixer,
@@ -44,7 +52,9 @@ class ALSA(IntervalModule):
     def run(self):
         self.create_mixer()
 
-        muted = self.alsamixer.getmute()[self.channel] == 1
+        muted = False
+        if self.has_mute:
+            muted = self.alsamixer.getmute()[self.channel] == 1
         self.fdict["volume"] = self.alsamixer.getvolume()[self.channel]
         self.fdict["muted"] = self.muted if muted else self.muted
 

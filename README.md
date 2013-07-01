@@ -271,6 +271,29 @@ __Settings:__
 
 
 
+### mpd
+
+
+Displays various information from MPD (the music player daemon)
+
+Available formatters:
+* title (the title of the current song)
+* album (the album of the current song, can be an empty string (e.g. for online streams))
+* artist (can be empty, too)
+* playtime_h (Playtime, hours)
+* playtime_m (Playtime, minutes)
+* playtime_s (Playtime, seconds)
+* pos (Position of current song in playlist, one-based)
+* len (Length of current playlist)
+
+
+__Settings:__
+
+* `port` — MPD port (default: `6600`)
+* `format` —  (default: `{title} [{playtime_h}:{playtime_m}:{playtime_s}]`)
+
+
+
 ### network
 
 
