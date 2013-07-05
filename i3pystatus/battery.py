@@ -111,9 +111,15 @@ class BatteryChecker(IntervalModule):
         ("alert", "Display a libnotify-notification on low battery"),
         "alert_percentage", "alert_format_title", "alert_format_body", "alert_percentage",
         "path",
+        ("status", "A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names"),
     )
     battery_ident = "BAT0"
     format = "{status} {remaining_hm}"
+    status = {
+        "CHR": "CHR",
+        "DIS": "DIS",
+        "FULL": "FULL",
+    }
     
     alert = False
     alert_percentage = 10
@@ -162,6 +168,8 @@ class BatteryChecker(IntervalModule):
                 icon="battery-caution",
                 urgency=2,
             )
+
+        fdict["status"] = self.status[fdict["status"]]
 
         self.output = {
             "full_text": self.format.format(**fdict).strip(),
