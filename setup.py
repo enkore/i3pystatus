@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name="i3pystatus",
-      version="3.14",
+      version="3.15",
       description="Like i3status, this generates status line for i3bar / i3wm",
       url="http://github.com/enkore/i3pystatus",
       license="MIT",
@@ -25,14 +25,4 @@ setup(name="i3pystatus",
       entry_points={
         "console_scripts": ["i3pystatus = i3pystatus:main"],
       },
-
-#      install_requires=[
- #       "gobject",
- #     ],
-#      install_requires=[
-#        "Jinja2",
- #       "lxml",
-  #      "markdown",
-   #     "PyRSS2Gen",
-    #  ]
      )

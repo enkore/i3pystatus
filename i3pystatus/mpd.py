@@ -16,17 +16,24 @@ class MPD(IntervalModule):
     * playtime_s (Playtime, seconds)
     * pos (Position of current song in playlist, one-based)
     * len (Length of current playlist)
+    * status
     """
     interval = 1
 
     settings = (
         ("port", "MPD port"),
         "format",
+        ("status", "Dictionary mapping pause, play and stop to output")
     )
 
     port = 6600
 
-    format = "{title} [{playtime_h}:{playtime_m}:{playtime_s}]"
+    format = "{title} {status}"
+    status = {
+        "pause": "▷",
+        "play": "▶",
+        "stop": "◾",
+    }
 
     def _mpd_command(self, sock, command):
         sock.send((command + "\n").encode("utf-8"))
@@ -46,6 +53,7 @@ class MPD(IntervalModule):
             status = self._mpd_command(s, "status")
             fdict["pos"] = int(status["song"])+1
             fdict["len"] = int(status["playlistlength"])
+            fdict["status"] = self.status[status["state"]]
 
             currentsong = self._mpd_command(s, "currentsong")
             fdict["title"] = currentsong["Title"]
@@ -60,3 +68,9 @@ class MPD(IntervalModule):
             self.output = {
                 "full_text": self.format.format(**fdict).strip(),
             }
+
+    def on_leftclick(self):
+        with socket.create_connection(("localhost", self.port)) as s:
+            s.recv(8192)
+            
+            self._mpd_command(s, "pause %i" % (0 if self._mpd_command(s, "status")["state"] == "pause" else 1))

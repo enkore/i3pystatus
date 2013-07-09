@@ -112,6 +112,7 @@ __Settings:__
 * `alert_format_body` —  (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
 * `alert_percentage` —  (default: `10`)
 * `path` —  (default: `None`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}`)
 
 
 
@@ -285,12 +286,14 @@ Available formatters:
 * playtime_s (Playtime, seconds)
 * pos (Position of current song in playlist, one-based)
 * len (Length of current playlist)
+* status
 
 
 __Settings:__
 
 * `port` — MPD port (default: `6600`)
-* `format` —  (default: `{title} [{playtime_h}:{playtime_m}:{playtime_s}]`)
+* `format` —  (default: `{title} {status}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'pause': '▷', 'play': '▶', 'stop': '◾'}`)
 
 
 
@@ -443,18 +446,6 @@ __Settings:__
 * `format_down` —  (default: `{interface}`)
 * `color_down` —  (default: `#FF0000`)
 * `name` —  (default: `eth0`)
-
-
-
-### xrandr
-
-
-Do Not Publish, private hack of it's own
-
-
-__Settings:__
-
-
 
 
 
