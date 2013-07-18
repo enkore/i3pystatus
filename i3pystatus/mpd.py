@@ -17,6 +17,8 @@ class MPD(IntervalModule):
     * pos (Position of current song in playlist, one-based)
     * len (Length of current playlist)
     * status
+
+    Left click on the module play/pauses, right click (un)mutes.
     """
     interval = 1
 
@@ -27,7 +29,6 @@ class MPD(IntervalModule):
     )
 
     port = 6600
-
     format = "{title} {status}"
     status = {
         "pause": "▷",
@@ -35,10 +36,11 @@ class MPD(IntervalModule):
         "stop": "◾",
     }
 
+    vol = 100
+
     def _mpd_command(self, sock, command):
         sock.send((command + "\n").encode("utf-8"))
-        reply = sock.recv(16384)
-        reply = reply.decode("utf-8")
+        reply = sock.recv(16384).decode("utf-8")
         replylines = reply.split("\n")[:-2]
 
         return dict(
@@ -56,7 +58,7 @@ class MPD(IntervalModule):
             fdict["status"] = self.status[status["state"]]
 
             currentsong = self._mpd_command(s, "currentsong")
-            fdict["title"] = currentsong["Title"]
+            fdict["title"] = currentsong.get("Title", "")
             fdict["album"] = currentsong.get("Album", "")
             fdict["artist"] = currentsong.get("Artist", "")
 
@@ -74,3 +76,14 @@ class MPD(IntervalModule):
             s.recv(8192)
             
             self._mpd_command(s, "pause %i" % (0 if self._mpd_command(s, "status")["state"] == "pause" else 1))
+
+    def on_rightclick(self):
+        with socket.create_connection(("localhost", self.port)) as s:
+            s.recv(8192)
+            
+            vol = int(self._mpd_command(s, "status")["volume"])
+            if vol == 0:
+                self._mpd_command(s, "setvol %i" % self.vol)
+            else:
+                self.vol = vol
+                self._mpd_command(s, "setvol 0")
