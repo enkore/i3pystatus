@@ -23,11 +23,13 @@ class MPD(IntervalModule):
     interval = 1
 
     settings = (
+        ("host"),
         ("port", "MPD port"),
         "format",
         ("status", "Dictionary mapping pause, play and stop to output")
     )
 
+    host = "localhost"
     port = 6600
     format = "{title} {status}"
     status = {
@@ -48,7 +50,7 @@ class MPD(IntervalModule):
         )
 
     def run(self):
-        with socket.create_connection(("localhost", self.port)) as s:
+        with socket.create_connection((self.host, self.port)) as s:
             s.recv(8192)
             fdict = {}
 

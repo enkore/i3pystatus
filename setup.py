@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name="i3pystatus",
-      version="3.16",
+      version="3.17",
       description="Like i3status, this generates status line for i3bar / i3wm",
       url="http://github.com/enkore/i3pystatus",
       license="MIT",
@@ -15,7 +15,6 @@ setup(name="i3pystatus",
         "Programming Language :: Python :: 3",
         "Topic :: Desktop Environment :: Window Managers",
       ],
-
       packages=[
         "i3pystatus",
         "i3pystatus.core",

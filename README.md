@@ -112,7 +112,7 @@ __Settings:__
 * `alert_format_body` —  (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
 * `alert_percentage` —  (default: `10`)
 * `path` —  (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}`)
 
 
 
@@ -288,12 +288,15 @@ Available formatters:
 * len (Length of current playlist)
 * status
 
+Left click on the module play/pauses, right click (un)mutes.
+
 
 __Settings:__
 
+* `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` —  (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'pause': '▷', 'play': '▶', 'stop': '◾'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
 
 
 
