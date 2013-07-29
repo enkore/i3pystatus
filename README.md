@@ -112,7 +112,7 @@ __Settings:__
 * `alert_format_body` —  (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
 * `alert_percentage` —  (default: `10`)
 * `path` —  (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}`)
 
 
 
@@ -296,7 +296,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` —  (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'pause': '▷', 'play': '▶'}`)
 
 
 
@@ -341,6 +341,20 @@ __Settings:__
 * `instance` — Tracker instance
 * `format` —  (default: `{name}:{progress}`)
 * `name` 
+
+
+
+### pulseaudio
+
+
+Shows volume of default PulseAudio sink (output).
+
+Requires libpulseaudio from PyPI. Based on http://freshfoo.com/blog/pulseaudio_monitoring
+
+
+__Settings:__
+
+* `format` — {volume} is the current volume (default: `♪: {volume}`)
 
 
 
