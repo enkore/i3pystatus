@@ -17,6 +17,7 @@ class PulseAudio(Module):
     format = "♪: {volume}"
 
     def init(self):
+        """Creates context, when context is ready context_notify_cb is called"""
         # Wrap callback methods in appropriate ctypefunc instances so
         # that the Pulseaudio C API can call them
         self._context_notify_cb = pa_context_notify_cb_t(self.context_notify_cb)
@@ -37,12 +38,14 @@ class PulseAudio(Module):
         pa_threaded_mainloop_start(_mainloop)
 
     def request_update(self, context):
+        """Requests a sink info update (sink_info_cb is called)"""
         pa_operation_unref(pa_context_get_sink_info_by_name(context, self.sink, self._sink_info_cb, None))
 
     def success_cb(self, context, success, userdata):
         pass
 
     def server_info_cb(self, context, server_info_p, userdata):
+        """Retrieves the default sink and calls request_update"""
         server_info = server_info_p.contents
 
         self.sink = server_info.default_sink_name
@@ -50,6 +53,11 @@ class PulseAudio(Module):
         self.request_update(context)
 
     def context_notify_cb(self, context, _):
+        """Checks wether the context is ready
+
+        -Queries server information (server_info_cb is called)
+        -Subscribes to property changes on all sinks (update_cb is called)
+        """
         state = pa_context_get_state(context)
 
         if state == PA_CONTEXT_READY:
@@ -57,15 +65,14 @@ class PulseAudio(Module):
 
             pa_context_set_subscribe_callback(context, self._update_cb, None)
 
-            # PA_SUBSCRIPTION_EVENT_CHANGE 
-            # PA_SUBSCRIPTION_MASK_SOURCE_OUTPUT 
             pa_operation_unref(pa_context_subscribe(context, PA_SUBSCRIPTION_EVENT_CHANGE|PA_SUBSCRIPTION_MASK_SINK, self._success_cb, None))
 
     def update_cb(self, context, t, idx, userdata):
-        """A sink property changed"""
+        """A sink property changed, calls request_update"""
         self.request_update(context)
 
     def sink_info_cb(self, context, sink_info_p, _, __):
+        """Updates self.output"""
         if sink_info_p:
             sink_info = sink_info_p.contents
             volume_percent = int(100 * sink_info.volume.values[0]/0x10000)
