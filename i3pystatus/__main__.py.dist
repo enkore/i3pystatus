@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from . import (
-    Status
-    modsde,
-    regex,
-)
+from . import Status
 
 # If you want to start i3status automatically with i3pystatus,
 # uncomment the following lines
