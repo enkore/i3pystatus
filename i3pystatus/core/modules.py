@@ -30,6 +30,9 @@ class Module(SettingsBase):
         """
         return True
 
+    def run(self):
+        pass
+
     def on_click(self, button):
         if button == 1: # Left mouse button
             self.on_leftclick()

@@ -39,9 +39,9 @@ class ConfigFinder:
         raise RuntimeError("Didn't find a config file, tried\n * {mods}".format(mods="\n * ".join(failed)))
 
 class Config:
-    def __init__(self):
+    def __init__(self, config_file=None):
         self.finder = ConfigFinder()
-        self.config_file = self.finder.find_config_file()
+        self.config_file = config_file or self.finder.find_config_file()
 
     def run(self):
         runpy.run_path(self.config_file, run_name="i3pystatus._config")
