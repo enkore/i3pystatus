@@ -55,7 +55,7 @@ class MPD(IntervalModule):
             fdict = {}
 
             status = self._mpd_command(s, "status")
-            fdict["pos"] = int(status["song"])+1
+            fdict["pos"] = int(status.get("song", 0))+1
             fdict["len"] = int(status["playlistlength"])
             fdict["status"] = self.status[status["state"]]
 
