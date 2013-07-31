@@ -168,10 +168,17 @@ Shows volume of ALSA mixer. You can also use this for inputs, btw.
 
 Requires pyalsaaudio
 
+Available formatters:
+
+* `{volume}` — the current volume in percent
+* `{muted}` — the value of one of the `muted` or `unmuted` settings
+* `{card}` — the associated soundcard
+* `{mixer}` — the associated ALSA mixer 
+
 
 __Settings:__
 
-* `format` — {volume} is the current volume, {muted} is one of `muted` or `unmuted`. {card} is the sound card used; {mixer} the mixer. (default: `♪: {volume}`)
+* `format` —  (default: `♪: {volume}`)
 * `mixer` — ALSA mixer (default: `Master`)
 * `mixer_id` — ALSA mixer id (default: `0`)
 * `card` — ALSA sound card (default: `0`)
@@ -187,6 +194,11 @@ __Settings:__
 
 
 Screen backlight info
+
+Available formatters:
+* `{brightness}` — current brightness relative to max_brightness
+* `{max_brightness}` — maximum brightness value
+* `{percentage}` — current brightness in percent
 
 
 __Settings:__
@@ -205,26 +217,25 @@ battery status
 
 Available formatters for format and alert_format_\*:
 
-* remaining_str
-* remaining_hm
-* percentage
-* percentage_design
-* consumption (Watts)
-* status
-* battery_ident
+* `{remaining_str}` — remaining time for charging or discharging in the format H:MM
+* `{remaining_hm}`- remaining time in the format Hh:MMm
+* `{percentage}` — battery percentage relative to the last full value
+* `{percentage_design}` — absolute battery charge percentage
+* `{consumption (Watts)}` — current power flowing into/out of the battery
+* `{status}`
+* `{battery_ident}` — the same as the setting
 
 
 __Settings:__
 
-* `battery_ident` —  (default: `BAT0`)
+* `battery_ident` — The name of your battery, usually BAT0 or BAT1 (default: `BAT0`)
 * `format` —  (default: `{status} {remaining_hm}`)
 * `alert` — Display a libnotify-notification on low battery (default: `False`)
 * `alert_percentage` —  (default: `10`)
-* `alert_format_title` —  (default: `Low battery`)
-* `alert_format_body` —  (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
-* `alert_percentage` —  (default: `10`)
-* `path` —  (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}`)
+* `alert_format_title` — The title of the notification, all formatters can be used (default: `Low battery`)
+* `alert_format_body` — The body text of the notification, all formatters can be used (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
+* `path` — Override the default-generated path (default: `None`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}`)
 
 
 
@@ -236,17 +247,17 @@ This class shows a clock
 
 __Settings:__
 
-* `format` — stftime format string (default: `None`)
+* `format` — stftime format string, `None` means to use the default, locale-dependent format (default: `None`)
 
 
 
 ### disk
 
 
-Gets used, free, available and total amount of bytes on the given mounted filesystem.
+Gets `{used}`, `{free}`, `{available}` and `{total}` amount of bytes on the given mounted filesystem.
 
-These values can also be expressed in percentages with the percentage_used, percentage_free
-and percentage_avail formats.
+These values can also be expressed in percentages with the `{percentage_used}`, `{percentage_free}`
+and `{percentage_avail}` formats.
 
 
 __Settings:__
@@ -390,16 +401,16 @@ __Settings:__
 Displays various information from MPD (the music player daemon)
 
 Available formatters:
-* title (the title of the current song)
-* album (the album of the current song, can be an empty string (e.g. for online streams))
-* artist (can be empty, too)
-* song_elapsed (Position in the currently playing song, looks like 3:54)
-* song_length (Length of the current song, same format as song_elapsed)
-* pos (Position of current song in playlist, one-based)
-* len (Songs in playlist)
-* status (play, pause, stop mapped through the `status` dictionary)
-* bitrate (Current bitrate in kilobit/s)
-* volume (Volume set in MPD)
+* `{title}` — (the title of the current song)
+* `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
+* `{artist}` — (can be empty, too)
+* `{song_elapsed}` — (Position in the currently playing song, looks like 3:54)
+* `{song_length}` — (Length of the current song, same format as song_elapsed)
+* `{pos}` — (Position of current song in playlist, one-based)
+* `{len}` — (Songs in playlist)
+* `{status}` — (play, pause, stop mapped through the `status` dictionary)
+* `{bitrate}` — (Current bitrate in kilobit/s)
+* `{volume}` — (Volume set in MPD)
 
 Left click on the module play/pauses, right click (un)mutes.
 
@@ -416,7 +427,7 @@ __Settings:__
 * `port` — MPD port (default: `6600`)
 * `format` —  (default: `{title} {status}`)
 * `format_sparse` —  (default: `None`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'pause': '▷', 'play': '▶'}`)
 
 
 
@@ -428,15 +439,15 @@ Display network information about a interface.
 Requires the PyPI package `netifaces-py3`.
 
 Available formatters:
-* `{interface}` same as setting
-* `{name}` same as setting
-* `{v4}` IPv4 address
-* `{v4mask}` subnet mask
-* `{v4cidr}` IPv4 address in cidr notation (i.e. 192.168.2.204/24)
-* `{v6}` IPv6 address
-* `{v6mask}` subnet mask
-* `{v6cidr}` IPv6 address in cidr notation
-* `{mac}` MAC of interface
+* `{interface}` — same as setting
+* `{name}` — same as setting
+* `{v4}` — IPv4 address
+* `{v4mask}` — subnet mask
+* `{v4cidr}` — IPv4 address in cidr notation (i.e. 192.168.2.204/24)
+* `{v6}` — IPv6 address
+* `{v6mask}` — subnet mask
+* `{v6cidr}` — IPv6 address in cidr notation
+* `{mac}` — MAC of interface
 
 Not available addresses (i.e. no IPv6 connectivity) are replaced with empty strings.
 
@@ -484,13 +495,13 @@ __Settings:__
 Shows pyLoad status
 
 Available formatters:
-* captcha (see captcha_true and captcha_false, which are the values filled in for this formatter)
-* progress (average over all running downloads)
-* progress_all (percentage of completed files/links in queue)
-* speed (kilobytes/s)
-* download (downloads enabled, also see download_true and download_false)
-* total (number of downloads)
-* free_space (free space in download directory in gigabytes)
+* `{captcha}` (see captcha_true and captcha_false, which are the values filled in for this formatter)
+* `{progress}` (average over all running downloads)
+* `{progress_all}` (percentage of completed files/links in queue)
+* `{speed}` (kilobytes/s)
+* `{download}` (downloads enabled, also see download_true and download_false)
+* `{total}` (number of downloads)
+* `{free_space}` (free space in download directory in gigabytes)
 
 
 __Settings:__
@@ -510,6 +521,8 @@ __Settings:__
 
 
 Simple regex file watcher
+
+The groups of the regex are passed to the format string as positional arguments.
 
 
 __Settings:__
@@ -570,9 +583,9 @@ Requires the PyPI packages `netifaces-py3` and `basiciw`.
 
 This is based on the network module, so all options and formatters are
 the same, except for these additional formatters:
-* {essid} ESSID of currently connected wifi
-* {freq} Current frequency
-* {quality} Link quality in percent
+* `{essid}` — ESSID of currently connected wifi
+* `{freq}` — Current frequency
+* `{quality}` — Link quality in percent
 
 
 __Settings:__

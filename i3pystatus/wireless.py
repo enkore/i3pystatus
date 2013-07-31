@@ -11,9 +11,9 @@ class Wireless(Network):
 
     This is based on the network module, so all options and formatters are
     the same, except for these additional formatters:
-    * {essid} ESSID of currently connected wifi
-    * {freq} Current frequency
-    * {quality} Link quality in percent
+    * `{essid}` — ESSID of currently connected wifi
+    * `{freq}` — Current frequency
+    * `{quality}` — Link quality in percent
     """
 
     interface = "wlan0"

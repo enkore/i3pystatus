@@ -7,12 +7,19 @@ class ALSA(IntervalModule):
     Shows volume of ALSA mixer. You can also use this for inputs, btw.
 
     Requires pyalsaaudio
+
+    Available formatters:
+
+    * `{volume}` — the current volume in percent
+    * `{muted}` — the value of one of the `muted` or `unmuted` settings
+    * `{card}` — the associated soundcard
+    * `{mixer}` — the associated ALSA mixer 
     """
 
     interval = 1
 
     settings = (
-        ("format", "{volume} is the current volume, {muted} is one of `muted` or `unmuted`. {card} is the sound card used; {mixer} the mixer."),
+        "format",
         ("mixer", "ALSA mixer"),
         ("mixer_id", "ALSA mixer id"),
         ("card", "ALSA sound card"),

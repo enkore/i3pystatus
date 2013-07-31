@@ -97,20 +97,23 @@ class BatteryChecker(IntervalModule):
 
     Available formatters for format and alert_format_\*:
 
-    * remaining_str
-    * remaining_hm
-    * percentage
-    * percentage_design
-    * consumption (Watts)
-    * status
-    * battery_ident
+    * `{remaining_str}` — remaining time for charging or discharging in the format H:MM
+    * `{remaining_hm}`- remaining time in the format Hh:MMm
+    * `{percentage}` — battery percentage relative to the last full value
+    * `{percentage_design}` — absolute battery charge percentage
+    * `{consumption (Watts)}` — current power flowing into/out of the battery
+    * `{status}`
+    * `{battery_ident}` — the same as the setting
     """
 
     settings = (
-        "battery_ident", "format",
+        ("battery_ident", "The name of your battery, usually BAT0 or BAT1"),
+        "format",
         ("alert", "Display a libnotify-notification on low battery"),
-        "alert_percentage", "alert_format_title", "alert_format_body", "alert_percentage",
-        "path",
+        "alert_percentage",
+        ("alert_format_title", "The title of the notification, all formatters can be used"),
+        ("alert_format_body", "The body text of the notification, all formatters can be used"),
+        ("path", "Override the default-generated path"),
         ("status", "A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names"),
     )
     battery_ident = "BAT0"

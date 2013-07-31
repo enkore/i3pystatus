@@ -4,23 +4,23 @@ import socket
 from i3pystatus import IntervalModule
 
 def format_time(seconds):
-    return "{}:{:02}".format(*divmod(int(seconds), 60))
+    return "{}:{:02}".format(*divmod(int(seconds), 60)) if seconds else ""
 
 class MPD(IntervalModule):
     """
     Displays various information from MPD (the music player daemon)
 
     Available formatters:
-    * title (the title of the current song)
-    * album (the album of the current song, can be an empty string (e.g. for online streams))
-    * artist (can be empty, too)
-    * song_elapsed (Position in the currently playing song, looks like 3:54)
-    * song_length (Length of the current song, same format as song_elapsed)
-    * pos (Position of current song in playlist, one-based)
-    * len (Songs in playlist)
-    * status (play, pause, stop mapped through the `status` dictionary)
-    * bitrate (Current bitrate in kilobit/s)
-    * volume (Volume set in MPD)
+    * `{title}` — (the title of the current song)
+    * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
+    * `{artist}` — (can be empty, too)
+    * `{song_elapsed}` — (Position in the currently playing song, looks like 3:54)
+    * `{song_length}` — (Length of the current song, same format as song_elapsed)
+    * `{pos}` — (Position of current song in playlist, one-based)
+    * `{len}` — (Songs in playlist)
+    * `{status}` — (play, pause, stop mapped through the `status` dictionary)
+    * `{bitrate}` — (Current bitrate in kilobit/s)
+    * `{volume}` — (Volume set in MPD)
 
     Left click on the module play/pauses, right click (un)mutes.
 

@@ -11,7 +11,7 @@ class Clock(IntervalModule):
     """
 
     settings = (
-        ("format", "stftime format string"),
+        ("format", "stftime format string, `None` means to use the default, locale-dependent format"),
     )
     format = None
     interval = 1
