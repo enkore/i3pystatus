@@ -224,7 +224,7 @@ __Settings:__
 * `alert_format_body` —  (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
 * `alert_percentage` —  (default: `10`)
 * `path` —  (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}`)
 
 
 
@@ -393,14 +393,21 @@ Available formatters:
 * title (the title of the current song)
 * album (the album of the current song, can be an empty string (e.g. for online streams))
 * artist (can be empty, too)
-* playtime_h (Playtime, hours)
-* playtime_m (Playtime, minutes)
-* playtime_s (Playtime, seconds)
+* song_elapsed (Position in the currently playing song, looks like 3:54)
+* song_length (Length of the current song, same format as song_elapsed)
 * pos (Position of current song in playlist, one-based)
-* len (Length of current playlist)
-* status
+* len (Songs in playlist)
+* status (play, pause, stop mapped through the `status` dictionary)
+* bitrate (Current bitrate in kilobit/s)
+* volume (Volume set in MPD)
 
 Left click on the module play/pauses, right click (un)mutes.
+
+`format` is the default format string and `format_sparse` is the format string for 
+situations where only partial metadata is available (only title, no album or artist data)
+, as often the case with internet radio.
+
+If `format_sparse` is None (the default), the standard format string is used.
 
 
 __Settings:__
@@ -408,7 +415,8 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` —  (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'play': '▶', 'pause': '▷', 'stop': '◾'}`)
+* `format_sparse` —  (default: `None`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
 
 
 
