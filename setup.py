@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name="i3pystatus",
-      version="3.20",
+      version="3.21",
       description="Like i3status, this generates status line for i3bar / i3wm",
       url="http://github.com/enkore/i3pystatus",
       license="MIT",
@@ -20,7 +20,7 @@ setup(name="i3pystatus",
         "i3pystatus.core",
         "i3pystatus.core.threading",
         "i3pystatus.mail",
-	"i3pystatus.pulseaudio",
+        "i3pystatus.pulseaudio",
       ],
       entry_points={
         "console_scripts": ["i3pystatus = i3pystatus:main"],
