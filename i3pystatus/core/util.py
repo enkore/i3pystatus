@@ -1,6 +1,7 @@
 
 import collections
 import itertools
+import re
 
 from .exceptions import *
 from .imputil import ClassFinder
@@ -106,3 +107,56 @@ def convert_position(pos, json):
     if pos < 0:
         pos = len(json) + (pos+1)
     return pos
+
+def formatp(string, **kwargs):
+    """
+    Function for advanced format strings with partial formatting
+
+    This function consumes format strings with groups enclosed in brackets. A
+    group enclosed in brackets will only become part of the result if all fields
+    inside the group evaluate True in boolean contexts.
+
+    Groups can be nested. The fields in a nested group do not count as fields in
+    the enclosing group, i.e. the enclosing group will evaluate to an empty
+    string even if a nested group would be eligible for formatting. Nesting is
+    thus equivalent to a logical or of all enclosing groups with the enclosed
+    group.
+
+    Escaped brackets, i.e. \[ and \] are copied verbatim to output.
+    """
+
+    pbracket = formatp.obracket_re.search(string)
+    if not pbracket:
+        return string.format(**kwargs)
+    pbracket = pbracket.start()
+    sbracket = list(formatp.cbracket_re.finditer(string))[-1].end()-1
+
+    prefix = string[:pbracket].format(**kwargs)
+    suffix = string[sbracket+1:].format(**kwargs)
+    string = string[pbracket+1:sbracket]
+
+    while True:
+        b = formatp.obracket_re.search(string)
+        e = list(formatp.cbracket_re.finditer(string))
+        if b and e:
+            b = b.start()
+            e = e[-1].end()
+            string = string[:b] + formatp(string[b:e], **kwargs) + string[e:]
+        else:
+            break
+
+    fields = formatp.field_re.findall(string)
+    successful_fields = 0
+    for fieldspec, fieldname in fields:
+        if kwargs.get(fieldname, False):
+            successful_fields += 1
+
+    if successful_fields != len(fields):
+        return prefix + suffix
+    else:
+        string = string.replace("\[", "[").replace("\]", "]")
+        return prefix + string.format(**kwargs) + suffix
+
+formatp.field_re = re.compile(r"({(\w+)[^}]*})")
+formatp.obracket_re = re.compile(r"(?<!\\)\[")
+formatp.cbracket_re = re.compile(r"(?<!\\)\]")

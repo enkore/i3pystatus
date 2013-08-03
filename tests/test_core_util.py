@@ -238,3 +238,27 @@ class KeyConstraintDictAdvancedTests(unittest.TestCase):
         assert kcd.missing() == set()
         del kcd["foo"]
         assert kcd.missing() == set(["foo"])
+
+class FormatPTests(unittest.TestCase):
+    def test_escaping(self):
+        assert util.formatp("[razamba \[ mabe \]]") == "razamba [ mabe ]"
+
+    def test_numerical(self):
+        assert util.formatp("[{t} - [schmuh {x}]]", t=1, x=2) == "1 - schmuh 2"
+        assert util.formatp("[{t} - [schmuh {x}]]", t=1, x=0) == "1 - "
+        assert util.formatp("[{t} - [schmuh {x}]]", t=0, x=0) == ""
+
+    def test_nesting(self):
+        s = "[[{artist} - ]{album} - ]{title}"
+        assert util.formatp(s, title="Black rose") == "Black rose"
+        assert util.formatp(s, artist="In Flames", title="Gyroscope") == "Gyroscope"
+        assert util.formatp(s, artist="SOAD", album="Toxicity", title="Science") == "SOAD - Toxicity - Science"
+        assert util.formatp(s, album="Toxicity", title="Science") == "Toxicity - Science"
+
+    def test_bare(self):
+        assert util.formatp("{foo} blar", foo="bar") == "bar blar"
+
+    def test_presuffix(self):
+        assert util.formatp("ALINA[{title} schnacke]KOMMAHER", title="") == "ALINAKOMMAHER"
+        assert util.formatp("grml[{title}]") == "grml"
+        assert util.formatp("[{t}]grml") == "grml"

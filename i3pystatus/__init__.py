@@ -7,11 +7,13 @@ from i3pystatus.core import Status
 from i3pystatus.core.modules import Module, IntervalModule
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.config import Config
+from i3pystatus.core.util import formatp
 
 __all__ = [
     "SettingsBase",
     "Module", "IntervalModule",
     "Status",
+    "formatp",
 ]
 
 def main():
