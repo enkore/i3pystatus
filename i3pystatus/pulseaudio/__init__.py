@@ -9,6 +9,7 @@ class PulseAudio(Module):
     Available formatters:
     * `{volume}` — volume in percent (0...100)
     * `{db}` — volume in decibels relative to 100 %, i.e. 100 % = 0 dB, 50 % = -18 dB, 0 % = -infinity dB
+    (the literal value for -infinity is `-∞`)
     """
 
     settings = (
@@ -77,7 +78,11 @@ class PulseAudio(Module):
         if sink_info_p:
             sink_info = sink_info_p.contents
             volume_percent = int(100 * sink_info.volume.values[0]/0x10000)
-            volume_db = int(pa_sw_volume_to_dB(sink_info.volume.values[0]))
+            volume_db = pa_sw_volume_to_dB(sink_info.volume.values[0])
+            if volume_db == float('-Infinity'):
+                volume_db = "-∞"
+            else:
+                volume_db = int(volume_db)
 
             self.output = {
                 "full_text": self.format.format(volume=volume_percent, db=volume_db),
