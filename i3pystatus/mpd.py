@@ -1,7 +1,7 @@
 
 import socket
 
-from i3pystatus import IntervalModule
+from i3pystatus import IntervalModule, formatp
 
 def format_time(seconds):
     return "{}:{:02}".format(*divmod(int(seconds), 60)) if seconds else ""
@@ -10,7 +10,7 @@ class MPD(IntervalModule):
     """
     Displays various information from MPD (the music player daemon)
 
-    Available formatters:
+    Available formatters (uses formatp)
     * `{title}` — (the title of the current song)
     * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
     * `{artist}` — (can be empty, too)
@@ -23,12 +23,6 @@ class MPD(IntervalModule):
     * `{volume}` — (Volume set in MPD)
 
     Left click on the module play/pauses, right click (un)mutes.
-
-    `format` is the default format string and `format_sparse` is the format string for 
-    situations where only partial metadata is available (only title, no album or artist data)
-    , as often the case with internet radio.
-
-    If `format_sparse` is None (the default), the standard format string is used.
     """
 
     interval = 1
@@ -36,7 +30,7 @@ class MPD(IntervalModule):
     settings = (
         ("host"),
         ("port", "MPD port"),
-        "format", "format_sparse",
+        ("format", "formatp string"),
         ("status", "Dictionary mapping pause, play and stop to output")
     )
 
@@ -90,12 +84,8 @@ class MPD(IntervalModule):
 
             }
 
-            fstring = self.format
-            if not fdict["album"] and not fdict["artist"]:
-                fstring = self.format_sparse
-
             self.output = {
-                "full_text": fstring.format(**fdict).strip(),
+                "full_text": formatp(self.format, **fdict).strip(),
             }
 
     def on_leftclick(self):
