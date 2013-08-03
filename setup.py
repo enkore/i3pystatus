@@ -19,7 +19,8 @@ setup(name="i3pystatus",
         "i3pystatus",
         "i3pystatus.core",
         "i3pystatus.core.threading",
-        "i3pystatus.mail"
+        "i3pystatus.mail",
+	"i3pystatus.pulseaudio",
       ],
       entry_points={
         "console_scripts": ["i3pystatus = i3pystatus:main"],

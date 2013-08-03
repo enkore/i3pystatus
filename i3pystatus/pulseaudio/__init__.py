@@ -1,5 +1,4 @@
-# libpulseaudio in PyPI
-from pulseaudio.lib_pulseaudio import *
+from .pulse import *
 
 from i3pystatus import Module
 
@@ -76,7 +75,12 @@ class PulseAudio(Module):
         if sink_info_p:
             sink_info = sink_info_p.contents
             volume_percent = int(100 * sink_info.volume.values[0]/0x10000)
+            volume_db = pa_sw_volume_to_dB(sink_info.volume.values[0])
 
             self.output = {
-                "full_text": self.format.format(volume=volume_percent),
+                "full_text": self.format.format(volume=volume_percent, db=volume_db),
             }
+
+    def on_leftclick(self):
+        import subprocess
+        subprocess.Popen(["pavucontrol"])
