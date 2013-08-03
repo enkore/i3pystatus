@@ -155,10 +155,37 @@ Also change your i3wm config to the following:
         workspace_buttons yes
     }
 
-## Modules
+### Formatting
 
-Many modules let you modify the output via a
-[format string](http://docs.python.org/3/library/string.html#formatstrings).
+All modules let you specifiy the exact output formatting using a
+[format string](http://docs.python.org/3/library/string.html#formatstrings), which
+gives you a great deal of flexibility.
+
+Some common stuff:
+
+* If a module gives you a float, it probably has a ton of uninteresting decimal
+places. Use `{somefloat:.0f}` to get the integer value, `{somefloat:0.2f}` gives
+you two decimal places after the decimal dot
+
+#### formatp
+
+Some modules use an extended format string syntax (the mpd module, for example).
+Given the format string below the output adapts itself to the available data.
+
+    [{artist}/{album}/]{title}{status}
+
+Only if both the artist and album is known they're displayed. If only one or none
+of them is known the entire group between the brackets is excluded.
+
+"is known" is here defined as "value evaluating to True in Python", i.e. an empty
+string or 0 (or 0.0) counts as "not known".
+
+Inside a group always all format specifiers must evaluate to true (logical and).
+
+You can nest groups. The inner group will only become part of the output if both
+the outer group and the inner group are eligible for output.
+
+## Modules
 
 !!module_doc!!
 

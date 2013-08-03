@@ -17,7 +17,7 @@ __all__ = [
 ]
 
 def main():
-    parser = argparse.ArgumentParser(description='A replacement for i3status')
+    parser = argparse.ArgumentParser(description="A replacement for i3status")
     parser.add_argument("-c", "--config", action="store", help="Config file")
     parser.add_argument("-t", "--test", action="store_true", help="Test modules")
     args = parser.parse_args()

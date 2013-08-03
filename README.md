@@ -155,10 +155,37 @@ Also change your i3wm config to the following:
         workspace_buttons yes
     }
 
-## Modules
+### Formatting
 
-Many modules let you modify the output via a
-[format string](http://docs.python.org/3/library/string.html#formatstrings).
+All modules let you specifiy the exact output formatting using a
+[format string](http://docs.python.org/3/library/string.html#formatstrings), which
+gives you a great deal of flexibility.
+
+Some common stuff:
+
+* If a module gives you a float, it probably has a ton of uninteresting decimal
+places. Use `{somefloat:.0f}` to get the integer value, `{somefloat:0.2f}` gives
+you two decimal places after the decimal dot
+
+#### formatp
+
+Some modules use an extended format string syntax (the mpd module, for example).
+Given the format string below the output adapts itself to the available data.
+
+    [{artist}/{album}/]{title}{status}
+
+Only if both the artist and album is known they're displayed. If only one or none
+of them is known the entire group between the brackets is excluded.
+
+"is known" is here defined as "value evaluating to True in Python", i.e. an empty
+string or 0 (or 0.0) counts as "not known".
+
+Inside a group always all format specifiers must evaluate to true (logical and).
+
+You can nest groups. The inner group will only become part of the output if both
+the outer group and the inner group are eligible for output.
+
+## Modules
 
 
 ### alsa
@@ -235,7 +262,7 @@ __Settings:__
 * `alert_format_title` — The title of the notification, all formatters can be used (default: `Low battery`)
 * `alert_format_body` — The body text of the notification, all formatters can be used (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
 * `path` — Override the default-generated path (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}`)
 
 
 
@@ -400,7 +427,7 @@ __Settings:__
 
 Displays various information from MPD (the music player daemon)
 
-Available formatters:
+Available formatters (uses formatp)
 * `{title}` — (the title of the current song)
 * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
 * `{artist}` — (can be empty, too)
@@ -414,19 +441,12 @@ Available formatters:
 
 Left click on the module play/pauses, right click (un)mutes.
 
-`format` is the default format string and `format_sparse` is the format string for 
-situations where only partial metadata is available (only title, no album or artist data)
-, as often the case with internet radio.
-
-If `format_sparse` is None (the default), the standard format string is used.
-
 
 __Settings:__
 
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
-* `format` —  (default: `{title} {status}`)
-* `format_sparse` —  (default: `None`)
+* `format` — formatp string (default: `{title} {status}`)
 * `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'pause': '▷', 'play': '▶'}`)
 
 
@@ -480,12 +500,14 @@ __Settings:__
 
 Shows volume of default PulseAudio sink (output).
 
-Requires libpulseaudio from PyPI. Based on http://freshfoo.com/blog/pulseaudio_monitoring
+Available formatters:
+* `{volume}` — volume in percent (0...100)
+* `{db}` — volume in decibels relative to 100 %, i.e. 100 % = 0 dB, 50 % = -18 dB, 0 % = -infinity dB
 
 
 __Settings:__
 
-* `format` — {volume} is the current volume (default: `♪: {volume}`)
+* `format` —  (default: `♪: {volume}`)
 
 
 

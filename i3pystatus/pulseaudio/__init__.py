@@ -12,7 +12,7 @@ class PulseAudio(Module):
     """
 
     settings = (
-        "format"
+        "format",
     )
 
     format = "♪: {volume}"
