@@ -239,6 +239,130 @@ class KeyConstraintDictAdvancedTests(unittest.TestCase):
         del kcd["foo"]
         assert kcd.missing() == set(["foo"])
 
+
+import re
+def formatp(string, **kwargs):
+    """
+    Function for advanced format strings with partial formatting
+
+    This function consumes format strings with groups enclosed in brackets. A
+    group enclosed in brackets will only become part of the result if all fields
+    inside the group evaluate True in boolean contexts.
+
+    Groups can be nested. The fields in a nested group do not count as fields in
+    the enclosing group, i.e. the enclosing group will evaluate to an empty
+    string even if a nested group would be eligible for formatting. Nesting is
+    thus equivalent to a logical or of all enclosing groups with the enclosed
+    group.
+
+    Escaped brackets, i.e. \[ and \] are copied verbatim to output.
+    """
+
+    class Token:
+        def __repr__(self):
+            return "<%s> " % self.__class__.__name__
+    class OpeningBracket(Token):
+        def __repr__(self):
+            return "<Group>"
+    class ClosingBracket(Token):
+        def __repr__(self):
+            return "</Group>"
+    class String(Token):
+        def __init__(self, str):
+            self.string = str
+        def __repr__(self):
+            return super().__repr__() + repr(self.string)
+
+    TOKENS = {
+        "[": OpeningBracket,
+        "]": ClosingBracket,
+    }
+
+
+    print("==")
+    print(string)
+    print("==")
+
+    stack = []
+
+    # Index of next unconsumed char
+    next = 0
+    # Last consumed char
+    prev = ""
+    # Current char
+    char = ""
+
+    while next < len(string):
+        prev = char
+        char = string[next]
+        next += 1
+
+        if prev != "\\" and char in TOKENS:
+            token = TOKENS[char]()
+            token.index = next
+            stack.append(token)
+        else:
+            if stack and isinstance(stack[-1], String):
+                stack[-1].string += c
+            else:
+                stack.append(String(c))
+
+    print("-----")
+    print("Dumping decomposition of")
+    print(string)
+    print("----")
+
+    output = ""
+    i = 0
+    for token in stack:
+        
+        if token.__class__ == ClosingBracket:
+            i-=1
+        print("  " * i, repr(token))
+        if token.__class__ == OpeningBracket:
+            i+=1
+        
+    print("----")
+
+
+    """pbracket = formatp.obracket_re.search(string)
+    if not pbracket:
+        return string.format(**kwargs)
+    pbracket = pbracket.start()
+    sbracket = list(formatp.cbracket_re.finditer(string))[-1].end()-1
+
+    prefix = string[:pbracket].format(**kwargs)
+    suffix = string[sbracket+1:].format(**kwargs)
+    string = string[pbracket+1:sbracket]
+
+    while True:
+        b = formatp.obracket_re.search(string)
+        e = list(formatp.cbracket_re.finditer(string))
+        if b and e:
+            b = b.start()
+            e = e[-1].end()
+            string = string[:b] + formatp(string[b:e], **kwargs) + string[e:]
+        else:
+            break
+
+    fields = formatp.field_re.findall(string)
+    successful_fields = 0
+    for fieldspec, fieldname in fields:
+        if kwargs.get(fieldname, False):
+            successful_fields += 1
+
+    if successful_fields != len(fields):
+        return prefix + suffix
+    else:
+        string = string.replace("\[", "[").replace("\]", "]")
+        return prefix + string.format(**kwargs) + suffix"""
+
+formatp.field_re = re.compile(r"({(\w+)[^}]*})")
+formatp.obracket_re = re.compile(r"(?<!\\)\[")
+formatp.cbracket_re = re.compile(r"(?<!\\)\]")
+
+util.formatp = formatp
+
 class FormatPTests(unittest.TestCase):
     def test_escaping(self):
         assert util.formatp("[razamba \[ mabe \]]") == "razamba [ mabe ]"
@@ -264,5 +388,8 @@ class FormatPTests(unittest.TestCase):
         assert util.formatp("[{t}]grml") == "grml"
 
     def test_generic(self):
-        s = "{status} [{artist} / {album} / ]{title}[ {song_elapsed}/{song_length}]"
-        assert util.formatp(s, status="▷", title="Only For The Weak", song_elapsed="1:41", song_length="4:55") == "▷ Only For The Weal 1:41/4:55"
+        s = "{status} [{artist} / [{album} / ]]{title}[ {song_elapsed}/{song_length}]"
+        assert util.formatp(s, status="▷", title="Only For The Weak", song_elapsed="1:41", song_length="4:55") == "▷ Only For The Weak 1:41/4:55"
+
+fpt = FormatPTests()
+fpt.test_generic()
