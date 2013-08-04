@@ -108,6 +108,20 @@ def convert_position(pos, json):
         pos = len(json) + (pos+1)
     return pos
 
+def flatten(l):
+    l = list(l)
+    i = 0
+    while i < len(l):
+        while isinstance(l[i], list):
+            if not l[i]:
+                l.pop(i)
+                i -= 1
+                break
+            else:
+                l[i:i + 1] = l[i]
+        i += 1
+    return l
+
 def formatp(string, **kwargs):
     """
     Function for advanced format strings with partial formatting
@@ -125,38 +139,104 @@ def formatp(string, **kwargs):
     Escaped brackets, i.e. \[ and \] are copied verbatim to output.
     """
 
-    pbracket = formatp.obracket_re.search(string)
-    if not pbracket:
-        return string.format(**kwargs)
-    pbracket = pbracket.start()
-    sbracket = list(formatp.cbracket_re.finditer(string))[-1].end()-1
+    def build_stack(string):
+        """
+        Builds a stack with OpeningBracket, ClosingBracket and String tokens.
+        Tokens have a level property denoting their nesting level.
+        They also have a string property containing associated text (empty for
+        all tokens but String tokens).
+        """
+        class Token:
+            string = ""
+            def __repr__(self):
+                return "<%s> " % self.__class__.__name__
+        class OpeningBracket(Token):
+            def __repr__(self):
+                return "<Group>"
+        class ClosingBracket(Token):
+            def __repr__(self):
+                return "</Group>"
+        class String(Token):
+            def __init__(self, str):
+                self.string = str
+            def __repr__(self):
+                return super().__repr__() + repr(self.string)
 
-    prefix = string[:pbracket].format(**kwargs)
-    suffix = string[sbracket+1:].format(**kwargs)
-    string = string[pbracket+1:sbracket]
+        TOKENS = {
+            "[": OpeningBracket,
+            "]": ClosingBracket,
+        }
 
-    while True:
-        b = formatp.obracket_re.search(string)
-        e = list(formatp.cbracket_re.finditer(string))
-        if b and e:
-            b = b.start()
-            e = e[-1].end()
-            string = string[:b] + formatp(string[b:e], **kwargs) + string[e:]
-        else:
-            break
+        stack = []
 
-    fields = formatp.field_re.findall(string)
-    successful_fields = 0
-    for fieldspec, fieldname in fields:
-        if kwargs.get(fieldname, False):
-            successful_fields += 1
+        # Index of next unconsumed char
+        next = 0
+        # Last consumed char
+        prev = ""
+        # Current char
+        char = ""
+        # Current level
+        level = 0
 
-    if successful_fields != len(fields):
-        return prefix + suffix
-    else:
-        string = string.replace("\[", "[").replace("\]", "]")
-        return prefix + string.format(**kwargs) + suffix
+        while next < len(string):
+            prev = char
+            char = string[next]
+            next += 1
+
+            if prev != "\\" and char in TOKENS:
+                token = TOKENS[char]()
+                token.index = next
+                if char == "]": level -= 1
+                token.level = level
+                if char == "[": level += 1
+                stack.append(token)
+            else:
+                if stack and isinstance(stack[-1], String):
+                    stack[-1].string += char
+                else:
+                    token = String(char)
+                    token.level = level
+                    stack.append(token)
+
+        return stack
+
+    def build_tree(items, level=0):
+        """
+        Builds a list-of-lists tree (in forward order) from a stack (reversed order),
+        and formats the elements on the fly, discarding everything not eligible for
+        inclusion.
+        """
+        subtree = []
+
+        while items:
+            nested = []
+            while items[0].level > level:
+                nested.append(items.pop(0))
+            if nested:
+                subtree.append(build_tree(nested, level+1))
+
+            item = items.pop(0)
+            if item.string:
+                string = item.string
+                if level == 0:
+                    subtree.append(string.format(**kwargs))
+                else:
+                    fields = formatp.field_re.findall(string)
+                    successful_fields = 0
+                    for fieldspec, fieldname in fields:
+                        if kwargs.get(fieldname, False):
+                            successful_fields += 1
+                    if successful_fields == len(fields):
+                        subtree.append(string.format(**kwargs))
+                    else:
+                        return []
+        return subtree
+
+    def merge_tree(items):
+        return "".join(flatten(items)).replace("\]", "]").replace("\[", "[")
+
+    stack = build_stack(string)
+    tree = build_tree(stack, 0)
+    return merge_tree(tree)
 
 formatp.field_re = re.compile(r"({(\w+)[^}]*})")
-formatp.obracket_re = re.compile(r"(?<!\\)\[")
-formatp.cbracket_re = re.compile(r"(?<!\\)\]")
