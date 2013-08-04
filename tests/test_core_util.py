@@ -262,3 +262,7 @@ class FormatPTests(unittest.TestCase):
         assert util.formatp("ALINA[{title} schnacke]KOMMAHER", title="") == "ALINAKOMMAHER"
         assert util.formatp("grml[{title}]") == "grml"
         assert util.formatp("[{t}]grml") == "grml"
+
+    def test_generic(self):
+        s = "{status} [{artist} / {album} / ]{title}[ {song_elapsed}/{song_length}]"
+        assert util.formatp(s, status="▷", title="Only For The Weak", song_elapsed="1:41", song_length="4:55") == "▷ Only For The Weal 1:41/4:55"
