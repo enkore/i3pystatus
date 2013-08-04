@@ -266,6 +266,8 @@ class FormatPTests(unittest.TestCase):
     def test_side_by_side(self):
         s = "{status} [{artist} / [{album} / ]]{title}[ {song_elapsed}/{song_length}]"
         assert util.formatp(s, status="▷", title="Only For The Weak", song_elapsed="1:41", song_length="4:55") == "▷ Only For The Weak 1:41/4:55"
+        assert util.formatp(s, status="", album="Foo", title="Die, Die, Crucified", song_elapsed="2:52") == " Die, Die, Crucified"
+        assert util.formatp("[[{a}][{b}]]", b=1) == "1"
 
     def test_complex_field(self):
         class NS:

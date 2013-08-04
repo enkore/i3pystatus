@@ -2,6 +2,7 @@
 import collections
 import itertools
 import re
+import string
 
 from i3pystatus.core.exceptions import *
 from i3pystatus.core.imputil import ClassFinder
@@ -240,3 +241,32 @@ def formatp(string, **kwargs):
     return merge_tree(tree)
 
 formatp.field_re = re.compile(r"({(\w+)[^}]*})")
+
+class TimeWrapper:
+    class TimeTemplate(string.Template):
+        delimiter = "%"
+        idpattern = r"[a-zA-Z]"
+
+    def __init__(self, seconds, default_format="%m:%S"):
+        self.seconds = int(seconds)
+        self.default_format = default_format
+
+    def __bool__(self):
+        return bool(self.seconds)
+
+    def __format__(self, format_spec):
+        format_spec = format_spec or self.default_format
+        h = self.seconds // 3600
+        m, s = divmod(self.seconds % 3600, 60)
+        l = h if h else ""
+        L = "%02d" % h if h else ""
+
+        if format_spec.startswith("%E"):
+            format_spec = format_spec[2:]
+            if not self.seconds:
+                return ""
+        return self.TimeTemplate(format_spec).substitute(
+            h=h, m=m, s=s,
+            H="%02d" % h, M="%02d" % m, S="%02d" % s,
+            l=l, L=L,
+        ).strip()

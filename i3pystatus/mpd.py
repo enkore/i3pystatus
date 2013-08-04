@@ -2,6 +2,7 @@
 import socket
 
 from i3pystatus import IntervalModule, formatp
+from i3pystatus.core.util import TimeWrapper
 
 def format_time(seconds):
     return "{}:{:02}".format(*divmod(int(seconds), 60)) if seconds else ""
@@ -14,8 +15,8 @@ class MPD(IntervalModule):
     * `{title}` — (the title of the current song)
     * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
     * `{artist}` — (can be empty, too)
-    * `{song_elapsed}` — (Position in the currently playing song, looks like 3:54)
-    * `{song_length}` — (Length of the current song, same format as song_elapsed)
+    * `{song_elapsed}` — (Position in the currently playing song, **uses TimeWrapper**, default is `%m:%S`)
+    * `{song_length}` — (Length of the current song, same as song_elapsed)
     * `{pos}` — (Position of current song in playlist, one-based)
     * `{len}` — (Songs in playlist)
     * `{status}` — (play, pause, stop mapped through the `status` dictionary)
@@ -78,8 +79,8 @@ class MPD(IntervalModule):
                 "title": currentsong.get("Title", ""),
                 "album": currentsong.get("Album", ""),
                 "artist": currentsong.get("Artist", ""),
-                "song_length": format_time(currentsong.get("Time", 0)),
-                "song_elapsed": format_time(float(status.get("elapsed", 0))),
+                "song_length": TimeWrapper(currentsong.get("Time", 0)),
+                "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
                 "bitrate": int(status.get("bitrate", 0)),
 
             }

@@ -19,6 +19,18 @@ status output compatible to i3status / i3bar of the i3 window manager.
 
 * [Arch Linux](https://aur.archlinux.org/packages/i3pystatus-git/)
 
+### Release Notes
+
+#### 3.24
+
+**This release introduced changes that may require manual changes to your
+configuration file**
+
+* Introduced TimeWrapper
+* battery module: removed remaining_\* formatters in favor of TimeWrapper,
+as it can not only reproduce all the variants removed, but can do much more.
+* mpd: Uses TimeWrapper for song_length, song_elapsed
+
 ## Configuration
 
 You can keep your config file at various places, i3pystatus will look
@@ -75,7 +87,7 @@ from network, wireless and pulseaudio in this example):
     # This would also display a desktop notification (via dbus) if the percentage
     # goes below 5 percent while discharging. The block will also color RED.
     status.register("battery",
-        format="{status}/{consumption:.2f}W {percentage:.2f}% [{percentage_design:.2f}%] {remaining_hm}",
+        format="{status}/{consumption:.2f}W {percentage:.2f}% [{percentage_design:.2f}%] {remaining:%E%hh:%Mm}",
         alert=True,
         alert_percentage=5,
         status={
@@ -184,6 +196,27 @@ Inside a group always all format specifiers must evaluate to true (logical and).
 
 You can nest groups. The inner group will only become part of the output if both
 the outer group and the inner group are eligible for output.
+
+#### TimeWrapper
+
+Some modules that output times use TimeWrapper to format these. TimeWrapper is
+a mere extension of the standard formatting method.
+
+The time format that should be used is specified using the format specifier, i.e.
+with some_time being 3951 seconds a format string like `{some_time:%h:%m:%s}`
+would produce `1:5:51`
+
+* `%h`, `%m` and `%s` are the hours, minutes and seconds without leading zeros
+(i.e. 0 to 59 for minutes and seconds)
+* `%H`, `%M` and `%S` are padded with a leading zero to two digits, i.e. 00 to 59
+* `%l` and `%L` produce hours non-padded and padded but only if hours is not zero.
+If the hours are zero it produces an empty string.
+* `%%` produces a literal %
+* `%E` (only valid on beginning of the string) if the time is null, don't format
+anything but rather produce an empty string. If the time is non-null it is
+removed from the string.
+* When the module in question also uses formatp, 0 seconds counts as "not known".
+* The formatted time is stripped, i.e. spaces on both ends of the result are removed
 
 ## Modules
 

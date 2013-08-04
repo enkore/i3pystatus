@@ -4,9 +4,9 @@
 import re
 import configparser
 
-from . import IntervalModule
-from .core.util import PrefixedKeyDict, lchop
-from .core.desktop import display_notification
+from i3pystatus import IntervalModule
+from i3pystatus.core.util import PrefixedKeyDict, lchop, TimeWrapper
+from i3pystatus.core.desktop import display_notification
 
 class UEventParser(configparser.ConfigParser):
     @staticmethod
@@ -78,18 +78,6 @@ class BatteryEnergy(Battery):
         else:
             return (self.bat["ENERGY_FULL"] - self.bat["ENERGY_NOW"]) / self.bat["POWER_NOW"] * 60
 
-def format_remaining(minutes, prefix):
-    hours, minutes = map(int, divmod(minutes, 60))
-
-    d = PrefixedKeyDict(prefix)
-    d.update({
-        "str": "{}:{:02}".format(hours, minutes),
-        "hm": "{}h:{:02}m".format(hours, minutes),
-        "hours": hours,
-        "mins": minutes,
-    })
-    return d
-
 class BatteryChecker(IntervalModule):
     """ 
     This class uses the /sys/class/power_supply/…/uevent interface to check for the
@@ -97,8 +85,7 @@ class BatteryChecker(IntervalModule):
 
     Available formatters for format and alert_format_\*:
 
-    * `{remaining_str}` — remaining time for charging or discharging in the format H:MM
-    * `{remaining_hm}`- remaining time in the format Hh:MMm
+    * `{remaining}` — remaining time for charging or discharging, uses TimeWrapper formatting, default format is `%E%h:%M`
     * `{percentage}` — battery percentage relative to the last full value
     * `{percentage_design}` — absolute battery charge percentage
     * `{consumption (Watts)}` — current power flowing into/out of the battery
@@ -117,7 +104,7 @@ class BatteryChecker(IntervalModule):
         ("status", "A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names"),
     )
     battery_ident = "BAT0"
-    format = "{status} {remaining_hm}"
+    format = "{status} {remaining}"
     status = {
         "CHR": "CHR",
         "DIS": "DIS",
@@ -143,17 +130,16 @@ class BatteryChecker(IntervalModule):
 
         fdict = {
             "battery_ident": self.battery_ident,
-            "remaining_str": "",
-            "remaining_hm": "",
             "percentage": battery.percentage(),
             "percentage_design": battery.percentage(design=True),
             "consumption": battery.consumption(),
+            "remaining": TimeWrapper(0, "%E%h:%M"),
         }
 
         status = battery.status()
         if status in ["Discharging", "Charging"]:
             remaining = battery.remaining()
-            fdict.update(format_remaining(remaining, "remaining_"))
+            fdict["remaining"] = TimeWrapper(remaining * 60, "%E%h:%M")
             if status == "Discharging":
                 fdict["status"] = "DIS"
                 if remaining < 15:
