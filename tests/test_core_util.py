@@ -263,6 +263,16 @@ class FormatPTests(unittest.TestCase):
         assert util.formatp("grml[{title}]") == "grml"
         assert util.formatp("[{t}]grml") == "grml"
 
-    def test_generic(self):
+    def test_side_by_side(self):
         s = "{status} [{artist} / [{album} / ]]{title}[ {song_elapsed}/{song_length}]"
         assert util.formatp(s, status="▷", title="Only For The Weak", song_elapsed="1:41", song_length="4:55") == "▷ Only For The Weak 1:41/4:55"
+
+    def test_complex_field(self):
+        class NS:
+            pass
+        obj = NS()
+        obj.attr = "bar"
+
+        s = "[{a:.3f} m]{obj.attr}"
+        assert util.formatp(s, a=3.14123456789, obj=obj) == "3.141 mbar"
+        assert util.formatp(s, a=0.0, obj=obj) == "bar"
