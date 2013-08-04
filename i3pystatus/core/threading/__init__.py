@@ -1,2 +1,2 @@
 
-from .manager import Manager
+from i3pystatus.core.threading.manager import Manager

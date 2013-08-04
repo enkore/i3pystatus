@@ -3,8 +3,8 @@ import sys
 import os
 from threading import Thread
 
-from . import io, util
-from .modules import Module, START_HOOKS
+from i3pystatus.core import io, util
+from i3pystatus.core.modules import Module, START_HOOKS
 
 class Status:
     def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):

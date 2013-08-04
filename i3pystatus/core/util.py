@@ -3,8 +3,8 @@ import collections
 import itertools
 import re
 
-from .exceptions import *
-from .imputil import ClassFinder
+from i3pystatus.core.exceptions import *
+from i3pystatus.core.imputil import ClassFinder
 
 def chain(fun):
     def chained(self, *args, **kwargs):

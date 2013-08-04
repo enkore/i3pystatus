@@ -1,9 +1,9 @@
 
 import time
 
-from .settings import SettingsBase
-from .threading import Manager
-from .util import convert_position, chain
+from i3pystatus.core.settings import SettingsBase
+from i3pystatus.core.threading import Manager
+from i3pystatus.core.util import convert_position, chain
 
 __all__ = [
     "Module", "AsyncModule", "IntervalModule",

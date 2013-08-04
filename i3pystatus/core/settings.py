@@ -1,5 +1,5 @@
-from .util import KeyConstraintDict
-from .exceptions import ConfigKeyError, ConfigMissingError
+from i3pystatus.core.util import KeyConstraintDict
+from i3pystatus.core.exceptions import ConfigKeyError, ConfigMissingError
 
 class SettingsBase:
     """

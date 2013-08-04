@@ -1,6 +1,6 @@
 
-from ..util import partition
-from . import threads, wrapper
+from i3pystatus.core.util import partition
+from i3pystatus.core.threading import threads, wrapper
 
 class Manager:
     def __init__(self, target_interval):
