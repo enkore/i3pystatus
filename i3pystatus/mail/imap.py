@@ -16,12 +16,14 @@ class IMAP(Backend):
     settings = (
         "host", "port",
         "username", "password",
-        "ssl"
+        "ssl",
+        "mailbox",
     )
     required = ("host", "username", "password")
 
     port = 993
     ssl = True
+    mailbox = "INBOX"
 
     imap_class = imaplib.IMAP4
     connection = None
@@ -35,7 +37,7 @@ class IMAP(Backend):
             try:
                 self.connection = self.imap_class(self.host, self.port)
                 self.connection.login(self.username, self.password)
-                self.connection.select()
+                self.connection.select(self.mailbox)
             except Exception:
                 self.connection = None
 
