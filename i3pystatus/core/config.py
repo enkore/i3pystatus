@@ -4,7 +4,7 @@ import runpy
 import sys
 import contextlib
 
-from i3pystatus.core.render import render_json
+from i3pystatus.core.util import render_json
 
 SEARCHPATH = (
     "~/.i3pystatus.py",

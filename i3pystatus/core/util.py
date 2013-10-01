@@ -270,3 +270,10 @@ class TimeWrapper:
             H="%02d" % h, M="%02d" % m, S="%02d" % s,
             l=l, L=L,
         ).strip()
+
+
+def render_json(json):
+    if not json.get("full_text", ""):
+        return ""
+
+    return json["full_text"]
