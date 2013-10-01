@@ -42,7 +42,7 @@ class IMAP(Backend):
                 self.connection = None
 
         try:
-            self.connection.select()
+            self.connection.select(self.mailbox)
         except Exception as e:
             self.connection = None
 
