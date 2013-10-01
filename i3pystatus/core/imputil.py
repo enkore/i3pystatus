@@ -2,6 +2,7 @@ import inspect
 import types
 from importlib import import_module
 
+
 class ClassFinder:
     """Support class to find classes of specific bases in a module"""
 

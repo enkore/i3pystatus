@@ -16,6 +16,7 @@ SEARCHPATH = (
     "$XDG_CONFIG_DIRS/i3pystatus.py",
 )
 
+
 class ConfigFinder:
     def __init__(self, searchpath=SEARCHPATH):
         self.searchpath = searchpath
@@ -37,6 +38,7 @@ class ConfigFinder:
                 failed.append(path)
 
         raise RuntimeError("Didn't find a config file, tried\n * {mods}".format(mods="\n * ".join(failed)))
+
 
 class Config:
     def __init__(self, config_file=None):
