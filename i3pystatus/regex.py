@@ -2,7 +2,9 @@ import re
 
 from i3pystatus import IntervalModule
 
+
 class Regex(IntervalModule):
+
     """
     Simple regex file watcher
 
@@ -26,5 +28,5 @@ class Regex(IntervalModule):
         with open(self.file, "r") as f:
             match = self.re.search(f.read())
             self.output = {
-                "full_text" : self.format.format(*match.groups()),
+                "full_text": self.format.format(*match.groups()),
             }

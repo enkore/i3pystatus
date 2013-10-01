@@ -2,7 +2,9 @@ from os.path import join
 
 from i3pystatus import IntervalModule
 
+
 class File(IntervalModule):
+
     """
     Rip information from text files
 

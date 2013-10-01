@@ -3,7 +3,9 @@ import glob
 
 from i3pystatus import IntervalModule
 
+
 class Temperature(IntervalModule):
+
     """
     Shows CPU temperature of Intel processors
 
@@ -11,7 +13,8 @@ class Temperature(IntervalModule):
     """
 
     settings = (
-        ("format", "format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps."),
+        ("format",
+         "format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps."),
         "color", "color_critical", "high_factor"
     )
     format = "{temp} °C"
@@ -22,9 +25,11 @@ class Temperature(IntervalModule):
 
     def init(self):
         self.base_path = "/sys/devices/platform/coretemp.0"
-        input = glob.glob("{base_path}/temp*_input".format(base_path=self.base_path))[0]
+        input = glob.glob(
+            "{base_path}/temp*_input".format(base_path=self.base_path))[0]
         self.input = re.search("temp([0-9]+)_input", input).group(1)
-        self.base_path = "{base_path}/temp{input}_".format(base_path=self.base_path, input=self.input)
+        self.base_path = "{base_path}/temp{input}_".format(
+            base_path=self.base_path, input=self.input)
 
         with open("{base_path}crit".format(base_path=self.base_path), "r") as f:
             self.critical = float(f.read().strip()) / 1000
@@ -44,7 +49,7 @@ class Temperature(IntervalModule):
             color = self.color_high
 
         self.output = {
-            "full_text" : self.format.format(temp=temp, critical=self.critical, high=self.high),
+            "full_text": self.format.format(temp=temp, critical=self.critical, high=self.high),
             "urgent": urgent,
             "color": color,
         }

@@ -1,12 +1,16 @@
 
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import http.cookiejar
 import webbrowser
 import json
 
 from i3pystatus import IntervalModule
 
+
 class pyLoad(IntervalModule):
+
     """
     Shows pyLoad status
 
@@ -40,12 +44,13 @@ class pyLoad(IntervalModule):
     def _rpc_call(self, method, data=None):
         if not data:
             data = {}
-        urlencoded  = urllib.parse.urlencode(data).encode("ascii")
+        urlencoded = urllib.parse.urlencode(data).encode("ascii")
         return json.loads(self.opener.open("{address}/api/{method}/".format(address=self.address, method=method), urlencoded).read().decode("utf-8"))
 
     def init(self):
         self.cj = http.cookiejar.CookieJar()
-        self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.cj))
+        self.opener = urllib.request.build_opener(
+            urllib.request.HTTPCookieProcessor(self.cj))
 
     def login(self):
         return self._rpc_call("login", {
@@ -59,7 +64,8 @@ class pyLoad(IntervalModule):
         downloads_status = self._rpc_call("statusDownloads")
 
         if downloads_status:
-            progress = sum(dl["percent"] for dl in downloads_status) / len(downloads_status) * 100
+            progress = sum(dl["percent"]
+                           for dl in downloads_status) / len(downloads_status) * 100
         else:
             progress = 100.0
 

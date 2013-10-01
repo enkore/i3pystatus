@@ -3,7 +3,9 @@ import basiciw
 
 from i3pystatus.network import Network
 
+
 class Wireless(Network):
+
     """
     Display network information about a interface.
 

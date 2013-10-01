@@ -4,6 +4,7 @@ import unittest
 
 from i3pystatus import battery
 
+
 def factory(path, format, expected):
     def test():
         bc = battery.BatteryChecker(path=path, format=format)
@@ -12,6 +13,7 @@ def factory(path, format, expected):
         assert bc.output["full_text"] == expected
     test.description = path + ":" + format
     return test
+
 
 def basic_test_generator():
     cases = [

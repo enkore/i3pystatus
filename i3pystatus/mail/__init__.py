@@ -1,7 +1,9 @@
 
 from i3pystatus import SettingsBase, IntervalModule
 
+
 class Backend(SettingsBase):
+
     """Handles the details of checking for mail"""
 
     unread = 0
@@ -9,7 +11,9 @@ class Backend(SettingsBase):
 
     You'll probably implement that as a property"""
 
+
 class Mail(IntervalModule):
+
     """
     Generic mail checker
 
@@ -29,7 +33,7 @@ class Mail(IntervalModule):
     required = ("backends",)
 
     color = "#ffffff"
-    color_unread  ="#ff0000"
+    color_unread = "#ff0000"
     format = "{unread} new email"
     format_plural = "{unread} new emails"
     hide_if_null = True
@@ -56,7 +60,7 @@ class Mail(IntervalModule):
             format = self.format_plural
 
         self.output = {
-            "full_text" : format.format(unread=unread),
-            "urgent" : urgent,
-            "color" : color,
+            "full_text": format.format(unread=unread),
+            "urgent": urgent,
+            "color": color,
         }

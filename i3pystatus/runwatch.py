@@ -3,7 +3,9 @@ import os.path
 
 from i3pystatus import IntervalModule
 
+
 class RunWatch(IntervalModule):
+
     """
     Expands the given path using glob to a pidfile and checks
     if the process ID found inside is valid

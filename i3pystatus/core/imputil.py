@@ -4,6 +4,7 @@ from importlib import import_module
 
 
 class ClassFinder:
+
     """Support class to find classes of specific bases in a module"""
 
     def __init__(self, baseclass):
@@ -44,5 +45,6 @@ class ClassFinder:
         elif inspect.isclass(module) and issubclass(module, self.baseclass):
             return module(*args, **kwargs)
         elif args or kwargs:
-            raise ValueError("Additional arguments are invalid if 'module' is already an object")
+            raise ValueError(
+                "Additional arguments are invalid if 'module' is already an object")
         return module

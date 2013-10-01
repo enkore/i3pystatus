@@ -8,7 +8,9 @@ import json
 
 from i3pystatus.mail import Backend
 
+
 class Notmuch(Backend):
+
     """
     This class uses the notmuch python bindings to check for the
     number of messages in the notmuch database with the tags "inbox"

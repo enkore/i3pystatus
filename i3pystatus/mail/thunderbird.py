@@ -18,7 +18,9 @@ from gi.repository import GObject
 
 from i3pystatus.mail import Backend
 
+
 class Thunderbird(Backend):
+
     """
     This class listens for dbus signals emitted by
     the dbus-sender extension for thunderbird.

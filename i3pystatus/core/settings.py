@@ -1,7 +1,9 @@
 from i3pystatus.core.util import KeyConstraintDict
 from i3pystatus.core.exceptions import ConfigKeyError, ConfigMissingError
 
+
 class SettingsBase:
+
     """
     Support class for providing a nice and flexible settings interface
 
@@ -26,6 +28,7 @@ class SettingsBase:
     def __init__(self, *args, **kwargs):
         def flatten_setting(setting):
             return setting[0] if isinstance(setting, tuple) else setting
+
         def flatten_settings(settings):
             return tuple(flatten_setting(setting) for setting in settings)
 
@@ -44,14 +47,16 @@ class SettingsBase:
         try:
             sm.update(settings_source)
         except KeyError as exc:
-           raise ConfigKeyError(type(self).__name__, key=exc.args[0]) from exc
+            raise ConfigKeyError(type(self).__name__, key=exc.args[0]) from exc
 
         try:
             self.__dict__.update(sm)
         except KeyConstraintDict.MissingKeys as exc:
-            raise ConfigMissingError(type(self).__name__, missing=exc.keys) from exc
+            raise ConfigMissingError(
+                type(self).__name__, missing=exc.keys) from exc
 
-        self.__name__ = "{}.{}".format(self.__module__, self.__class__.__name__)
+        self.__name__ = "{}.{}".format(
+            self.__module__, self.__class__.__name__)
 
         self.init()
 

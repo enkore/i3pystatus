@@ -9,6 +9,7 @@ __all__ = [
     "Module", "AsyncModule", "IntervalModule",
 ]
 
+
 class Module(SettingsBase):
     output = None
     position = 0
@@ -34,9 +35,9 @@ class Module(SettingsBase):
         pass
 
     def on_click(self, button):
-        if button == 1: # Left mouse button
+        if button == 1:  # Left mouse button
             self.on_leftclick()
-        elif button == 3: # Right mouse button
+        elif button == 3:  # Right mouse button
             self.on_rightclick()
 
     @chain
@@ -52,8 +53,9 @@ class Module(SettingsBase):
     def __repr__(self):
         return self.__class__.__name__
 
+
 class IntervalModule(Module):
-    interval = 5 # seconds
+    interval = 5  # seconds
     managers = {}
 
     def registered(self, status_handler):

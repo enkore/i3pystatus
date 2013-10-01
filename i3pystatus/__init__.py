@@ -16,10 +16,12 @@ __all__ = [
     "formatp",
 ]
 
+
 def main():
     parser = argparse.ArgumentParser(description="A replacement for i3status")
     parser.add_argument("-c", "--config", action="store", help="Config file")
-    parser.add_argument("-t", "--test", action="store_true", help="Test modules")
+    parser.add_argument(
+        "-t", "--test", action="store_true", help="Test modules")
     args = parser.parse_args()
 
     config = Config(config_file=args.config)

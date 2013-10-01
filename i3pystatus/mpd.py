@@ -4,10 +4,13 @@ import socket
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import TimeWrapper
 
+
 def format_time(seconds):
     return "{}:{:02}".format(*divmod(int(seconds), 60)) if seconds else ""
 
+
 class MPD(IntervalModule):
+
     """
     Displays various information from MPD (the music player daemon)
 
@@ -71,7 +74,7 @@ class MPD(IntervalModule):
             currentsong = self._mpd_command(s, "currentsong")
 
             fdict = {
-                "pos": int(status.get("song", 0))+1,
+                "pos": int(status.get("song", 0)) + 1,
                 "len": int(status["playlistlength"]),
                 "status": self.status[status["state"]],
                 "volume": int(status["volume"]),
@@ -92,13 +95,14 @@ class MPD(IntervalModule):
     def on_leftclick(self):
         with socket.create_connection(("localhost", self.port)) as s:
             s.recv(8192)
-            
-            self._mpd_command(s, "pause %i" % (0 if self._mpd_command(s, "status")["state"] == "pause" else 1))
+
+            self._mpd_command(s, "pause %i" %
+                              (0 if self._mpd_command(s, "status")["state"] == "pause" else 1))
 
     def on_rightclick(self):
         with socket.create_connection(("localhost", self.port)) as s:
             s.recv(8192)
-            
+
             vol = int(self._mpd_command(s, "status")["volume"])
             if vol == 0:
                 self._mpd_command(s, "setvol %i" % self.vol)

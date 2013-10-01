@@ -7,16 +7,19 @@ import string
 from i3pystatus.core.exceptions import *
 from i3pystatus.core.imputil import ClassFinder
 
+
 def chain(fun):
     def chained(self, *args, **kwargs):
         fun(self, *args, **kwargs)
         return self
     return chained
 
+
 def lchop(string, prefix):
     if string.startswith(prefix):
         return string[len(prefix):]
     return string
+
 
 def popwhile(predicate, iterable):
     while iterable:
@@ -25,6 +28,7 @@ def popwhile(predicate, iterable):
             yield item
         else:
             break
+
 
 def partition(iterable, limit, key=lambda x: x):
     def pop_partition():
@@ -40,18 +44,22 @@ def partition(iterable, limit, key=lambda x: x):
 
     return partitions
 
+
 def round_dict(dic, places):
     for key, value in dic.items():
         dic[key] = round(value, places)
 
+
 class ModuleList(collections.UserList):
+
     def __init__(self, status_handler, module_base):
         self.status_handler = status_handler
         self.finder = ClassFinder(module_base)
         super().__init__()
 
     def append(self, module, *args, **kwargs):
-        module = self.finder.instanciate_class_from_module(module, *args, **kwargs)
+        module = self.finder.instanciate_class_from_module(
+            module, *args, **kwargs)
         module.registered(self.status_handler)
         super().append(module)
         return module
@@ -63,7 +71,9 @@ class ModuleList(collections.UserList):
                 return module
         return None
 
+
 class PrefixedKeyDict(collections.UserDict):
+
     def __init__(self, prefix):
         super().__init__()
 
@@ -72,8 +82,11 @@ class PrefixedKeyDict(collections.UserDict):
     def __setitem__(self, key, value):
         super().__setitem__(self.prefix + key, value)
 
+
 class KeyConstraintDict(collections.UserDict):
+
     class MissingKeys(Exception):
+
         def __init__(self, keys):
             self.keys = keys
 
@@ -104,10 +117,12 @@ class KeyConstraintDict(collections.UserDict):
     def missing(self):
         return self.required_keys - (self.seen_keys & self.required_keys)
 
+
 def convert_position(pos, json):
     if pos < 0:
-        pos = len(json) + (pos+1)
+        pos = len(json) + (pos + 1)
     return pos
+
 
 def flatten(l):
     l = list(l)
@@ -122,6 +137,7 @@ def flatten(l):
                 l[i:i + 1] = l[i]
         i += 1
     return l
+
 
 def formatp(string, **kwargs):
     """
@@ -149,17 +165,25 @@ def formatp(string, **kwargs):
         """
         class Token:
             string = ""
+
             def __repr__(self):
                 return "<%s> " % self.__class__.__name__
+
         class OpeningBracket(Token):
+
             def __repr__(self):
                 return "<Group>"
+
         class ClosingBracket(Token):
+
             def __repr__(self):
                 return "</Group>"
+
         class String(Token):
+
             def __init__(self, str):
                 self.string = str
+
             def __repr__(self):
                 return super().__repr__() + repr(self.string)
 
@@ -187,9 +211,11 @@ def formatp(string, **kwargs):
             if prev != "\\" and char in TOKENS:
                 token = TOKENS[char]()
                 token.index = next
-                if char == "]": level -= 1
+                if char == "]":
+                    level -= 1
                 token.level = level
-                if char == "[": level += 1
+                if char == "[":
+                    level += 1
                 stack.append(token)
             else:
                 if stack and isinstance(stack[-1], String):
@@ -214,7 +240,7 @@ def formatp(string, **kwargs):
             while items[0].level > level:
                 nested.append(items.pop(0))
             if nested:
-                subtree.append(build_tree(nested, level+1))
+                subtree.append(build_tree(nested, level + 1))
 
             item = items.pop(0)
             if item.string:
@@ -242,7 +268,9 @@ def formatp(string, **kwargs):
 
 formatp.field_re = re.compile(r"({(\w+)[^}]*})")
 
+
 class TimeWrapper:
+
     class TimeTemplate(string.Template):
         delimiter = "%"
         idpattern = r"[a-zA-Z]"

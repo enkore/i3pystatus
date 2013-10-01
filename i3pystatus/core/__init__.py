@@ -6,7 +6,9 @@ from threading import Thread
 from i3pystatus.core import io, util
 from i3pystatus.core.modules import Module, START_HOOKS
 
+
 class Status:
+
     def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
         self.standalone = standalone
         if standalone:
@@ -28,7 +30,7 @@ class Status:
             return None
 
     def run_command_endpoint(self):
-        for command in io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull,"w")), skiplines=1).read():
+        for command in io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1).read():
             module = self.modules.get_by_id(command["instance"])
             if module:
                 module.on_click(command["button"])

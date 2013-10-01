@@ -8,6 +8,7 @@ timer = time.perf_counter if hasattr(time, "perf_counter") else time.clock
 
 
 class Thread(threading.Thread):
+
     def __init__(self, target_interval, workloads=None, start_barrier=1):
         super().__init__()
         self.workloads = workloads or []
@@ -36,7 +37,8 @@ class Thread(threading.Thread):
             time.sleep(0.4)
 
     def execute_workloads(self):
-        for workload in self: workload()
+        for workload in self:
+            workload()
         self.workloads.sort(key=lambda workload: workload.time)
 
     def run(self):
@@ -54,6 +56,7 @@ class Thread(threading.Thread):
 
 
 class Wrapper:
+
     def __init__(self, workload):
         self.workload = workload
 
@@ -62,6 +65,7 @@ class Wrapper:
 
 
 class ExceptionWrapper(Wrapper):
+
     def __call__(self):
         try:
             self.workload()
@@ -84,6 +88,7 @@ class WorkloadWrapper(Wrapper):
 
 
 class Manager:
+
     def __init__(self, target_interval):
         self.target_interval = target_interval
         self.upper_bound = target_interval * 1.1
@@ -108,7 +113,8 @@ class Manager:
         return partition(workloads, self.lower_bound, lambda workload: workload.time)
 
     def create_threads(self, threads):
-        for workloads in threads: self.create_thread(workloads)
+        for workloads in threads:
+            self.create_thread(workloads)
 
     def create_thread(self, workloads):
         thread = Thread(self.target_interval, workloads, start_barrier=0)
@@ -119,4 +125,5 @@ class Manager:
         self.threads[0].append(self.wrap(workload))
 
     def start(self):
-        for thread in self.threads: thread.start()
+        for thread in self.threads:
+            thread.start()

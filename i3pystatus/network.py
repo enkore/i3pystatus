@@ -7,6 +7,8 @@ import netifaces
 from i3pystatus import IntervalModule
 
 # Remainder: if we raise minimum Python version to 3.3, use ipaddress module
+
+
 def count_bits(integer):
     bits = 0
     while(integer):
@@ -14,30 +16,38 @@ def count_bits(integer):
         bits += 1
     return bits
 
+
 def v6_to_int(v6):
     return int(v6.replace(":", ""), 16)
+
 
 def prefix6(mask):
     return count_bits(v6_to_int(mask))
 
+
 def cidr6(addr, mask):
     return "{addr}/{bits}".format(addr=addr, bits=prefix6(mask))
+
 
 def v4_to_int(v4):
     sum = 0
     mul = 1
     for part in reversed(v4.split(".")):
         sum += int(part) * mul
-        mul *= 2**8
+        mul *= 2 ** 8
     return sum
+
 
 def prefix4(mask):
     return count_bits(v4_to_int(mask))
 
+
 def cidr4(addr, mask):
     return "{addr}/{bits}".format(addr=addr, bits=prefix4(mask))
 
+
 class Network(IntervalModule):
+
     """
     Display network information about a interface.
 
@@ -72,7 +82,8 @@ class Network(IntervalModule):
 
     def init(self):
         if self.interface not in netifaces.interfaces():
-            raise RuntimeError("Unknown interface {iface}!".format(iface=self.interface))
+            raise RuntimeError(
+                "Unknown interface {iface}!".format(iface=self.interface))
 
         self.baseinfo = {
             "interface": self.interface,
@@ -83,7 +94,8 @@ class Network(IntervalModule):
     def collect(self):
         info = netifaces.ifaddresses(self.interface)
         up = netifaces.AF_INET in info or netifaces.AF_INET6 in info
-        fdict = dict(zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
+        fdict = dict(
+            zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
         fdict.update(self.baseinfo)
 
         if up:

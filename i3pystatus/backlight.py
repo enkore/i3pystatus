@@ -1,6 +1,8 @@
 from i3pystatus.file import File
 
+
 class Backlight(File):
+
     """
     Screen backlight info
 
@@ -17,15 +19,15 @@ class Backlight(File):
     )
     required = ()
 
-    backlight="acpi_video0"
-    format="{brightness}/{max_brightness}"
+    backlight = "acpi_video0"
+    format = "{brightness}/{max_brightness}"
 
     base_path = "/sys/class/backlight/{backlight}/"
-    components={
+    components = {
         "brightness": (int, "brightness"),
         "max_brightness": (int, "max_brightness"),
     }
-    transforms={
+    transforms = {
         "percentage": lambda cdict: (cdict["brightness"] / cdict["max_brightness"]) * 100,
     }
 

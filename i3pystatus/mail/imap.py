@@ -3,16 +3,18 @@
 
 import sys
 import json
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 import imaplib
 
 from i3pystatus.mail import Backend
 
+
 class IMAP(Backend):
+
     """ 
     Checks for mail on a IMAP server
     """
-    
+
     settings = (
         "host", "port",
         "username", "password",
@@ -52,7 +54,7 @@ class IMAP(Backend):
     def unread(self):
         conn = self.get_connection()
         if conn:
-            return len(conn.search(None,"UnSeen")[1][0].split())
+            return len(conn.search(None, "UnSeen")[1][0].split())
         else:
             sys.stderr.write("no connection")
 

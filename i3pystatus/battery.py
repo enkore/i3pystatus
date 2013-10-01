@@ -4,11 +4,13 @@
 import re
 import configparser
 
-from i3pystatus import IntervalModule
+from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import PrefixedKeyDict, lchop, TimeWrapper
 from i3pystatus.core.desktop import display_notification
 
+
 class UEventParser(configparser.ConfigParser):
+
     @staticmethod
     def parse_file(file):
         parser = UEventParser()
@@ -25,7 +27,9 @@ class UEventParser(configparser.ConfigParser):
     def read_string(self, string):
         super().read_string("[id10t]\n" + string)
 
+
 class Battery:
+
     @staticmethod
     def create(from_file):
         batinfo = UEventParser.parse_file(from_file)
@@ -52,33 +56,41 @@ class Battery:
         else:
             return "Full"
 
+
 class BatteryCharge(Battery):
+
     def consumption(self):
-        return self.bat["VOLTAGE_NOW"] * self.bat["CURRENT_NOW"] # V  * A = W
+        return self.bat["VOLTAGE_NOW"] * self.bat["CURRENT_NOW"]  # V  * A = W
 
     def _percentage(self, design):
-        return self.bat["CHARGE_NOW"] / self.bat["CHARGE_FULL"+design]
+        return self.bat["CHARGE_NOW"] / self.bat["CHARGE_FULL" + design]
 
     def remaining(self):
         if self.status() == "Discharging":
-            return self.bat["CHARGE_NOW"] / self.bat["CURRENT_NOW"] * 60 # Ah / A = h * 60 min = min
+            # Ah / A = h * 60 min = min
+            return self.bat["CHARGE_NOW"] / self.bat["CURRENT_NOW"] * 60
         else:
             return (self.bat["CHARGE_FULL"] - self.bat["CHARGE_NOW"]) / self.bat["CURRENT_NOW"] * 60
 
+
 class BatteryEnergy(Battery):
+
     def consumption(self):
         return self.bat["POWER_NOW"]
 
     def _percentage(self, design):
-        return self.bat["ENERGY_NOW"] / self.bat["ENERGY_FULL"+design]
+        return self.bat["ENERGY_NOW"] / self.bat["ENERGY_FULL" + design]
 
     def remaining(self):
         if self.status() == "Discharging":
-            return self.bat["ENERGY_NOW"] / self.bat["POWER_NOW"] * 60 # Wh / W = h * 60 min = min
+            # Wh / W = h * 60 min = min
+            return self.bat["ENERGY_NOW"] / self.bat["POWER_NOW"] * 60
         else:
             return (self.bat["ENERGY_FULL"] - self.bat["ENERGY_NOW"]) / self.bat["POWER_NOW"] * 60
 
+
 class BatteryChecker(IntervalModule):
+
     """ 
     This class uses the /sys/class/power_supply/…/uevent interface to check for the
     battery status
@@ -98,8 +110,10 @@ class BatteryChecker(IntervalModule):
         "format",
         ("alert", "Display a libnotify-notification on low battery"),
         "alert_percentage",
-        ("alert_format_title", "The title of the notification, all formatters can be used"),
-        ("alert_format_body", "The body text of the notification, all formatters can be used"),
+        ("alert_format_title",
+         "The title of the notification, all formatters can be used"),
+        ("alert_format_body",
+         "The body text of the notification, all formatters can be used"),
         ("path", "Override the default-generated path"),
         ("status", "A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names"),
     )
@@ -110,7 +124,7 @@ class BatteryChecker(IntervalModule):
         "DIS": "DIS",
         "FULL": "FULL",
     }
-    
+
     alert = False
     alert_percentage = 10
     alert_format_title = "Low battery"
@@ -120,7 +134,8 @@ class BatteryChecker(IntervalModule):
 
     def init(self):
         if not self.path:
-            self.path = "/sys/class/power_supply/{0}/uevent".format(self.battery_ident)
+            self.path = "/sys/class/power_supply/{0}/uevent".format(
+                self.battery_ident)
 
     def run(self):
         urgent = False
@@ -152,8 +167,8 @@ class BatteryChecker(IntervalModule):
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
             display_notification(
-                title=self.alert_format_title.format(**fdict),
-                body=self.alert_format_body.format(**fdict),
+                title=formatp(self.alert_format_title, **fdict),
+                body=formatp(self.alert_format_body, **fdict),
                 icon="battery-caution",
                 urgency=2,
             )
@@ -161,7 +176,7 @@ class BatteryChecker(IntervalModule):
         fdict["status"] = self.status[fdict["status"]]
 
         self.output = {
-            "full_text": self.format.format(**fdict).strip(),
+            "full_text": formatp(self.format, **fdict).strip(),
             "instance": self.battery_ident,
             "urgent": urgent,
             "color": color

@@ -9,14 +9,17 @@ import types
 
 from i3pystatus.core import util
 
+
 def get_random_string(length=6, chars=string.printable):
     return ''.join(random.choice(chars) for x in range(length))
+
 
 def lchop(prefix, string):
     chopped = util.lchop(string, prefix)
     if string.startswith(prefix):
         assert len(chopped) == len(string) - len(prefix)
     assert not (prefix and chopped.startswith(prefix))
+
 
 def lchop_test_generator():
     cases = [
@@ -49,17 +52,19 @@ def lchop_test_generator():
         ("<|(h|P9Wz9d9'u,M", '7d-A\nY{}5"\' !*gHHh`x0!B2Ox?yeKb\x0b'),
         ('bV?:f\x0b#HDhuwSvys3', ";\r,L![\x0cU7@ne@'?[*&V<dap]+Tq[n1!|PE"),
         ('T\r~bGV^@JC?P@Pa66.', "9,q>VI,[}pHM\nB65@LfE16VJPw=r'zU\x0bzWj@"),
-        ('^|j7N!mV0o(?*1>p?dy', '\\ZdA&:\t\x0b:8\t|7.Kl,oHw-\x0cS\nwZlND~uC@le`Sm'),
+        ('^|j7N!mV0o(?*1>p?dy',
+         '\\ZdA&:\t\x0b:8\t|7.Kl,oHw-\x0cS\nwZlND~uC@le`Sm'),
     ]
 
     for prefix, string in cases:
-        yield lchop, prefix, prefix+string
+        yield lchop, prefix, prefix + string
         yield lchop, prefix, string
         yield lchop, string, string
         yield lchop, string, prefix
         yield lchop, "", string
         yield lchop, prefix, ""
-        yield lchop, prefix+prefix, prefix+prefix+prefix+string
+        yield lchop, prefix + prefix, prefix + prefix + prefix + string
+
 
 def partition(iterable, limit, assrt):
     partitions = util.partition(iterable, limit)
@@ -70,8 +75,8 @@ def partition(iterable, limit, assrt):
 
 def partition_test_generator():
     cases = [
-        ([1, 2, 3, 4], 3, [[1,2], [3], [4]]),
-        ([2, 1, 3, 4], 3, [[1,2], [3], [4]]),
+        ([1, 2, 3, 4], 3, [[1, 2], [3], [4]]),
+        ([2, 1, 3, 4], 3, [[1, 2], [3], [4]]),
         ([0.33, 0.45, 0.89], 1, [[0.33, 0.45, 0.89]]),
         ([], 10, []),
     ]
@@ -79,8 +84,10 @@ def partition_test_generator():
     for iterable, limit, assrt in cases:
         yield partition, iterable, limit, assrt
 
+
 def popwhile(iterable, predicate, assrt):
     assert list(util.popwhile(predicate, iterable)) == assrt
+
 
 def popwhile_test_generator():
     cases = [
@@ -94,11 +101,13 @@ def popwhile_test_generator():
     for iterable, predicate, assrt in cases:
         yield popwhile, iterable, predicate, assrt
 
+
 def keyconstraintdict_missing(valid, required, feedkeys, assrt_missing):
     kcd = util.KeyConstraintDict(valid_keys=valid, required_keys=required)
     kcd.update(dict.fromkeys(feedkeys))
 
     assert kcd.missing() == set(assrt_missing)
+
 
 def keyconstraintdict_missing_test_generator():
     cases = [
@@ -106,13 +115,16 @@ def keyconstraintdict_missing_test_generator():
         (("foo", "bar", "baz"), ("foo",), ("bar",), ("foo",)),
         (("foo", "bar", "baz"), ("foo",), tuple(), ("foo",)),
         (("foo", "bar", "baz"), ("bar", "baz"), ("bar", "baz"), tuple()),
-        (("foo", "bar", "baz"), ("bar", "baz"), ("bar", "foo", "baz"), tuple()),
+        (("foo", "bar", "baz"), ("bar", "baz"),
+         ("bar", "foo", "baz"), tuple()),
     ]
 
     for valid, required, feed, missing in cases:
         yield keyconstraintdict_missing, valid, required, feed, missing
 
+
 class ModuleListTests(unittest.TestCase):
+
     class ModuleBase:
         pass
 
@@ -128,7 +140,8 @@ class ModuleListTests(unittest.TestCase):
         module.registered.assert_called_with(self.status_handler)
 
     def _create_module_class(self, name, bases=None):
-        if not bases: bases = (self.ModuleBase,)
+        if not bases:
+            bases = (self.ModuleBase,)
         return type(name, bases, {
             "registered": MagicMock(),
             "__init__": MagicMock(return_value=None),
@@ -173,7 +186,9 @@ class ModuleListTests(unittest.TestCase):
         cls.__init__.assert_called_with()
         cls.registered.assert_called_with(self.status_handler)
 
+
 class PrefixedKeyDictTests(unittest.TestCase):
+
     def test_no_prefix(self):
         dict = util.PrefixedKeyDict("")
         dict["foo"] = None
@@ -200,46 +215,55 @@ class PrefixedKeyDictTests(unittest.TestCase):
         assert realdict["pfx_foo"] == None
         assert realdict["pfx_bar"] == 42
 
+
 class KeyConstraintDictAdvancedTests(unittest.TestCase):
+
     def test_invalid_1(self):
         kcd = util.KeyConstraintDict(valid_keys=tuple(), required_keys=tuple())
         with self.assertRaises(KeyError):
             kcd["invalid"] = True
 
     def test_invalid_2(self):
-        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=tuple())
+        kcd = util.KeyConstraintDict(
+            valid_keys=("foo", "bar"), required_keys=tuple())
         with self.assertRaises(KeyError):
             kcd["invalid"] = True
 
     def test_incomplete_iteration(self):
-        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
+        kcd = util.KeyConstraintDict(
+            valid_keys=("foo", "bar"), required_keys=("foo",))
         with self.assertRaises(util.KeyConstraintDict.MissingKeys):
             for x in kcd:
                 pass
 
     def test_completeness(self):
-        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
+        kcd = util.KeyConstraintDict(
+            valid_keys=("foo", "bar"), required_keys=("foo",))
         kcd["foo"] = False
         for x in kcd:
             pass
         assert kcd.missing() == set()
 
     def test_remove_required(self):
-        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
+        kcd = util.KeyConstraintDict(
+            valid_keys=("foo", "bar"), required_keys=("foo",))
         kcd["foo"] = None
         assert kcd.missing() == set()
         del kcd["foo"]
         assert kcd.missing() == set(["foo"])
 
     def test_set_twice(self):
-        kcd = util.KeyConstraintDict(valid_keys=("foo", "bar"), required_keys=("foo",))
+        kcd = util.KeyConstraintDict(
+            valid_keys=("foo", "bar"), required_keys=("foo",))
         kcd["foo"] = 1
         kcd["foo"] = 2
         assert kcd.missing() == set()
         del kcd["foo"]
         assert kcd.missing() == set(["foo"])
 
+
 class FormatPTests(unittest.TestCase):
+
     def test_escaping(self):
         assert util.formatp("[razamba \[ mabe \]]") == "razamba [ mabe ]"
 
@@ -251,22 +275,28 @@ class FormatPTests(unittest.TestCase):
     def test_nesting(self):
         s = "[[{artist} - ]{album} - ]{title}"
         assert util.formatp(s, title="Black rose") == "Black rose"
-        assert util.formatp(s, artist="In Flames", title="Gyroscope") == "Gyroscope"
-        assert util.formatp(s, artist="SOAD", album="Toxicity", title="Science") == "SOAD - Toxicity - Science"
-        assert util.formatp(s, album="Toxicity", title="Science") == "Toxicity - Science"
+        assert util.formatp(
+            s, artist="In Flames", title="Gyroscope") == "Gyroscope"
+        assert util.formatp(
+            s, artist="SOAD", album="Toxicity", title="Science") == "SOAD - Toxicity - Science"
+        assert util.formatp(
+            s, album="Toxicity", title="Science") == "Toxicity - Science"
 
     def test_bare(self):
         assert util.formatp("{foo} blar", foo="bar") == "bar blar"
 
     def test_presuffix(self):
-        assert util.formatp("ALINA[{title} schnacke]KOMMAHER", title="") == "ALINAKOMMAHER"
+        assert util.formatp(
+            "ALINA[{title} schnacke]KOMMAHER", title="") == "ALINAKOMMAHER"
         assert util.formatp("grml[{title}]") == "grml"
         assert util.formatp("[{t}]grml") == "grml"
 
     def test_side_by_side(self):
         s = "{status} [{artist} / [{album} / ]]{title}[ {song_elapsed}/{song_length}]"
-        assert util.formatp(s, status="▷", title="Only For The Weak", song_elapsed="1:41", song_length="4:55") == "▷ Only For The Weak 1:41/4:55"
-        assert util.formatp(s, status="", album="Foo", title="Die, Die, Crucified", song_elapsed="2:52") == " Die, Die, Crucified"
+        assert util.formatp(s, status="▷", title="Only For The Weak",
+                            song_elapsed="1:41", song_length="4:55") == "▷ Only For The Weak 1:41/4:55"
+        assert util.formatp(
+            s, status="", album="Foo", title="Die, Die, Crucified", song_elapsed="2:52") == " Die, Die, Crucified"
         assert util.formatp("[[{a}][{b}]]", b=1) == "1"
 
     def test_complex_field(self):

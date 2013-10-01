@@ -5,7 +5,9 @@ import sys
 import threading
 from contextlib import contextmanager
 
+
 class IOHandler:
+
     def __init__(self, inp=sys.stdin, out=sys.stdout):
         self.inp = inp
         self.out = out
@@ -42,7 +44,9 @@ class IOHandler:
             raise EOFError()
         return line
 
+
 class StandaloneIO(IOHandler):
+
     """
     I/O handler for standalone usage of i3pystatus (w/o i3status)
 
@@ -69,9 +73,11 @@ class StandaloneIO(IOHandler):
     def read_line(self):
         self.n += 1
 
-        return self.proto[min(self.n, len(self.proto)-1)]
+        return self.proto[min(self.n, len(self.proto) - 1)]
+
 
 class JSONIO:
+
     def __init__(self, io, skiplines=2):
         self.io = io
         for i in range(skiplines):
