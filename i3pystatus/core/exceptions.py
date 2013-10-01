@@ -6,18 +6,21 @@ class ConfigError(Exception):
 
         super().__init__(message)
 
+
 class ConfigKeyError(ConfigError, KeyError):
     def format(self, key):
         return "invalid option '{0}'".format(key)
 
+
 class ConfigMissingError(ConfigError):
     def format(self, missing):
         return "missing required options: {0}".format(missing)
-        super().__init__(module)
+
 
 class ConfigAmbigiousClassesError(ConfigError):
     def format(self, ambigious_classes):
         return "ambigious module specification, found multiple classes: {0}".format(ambigious_classes)
+
 
 class ConfigInvalidModuleError(ConfigError):
     def format(self):
