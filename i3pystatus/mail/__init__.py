@@ -22,7 +22,7 @@ class Mail(IntervalModule):
 !!i3pystatus.mail!!"""
 
     settings = (
-        ("backends", "List of backends (instances of i3pystatus.mail.xxx)"),
+        ("backends", "List of backends (instances of `i3pystatus.mail.xxx.Backend`)"),
         "color", "color_unread", "format", "format_plural",
         ("hide_if_null", "Don't output anything if there are no new mails"),
     )

@@ -56,3 +56,5 @@ class Thunderbird(Backend):
     def unread(self):
         self.run()
         return len(self._unread)
+
+Backend = Thunderbird

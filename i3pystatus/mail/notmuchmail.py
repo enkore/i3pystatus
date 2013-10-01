@@ -23,3 +23,5 @@ class Notmuch(Backend):
     @property
     def unread(self):
         return notmuch.Query(self.db, "tag:unread and tag:inbox").count_messages()
+
+Backend = Notmuch
