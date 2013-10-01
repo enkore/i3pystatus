@@ -113,8 +113,11 @@ def get_all(module_path, heading, finder=None):
 
     for name, module in get_modules(module_path):
         classes = finder.search_module(module)
+        found = []
         for cls in classes:
-            mods.append(Module(cls, neighbours=len(classes), module_name=name, module=module, heading=heading))
+            if cls.__name__ not in found:
+                found.append(cls.__name__)
+                mods.append(Module(cls, neighbours=len(classes), module_name=name, module=module, heading=heading))
 
     return sorted(mods, key=lambda module: module.name)
 

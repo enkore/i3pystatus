@@ -294,7 +294,7 @@ __Settings:__
 * `alert_format_title` — The title of the notification, all formatters can be used (default: `Low battery`)
 * `alert_format_body` — The body text of the notification, all formatters can be used (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
 * `path` — Override the default-generated path (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}`)
 
 
 
@@ -379,7 +379,7 @@ The `backends` setting determines the backends to use. Currently available are:
 
 __Settings:__
 
-* `backends` — List of backends (instances of i3pystatus.mail.xxx)
+* `backends` — List of backends (instances of `i3pystatus.mail.xxx.zzz`)
 * `color` —  (default: `#ffffff`)
 * `color_unread` —  (default: `#ff0000`)
 * `format` —  (default: `{unread} new email`)
@@ -390,7 +390,7 @@ __Settings:__
     Currently available backends are:
 
 
-> ### imap
+> ### imap.IMAP
 > 
 > 
 > Checks for mail on a IMAP server
@@ -407,7 +407,7 @@ __Settings:__
 > 
 > 
 > 
-> ### notmuchmail
+> ### notmuchmail.Notmuch
 > 
 > 
 > This class uses the notmuch python bindings to check for the
@@ -421,7 +421,7 @@ __Settings:__
 > 
 > 
 > 
-> ### thunderbird
+> ### thunderbird.Thunderbird
 > 
 > 
 > This class listens for dbus signals emitted by
@@ -480,7 +480,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` — formatp string (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'play': '▶', 'pause': '▷', 'stop': '◾'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'pause': '▷', 'stop': '◾', 'play': '▶'}`)
 
 
 
