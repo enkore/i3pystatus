@@ -294,7 +294,7 @@ __Settings:__
 * `alert_format_title` — The title of the notification, all formatters can be used (default: `Low battery`)
 * `alert_format_body` — The body text of the notification, all formatters can be used (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!`)
 * `path` — Override the default-generated path (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}`)
 
 
 
@@ -438,6 +438,26 @@ __Settings:__
 > 
 > 
 
+### mem
+
+
+Shows memory load
+
+Available formatters:
+* {avail_mem}
+* {percent_used_mem}
+* {used_mem}
+* {total_mem}
+
+Requires psutil (from PyPI)
+
+
+__Settings:__
+
+* `format` — format string used for output. (default: `{avail_mem} MB`)
+
+
+
 ### modsde
 
 
@@ -480,7 +500,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` — formatp string (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'pause': '▷', 'stop': '◾', 'play': '▶'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
 
 
 

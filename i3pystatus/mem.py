@@ -12,6 +12,8 @@ class Mem(IntervalModule):
     * {percent_used_mem}
     * {used_mem}
     * {total_mem}
+
+    Requires psutil (from PyPI)
     """
 
     format = "{avail_mem} MB"
