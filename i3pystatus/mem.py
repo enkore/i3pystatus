@@ -11,7 +11,7 @@ class Mem(IntervalModule):
     {total_mem}
     """
 
-    format = "{avail_mem} MB, {used_mem}"
+    format = "{avail_mem} MB"
     settings = (
         ("format", "format string used for output. {free_mem is the amount of free memory in MB}."),
     )
@@ -25,6 +25,3 @@ class Mem(IntervalModule):
         self.output = {
             "full_text" : self.format.format(used_mem=used_mem, avail_mem=avail_mem, total_mem=total_mem, percent_used_mem=percent_used_mem)
         }
-        print(self.output)
-a=Mem()
-a.run()
