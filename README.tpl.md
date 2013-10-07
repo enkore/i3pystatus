@@ -99,7 +99,7 @@ from network, wireless and pulseaudio in this example):
     # This would look like this:
     # Discharging 6h:51m
     status.register("battery",
-        format="{status} {remaining_hm}",
+        format="{status} {remaining:%E%hh:%Mm}",
         alert=True,
         alert_percentage=5,
         status={
