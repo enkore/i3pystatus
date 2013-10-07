@@ -128,7 +128,7 @@ class BatteryChecker(IntervalModule):
     alert = False
     alert_percentage = 10
     alert_format_title = "Low battery"
-    alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining_hm}) remaining!"
+    alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
 
     path = None
 
@@ -171,6 +171,7 @@ class BatteryChecker(IntervalModule):
                 body=formatp(self.alert_format_body, **fdict),
                 icon="battery-caution",
                 urgency=2,
+                timeout=60,
             )
 
         fdict["status"] = self.status[fdict["status"]]
