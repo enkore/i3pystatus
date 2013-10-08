@@ -11,6 +11,9 @@ status output compatible to i3status / i3bar of the i3 window manager.
 
 ## Installation
 
+Note: i3pystatus requires Python 3.2 or newer and is not compatible with
+Python 2.x.
+
 ### From PyPI package [i3pystatus](https://pypi.python.org/pypi/i3pystatus)
 
     pip install i3pystatus
@@ -500,7 +503,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` — formatp string (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'pause': '▷', 'play': '▶', 'stop': '◾'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'pause': '▷', 'stop': '◾', 'play': '▶'}`)
 
 
 
