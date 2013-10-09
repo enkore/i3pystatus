@@ -91,7 +91,7 @@ class BatteryEnergy(Battery):
 
 class BatteryChecker(IntervalModule):
 
-    """ 
+    """
     This class uses the /sys/class/power_supply/…/uevent interface to check for the
     battery status
 

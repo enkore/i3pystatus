@@ -15,7 +15,7 @@ class ALSA(IntervalModule):
     * `{volume}` — the current volume in percent
     * `{muted}` — the value of one of the `muted` or `unmuted` settings
     * `{card}` — the associated soundcard
-    * `{mixer}` — the associated ALSA mixer 
+    * `{mixer}` — the associated ALSA mixer
     """
 
     interval = 1

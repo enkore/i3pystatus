@@ -73,7 +73,7 @@ class pyLoad(IntervalModule):
             "download": self.download_true if server_status["download"] else self.download_false,
             "speed": server_status["speed"] / 1024,
             "progress": progress,
-            "progress_all":  sum(pkg["linksdone"] for pkg in self._rpc_call("getQueue")) / server_status["total"] * 100,
+            "progress_all": sum(pkg["linksdone"] for pkg in self._rpc_call("getQueue")) / server_status["total"] * 100,
             "captcha": self.captcha_true if self._rpc_call("isCaptchaWaiting") else self.captcha_false,
             "free_space": self._rpc_call("freeSpace") / (1024 ** 3),
         }

@@ -236,7 +236,7 @@ Available formatters:
 * `{volume}` — the current volume in percent
 * `{muted}` — the value of one of the `muted` or `unmuted` settings
 * `{card}` — the associated soundcard
-* `{mixer}` — the associated ALSA mixer 
+* `{mixer}` — the associated ALSA mixer
 
 
 __Settings:__
@@ -297,7 +297,7 @@ __Settings:__
 * `alert_format_title` — The title of the notification, all formatters can be used (default: `Low battery`)
 * `alert_format_body` — The body text of the notification, all formatters can be used (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!`)
 * `path` — Override the default-generated path (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}`)
 
 
 
@@ -503,7 +503,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` — formatp string (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'pause': '▷', 'stop': '◾', 'play': '▶'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
 
 
 
@@ -619,7 +619,7 @@ __Settings:__
 Expands the given path using glob to a pidfile and checks
 if the process ID found inside is valid
 (that is, if the process is running).
-You can use this to check if a specific application, 
+You can use this to check if a specific application,
 such as a VPN client or your DHCP client is running.
 
 Available formatters are {pid} and {name}.

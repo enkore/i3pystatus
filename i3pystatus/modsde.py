@@ -17,7 +17,7 @@ from i3pystatus import IntervalModule
 
 class ModsDeChecker(IntervalModule):
 
-    """ 
+    """
     This class returns i3status parsable output of the number of
     unread posts in any bookmark in the mods.de forums.
     """

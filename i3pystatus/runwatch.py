@@ -10,7 +10,7 @@ class RunWatch(IntervalModule):
     Expands the given path using glob to a pidfile and checks
     if the process ID found inside is valid
     (that is, if the process is running).
-    You can use this to check if a specific application, 
+    You can use this to check if a specific application,
     such as a VPN client or your DHCP client is running.
 
     Available formatters are {pid} and {name}.

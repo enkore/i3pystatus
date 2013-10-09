@@ -23,8 +23,6 @@ class Disk(IntervalModule):
     divisor = 1024 ** 3
 
     def run(self):
-        cdict = {}
-
         stat = os.statvfs(self.path)
         cdict = {
             "total": (stat.f_bsize * stat.f_blocks) / self.divisor,

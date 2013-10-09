@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, locale, datetime
+import os
+import locale
+import datetime
 
 from i3pystatus import IntervalModule
 
+
 class Clock(IntervalModule):
-    """ 
+
+    """
     This class shows a clock
     """
 

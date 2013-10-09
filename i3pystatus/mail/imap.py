@@ -11,7 +11,7 @@ from i3pystatus.mail import Backend
 
 class IMAP(Backend):
 
-    """ 
+    """
     Checks for mail on a IMAP server
     """
 
