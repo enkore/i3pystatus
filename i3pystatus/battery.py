@@ -40,12 +40,12 @@ class Battery:
 
     def __init__(self, batinfo):
         self.bat = batinfo
-        self.normalize_µ()
+        self.normalize_micro()
 
-    def normalize_µ(self):
-        for key, µvalue in self.bat.items():
+    def normalize_micro(self):
+        for key, microvalue in self.bat.items():
             if re.match(r"(VOLTAGE|CHARGE|CURRENT|POWER|ENERGY)_(NOW|FULL|MIN)(_DESIGN)?", key):
-                self.bat[key] = float(µvalue) / 1000000.0
+                self.bat[key] = float(microvalue) / 1000000.0
 
     def percentage(self, design=False):
         return self._percentage("_DESIGN" if design else "") * 100
