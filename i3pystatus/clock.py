@@ -22,17 +22,6 @@ class Clock(IntervalModule):
 
     def init(self):
         if self.format is None:
-            #
-            # WARNING
-            # i3bar does something with the locale, wich probably
-            # crashes i3pystatus when the code block below is run.
-            # I don't know how to debug i3bar (I doubt it has any
-            # debugging facilities).
-            #
-            # If your i3bar stays blank after enabling clock, well,
-            # just set the format string and it should work :-)
-            #
-
             lang = os.environ.get('LANG', None)
             if lang:
                 locale.setlocale(locale.LC_ALL, lang)
