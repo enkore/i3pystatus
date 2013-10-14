@@ -22,7 +22,6 @@ class Weather(IntervalModule):
     format = "{current_temp}"
 
     def run(self):
-        #current_temp = pywapi.get_weather_from_weather_com(self.location_code)['current_conditions']['temperature']
         result = pywapi.get_weather_from_weather_com(self.location_code, self.units)
         conditions = result['current_conditions']
         temperature = conditions['temperature']
