@@ -12,9 +12,9 @@ class Status:
     """
     The main class used for registering modules and managing I/O
 
-    :param standalone: Wether i3pystatus should read i3status-compatible input from :param:`input_stream`
+    :param standalone: Wether i3pystatus should read i3status-compatible input from `input_stream`
     :param interval: Update interval in seconds
-    :param input_stream: A file-like object that provides the input stream, if :param:`standalone` is False.
+    :param input_stream: A file-like object that provides the input stream, if `standalone` is False.
     """
 
     def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
