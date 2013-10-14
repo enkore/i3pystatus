@@ -503,7 +503,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` — formatp string (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'play': '▶', 'pause': '▷', 'stop': '◾'}`)
 
 
 
@@ -650,6 +650,26 @@ __Settings:__
 * `color` —  (default: `#FFFFFF`)
 * `color_critical` —  (default: `#FF0000`)
 * `high_factor` —  (default: `0.7`)
+
+
+
+### weather
+
+
+This module gets the weather from weather.com using pywapi module
+First, you need to get the code for the location from the www.weather.com
+Available formatters:
+    {current_temp}
+    {humidity}
+
+Requires pywapi from PyPI.
+
+
+__Settings:__
+
+* `location_code` —  (required)
+* `units` 
+* `format` —  (default: `{current_temp}`)
 
 
 
