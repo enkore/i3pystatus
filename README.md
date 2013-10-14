@@ -653,6 +653,19 @@ __Settings:__
 
 
 
+### text
+
+
+Display static, colored text.
+
+
+__Settings:__
+
+* `text` —  (required)
+* `color` — HTML color code #RRGGBB (default: `None`)
+
+
+
 ### weather
 
 
