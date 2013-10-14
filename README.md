@@ -278,7 +278,7 @@ __Settings:__
 This class uses the /sys/class/power_supply/…/uevent interface to check for the
 battery status
 
-Available formatters for format and alert_format_\*:
+Available formatters:
 
 * `{remaining}` — remaining time for charging or discharging, uses TimeWrapper formatting, default format is `%E%h:%M`
 * `{percentage}` — battery percentage relative to the last full value
@@ -503,7 +503,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` — formatp string (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'play': '▶', 'pause': '▷', 'stop': '◾'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
 
 
 
@@ -668,7 +668,7 @@ Requires pywapi from PyPI.
 __Settings:__
 
 * `location_code` —  (required)
-* `units` 
+* `units` — *C*elsius or *F*ahrenheit (default: `C`)
 * `format` —  (default: `{current_temp}`)
 
 
