@@ -17,10 +17,12 @@ class Weather(IntervalModule):
 
     settings = (
         "location_code",
-        "units",
+        ("units", "*C*elsius or *F*ahrenheit"),
         "format",
     )
     required = ("location_code",)
+
+    units = "C"
     format = "{current_temp}"
 
     def run(self):
