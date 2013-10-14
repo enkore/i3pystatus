@@ -9,6 +9,8 @@ class Weather(IntervalModule):
     Available formatters:
         {current_temp}
         {humidity}
+
+    Requires pywapi from PyPI.
     """
 
     interval = 20
@@ -18,7 +20,7 @@ class Weather(IntervalModule):
         "units",
         "format",
     )
-    #required = ("location_code")
+    required = ("location_code",)
     format = "{current_temp}"
 
     def run(self):
