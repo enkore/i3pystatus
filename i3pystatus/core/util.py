@@ -1,7 +1,9 @@
 
 import collections
+import functools
 import itertools
 import re
+import socket
 import string
 
 from i3pystatus.core.exceptions import *
@@ -305,3 +307,32 @@ def render_json(json):
         return ""
 
     return json["full_text"]
+
+
+def require(predicate):
+    """
+    Decorator factory for methods requiring a predicate. If the predicate is not fulfilled during a method call, the
+    method call is skipped and None is returned.
+
+    :param predicate: A callable returning a truth value
+    :returns: Method decorator
+    """
+    def decorator(method):
+        @functools.wraps(method)
+        def wrapper(*args, **kwargs):
+            if predicate():
+                return method(*args, **kwargs)
+            return None
+        return wrapper
+    return decorator
+
+
+def internet():
+    """
+    Checks for a internet connection by connecting to 8.8.8.8 (Google DNS)
+    """
+    try:
+        socket.create_connection(("8.8.8.8", 53), 1).close()
+        return True
+    except OSError:
+        return False
