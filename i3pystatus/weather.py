@@ -1,5 +1,7 @@
 from i3pystatus import IntervalModule
 import pywapi
+from i3pystatus.core.util import internet, require
+
 
 class Weather(IntervalModule):
 
@@ -25,6 +27,7 @@ class Weather(IntervalModule):
     units = "C"
     format = "{current_temp}"
 
+    @require(internet)
     def run(self):
         result = pywapi.get_weather_from_weather_com(self.location_code, self.units)
         conditions = result['current_conditions']
