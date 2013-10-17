@@ -48,6 +48,9 @@ def partition(iterable, limit, key=lambda x: x):
 
 
 def round_dict(dic, places):
+    """
+    Rounds all values in a dict containing only numeric types to `places` decimal places.
+    """
     for key, value in dic.items():
         dic[key] = round(value, places)
 
@@ -75,7 +78,11 @@ class ModuleList(collections.UserList):
 
 
 class PrefixedKeyDict(collections.UserDict):
+    """
+    A dict implementation adding a prefix to every key added
 
+    :param prefix: Prefix to prepend
+    """
     def __init__(self, prefix):
         super().__init__()
 
@@ -86,6 +93,12 @@ class PrefixedKeyDict(collections.UserDict):
 
 
 class KeyConstraintDict(collections.UserDict):
+    """
+    A dict implementation with sets of valid and required keys
+
+    :param valid_keys: Set of valid keys
+    :param required_keys: Set of required keys, must be a subset of valid_keys
+    """
 
     class MissingKeys(Exception):
 
@@ -100,6 +113,8 @@ class KeyConstraintDict(collections.UserDict):
         self.seen_keys = set()
 
     def __setitem__(self, key, value):
+        """Trying to add an invalid key will raise KeyError
+        """
         if key in self.valid_keys:
             self.seen_keys.add(key)
             self.data[key] = value
@@ -111,12 +126,16 @@ class KeyConstraintDict(collections.UserDict):
         del self.data[key]
 
     def __iter__(self):
+        """Iteration will raise a MissingKeys exception unless all required keys are set
+        """
         if self.missing():
             raise self.MissingKeys(self.missing())
 
         return self.data.__iter__()
 
     def missing(self):
+        """Returns a set of keys that are required but not set
+        """
         return self.required_keys - (self.seen_keys & self.required_keys)
 
 
@@ -127,6 +146,12 @@ def convert_position(pos, json):
 
 
 def flatten(l):
+    """
+    Flattens a hierarchy of nested lists into a single list containing all elements in order
+
+    :param l: list of arbitrary types and lists
+    :returns: list of arbitrary types
+    """
     l = list(l)
     i = 0
     while i < len(l):
@@ -156,6 +181,10 @@ def formatp(string, **kwargs):
     group.
 
     Escaped brackets, i.e. \[ and \] are copied verbatim to output.
+
+    :param string: Format string
+    :param **kwargs: keyword arguments providing data for the format string
+    :returns: Formatted string
     """
 
     def build_stack(string):
@@ -316,6 +345,10 @@ def require(predicate):
 
     :param predicate: A callable returning a truth value
     :returns: Method decorator
+
+    .. seealso::
+
+        :py:func:`internet`
     """
     def decorator(method):
         @functools.wraps(method)
@@ -330,6 +363,8 @@ def require(predicate):
 def internet():
     """
     Checks for a internet connection by connecting to 8.8.8.8 (Google DNS)
+
+    :returns: True if internet connection is available
     """
     try:
         socket.create_connection(("8.8.8.8", 53), 1).close()
