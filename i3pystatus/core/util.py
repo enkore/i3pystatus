@@ -18,12 +18,24 @@ def chain(fun):
 
 
 def lchop(string, prefix):
+    """Removes a prefix from string
+
+    :param string: String, possibly prefixed with prefix
+    :param prefix: Prefix to remove from string
+    :returns: string without the prefix
+    """
     if string.startswith(prefix):
         return string[len(prefix):]
     return string
 
 
 def popwhile(predicate, iterable):
+    """Generator function yielding items of iterable while predicate holds for each item
+
+    :param predicate: function taking an item returning bool
+    :param iterable: iterable
+    :returns: iterable (generator function)
+    """
     while iterable:
         item = iterable.pop()
         if predicate(item):
@@ -56,7 +68,6 @@ def round_dict(dic, places):
 
 
 class ModuleList(collections.UserList):
-
     def __init__(self, status_handler, module_base):
         self.status_handler = status_handler
         self.finder = ClassFinder(module_base)
@@ -83,6 +94,7 @@ class PrefixedKeyDict(collections.UserDict):
 
     :param prefix: Prefix to prepend
     """
+
     def __init__(self, prefix):
         super().__init__()
 
@@ -101,7 +113,6 @@ class KeyConstraintDict(collections.UserDict):
     """
 
     class MissingKeys(Exception):
-
         def __init__(self, keys):
             self.keys = keys
 
@@ -180,7 +191,7 @@ def formatp(string, **kwargs):
     thus equivalent to a logical or of all enclosing groups with the enclosed
     group.
 
-    Escaped brackets, i.e. \[ and \] are copied verbatim to output.
+    Escaped brackets, i.e. \\[ and \\] are copied verbatim to output.
 
     :param string: Format string
     :param **kwargs: keyword arguments providing data for the format string
@@ -201,17 +212,14 @@ def formatp(string, **kwargs):
                 return "<%s> " % self.__class__.__name__
 
         class OpeningBracket(Token):
-
             def __repr__(self):
                 return "<Group>"
 
         class ClosingBracket(Token):
-
             def __repr__(self):
                 return "</Group>"
 
         class String(Token):
-
             def __init__(self, str):
                 self.string = str
 
@@ -255,7 +263,6 @@ def formatp(string, **kwargs):
                     token = String(char)
                     token.level = level
                     stack.append(token)
-
         return stack
 
     def build_tree(items, level=0):
@@ -279,7 +286,7 @@ def formatp(string, **kwargs):
                 if level == 0:
                     subtree.append(string.format(**kwargs))
                 else:
-                    fields = formatp.field_re.findall(string)
+                    fields = re.findall(r"({(\w+)[^}]*})", string)
                     successful_fields = 0
                     for fieldspec, fieldname in fields:
                         if kwargs.get(fieldname, False):
@@ -297,11 +304,8 @@ def formatp(string, **kwargs):
     tree = build_tree(stack, 0)
     return merge_tree(tree)
 
-formatp.field_re = re.compile(r"({(\w+)[^}]*})")
-
 
 class TimeWrapper:
-
     class TimeTemplate(string.Template):
         delimiter = "%"
         idpattern = r"[a-zA-Z]"
