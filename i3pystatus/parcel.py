@@ -6,6 +6,7 @@ import lxml.html
 from lxml.cssselect import CSSSelector
 
 from i3pystatus import IntervalModule
+from i3pystatus.core.util import internet, require
 
 
 class TrackerAPI:
@@ -89,6 +90,7 @@ class ParcelTracker(IntervalModule):
 
     format = "{name}:{progress}"
 
+    @require(internet)
     def run(self):
         fdict = {
             "name": self.name,
