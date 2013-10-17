@@ -306,6 +306,23 @@ def formatp(string, **kwargs):
 
 
 class TimeWrapper:
+    """
+    A wrapper that implements __format__ and __bool__ for time differences and time spans.
+
+    :param seconds: seconds (numeric)
+    :param default_format: the default format to be used if no explicit format_spec is passed to __format__
+
+    Format string syntax:
+
+    * %h, %m and %s are the hours, minutes and seconds without leading zeros (i.e. 0 to 59 for minutes and seconds)
+    * %H, %M and %S are padded with a leading zero to two digits, i.e. 00 to 59
+    * %l and %L produce hours non-padded and padded but only if hours is not zero. If the hours are zero it produces an empty string.
+    * %% produces a literal %
+    * %E (only valid on beginning of the string) if the time is null, don't format anything but rather produce an empty string. If the time is non-null it is removed from the string.
+
+    The formatted string is stripped, i.e. spaces on both ends of the result are removed
+    """
+
     class TimeTemplate(string.Template):
         delimiter = "%"
         idpattern = r"[a-zA-Z]"
@@ -315,9 +332,13 @@ class TimeWrapper:
         self.default_format = default_format
 
     def __bool__(self):
+        """:returns: `bool(seconds)`, i.e. False if seconds == 0 and True otherwise
+        """
         return bool(self.seconds)
 
     def __format__(self, format_spec):
+        """Formats the time span given the format_spec (or the default_format).
+        """
         format_spec = format_spec or self.default_format
         h = self.seconds // 3600
         m, s = divmod(self.seconds % 3600, 60)
