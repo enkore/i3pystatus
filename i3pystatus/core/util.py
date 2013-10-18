@@ -348,13 +348,6 @@ class TimeWrapper:
         ).strip()
 
 
-def render_json(json):
-    if not json.get("full_text", ""):
-        return ""
-
-    return json["full_text"]
-
-
 def require(predicate):
     """
     Decorator factory for methods requiring a predicate. If the predicate is not fulfilled during a method call, the

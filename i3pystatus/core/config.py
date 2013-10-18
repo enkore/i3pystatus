@@ -71,7 +71,7 @@ class Config:
                             continue
                         module.run()
                         output = module.output or {"full_text": "(no output)"}
-                        print(render_json(output))
+                        print(output.get("full_text", ""))
 
             i3pystatus.Status = TestStatus
             yield
