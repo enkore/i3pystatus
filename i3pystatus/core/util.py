@@ -11,6 +11,8 @@ from i3pystatus.core.imputil import ClassFinder
 
 
 def chain(fun):
+    """Method decorator to implicitly return `self` from the decorated method
+    """
     def chained(self, *args, **kwargs):
         fun(self, *args, **kwargs)
         return self
