@@ -208,23 +208,15 @@ def formatp(string, **kwargs):
         class Token:
             string = ""
 
-            def __repr__(self):
-                return "<%s> " % self.__class__.__name__
-
         class OpeningBracket(Token):
-            def __repr__(self):
-                return "<Group>"
+            pass
 
         class ClosingBracket(Token):
-            def __repr__(self):
-                return "</Group>"
+            pass
 
         class String(Token):
             def __init__(self, str):
                 self.string = str
-
-            def __repr__(self):
-                return super().__repr__() + repr(self.string)
 
         TOKENS = {
             "[": OpeningBracket,
