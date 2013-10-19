@@ -1,10 +1,7 @@
-
 import os.path
 import runpy
 import sys
 import contextlib
-
-from i3pystatus.core.util import render_json
 
 SEARCHPATH = (
     "~/.i3pystatus.py",
