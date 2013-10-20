@@ -233,6 +233,37 @@ removed from the string.
 
 ## Modules
 
+System:
+[Clock](#clock)
+[Free space](#disk)
+[System load](#load)
+[Memory usage](#mem)
+
+Audio:
+[ALSA](#alsa)
+[PulseAudio](#pulseaudio)
+
+Hardware:
+[Battery](#battery)
+[Screen brightness](#backlight)
+[CPU temperature (Intel)](#temp)
+
+Network:
+[Wired](#network)
+[Wireless](#wireless)
+
+Other:
+[Unread mail](#mail)
+[Tracking parcels](#parcel)
+[pyLoad](#pyload)
+[Weather](#weather)
+[Music Player Daemon (MPD)](#mpd)
+
+Advanced:
+[Rip info from files](#file)
+[Regular expressions](#regex)
+[Run watcher](#runwatch)
+
 !!module_doc!!
 
 ## Contribute
