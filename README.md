@@ -24,6 +24,16 @@ Python 2.x.
 
 ### Release Notes
 
+#### 3.27
+
+* Add weather module
+* Add text module
+* PulseAudio module: Add muted/unmuted options
+
+#### 3.26
+
+* Add mem module
+
 #### 3.24
 
 **This release introduced changes that may require manual changes to your
@@ -503,7 +513,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` — formatp string (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'play': '▶', 'pause': '▷', 'stop': '◾'}`)
 
 
 
@@ -560,11 +570,14 @@ Available formatters:
 * `{volume}` — volume in percent (0...100)
 * `{db}` — volume in decibels relative to 100 %, i.e. 100 % = 0 dB, 50 % = -18 dB, 0 % = -infinity dB
 (the literal value for -infinity is `-∞`)
+* `{muted}` — the value of one of the `muted` or `unmuted` settings
 
 
 __Settings:__
 
 * `format` —  (default: `♪: {volume}`)
+* `muted` —  (default: `M`)
+* `unmuted` —  (default: ``)
 
 
 

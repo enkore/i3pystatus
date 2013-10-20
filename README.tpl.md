@@ -24,6 +24,16 @@ Python 2.x.
 
 ### Release Notes
 
+#### 3.27
+
+* Add weather module
+* Add text module
+* PulseAudio module: Add muted/unmuted options
+
+#### 3.26
+
+* Add mem module
+
 #### 3.24
 
 **This release introduced changes that may require manual changes to your
