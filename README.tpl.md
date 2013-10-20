@@ -234,34 +234,34 @@ removed from the string.
 ## Modules
 
 System:
-[Clock](#clock)
-[Free space](#disk)
-[System load](#load)
+[Clock](#clock) - 
+[Free space](#disk) - 
+[System load](#load) - 
 [Memory usage](#mem)
 
 Audio:
-[ALSA](#alsa)
+[ALSA](#alsa) -
 [PulseAudio](#pulseaudio)
 
 Hardware:
-[Battery](#battery)
-[Screen brightness](#backlight)
+[Battery](#battery) -
+[Screen brightness](#backlight) -
 [CPU temperature (Intel)](#temp)
 
 Network:
-[Wired](#network)
+[Wired](#network) -
 [Wireless](#wireless)
 
 Other:
-[Unread mail](#mail)
-[Tracking parcels](#parcel)
-[pyLoad](#pyload)
-[Weather](#weather)
+[Unread mail](#mail) -
+[Tracking parcels](#parcel) -
+[pyLoad](#pyload) -
+[Weather](#weather) -
 [Music Player Daemon (MPD)](#mpd)
 
 Advanced:
-[Rip info from files](#file)
-[Regular expressions](#regex)
+[Rip info from files](#file) -
+[Regular expressions](#regex) -
 [Run watcher](#runwatch)
 
 !!module_doc!!

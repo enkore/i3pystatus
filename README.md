@@ -234,34 +234,34 @@ removed from the string.
 ## Modules
 
 System:
-[Clock](#clock)
-[Free space](#disk)
-[System load](#load)
+[Clock](#clock) - 
+[Free space](#disk) - 
+[System load](#load) - 
 [Memory usage](#mem)
 
 Audio:
-[ALSA](#alsa)
+[ALSA](#alsa) -
 [PulseAudio](#pulseaudio)
 
 Hardware:
-[Battery](#battery)
-[Screen brightness](#backlight)
+[Battery](#battery) -
+[Screen brightness](#backlight) -
 [CPU temperature (Intel)](#temp)
 
 Network:
-[Wired](#network)
+[Wired](#network) -
 [Wireless](#wireless)
 
 Other:
-[Unread mail](#mail)
-[Tracking parcels](#parcel)
-[pyLoad](#pyload)
-[Weather](#weather)
+[Unread mail](#mail) -
+[Tracking parcels](#parcel) -
+[pyLoad](#pyload) -
+[Weather](#weather) -
 [Music Player Daemon (MPD)](#mpd)
 
 Advanced:
-[Rip info from files](#file)
-[Regular expressions](#regex)
+[Rip info from files](#file) -
+[Regular expressions](#regex) -
 [Run watcher](#runwatch)
 
 
@@ -338,7 +338,7 @@ __Settings:__
 * `alert_format_title` — The title of the notification, all formatters can be used (default: `Low battery`)
 * `alert_format_body` — The body text of the notification, all formatters can be used (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!`)
 * `path` — Override the default-generated path (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}`)
 
 
 
