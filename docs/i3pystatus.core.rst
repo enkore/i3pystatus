@@ -9,13 +9,6 @@ core Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`config` Module
---------------------
-
-.. automodule:: i3pystatus.core.config
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 :mod:`desktop` Module
 ---------------------
