@@ -76,7 +76,7 @@ class ModuleList(collections.UserList):
     def get_module_by_id(self, find_id):
         find_id = int(find_id)
         for module in self:
-            if int(id(module)) == find_id:
+            if id(module) == find_id:
                 return module
 
 
