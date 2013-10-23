@@ -5,12 +5,11 @@ import re
 import configparser
 
 from i3pystatus import IntervalModule, formatp
-from i3pystatus.core.util import PrefixedKeyDict, lchop, TimeWrapper
+from i3pystatus.core.util import lchop, TimeWrapper
 from i3pystatus.core.desktop import display_notification
 
 
 class UEventParser(configparser.ConfigParser):
-
     @staticmethod
     def parse_file(file):
         parser = UEventParser()
@@ -29,7 +28,6 @@ class UEventParser(configparser.ConfigParser):
 
 
 class Battery:
-
     @staticmethod
     def create(from_file):
         batinfo = UEventParser.parse_file(from_file)
@@ -58,7 +56,6 @@ class Battery:
 
 
 class BatteryCharge(Battery):
-
     def consumption(self):
         return self.bat["VOLTAGE_NOW"] * self.bat["CURRENT_NOW"]  # V  * A = W
 
@@ -74,7 +71,6 @@ class BatteryCharge(Battery):
 
 
 class BatteryEnergy(Battery):
-
     def consumption(self):
         return self.bat["POWER_NOW"]
 
@@ -90,7 +86,6 @@ class BatteryEnergy(Battery):
 
 
 class BatteryChecker(IntervalModule):
-
     """
     This class uses the /sys/class/power_supply/…/uevent interface to check for the
     battery status

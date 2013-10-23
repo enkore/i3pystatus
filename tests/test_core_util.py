@@ -4,7 +4,6 @@ import unittest
 from unittest.mock import MagicMock
 import string
 import random
-import sys
 import types
 
 from i3pystatus.core import util
@@ -185,35 +184,6 @@ class ModuleListTests(unittest.TestCase):
 
         cls.__init__.assert_called_with()
         cls.registered.assert_called_with(self.status_handler)
-
-
-class PrefixedKeyDictTests(unittest.TestCase):
-
-    def test_no_prefix(self):
-        dict = util.PrefixedKeyDict("")
-        dict["foo"] = None
-        dict["bar"] = 42
-
-        assert dict["foo"] == None
-        assert dict["bar"] == 42
-
-    def test_prefix(self):
-        dict = util.PrefixedKeyDict("pfx_")
-        dict["foo"] = None
-        dict["bar"] = 42
-
-        assert dict["pfx_foo"] == None
-        assert dict["pfx_bar"] == 42
-
-    def test_dict(self):
-        d = util.PrefixedKeyDict("pfx_")
-        d["foo"] = None
-        d["bar"] = 42
-
-        realdict = dict(d)
-
-        assert realdict["pfx_foo"] == None
-        assert realdict["pfx_bar"] == 42
 
 
 class KeyConstraintDictAdvancedTests(unittest.TestCase):

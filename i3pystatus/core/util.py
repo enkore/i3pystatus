@@ -89,22 +89,6 @@ class ModuleList(collections.UserList):
                 return module
 
 
-class PrefixedKeyDict(collections.UserDict):
-    """
-    A dict implementation adding a prefix to every key added
-
-    :param prefix: Prefix to prepend
-    """
-
-    def __init__(self, prefix):
-        super().__init__()
-
-        self.prefix = prefix
-
-    def __setitem__(self, key, value):
-        super().__setitem__(self.prefix + key, value)
-
-
 class KeyConstraintDict(collections.UserDict):
     """
     A dict implementation with sets of valid and required keys
