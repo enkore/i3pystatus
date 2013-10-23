@@ -2,13 +2,19 @@
 import sys
 import os
 from threading import Thread
-from i3pystatus.core.imputil import ClassFinder
 
+from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core import io, util
 from i3pystatus.core.modules import Module
 
 
 class CommandEndpoint:
+    """
+    Endpoint for i3bar click events: http://i3wm.org/docs/i3bar-protocol.html#_click_events
+
+    :param modules: dict-like object with item access semantics via .get()
+    :param io_handler_factory: function creating a file-like object returning a JSON generator on .read()
+    """
     def __init__(self, modules, io_handler_factory):
         self.modules = modules
         self.io_handler_factory = io_handler_factory
@@ -16,11 +22,12 @@ class CommandEndpoint:
         self.thread.daemon = True
 
     def start(self):
+        """Starts the background thread"""
         self.thread.start()
 
     def _command_endpoint(self):
         for command in self.io_handler_factory().read():
-            target_module = self.modules.get_module_by_id(command["instance"])
+            target_module = self.modules.get(command["instance"])
             if target_module:
                 target_module.on_click(command["button"])
 
