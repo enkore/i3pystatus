@@ -238,7 +238,7 @@ class KeyConstraintDictAdvancedTests(unittest.TestCase):
         kcd["foo"] = None
         assert kcd.missing() == set()
         del kcd["foo"]
-        assert kcd.missing() == set(["foo"])
+        assert kcd.missing() == {"foo"}
 
     def test_set_twice(self):
         kcd = util.KeyConstraintDict(
@@ -247,7 +247,7 @@ class KeyConstraintDictAdvancedTests(unittest.TestCase):
         kcd["foo"] = 2
         assert kcd.missing() == set()
         del kcd["foo"]
-        assert kcd.missing() == set(["foo"])
+        assert kcd.missing() == {"foo"}
 
 
 class FormatPTests(unittest.TestCase):
