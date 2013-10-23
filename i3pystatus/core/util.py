@@ -73,7 +73,7 @@ class ModuleList(collections.UserList):
         super().append(module)
         return module
 
-    def get_module_by_id(self, find_id):
+    def get(self, find_id):
         find_id = int(find_id)
         for module in self:
             if id(module) == find_id:
