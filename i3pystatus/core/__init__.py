@@ -33,7 +33,19 @@ class Status:
         """Register a new module."""
 
         if module:
-            return self.modules.append(module, *args, **kwargs)
+            try:
+                return self.modules.append(module, *args, **kwargs)
+            except ImportError as import_error:
+                if import_error.name and not import_error.path and isinstance(module, str):
+                    # This is a package/module not found exception raised by importing a module on-the-fly
+                    from i3pystatus.text import Text
+                    return self.modules.append(Text(
+                        color="#FF0000",
+                        text="{i3py_mod}: Missing Python module '{missing_module}'".format(
+                            i3py_mod=module,
+                            missing_module=import_error.name)))
+                else:
+                    raise import_error
         else:
             return None
 
