@@ -5,7 +5,6 @@ from i3pystatus.core.exceptions import ConfigAmbigiousClassesError, ConfigInvali
 
 
 class ClassFinder:
-
     """Support class to find classes of specific bases in a module"""
 
     def __init__(self, baseclass):
@@ -20,11 +19,13 @@ class ClassFinder:
             )
         return predicate
 
-    def search_module(self, module):
-        return list(zip(*inspect.getmembers(module, self.predicate_factory(module))))[1]
+    def get_matching_classes(self, module):
+        # Transpose [ (name, list), ... ] to ( [name, ...], [list, ...] )
+        classes = list(zip(*inspect.getmembers(module, self.predicate_factory(module))))
+        return classes[1] if classes else []
 
     def get_class(self, module):
-        classes = self.search_module(module)
+        classes = self.get_matching_classes(module)
 
         if len(classes) > 1:
             # If there are multiple Module clases bundled in one module,

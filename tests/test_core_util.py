@@ -6,7 +6,8 @@ import string
 import random
 import types
 
-from i3pystatus.core import util
+from i3pystatus.core.exceptions import ConfigAmbigiousClassesError, ConfigInvalidModuleError
+from i3pystatus.core import util, ClassFinder
 
 
 def get_random_string(length=6, chars=string.printable):
@@ -170,11 +171,28 @@ class ModuleListTests(unittest.TestCase):
         pymod.some_class = self._create_module_class("some_class")
         pymod.some_class.__module__ = "other_module"
 
-        with self.assertRaises(IndexError):
+        with self.assertRaises(ConfigInvalidModuleError):
             self.ml.append(pymod)
 
         assert not pymod.some_class.__init__.called
         assert not pymod.some_class.registered.called
+
+    def test_ambigious_classdef(self):
+        pymod = types.ModuleType("test_mod")
+        pymod.some_class = self._create_module_class("some_class")
+        pymod.some_class.__module__ = "test_mod"
+        pymod.some_other_class = self._create_module_class("some_other_class")
+        pymod.some_other_class.__module__ = "test_mod"
+
+        with self.assertRaises(ConfigAmbigiousClassesError):
+            self.ml.append(pymod)
+
+    def test_invalid_module(self):
+        pymod = types.ModuleType("test_mod")
+
+        with self.assertRaises(ConfigInvalidModuleError):
+            self.ml.append(pymod)
+
 
     def test_append_class_inheritance(self):
         in_between = self._create_module_class("in_between")
