@@ -130,7 +130,7 @@ class ModuleListTests(unittest.TestCase):
 
     def setUp(self):
         self.status_handler = MagicMock()
-        self.ml = util.ModuleList(self.status_handler, self.ModuleBase)
+        self.ml = util.ModuleList(self.status_handler, ClassFinder(self.ModuleBase))
 
     def test_append_simple(self):
         module = self.ModuleBase()

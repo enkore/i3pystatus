@@ -61,9 +61,9 @@ def round_dict(dic, places):
 
 
 class ModuleList(collections.UserList):
-    def __init__(self, status_handler, module_base):
+    def __init__(self, status_handler, class_finder):
         self.status_handler = status_handler
-        self.finder = ClassFinder(module_base)
+        self.finder = class_finder
         super().__init__()
 
     def append(self, module, *args, **kwargs):

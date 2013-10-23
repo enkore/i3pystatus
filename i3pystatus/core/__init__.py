@@ -2,6 +2,7 @@
 import sys
 import os
 from threading import Thread
+from i3pystatus.core.imputil import ClassFinder
 
 from i3pystatus.core import io, util
 from i3pystatus.core.modules import Module, START_HOOKS
@@ -27,7 +28,7 @@ class Status:
         else:
             self.io = io.IOHandler(input_stream)
 
-        self.modules = util.ModuleList(self, Module)
+        self.modules = util.ModuleList(self, ClassFinder(Module))
 
     def register(self, module, *args, **kwargs):
         """Register a new module."""

@@ -118,7 +118,7 @@ def get_all(module_path, heading, finder=None, ignore=None):
         finder = ClassFinder(i3pystatus.Module)
 
     for name, module in get_modules(module_path):
-        classes = finder.search_module(module)
+        classes = finder.get_matching_classes(module)
         found = []
         for cls in classes:
             if cls.__name__ not in found:
