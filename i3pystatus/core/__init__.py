@@ -8,27 +8,42 @@ from i3pystatus.core import io, util
 from i3pystatus.core.modules import Module, START_HOOKS
 
 
-class Status:
+class CommandEndpoint:
+    def __init__(self, modules, io_handler_factory):
+        self.modules = modules
+        self.io_handler_factory = io_handler_factory
+        self.thread = Thread(target=self._command_endpoint)
+        self.thread.daemon = True
 
+    def start(self):
+        self.thread.start()
+
+    def _command_endpoint(self):
+        for command in self.io_handler_factory().read():
+            target_module = self.modules.get_module_by_id(command["instance"])
+            if target_module:
+                target_module.on_click(command["button"])
+
+
+class Status:
     """
     The main class used for registering modules and managing I/O
 
-    :param standalone: Wether i3pystatus should read i3status-compatible input from `input_stream`
+    :param standalone: Whether i3pystatus should read i3status-compatible input from `input_stream`
     :param interval: Update interval in seconds
     :param input_stream: A file-like object that provides the input stream, if `standalone` is False.
     """
 
     def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
+        self.modules = util.ModuleList(self, ClassFinder(Module))
         self.standalone = standalone
         if standalone:
             self.io = io.StandaloneIO(interval)
-            self.ce_thread = Thread(target=self.run_command_endpoint)
-            self.ce_thread.daemon = True
-            self.ce_thread.start()
+            self.command_endpoint = CommandEndpoint(
+                self.modules,
+                lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1))
         else:
             self.io = io.IOHandler(input_stream)
-
-        self.modules = util.ModuleList(self, ClassFinder(Module))
 
     def register(self, module, *args, **kwargs):
         """Register a new module."""
@@ -50,17 +65,12 @@ class Status:
         else:
             return None
 
-    def run_command_endpoint(self):
-        for command in io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1).read():
-            module = self.modules.get_module_by_id(command["instance"])
-            if module:
-                module.on_click(command["button"])
-
     def call_start_hooks(self):
         for hook in START_HOOKS:
             hook()
 
     def run(self):
+        self.command_endpoint.start()
         self.call_start_hooks()
         for j in io.JSONIO(self.io).read():
             for module in self.modules:
