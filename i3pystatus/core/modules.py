@@ -18,13 +18,6 @@ class Module(SettingsBase):
             self.output["instance"] = str(id(self))
             json.insert(convert_position(self.position, json), self.output)
 
-    def test(self):
-        """
-        Return True if settings seem ok (i.e. login credentials and such are valid)
-        or a string describing the problem
-        """
-        return True
-
     def run(self):
         pass
 

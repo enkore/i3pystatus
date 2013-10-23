@@ -71,11 +71,6 @@ class ModsDeChecker(IntervalModule):
                 urllib.request.HTTPCookieProcessor(self.cj))
             self.logged_in = False
 
-    def test(self):
-        if not self.login():
-            return "Wrong credentials or no internet connection"
-        return True
-
     def login(self):
         data = urllib.parse.urlencode({
             "login_username": self.username,
