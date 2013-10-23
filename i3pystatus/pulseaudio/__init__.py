@@ -2,7 +2,6 @@ from .pulse import *
 
 from i3pystatus import Module
 
-
 class PulseAudio(Module):
 
     """
@@ -40,7 +39,7 @@ class PulseAudio(Module):
         # connection to Pulseaudio
         _mainloop = pa_threaded_mainloop_new()
         _mainloop_api = pa_threaded_mainloop_get_api(_mainloop)
-        context = pa_context_new(_mainloop_api, 'peak_demo'.encode("ascii"))
+        context = pa_context_new(_mainloop_api, "i3pystatus_pulseaudio".encode("ascii"))
 
         pa_context_set_state_callback(context, self._context_notify_cb, None)
         pa_context_connect(context, None, 0, None)
