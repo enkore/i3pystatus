@@ -10,60 +10,16 @@ from i3pystatus.core.exceptions import ConfigAmbigiousClassesError, ConfigInvali
 from i3pystatus.core import util, ClassFinder
 
 
-def get_random_string(length=6, chars=string.printable):
-    return ''.join(random.choice(chars) for x in range(length))
+def test_lchop_prefixed():
+    assert util.lchop("12345", "12") == "345"
 
 
-def lchop(prefix, string):
-    chopped = util.lchop(string, prefix)
-    if string.startswith(prefix):
-        assert len(chopped) == len(string) - len(prefix)
-    assert not (prefix and chopped.startswith(prefix))
+def test_lchop_no_prefix():
+    assert util.lchop("345", "") == "345"
 
 
-def lchop_test_generator():
-    cases = [
-        ('\x0b,S0I', "=t5Bk+\x0b'_;duq=9"),
-        ('H1@\x0b_\t', '<&9<;Q(0L";^$7'),
-        ('NWV#B0u', '~Q_wx5"$W\x0b[(T'),
-        ('by=uHfZ>', 'AdytjC5-OUR\\'),
-        ('/FD|^6=m3', 'l0:%ibW7*}S'),
-        ('!.LsV90/$\x0b', 'nD}L&4]MGC'),
-        ('S0zOIvbm:~L', 'jJ\\UGOMY<'),
-        ("'aZ@,AA\x0b;Dmm", 'ZD +9}f;'),
-        ('Ae;=SoHD(1VPJ', 'x\r)du,+'),
-        ('ANDT \t>tZ1Iy9}', 'wpz%F`'),
-        ('|w?>bv,t# BkGeE', '07mZR'),
-        ('1MSN\x0c\r}Tu8r3uCe)', '\\I6-'),
-        ('0;-!MVW4+\rz]J3@SQ', 'lvG'),
-        ('Zi\x0b^5E?}a\\KJ(,O4n(', '8:'),
-        ('I-X[~2sQigGLA_~ZD%G', '#'),
-        (':xio!', 'v=ApOu\t_,}'),
-        ('%bM%W\n', '7$wZ]gaL!U/%'),
-        ('~\x0bILq>+', '[4}LhQ1zz1m?D&'),
-        ('+"a)\x0c:4Q', '\niNQ+GY8+)UtQ\r#M'),
-        ('R3PHi/[S*', 'J7fV19X(c^^J(9BAY+'),
-        ('%Z?=m|3Wtr', 'O7K%GpQRJR%y}wIDq~H\\'),
-        ('wyR0V*y^+D)', '>tsX)@%=u[83/hf0j?+xXV'),
-        ('4}joZKr?j$u)', '\r\x0cje4QAha\\Y2]V\n`5[.TG~$0'),
-        ('at%Y)%g5.*vKJ', 'MnucPcE!h;gkhAdI*`Jv$%dafJ'),
-        ('XKH\\n\'gf4@"6`-', '#~:Nt[^9wtE.4\\@<i|tWiu|p7:uw'),
-        ('mLV!q;:\n\nk5u\x0cD>', "9)#qPuEF-A@ -DTE\r= (KgM\\h'i$XU"),
-        ("<|(h|P9Wz9d9'u,M", '7d-A\nY{}5"\' !*gHHh`x0!B2Ox?yeKb\x0b'),
-        ('bV?:f\x0b#HDhuwSvys3', ";\r,L![\x0cU7@ne@'?[*&V<dap]+Tq[n1!|PE"),
-        ('T\r~bGV^@JC?P@Pa66.', "9,q>VI,[}pHM\nB65@LfE16VJPw=r'zU\x0bzWj@"),
-        ('^|j7N!mV0o(?*1>p?dy',
-         '\\ZdA&:\t\x0b:8\t|7.Kl,oHw-\x0cS\nwZlND~uC@le`Sm'),
-    ]
-
-    for prefix, string in cases:
-        yield lchop, prefix, prefix + string
-        yield lchop, prefix, string
-        yield lchop, string, string
-        yield lchop, string, prefix
-        yield lchop, "", string
-        yield lchop, prefix, ""
-        yield lchop, prefix + prefix, prefix + prefix + prefix + string
+def test_lchop_unmatched():
+    assert util.lchop("12345", "345") == "12345"
 
 
 def partition(iterable, limit, assrt):
@@ -124,7 +80,6 @@ def keyconstraintdict_missing_test_generator():
 
 
 class ModuleListTests(unittest.TestCase):
-
     class ModuleBase:
         pass
 
@@ -205,7 +160,6 @@ class ModuleListTests(unittest.TestCase):
 
 
 class KeyConstraintDictAdvancedTests(unittest.TestCase):
-
     def test_invalid_1(self):
         kcd = util.KeyConstraintDict(valid_keys=tuple(), required_keys=tuple())
         with self.assertRaises(KeyError):
@@ -251,7 +205,6 @@ class KeyConstraintDictAdvancedTests(unittest.TestCase):
 
 
 class FormatPTests(unittest.TestCase):
-
     def test_escaping(self):
         assert util.formatp("[razamba \[ mabe \]]") == "razamba [ mabe ]"
 
