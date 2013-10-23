@@ -40,9 +40,9 @@ class Module(SettingsBase):
         elif button == 3:  # Right mouse button
             self.on_rightclick()
 
-    @chain
     def move(self, position):
         self.position = position
+        return self
 
     def on_leftclick(self):
         pass
