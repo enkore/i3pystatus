@@ -37,9 +37,6 @@ class Module(SettingsBase):
     def on_rightclick(self):
         pass
 
-    def __repr__(self):
-        return self.__class__.__name__
-
 
 class IntervalModule(Module):
     interval = 5  # seconds
