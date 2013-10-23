@@ -24,6 +24,15 @@ Python 2.x.
 
 ### Release Notes
 
+#### 3.28
+
+* **If you're currently using the `i3pystatus` command to run your i3bar**:
+    Replace `i3pystatus` command in your i3 configuration with `python ~/path/to/your/i3pystatus.py`
+* Improved error handling
+* Removed `i3pystatus` binary
+* pulseaudio: changed context name to "i3pystatus_pulseaudio"
+* Code changes
+
 #### 3.27
 
 * Add weather module
@@ -257,7 +266,8 @@ Other:
 [Tracking parcels](#parcel) -
 [pyLoad](#pyload) -
 [Weather](#weather) -
-[Music Player Daemon (MPD)](#mpd)
+[Music Player Daemon (MPD)](#mpd) -
+[Simple text](#text)
 
 Advanced:
 [Rip info from files](#file) -

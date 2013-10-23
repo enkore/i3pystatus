@@ -24,6 +24,15 @@ Python 2.x.
 
 ### Release Notes
 
+#### 3.28
+
+* **If you're currently using the `i3pystatus` command to run your i3bar**:
+    Replace `i3pystatus` command in your i3 configuration with `python ~/path/to/your/i3pystatus.py`
+* Improved error handling
+* Removed `i3pystatus` binary
+* pulseaudio: changed context name to "i3pystatus_pulseaudio"
+* Code changes
+
 #### 3.27
 
 * Add weather module
@@ -257,7 +266,8 @@ Other:
 [Tracking parcels](#parcel) -
 [pyLoad](#pyload) -
 [Weather](#weather) -
-[Music Player Daemon (MPD)](#mpd)
+[Music Player Daemon (MPD)](#mpd) -
+[Simple text](#text)
 
 Advanced:
 [Rip info from files](#file) -
@@ -338,7 +348,7 @@ __Settings:__
 * `alert_format_title` — The title of the notification, all formatters can be used (default: `Low battery`)
 * `alert_format_body` — The body text of the notification, all formatters can be used (default: `Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!`)
 * `path` — Override the default-generated path (default: `None`)
-* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}`)
+* `status` — A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: `{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}`)
 
 
 
@@ -544,7 +554,7 @@ __Settings:__
 * `host` —  (default: `localhost`)
 * `port` — MPD port (default: `6600`)
 * `format` — formatp string (default: `{title} {status}`)
-* `status` — Dictionary mapping pause, play and stop to output (default: `{'play': '▶', 'pause': '▷', 'stop': '◾'}`)
+* `status` — Dictionary mapping pause, play and stop to output (default: `{'stop': '◾', 'play': '▶', 'pause': '▷'}`)
 
 
 
