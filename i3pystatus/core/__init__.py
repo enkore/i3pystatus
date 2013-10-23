@@ -51,7 +51,7 @@ class Status:
 
     def run_command_endpoint(self):
         for command in io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1).read():
-            module = self.modules.get_by_id(command["instance"])
+            module = self.modules.get_module_by_id(command["instance"])
             if module:
                 module.on_click(command["button"])
 
