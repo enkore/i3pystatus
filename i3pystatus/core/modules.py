@@ -52,11 +52,7 @@ class IntervalModule(Module):
             am = Manager(self.interval)
             am.append(self)
             IntervalModule.managers[self.interval] = am
-
-    @classmethod
-    def _start(cls):
-        for manager in cls.managers.values():
-            manager.start()
+            am.start()
 
     def __call__(self):
         self.run()
@@ -66,7 +62,3 @@ class IntervalModule(Module):
 
         Do not rely on this being called from the same thread at all times.
         If you need to always have the same thread context, subclass AsyncModule."""
-
-START_HOOKS = (
-    IntervalModule._start,
-)

@@ -5,7 +5,7 @@ from threading import Thread
 from i3pystatus.core.imputil import ClassFinder
 
 from i3pystatus.core import io, util
-from i3pystatus.core.modules import Module, START_HOOKS
+from i3pystatus.core.modules import Module
 
 
 class CommandEndpoint:
@@ -65,13 +65,8 @@ class Status:
         else:
             return None
 
-    def call_start_hooks(self):
-        for hook in START_HOOKS:
-            hook()
-
     def run(self):
         self.command_endpoint.start()
-        self.call_start_hooks()
         for j in io.JSONIO(self.io).read():
             for module in self.modules:
                 module.inject(j)
