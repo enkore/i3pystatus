@@ -1,6 +1,7 @@
 import inspect
 import types
 from importlib import import_module
+from i3pystatus.core.exceptions import ConfigAmbigiousClassesError, ConfigInvalidModuleError
 
 
 class ClassFinder:
