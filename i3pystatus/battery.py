@@ -145,12 +145,12 @@ class BatteryChecker(IntervalModule):
         }
 
         status = battery.status()
-        if status in ["Discharging", "Charging"]:
+        if status in ["Charging", "Discharging"]:
             remaining = battery.remaining()
             fdict["remaining"] = TimeWrapper(remaining * 60, "%E%h:%M")
             if status == "Discharging":
                 fdict["status"] = "DIS"
-                if remaining < 15:
+                if battery.percentage() <= self.alert_percentage:
                     urgent = True
                     color = "#ff0000"
             else:
