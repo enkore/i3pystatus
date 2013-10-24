@@ -6,7 +6,7 @@ import configparser
 
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import lchop, TimeWrapper
-from i3pystatus.core.desktop import display_notification
+from i3pystatus.core.desktop import DesktopNotification
 
 
 class UEventParser(configparser.ConfigParser):
@@ -161,13 +161,13 @@ class BatteryChecker(IntervalModule):
             fdict["status"] = "FULL"
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
-            display_notification(
+            DesktopNotification(
                 title=formatp(self.alert_format_title, **fdict),
                 body=formatp(self.alert_format_body, **fdict),
                 icon="battery-caution",
                 urgency=2,
                 timeout=60,
-            )
+            ).display()
 
         fdict["status"] = self.status[fdict["status"]]
 
