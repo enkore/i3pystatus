@@ -105,10 +105,8 @@ class BatteryChecker(IntervalModule):
         "format",
         ("alert", "Display a libnotify-notification on low battery"),
         "alert_percentage",
-        ("alert_format_title",
-         "The title of the notification, all formatters can be used"),
-        ("alert_format_body",
-         "The body text of the notification, all formatters can be used"),
+        ("alert_format_title", "The title of the notification, all formatters can be used"),
+        ("alert_format_body", "The body text of the notification, all formatters can be used"),
         ("path", "Override the default-generated path"),
         ("status", "A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names"),
     )
