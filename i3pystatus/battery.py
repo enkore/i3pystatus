@@ -30,59 +30,59 @@ class UEventParser(configparser.ConfigParser):
 class Battery:
     @staticmethod
     def create(from_file):
-        batinfo = UEventParser.parse_file(from_file)
-        if "POWER_NOW" in batinfo:
-            return BatteryEnergy(batinfo)
+        battery_info = UEventParser.parse_file(from_file)
+        if "POWER_NOW" in battery_info:
+            return BatteryEnergy(battery_info)
         else:
-            return BatteryCharge(batinfo)
+            return BatteryCharge(battery_info)
 
-    def __init__(self, batinfo):
-        self.bat = batinfo
+    def __init__(self, battery_info):
+        self.battery_info = battery_info
         self.normalize_micro()
 
     def normalize_micro(self):
-        for key, microvalue in self.bat.items():
+        for key, micro_value in self.battery_info.items():
             if re.match(r"(VOLTAGE|CHARGE|CURRENT|POWER|ENERGY)_(NOW|FULL|MIN)(_DESIGN)?", key):
-                self.bat[key] = float(microvalue) / 1000000.0
+                self.battery_info[key] = float(micro_value) / 1000000.0
 
     def percentage(self, design=False):
         return self._percentage("_DESIGN" if design else "") * 100
 
     def status(self):
         if self.consumption():
-            return "Discharging" if self.bat["STATUS"] == "Discharging" else "Charging"
+            return "Discharging" if self.battery_info["STATUS"] == "Discharging" else "Charging"
         else:
             return "Full"
 
 
 class BatteryCharge(Battery):
     def consumption(self):
-        return self.bat["VOLTAGE_NOW"] * self.bat["CURRENT_NOW"]  # V  * A = W
+        return self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"]  # V  * A = W
 
     def _percentage(self, design):
-        return self.bat["CHARGE_NOW"] / self.bat["CHARGE_FULL" + design]
+        return self.battery_info["CHARGE_NOW"] / self.battery_info["CHARGE_FULL" + design]
 
     def remaining(self):
         if self.status() == "Discharging":
             # Ah / A = h * 60 min = min
-            return self.bat["CHARGE_NOW"] / self.bat["CURRENT_NOW"] * 60
+            return self.battery_info["CHARGE_NOW"] / self.battery_info["CURRENT_NOW"] * 60
         else:
-            return (self.bat["CHARGE_FULL"] - self.bat["CHARGE_NOW"]) / self.bat["CURRENT_NOW"] * 60
+            return (self.battery_info["CHARGE_FULL"] - self.battery_info["CHARGE_NOW"]) / self.battery_info["CURRENT_NOW"] * 60
 
 
 class BatteryEnergy(Battery):
     def consumption(self):
-        return self.bat["POWER_NOW"]
+        return self.battery_info["POWER_NOW"]
 
     def _percentage(self, design):
-        return self.bat["ENERGY_NOW"] / self.bat["ENERGY_FULL" + design]
+        return self.battery_info["ENERGY_NOW"] / self.battery_info["ENERGY_FULL" + design]
 
     def remaining(self):
         if self.status() == "Discharging":
             # Wh / W = h * 60 min = min
-            return self.bat["ENERGY_NOW"] / self.bat["POWER_NOW"] * 60
+            return self.battery_info["ENERGY_NOW"] / self.battery_info["POWER_NOW"] * 60
         else:
-            return (self.bat["ENERGY_FULL"] - self.bat["ENERGY_NOW"]) / self.bat["POWER_NOW"] * 60
+            return (self.battery_info["ENERGY_FULL"] - self.battery_info["ENERGY_NOW"]) / self.battery_info["POWER_NOW"] * 60
 
 
 class BatteryChecker(IntervalModule):
