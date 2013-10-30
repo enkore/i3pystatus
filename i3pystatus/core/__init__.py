@@ -16,6 +16,7 @@ class CommandEndpoint:
     :param modules: dict-like object with item access semantics via .get()
     :param io_handler_factory: function creating a file-like object returning a JSON generator on .read()
     """
+
     def __init__(self, modules, io_handler_factory):
         self.modules = modules
         self.io_handler_factory = io_handler_factory
@@ -57,25 +58,25 @@ class Status:
         """Register a new module."""
         from i3pystatus.text import Text
 
-        if module:
-            try:
-                return self.modules.append(module, *args, **kwargs)
-            except ImportError as import_error:
-                if import_error.name and not import_error.path and isinstance(module, str):
-                    # This is a package/module not found exception raised by importing a module on-the-fly
-                    return self.modules.append(Text(
-                        color="#FF0000",
-                        text="{i3py_mod}: Missing Python module '{missing_module}'".format(
-                            i3py_mod=module,
-                            missing_module=import_error.name)))
-                else:
-                    raise import_error
-            except ConfigError as configuration_error:
+        if not module:
+            return
+
+        try:
+            return self.modules.append(module, *args, **kwargs)
+        except ImportError as import_error:
+            if import_error.name and not import_error.path and isinstance(module, str):
+                # This is a package/module not found exception raised by importing a module on-the-fly
                 return self.modules.append(Text(
-                        color="#FF0000",
-                        text=configuration_error.message))
-        else:
-            return None
+                    color="#FF0000",
+                    text="{i3py_mod}: Missing Python module '{missing_module}'".format(
+                        i3py_mod=module,
+                        missing_module=import_error.name)))
+            else:
+                raise import_error
+        except ConfigError as configuration_error:
+            return self.modules.append(Text(
+                    color="#FF0000",
+                    text=configuration_error.message))
 
     def run(self):
         self.command_endpoint.start()
