@@ -2,7 +2,6 @@
 import time
 import json
 import sys
-import threading
 from contextlib import contextmanager
 
 

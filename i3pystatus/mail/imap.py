@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import json
-from datetime import datetime, timedelta
 import imaplib
 
 from i3pystatus.mail import Backend
@@ -45,7 +43,7 @@ class IMAP(Backend):
 
         try:
             self.connection.select(self.mailbox)
-        except Exception as e:
+        except Exception:
             self.connection = None
 
         return self.connection

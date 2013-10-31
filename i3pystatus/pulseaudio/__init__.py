@@ -2,6 +2,7 @@ from .pulse import *
 
 from i3pystatus import Module
 
+
 class PulseAudio(Module):
 
     """

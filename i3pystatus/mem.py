@@ -1,7 +1,7 @@
 from i3pystatus import IntervalModule
 from psutil import virtual_memory
 
-MEGABYTE = 1024**2
+MEGABYTE = 1024 * 1024
 
 
 class Mem(IntervalModule):

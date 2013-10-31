@@ -1,13 +1,9 @@
 
 import collections
 import functools
-import itertools
 import re
 import socket
 import string
-
-from i3pystatus.core.exceptions import *
-from i3pystatus.core.imputil import ClassFinder
 
 
 def lchop(string, prefix):

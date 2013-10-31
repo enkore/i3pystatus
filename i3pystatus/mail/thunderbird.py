@@ -7,9 +7,6 @@
 # The plugin must be active and thunderbird running for the module to work
 # properly.
 
-import json
-import threading
-import time
 from functools import partial
 
 import dbus

@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import sys
-import json
-import time
-import threading
 import urllib.request
 import urllib.parse
 import urllib.error

@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 
-import sys
-import io
 import pkgutil
-from collections import namedtuple
 import textwrap
 
 import i3pystatus
