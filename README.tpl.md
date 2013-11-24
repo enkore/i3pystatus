@@ -55,24 +55,7 @@ as it can not only reproduce all the variants removed, but can do much more.
 
 ## Configuration
 
-You can keep your config file at various places, i3pystatus will look
-for it in these places:
-
-    ~/.i3pystatus.py
-    ~/.i3/i3pystatus.py
-    ~/.config/i3pystatus.py
-    $XDG_CONFIG_HOME/i3pystatus.py
-    /etc/i3pystatus.py
-    /etc/xdg/i3pystatus.py
-    $XDG_CONFIG_DIRS/i3pystatus.py
-
-The config file is just a normal Python module that is executed if you execute
-i3pystatus (it is placed inside the i3pystatus package).
-
-You can also execute your config file instead of i3pystatus, but you need to
-use an absolute import (`from i3pystatus import Status`) and cannot name it
-i3pystatus.py. This is very handy for using different status lines for different
-outputs.
+The config file is just a normal Python script.
 
 A simple configuration file could look like this (note the additional dependencies
 from network, wireless and pulseaudio in this example):
@@ -81,7 +64,7 @@ from network, wireless and pulseaudio in this example):
 
     import subprocess
 
-    from . import Status
+    from i3pystatus import Status
 
     status = Status(standalone=True)
 
@@ -184,7 +167,7 @@ Also change your i3wm config to the following:
 
     # i3bar
     bar {
-        status_command    i3pystatus
+        status_command    python ~/.path/to/your/config/file.py
         position          top
         workspace_buttons yes
     }
