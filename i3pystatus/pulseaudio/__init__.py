@@ -9,9 +9,10 @@ class PulseAudio(Module):
     Shows volume of default PulseAudio sink (output).
 
     Available formatters:
+
     * `{volume}` — volume in percent (0...100)
     * `{db}` — volume in decibels relative to 100 %, i.e. 100 % = 0 dB, 50 % = -18 dB, 0 % = -infinity dB
-    (the literal value for -infinity is `-∞`)
+      (the literal value for -infinity is `-∞`)
     * `{muted}` — the value of one of the `muted` or `unmuted` settings
     """
 

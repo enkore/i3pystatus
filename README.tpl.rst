@@ -1,15 +1,15 @@
-<!--
-    Always edit README.tpl.md and create README.md by running
-    python -m i3pystatus.mkdocs
-    You can also let the maintainer do the latter :)
--->
+..  Always edit README.tpl.md and create README.md by running
+    python -m i3pystatus.mkdocs You can also let the maintainer do the
+    latter :)
 
-# i3pystatus
+i3pystatus
+==========
 
 i3pystatus is a (hopefully growing) collection of python scripts for 
 status output compatible to i3status / i3bar of the i3 window manager.
 
-## Installation
+Installation
+------------
 
 Note: i3pystatus requires Python 3.2 or newer and is not compatible with
 Python 2.x.
@@ -22,9 +22,11 @@ Python 2.x.
 
 * [Arch Linux](https://aur.archlinux.org/packages/i3pystatus-git/)
 
-### Release Notes
+Release Notes
+-------------
 
-#### 3.28
+3.28 (not released yet)
++++++++++++++++++++++++
 
 * **If you're currently using the `i3pystatus` command to run your i3bar**:
     Replace `i3pystatus` command in your i3 configuration with `python ~/path/to/your/i3pystatus.py`
@@ -33,32 +35,39 @@ Python 2.x.
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
 * Code changes
 
-#### 3.27
+3.27
+++++
 
 * Add weather module
 * Add text module
 * PulseAudio module: Add muted/unmuted options
 
-#### 3.26
+3.26
+++++
 
 * Add mem module
 
-#### 3.24
+3.24
+++++
 
 **This release introduced changes that may require manual changes to your
 configuration file**
 
 * Introduced TimeWrapper
-* battery module: removed remaining_\* formatters in favor of TimeWrapper,
-as it can not only reproduce all the variants removed, but can do much more.
+* battery module: removed remaining\_* formatters in favor of
+  TimeWrapper, as it can not only reproduce all the variants removed,
+  but can do much more.
 * mpd: Uses TimeWrapper for song_length, song_elapsed
 
-## Configuration
+Configuration
+-------------
 
 The config file is just a normal Python script.
 
 A simple configuration file could look like this (note the additional dependencies
 from network, wireless and pulseaudio in this example):
+
+::
 
     # -*- coding: utf-8 -*-
 
@@ -165,6 +174,8 @@ from network, wireless and pulseaudio in this example):
 
 Also change your i3wm config to the following:
 
+::
+
     # i3bar
     bar {
         status_command    python ~/.path/to/your/config/file.py
@@ -172,22 +183,25 @@ Also change your i3wm config to the following:
         workspace_buttons yes
     }
 
-### Formatting
+Formatting
+++++++++++
 
 All modules let you specifiy the exact output formatting using a
 [format string](http://docs.python.org/3/library/string.html#formatstrings), which
 gives you a great deal of flexibility.
 
-Some common stuff:
+If a module gives you a float, it probably has a ton of
+uninteresting decimal places. Use `{somefloat:.0f}` to get the integer
+value, `{somefloat:0.2f}` gives you two decimal places after the
+decimal dot
 
-* If a module gives you a float, it probably has a ton of uninteresting decimal
-places. Use `{somefloat:.0f}` to get the integer value, `{somefloat:0.2f}` gives
-you two decimal places after the decimal dot
-
-#### formatp
+formatp
+~~~~~~~
 
 Some modules use an extended format string syntax (the mpd module, for example).
 Given the format string below the output adapts itself to the available data.
+
+::
 
     [{artist}/{album}/]{title}{status}
 
@@ -202,7 +216,8 @@ Inside a group always all format specifiers must evaluate to true (logical and).
 You can nest groups. The inner group will only become part of the output if both
 the outer group and the inner group are eligible for output.
 
-#### TimeWrapper
+TimeWrapper
+~~~~~~~~~~~
 
 Some modules that output times use TimeWrapper to format these. TimeWrapper is
 a mere extension of the standard formatting method.
@@ -211,55 +226,35 @@ The time format that should be used is specified using the format specifier, i.e
 with some_time being 3951 seconds a format string like `{some_time:%h:%m:%s}`
 would produce `1:5:51`
 
-* `%h`, `%m` and `%s` are the hours, minutes and seconds without leading zeros
-(i.e. 0 to 59 for minutes and seconds)
-* `%H`, `%M` and `%S` are padded with a leading zero to two digits, i.e. 00 to 59
-* `%l` and `%L` produce hours non-padded and padded but only if hours is not zero.
-If the hours are zero it produces an empty string.
+* `%h`, `%m` and `%s` are the hours, minutes and seconds without
+  leading zeros (i.e. 0 to 59 for minutes and seconds)
+* `%H`, `%M` and `%S` are padded with a leading zero to two digits,
+  i.e. 00 to 59
+* `%l` and `%L` produce hours non-padded and padded but only if hours
+  is not zero.  If the hours are zero it produces an empty string.
 * `%%` produces a literal %
-* `%E` (only valid on beginning of the string) if the time is null, don't format
-anything but rather produce an empty string. If the time is non-null it is
-removed from the string.
-* When the module in question also uses formatp, 0 seconds counts as "not known".
-* The formatted time is stripped, i.e. spaces on both ends of the result are removed
+* `%E` (only valid on beginning of the string) if the time is null,
+  don't format anything but rather produce an empty string. If the
+  time is non-null it is removed from the string.
+* When the module in question also uses formatp, 0 seconds counts as
+  "not known".
+* The formatted time is stripped, i.e. spaces on both ends of the
+  result are removed
 
-## Modules
+Modules
+-------
 
-System:
-[Clock](#clock) - 
-[Free space](#disk) - 
-[System load](#load) - 
-[Memory usage](#mem)
-
-Audio:
-[ALSA](#alsa) -
-[PulseAudio](#pulseaudio)
-
-Hardware:
-[Battery](#battery) -
-[Screen brightness](#backlight) -
-[CPU temperature (Intel)](#temp)
-
-Network:
-[Wired](#network) -
-[Wireless](#wireless)
-
-Other:
-[Unread mail](#mail) -
-[Tracking parcels](#parcel) -
-[pyLoad](#pyload) -
-[Weather](#weather) -
-[Music Player Daemon (MPD)](#mpd) -
-[Simple text](#text)
-
-Advanced:
-[Rip info from files](#file) -
-[Regular expressions](#regex) -
-[Run watcher](#runwatch)
+:System: `clock`_ - `disk`_ - `load`_ - `mem`_ 
+:Audio: `alsa`_ - `pulseaudio`_
+:Hardware: `battery`_ - `backlight`_ - `temp`_
+:Network: `network`_ - `wireless`_
+:Other: `mail`_ - `parcel`_ - `pyload`_ - `weather`_ - `mpd`_ - `text`_
+:Advanced: `file`_ - `regex`_ - `runwatch`_
 
 !!module_doc!!
 
-## Contribute
+Contribute
+----------
 
 To contribute a module, make sure it uses one of the Module classes. Most modules
 use IntervalModule, which just calls a function repeatedly in a specified interval.
@@ -268,8 +263,3 @@ The output attribute should be set to a dictionary which represents your modules
 the protocol is documented [here](http://i3wm.org/docs/i3bar-protocol.html).
 
 **Patches and pull requests are very welcome :-)**
-
-### The README
-
-The README.md file is generated from the README.tpl.md file; only edit the latter
-and run `python -m i3pystatus.mkdocs`.

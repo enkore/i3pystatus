@@ -10,11 +10,12 @@ from .core.imputil import ClassFinder
 
 IGNORE = ("__main__", "mkdocs", "core")
 MODULE_FORMAT = """
-{heading} {name}
+{name}
+{heading}
 
 {doc}
 
-__Settings:__
+Settings:
 
 {settings}
 
@@ -56,7 +57,7 @@ class Module:
             name=self.name,
             doc=textwrap.dedent(self.doc),
             settings=self.format_settings(),
-            heading=self.heading,
+            heading=self.heading * len(self.name),
             endstring=self.endstring
         )
 
@@ -83,15 +84,11 @@ class Setting:
         if self.required:
             attrs.append("required")
         if self.default is not self.sentinel:
-            attrs.append("default: `{default}`".format(default=self.default))
+            attrs.append("default: '{default}'".format(default=self.default))
 
-        formatted = "* `{name}` ".format(name=self.name)
-        if self.doc or attrs:
-            formatted += "— "
-            if self.doc:
-                formatted += self.doc
-            if attrs:
-                formatted += " ({attrs})".format(attrs=", ".join(attrs))
+        formatted = ":{name}: {doc}".format(name=self.name, doc=self.doc)
+        if attrs:
+            formatted += " ({attrs})".format(attrs=", ".join(attrs))
 
         return formatted
 
@@ -126,15 +123,15 @@ def get_all(module_path, heading, finder=None, ignore=None):
     return sorted(mods, key=lambda module: module.name)
 
 
-def generate_doc_for_module(module_path, heading="###", finder=None, ignore=None):
+def generate_doc_for_module(module_path, heading="+", finder=None, ignore=None):
     return "".join(map(str, get_all(module_path, heading, finder, ignore or [])))
 
-with open("README.tpl.md", "r") as template:
+with open("README.tpl.rst", "r") as template:
     tpl = template.read()
     tpl = tpl.replace(
         "!!module_doc!!", generate_doc_for_module(i3pystatus.__path__))
     finder = ClassFinder(baseclass=i3pystatus.mail.Backend)
     tpl = tpl.replace("!!i3pystatus.mail!!", generate_doc_for_module(
-        i3pystatus.mail.__path__, "###", finder, ["Backend"]).replace("\n", "\n> "))
-    with open("README.md", "w") as output:
+        i3pystatus.mail.__path__, "~", finder, ["Backend"]).replace("\n", "\n"))
+    with open("README.rst", "w") as output:
         output.write(tpl + "\n")

@@ -54,6 +54,7 @@ class Network(IntervalModule):
     Requires the PyPI package `netifaces-py3`.
 
     Available formatters:
+
     * `{interface}` — same as setting
     * `{name}` — same as setting
     * `{v4}` — IPv4 address
@@ -71,6 +72,7 @@ class Network(IntervalModule):
         ("interface", "Interface to obtain information for"),
         "format_up", "color_up",
         "format_down", "color_down",
+        ("detached_down", "If the interface doesn't exist, display it as if it were down"),
         "name",
     )
 
@@ -79,24 +81,28 @@ class Network(IntervalModule):
     format_down = "{interface}"
     color_up = "#00FF00"
     color_down = "#FF0000"
+    detached_down = False
 
     def init(self):
-        if self.interface not in netifaces.interfaces():
+        if self.interface not in netifaces.interfaces() and not self.detached_down:
             raise RuntimeError(
                 "Unknown interface {iface}!".format(iface=self.interface))
 
-        self.baseinfo = {
-            "interface": self.interface,
-            "name": self.name,
-            "mac": netifaces.ifaddresses(self.interface)[netifaces.AF_PACKET][0]["addr"],
-        }
-
     def collect(self):
+        if self.interface not in netifaces.interfaces() and self.detached_down:
+            self.format = self.format_down
+            color = self.color_down
+            return self.color_down, self.format_down, {"interface": self.interface, "name": self.name}, False
+
         info = netifaces.ifaddresses(self.interface)
         up = netifaces.AF_INET in info or netifaces.AF_INET6 in info
         fdict = dict(
             zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
-        fdict.update(self.baseinfo)
+        fdict.update({
+            "interface": self.interface,
+            "name": self.name,
+            "mac": info[netifaces.AF_PACKET][0]["addr"],
+        })
 
         if up:
             format = self.format_up
@@ -115,7 +121,7 @@ class Network(IntervalModule):
             format = self.format_down
             color = self.color_down
 
-        return (color, format, fdict, up)
+        return color, format, fdict, up
 
     def run(self):
         color, format, fdict, up = self.collect()

@@ -22,8 +22,7 @@ class Thunderbird(Backend):
     This class listens for dbus signals emitted by
     the dbus-sender extension for thunderbird.
 
-    Requires
-    * python-dbus
+    Requires python-dbus
     """
 
     _unread = set()

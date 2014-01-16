@@ -9,6 +9,7 @@ class Mem(IntervalModule):
     Shows memory load
 
     Available formatters:
+
     * {avail_mem}
     * {percent_used_mem}
     * {used_mem}

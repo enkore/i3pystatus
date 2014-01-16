@@ -9,8 +9,9 @@ class Weather(IntervalModule):
     This module gets the weather from weather.com using pywapi module
     First, you need to get the code for the location from the www.weather.com
     Available formatters:
-        {current_temp}
-        {humidity}
+
+    * {current_temp}
+    * {humidity}
 
     Requires pywapi from PyPI.
     """
@@ -19,7 +20,7 @@ class Weather(IntervalModule):
 
     settings = (
         "location_code",
-        ("units", "*C*elsius or *F*ahrenheit"),
+        ("units", "Celsius (C) or Fahrenheit (F)"),
         "format",
     )
     required = ("location_code",)

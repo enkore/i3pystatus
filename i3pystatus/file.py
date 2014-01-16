@@ -9,13 +9,15 @@ class File(IntervalModule):
     Rip information from text files
 
     components is a dict of pairs of the form:
+    
+    ::
 
         name => (callable, file)
 
     * Where `name` is a valid identifier, which is used in the format string to access
-    the value of that component.
+      the value of that component.
     * `callable` is some callable to convert the contents of `file`. A common choice is
-    float or int.
+      float or int.
     * `file` names a file, relative to `base_path`.
 
     transforms is a optional dict of callables taking a single argument (a dictionary containing the values
