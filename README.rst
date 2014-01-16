@@ -332,7 +332,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 
 
 
@@ -419,7 +419,7 @@ mail
 
 Generic mail checker
 
-The `backends` setting determines the backends to use. Currently available are:
+The `backends` setting determines the backends to use.
 
 
 Settings:
@@ -430,9 +430,6 @@ Settings:
 :format:  (default: ``{unread} new email``)
 :format_plural:  (default: ``{unread} new emails``)
 :hide_if_null: Don't output anything if there are no new mails (default: ``True``)
-
-
-    Currently available backends are:
 
 
 imap.IMAP
@@ -565,7 +562,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
 
 
 

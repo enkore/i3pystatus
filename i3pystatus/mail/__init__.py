@@ -17,13 +17,10 @@ class Mail(IntervalModule):
     """
     Generic mail checker
 
-    The `backends` setting determines the backends to use. Currently available are:
+    The `backends` setting determines the backends to use.
     """
 
-    _endstring = """
-    Currently available backends are:
-
-!!i3pystatus.mail!!"""
+    _endstring = """!!i3pystatus.mail!!"""
 
     settings = (
         ("backends", "List of backends (instances of `i3pystatus.mail.xxx.zzz`)"),
