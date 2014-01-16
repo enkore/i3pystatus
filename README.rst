@@ -332,7 +332,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
 
 
 
@@ -435,68 +435,68 @@ Settings:
     Currently available backends are:
 
 
-imap.IMAP
-~~~~~~~~~
-
-
-Checks for mail on a IMAP server
-
-
-Settings:
-
-:host:  (required)
-:port:  (default: ``993``)
-:username:  (required)
-:password:  (required)
-:ssl:  (default: ``True``)
-:mailbox:  (default: ``INBOX``)
-
-
-
-mbox.MboxMail
-~~~~~~~~~~~~~
-
-
-Checks for local mail in mbox
-
-
-Settings:
-
-
-
-
-
-notmuchmail.Notmuch
-~~~~~~~~~~~~~~~~~~~
-
-
-This class uses the notmuch python bindings to check for the
-number of messages in the notmuch database with the tags "inbox"
-and "unread"
-
-
-Settings:
-
-:db_path:  (required)
-
-
-
-thunderbird.Thunderbird
-~~~~~~~~~~~~~~~~~~~~~~~
-
-
-This class listens for dbus signals emitted by
-the dbus-sender extension for thunderbird.
-
-Requires python-dbus
-
-
-Settings:
-
-
-
-
-
+    imap.IMAP
+    ~~~~~~~~~
+    
+    
+    Checks for mail on a IMAP server
+    
+    
+    Settings:
+    
+    :host:  (required)
+    :port:  (default: ``993``)
+    :username:  (required)
+    :password:  (required)
+    :ssl:  (default: ``True``)
+    :mailbox:  (default: ``INBOX``)
+    
+    
+    
+    mbox.MboxMail
+    ~~~~~~~~~~~~~
+    
+    
+    Checks for local mail in mbox
+    
+    
+    Settings:
+    
+    
+    
+    
+    
+    notmuchmail.Notmuch
+    ~~~~~~~~~~~~~~~~~~~
+    
+    
+    This class uses the notmuch python bindings to check for the
+    number of messages in the notmuch database with the tags "inbox"
+    and "unread"
+    
+    
+    Settings:
+    
+    :db_path:  (required)
+    
+    
+    
+    thunderbird.Thunderbird
+    ~~~~~~~~~~~~~~~~~~~~~~~
+    
+    
+    This class listens for dbus signals emitted by
+    the dbus-sender extension for thunderbird.
+    
+    Requires python-dbus
+    
+    
+    Settings:
+    
+    
+    
+    
+    
 
 mem
 +++
@@ -565,7 +565,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'play': '▶', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
 
 
 
