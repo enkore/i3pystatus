@@ -191,7 +191,7 @@ Formatting
 ++++++++++
 
 All modules let you specifiy the exact output formatting using a
-[format string](http://docs.python.org/3/library/string.html#formatstrings), which
+`format string <http://docs.python.org/3/library/string.html#formatstrings`_, which
 gives you a great deal of flexibility.
 
 If a module gives you a float, it probably has a ton of
@@ -332,7 +332,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: 'Low battery')
 :alert_format_body: The body text of the notification, all formatters can be used (default: 'Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!')
 :path: Override the default-generated path (default: 'None')
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: '{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}')
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: '{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}')
 
 
 
@@ -565,7 +565,7 @@ Settings:
 :host:  (default: 'localhost')
 :port: MPD port (default: '6600')
 :format: formatp string (default: '{title} {status}')
-:status: Dictionary mapping pause, play and stop to output (default: '{'pause': '▷', 'stop': '◾', 'play': '▶'}')
+:status: Dictionary mapping pause, play and stop to output (default: '{'stop': '◾', 'play': '▶', 'pause': '▷'}')
 
 
 

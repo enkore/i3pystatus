@@ -191,7 +191,7 @@ Formatting
 ++++++++++
 
 All modules let you specifiy the exact output formatting using a
-[format string](http://docs.python.org/3/library/string.html#formatstrings), which
+`format string <http://docs.python.org/3/library/string.html#formatstrings`_, which
 gives you a great deal of flexibility.
 
 If a module gives you a float, it probably has a ton of
