@@ -274,15 +274,15 @@ Available formatters:
 
 Settings:
 
-:format:  (default: '♪: {volume}')
-:mixer: ALSA mixer (default: 'Master')
-:mixer_id: ALSA mixer id (default: '0')
-:card: ALSA sound card (default: '0')
-:muted:  (default: 'M')
-:unmuted:  (default: '')
-:color_muted:  (default: '#AAAAAA')
-:color:  (default: '#FFFFFF')
-:channel:  (default: '0')
+:format:  (default: ``♪: {volume}``)
+:mixer: ALSA mixer (default: ``Master``)
+:mixer_id: ALSA mixer id (default: ``0``)
+:card: ALSA sound card (default: ``0``)
+:muted:  (default: ``M``)
+:unmuted:  (default: ````)
+:color_muted:  (default: ``#AAAAAA``)
+:color:  (default: ``#FFFFFF``)
+:channel:  (default: ``0``)
 
 
 
@@ -300,9 +300,9 @@ Available formatters:
 
 Settings:
 
-:format: format string, formatters: brightness, max_brightness, percentage (default: '{brightness}/{max_brightness}')
-:backlight: backlight, see `/sys/class/backlight/` (default: 'acpi_video0')
-:color:  (default: '#FFFFFF')
+:format: format string, formatters: brightness, max_brightness, percentage (default: ``{brightness}/{max_brightness}``)
+:backlight: backlight, see `/sys/class/backlight/` (default: ``acpi_video0``)
+:color:  (default: ``#FFFFFF``)
 
 
 
@@ -325,14 +325,14 @@ Available formatters:
 
 Settings:
 
-:battery_ident: The name of your battery, usually BAT0 or BAT1 (default: 'BAT0')
-:format:  (default: '{status} {remaining}')
-:alert: Display a libnotify-notification on low battery (default: 'False')
-:alert_percentage:  (default: '10')
-:alert_format_title: The title of the notification, all formatters can be used (default: 'Low battery')
-:alert_format_body: The body text of the notification, all formatters can be used (default: 'Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!')
-:path: Override the default-generated path (default: 'None')
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: '{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}')
+:battery_ident: The name of your battery, usually BAT0 or BAT1 (default: ``BAT0``)
+:format:  (default: ``{status} {remaining}``)
+:alert: Display a libnotify-notification on low battery (default: ``False``)
+:alert_percentage:  (default: ``10``)
+:alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
+:alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
+:path: Override the default-generated path (default: ``None``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 
 
 
@@ -345,7 +345,7 @@ This class shows a clock
 
 Settings:
 
-:format: stftime format string, `None` means to use the default, locale-dependent format (default: 'None')
+:format: stftime format string, `None` means to use the default, locale-dependent format (default: ``None``)
 
 
 
@@ -361,9 +361,9 @@ and `{percentage_avail}` formats.
 
 Settings:
 
-:format:  (default: '{free}/{avail}')
+:format:  (default: ``{free}/{avail}``)
 :path:  (required)
-:divisor: divide all byte values by this value, commonly 1024**3 (gigabyte) (default: '1073741824')
+:divisor: divide all byte values by this value, commonly 1024**3 (gigabyte) (default: ``1073741824``)
 
 
 
@@ -393,10 +393,10 @@ Settings:
 
 :format:  (required)
 :components:  (required)
-:transforms:  (default: '{}')
-:base_path:  (default: '/')
-:color:  (default: '#FFFFFF')
-:interval:  (default: '5')
+:transforms:  (default: ``{}``)
+:base_path:  (default: ``/``)
+:color:  (default: ``#FFFFFF``)
+:interval:  (default: ``5``)
 
 
 
@@ -409,7 +409,7 @@ Shows system load
 
 Settings:
 
-:format: format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: '{avg1} {avg5}')
+:format: format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: ``{avg1} {avg5}``)
 
 
 
@@ -425,11 +425,11 @@ The `backends` setting determines the backends to use. Currently available are:
 Settings:
 
 :backends: List of backends (instances of `i3pystatus.mail.xxx.zzz`)
-:color:  (default: '#ffffff')
-:color_unread:  (default: '#ff0000')
-:format:  (default: '{unread} new email')
-:format_plural:  (default: '{unread} new emails')
-:hide_if_null: Don't output anything if there are no new mails (default: 'True')
+:color:  (default: ``#ffffff``)
+:color_unread:  (default: ``#ff0000``)
+:format:  (default: ``{unread} new email``)
+:format_plural:  (default: ``{unread} new emails``)
+:hide_if_null: Don't output anything if there are no new mails (default: ``True``)
 
 
     Currently available backends are:
@@ -445,11 +445,11 @@ Checks for mail on a IMAP server
 Settings:
 
 :host:  (required)
-:port:  (default: '993')
+:port:  (default: ``993``)
 :username:  (required)
 :password:  (required)
-:ssl:  (default: 'True')
-:mailbox:  (default: 'INBOX')
+:ssl:  (default: ``True``)
+:mailbox:  (default: ``INBOX``)
 
 
 
@@ -516,7 +516,7 @@ Requires psutil (from PyPI)
 
 Settings:
 
-:format: format string used for output. (default: '{avail_mem} MB')
+:format: format string used for output. (default: ``{avail_mem} MB``)
 
 
 
@@ -530,9 +530,9 @@ unread posts in any bookmark in the mods.de forums.
 
 Settings:
 
-:format: Use {unread} as the formatter for number of unread posts (default: '{unread} new posts in bookmarks')
-:offset: subtract number of posts before output (default: '0')
-:color:  (default: '#7181fe')
+:format: Use {unread} as the formatter for number of unread posts (default: ``{unread} new posts in bookmarks``)
+:offset: subtract number of posts before output (default: ``0``)
+:color:  (default: ``#7181fe``)
 :username:  (required)
 :password:  (required)
 
@@ -562,10 +562,10 @@ Left click on the module play/pauses, right click (un)mutes.
 
 Settings:
 
-:host:  (default: 'localhost')
-:port: MPD port (default: '6600')
-:format: formatp string (default: '{title} {status}')
-:status: Dictionary mapping pause, play and stop to output (default: '{'stop': '◾', 'play': '▶', 'pause': '▷'}')
+:host:  (default: ``localhost``)
+:port: MPD port (default: ``6600``)
+:format: formatp string (default: ``{title} {status}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'play': '▶', 'pause': '▷'}``)
 
 
 
@@ -594,13 +594,13 @@ Not available addresses (i.e. no IPv6 connectivity) are replaced with empty stri
 
 Settings:
 
-:interface: Interface to obtain information for (default: 'eth0')
-:format_up:  (default: '{interface}: {v4}')
-:color_up:  (default: '#00FF00')
-:format_down:  (default: '{interface}')
-:color_down:  (default: '#FF0000')
-:detached_down: If the interface doesn't exist, display it as if it were down (default: 'False')
-:name:  (default: 'eth0')
+:interface: Interface to obtain information for (default: ``eth0``)
+:format_up:  (default: ``{interface}: {v4}``)
+:color_up:  (default: ``#00FF00``)
+:format_down:  (default: ``{interface}``)
+:color_down:  (default: ``#FF0000``)
+:detached_down: If the interface doesn't exist, display it as if it were down (default: ``False``)
+:name:  (default: ``eth0``)
 
 
 
@@ -612,7 +612,7 @@ parcel
 Settings:
 
 :instance: Tracker instance
-:format:  (default: '{name}:{progress}')
+:format:  (default: ``{name}:{progress}``)
 :name: 
 
 
@@ -633,9 +633,9 @@ Available formatters:
 
 Settings:
 
-:format:  (default: '♪: {volume}')
-:muted:  (default: 'M')
-:unmuted:  (default: '')
+:format:  (default: ``♪: {volume}``)
+:muted:  (default: ``M``)
+:unmuted:  (default: ````)
 
 
 
@@ -658,12 +658,12 @@ Available formatters:
 
 Settings:
 
-:address: Address of pyLoad webinterface (default: 'http://127.0.0.1:8000')
-:format:  (default: '{captcha} {progress_all:.1f}% {speed:.1f} kb/s')
-:captcha_true:  (default: 'Captcha waiting')
-:captcha_false:  (default: '')
-:download_true:  (default: 'Downloads enabled')
-:download_false:  (default: 'Downloads disabled')
+:address: Address of pyLoad webinterface (default: ``http://127.0.0.1:8000``)
+:format:  (default: ``{captcha} {progress_all:.1f}% {speed:.1f} kb/s``)
+:captcha_true:  (default: ``Captcha waiting``)
+:captcha_false:  (default: ````)
+:download_true:  (default: ``Downloads enabled``)
+:download_false:  (default: ``Downloads disabled``)
 :username:  (required)
 :password:  (required)
 
@@ -680,10 +680,10 @@ The groups of the regex are passed to the format string as positional arguments.
 
 Settings:
 
-:format: format string used for output (default: '{0}')
+:format: format string used for output (default: ``{0}``)
 :regex:  (required)
 :file: file to search for regex matches
-:flags: Python.re flags (default: '0')
+:flags: Python.re flags (default: ``0``)
 
 
 
@@ -702,10 +702,10 @@ Available formatters are {pid} and {name}.
 
 Settings:
 
-:format_up:  (default: '{name}')
-:format_down:  (default: '{name}')
-:color_up:  (default: '#00FF00')
-:color_down:  (default: '#FF0000')
+:format_up:  (default: ``{name}``)
+:format_down:  (default: ``{name}``)
+:color_up:  (default: ``#00FF00``)
+:color_down:  (default: ``#FF0000``)
 :path:  (required)
 :name:  (required)
 
@@ -722,10 +722,10 @@ AMD is currently not supported as they can only report a relative temperature, w
 
 Settings:
 
-:format: format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps. (default: '{temp} °C')
-:color:  (default: '#FFFFFF')
-:color_critical:  (default: '#FF0000')
-:high_factor:  (default: '0.7')
+:format: format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps. (default: ``{temp} °C``)
+:color:  (default: ``#FFFFFF``)
+:color_critical:  (default: ``#FF0000``)
+:high_factor:  (default: ``0.7``)
 
 
 
@@ -739,7 +739,7 @@ Display static, colored text.
 Settings:
 
 :text:  (required)
-:color: HTML color code #RRGGBB (default: 'None')
+:color: HTML color code #RRGGBB (default: ``None``)
 
 
 
@@ -760,8 +760,8 @@ Requires pywapi from PyPI.
 Settings:
 
 :location_code:  (required)
-:units: Celsius (C) or Fahrenheit (F) (default: 'C')
-:format:  (default: '{current_temp}')
+:units: Celsius (C) or Fahrenheit (F) (default: ``C``)
+:format:  (default: ``{current_temp}``)
 
 
 
@@ -783,13 +783,13 @@ the same, except for these additional formatters and that detached_down doesn't 
 
 Settings:
 
-:interface: Interface to obtain information for (default: 'wlan0')
-:format_up:  (default: '{interface}: {v4}')
-:color_up:  (default: '#00FF00')
-:format_down:  (default: '{interface}')
-:color_down:  (default: '#FF0000')
-:detached_down: If the interface doesn't exist, display it as if it were down (default: 'False')
-:name:  (default: 'eth0')
+:interface: Interface to obtain information for (default: ``wlan0``)
+:format_up:  (default: ``{interface}: {v4}``)
+:color_up:  (default: ``#00FF00``)
+:format_down:  (default: ``{interface}``)
+:color_down:  (default: ``#FF0000``)
+:detached_down: If the interface doesn't exist, display it as if it were down (default: ``False``)
+:name:  (default: ``eth0``)
 
 
 
