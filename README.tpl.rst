@@ -14,13 +14,17 @@ Installation
 Note: i3pystatus requires Python 3.2 or newer and is not compatible with
 Python 2.x.
 
-### From PyPI package [i3pystatus](https://pypi.python.org/pypi/i3pystatus)
+From PyPI package `i3pystatus <https://pypi.python.org/pypi/i3pystatus>`_
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+::
 
     pip install i3pystatus
 
-### Packages for your OS
+Packages for your OS
+++++++++++++++++++++
 
-* [Arch Linux](https://aur.archlinux.org/packages/i3pystatus-git/)
+* `Arch Linux <https://aur.archlinux.org/packages/i3pystatus-git/>`_
 
 Release Notes
 -------------
@@ -28,10 +32,10 @@ Release Notes
 3.28 (not released yet)
 +++++++++++++++++++++++
 
-* **If you're currently using the `i3pystatus` command to run your i3bar**:
-    Replace `i3pystatus` command in your i3 configuration with `python ~/path/to/your/i3pystatus.py`
+* **If you're currently using the ``i3pystatus`` command to run your i3bar**:
+    Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/i3pystatus.py``
 * Improved error handling
-* Removed `i3pystatus` binary
+* Removed ``i3pystatus`` binary
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
 * Code changes
 
@@ -191,8 +195,8 @@ All modules let you specifiy the exact output formatting using a
 gives you a great deal of flexibility.
 
 If a module gives you a float, it probably has a ton of
-uninteresting decimal places. Use `{somefloat:.0f}` to get the integer
-value, `{somefloat:0.2f}` gives you two decimal places after the
+uninteresting decimal places. Use ``{somefloat:.0f}`` to get the integer
+value, ``{somefloat:0.2f}`` gives you two decimal places after the
 decimal dot
 
 formatp
@@ -223,17 +227,17 @@ Some modules that output times use TimeWrapper to format these. TimeWrapper is
 a mere extension of the standard formatting method.
 
 The time format that should be used is specified using the format specifier, i.e.
-with some_time being 3951 seconds a format string like `{some_time:%h:%m:%s}`
-would produce `1:5:51`
+with some_time being 3951 seconds a format string like ``{some_time:%h:%m:%s}``
+would produce ``1:5:51``
 
-* `%h`, `%m` and `%s` are the hours, minutes and seconds without
+* ``%h``, ``%m`` and ``%s`` are the hours, minutes and seconds without
   leading zeros (i.e. 0 to 59 for minutes and seconds)
-* `%H`, `%M` and `%S` are padded with a leading zero to two digits,
+* ``%H``, ``%M`` and ``%S`` are padded with a leading zero to two digits,
   i.e. 00 to 59
-* `%l` and `%L` produce hours non-padded and padded but only if hours
+* ``%l`` and ``%L`` produce hours non-padded and padded but only if hours
   is not zero.  If the hours are zero it produces an empty string.
-* `%%` produces a literal %
-* `%E` (only valid on beginning of the string) if the time is null,
+* ``%%`` produces a literal %
+* ``%E`` (only valid on beginning of the string) if the time is null,
   don't format anything but rather produce an empty string. If the
   time is non-null it is removed from the string.
 * When the module in question also uses formatp, 0 seconds counts as
@@ -260,6 +264,6 @@ To contribute a module, make sure it uses one of the Module classes. Most module
 use IntervalModule, which just calls a function repeatedly in a specified interval.
 
 The output attribute should be set to a dictionary which represents your modules output,
-the protocol is documented [here](http://i3wm.org/docs/i3bar-protocol.html).
+the protocol is documented `here <http://i3wm.org/docs/i3bar-protocol.html>`_.
 
 **Patches and pull requests are very welcome :-)**
