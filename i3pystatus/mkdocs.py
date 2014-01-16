@@ -84,7 +84,7 @@ class Setting:
         if self.required:
             attrs.append("required")
         if self.default is not self.sentinel:
-            attrs.append("default: '{default}'".format(default=self.default))
+            attrs.append("default: ``{default}``".format(default=self.default))
 
         formatted = ":{name}: {doc}".format(name=self.name, doc=self.doc)
         if attrs:
@@ -132,6 +132,6 @@ with open("README.tpl.rst", "r") as template:
         "!!module_doc!!", generate_doc_for_module(i3pystatus.__path__))
     finder = ClassFinder(baseclass=i3pystatus.mail.Backend)
     tpl = tpl.replace("!!i3pystatus.mail!!", generate_doc_for_module(
-        i3pystatus.mail.__path__, "~", finder, ["Backend"]).replace("\n", "\n"))
+        i3pystatus.mail.__path__, "~", finder, ["Backend"]))
     with open("README.rst", "w") as output:
         output.write(tpl + "\n")
