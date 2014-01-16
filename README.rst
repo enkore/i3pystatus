@@ -788,21 +788,6 @@ Settings:
 :name:  (default: 'eth0')
 
 
-
-xrandr
-++++++
-
-
-Do Not Publish, private hack of it's own
-
-
-Settings:
-
-
-
-
-
-
 Contribute
 ----------
 
