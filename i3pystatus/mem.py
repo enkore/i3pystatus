@@ -21,7 +21,7 @@ class Mem(IntervalModule):
     color = "#00FF00"
     warn_color = "#FFFF00"
     alert_color = "#FF0000"
-    warn_percantage = 50
+    warn_percentage = 50
     alert_percentage = 80
     _round = 2
 
@@ -29,15 +29,14 @@ class Mem(IntervalModule):
         ("format", "format string used for output."),
         ("divisor",
             "divide all byte values by this value, default 1024**2(mebibytes"),
-        ("warn_percantage", "minimal percantage for warn state"),
-        ("alert_percentage", "minimal percantage for alert state"),
+        ("warn_percentage", "minimal percentage for warn state"),
+        ("alert_percentage", "minimal percentage for alert state"),
         ("color", "standard color"),
         ("warn_color",
             "defines the color used wann warn percentage ist exceeded"),
         ("alert_color",
             "defines the color used when alert percentage is exceeded"),
         ("round", "round byte values to given length behind dot")
-
     )
 
     def run(self):
@@ -47,9 +46,8 @@ class Mem(IntervalModule):
         if memory_usage.percent >= self.alert_percentage:
             color = self.alert_color
 
-        elif memory_usage.percent >= self.warn_percantage:
+        elif memory_usage.percent >= self.warn_percentage:
             color = self.warn_color
-
         else:
             color = self.color
 
