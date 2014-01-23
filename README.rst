@@ -34,6 +34,7 @@ Release Notes
 
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/i3pystatus.py``
+* New options for `mem`_ (thanks Arvedui)
 * Improved error handling
 * Removed ``i3pystatus`` binary
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
@@ -332,7 +333,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}``)
 
 
 
@@ -513,7 +514,14 @@ Requires psutil (from PyPI)
 
 Settings:
 
-:format: format string used for output. (default: ``{avail_mem} MB``)
+:format: format string used for output. (default: ``{avail_mem} MiB``)
+:divisor: divide all byte values by this value, default 1024**2(mebibytes (default: ``1048576``)
+:warn_percentage: minimal percentage for warn state (default: ``50``)
+:alert_percentage: minimal percentage for alert state (default: ``80``)
+:color: standard color (default: ``#00FF00``)
+:warn_color: defines the color used wann warn percentage ist exceeded (default: ``#FFFF00``)
+:alert_color: defines the color used when alert percentage is exceeded (default: ``#FF0000``)
+:round: round byte values to given length behind dot
 
 
 
@@ -562,7 +570,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
 
 
 
