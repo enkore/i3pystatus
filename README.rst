@@ -35,6 +35,7 @@ Release Notes
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/i3pystatus.py``
 * New options for `mem`_ (thanks Arvedui)
+* Added `cpu\_usage`_
 * Improved error handling
 * Removed ``i3pystatus`` binary
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
@@ -249,7 +250,7 @@ would produce ``1:5:51``
 Modules
 -------
 
-:System: `clock`_ - `disk`_ - `load`_ - `mem`_  `cpu_usage`_
+:System: `clock`_ - `disk`_ - `load`_ - `mem`_  - `cpu\_usage`_
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `battery`_ - `backlight`_ - `temp`_
 :Network: `network`_ - `wireless`_
@@ -333,7 +334,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 
 
 
@@ -591,7 +592,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'play': '▶', 'pause': '▷'}``)
 
 
 

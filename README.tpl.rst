@@ -35,6 +35,7 @@ Release Notes
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/i3pystatus.py``
 * New options for `mem`_ (thanks Arvedui)
+* Added `cpu\_usage`_
 * Improved error handling
 * Removed ``i3pystatus`` binary
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
@@ -249,7 +250,7 @@ would produce ``1:5:51``
 Modules
 -------
 
-:System: `clock`_ - `disk`_ - `load`_ - `mem`_  `cpu_usage`_
+:System: `clock`_ - `disk`_ - `load`_ - `mem`_  - `cpu\_usage`_
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `battery`_ - `backlight`_ - `temp`_
 :Network: `network`_ - `wireless`_
