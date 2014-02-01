@@ -18,7 +18,7 @@ class CpuUsage(IntervalModule):
 
     format = "{usage:02}%"
     settings = (
-        ("format", "format string. Default: '{usage:02}%'")
+        ("format", "format string"),
     )
 
 
