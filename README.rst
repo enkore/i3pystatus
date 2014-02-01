@@ -249,7 +249,7 @@ would produce ``1:5:51``
 Modules
 -------
 
-:System: `clock`_ - `disk`_ - `load`_ - `mem`_ 
+:System: `clock`_ - `disk`_ - `load`_ - `mem`_  `cpu_usage`_
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `battery`_ - `backlight`_ - `temp`_
 :Network: `network`_ - `wireless`_
@@ -333,7 +333,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}``)
 
 
 
@@ -347,6 +347,27 @@ This class shows a clock
 Settings:
 
 :format: stftime format string, `None` means to use the default, locale-dependent format (default: ``None``)
+
+
+
+cpu_usage
++++++++++
+
+
+Shows CPU usage.
+The first output will be inacurate
+Linux only
+
+Available formatters:
+
+* {usage}
+
+
+
+Settings:
+
+:format:  (default: ``{usage:02}%``)
+:format string. Default: '{usage:02}%': 
 
 
 
@@ -570,7 +591,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
 
 
 

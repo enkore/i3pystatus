@@ -249,7 +249,7 @@ would produce ``1:5:51``
 Modules
 -------
 
-:System: `clock`_ - `disk`_ - `load`_ - `mem`_ 
+:System: `clock`_ - `disk`_ - `load`_ - `mem`_  `cpu_usage`_
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `battery`_ - `backlight`_ - `temp`_
 :Network: `network`_ - `wireless`_
