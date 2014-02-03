@@ -22,8 +22,7 @@ class CpuUsage(IntervalModule):
     )
 
 
-    def __init__(self):
-        IntervalModule.__init__(self)
+    def init(self):
         self.prev_idle = 0
         self.prev_busy = 0
         self.interval = 1
