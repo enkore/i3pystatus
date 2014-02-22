@@ -20,12 +20,12 @@ class Weather(IntervalModule):
 
     settings = (
         "location_code",
-        ("units", "Celsius (C) or Fahrenheit (F)"),
+        ("units", "Celsius (metric) or Fahrenheit (imperial)"),
         "format",
     )
     required = ("location_code",)
 
-    units = "C"
+    units = "metric"
     format = "{current_temp}"
 
     @require(internet)
