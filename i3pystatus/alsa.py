@@ -67,7 +67,7 @@ class ALSA(IntervalModule):
             muted = self.alsamixer.getmute()[self.channel] == 1
 
         self.fdict["volume"] = self.alsamixer.getvolume()[self.channel]
-        self.fdict["muted"] = self.muted if muted else self.muted
+        self.fdict["muted"] = self.muted if muted else self.unmuted
 
         self.output = {
             "full_text": self.format.format(**self.fdict),
