@@ -81,28 +81,25 @@ class MPD(IntervalModule):
         try:
             status = self._mpd_command(self.s, "status")
             currentsong = self._mpd_command(self.s, "currentsong")
+            fdict = {
+                "pos": int(status.get("song", 0)) + 1,
+                "len": int(status["playlistlength"]),
+                "status": self.status[status["state"]],
+                "volume": int(status["volume"]),
+
+                "title": currentsong.get("Title", ""),
+                "album": currentsong.get("Album", ""),
+                "artist": currentsong.get("Artist", ""),
+                "song_length": TimeWrapper(currentsong.get("Time", 0)),
+                "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
+                "bitrate": int(status.get("bitrate", 0)),
+
+            }
+            self.output = {
+                "full_text": formatp(self.format, **fdict).strip(),
+            }
         except Exception as e:
             self.output = {"full_text": "error connecting MPD"}
-            return
-
-        fdict = {
-            "pos": int(status.get("song", 0)) + 1,
-            "len": int(status["playlistlength"]),
-            "status": self.status[status["state"]],
-            "volume": int(status["volume"]),
-
-            "title": currentsong.get("Title", ""),
-            "album": currentsong.get("Album", ""),
-            "artist": currentsong.get("Artist", ""),
-            "song_length": TimeWrapper(currentsong.get("Time", 0)),
-            "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
-            "bitrate": int(status.get("bitrate", 0)),
-
-        }
-
-        self.output = {
-            "full_text": formatp(self.format, **fdict).strip(),
-        }
 
     def on_leftclick(self):
         with socket.create_connection(("localhost", self.port)) as s:
