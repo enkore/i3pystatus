@@ -41,11 +41,7 @@ class MPD(IntervalModule):
 
     host = "localhost"
     port = 6600
-    try:
-        s = socket.create_connection((host, port))
-        s.recv(8192)
-    except Exception as e:
-        s = None
+    s = None
     format = "{title} {status}"
     format_sparse = None
     status = {
@@ -64,20 +60,21 @@ class MPD(IntervalModule):
             sock = self.s
             sock.recv(8192)
             sock.send((command + "\n").encode("utf-8"))
-        reply = sock.recv(16384).decode("utf-8")
-        replylines = reply.split("\n")[:-2]
+        try:
+            reply = sock.recv(16384).decode("utf-8")
+            replylines = reply.split("\n")[:-2]
 
-        return dict(
-            (line.split(": ", 1)[0], line.split(": ", 1)[1]) for line in replylines
-        )
+            return dict(
+                (line.split(": ", 1)) for line in replylines
+            )
+        except Exception as e:
+            return None
 
     def init(self):
         if not self.format_sparse:
             self.format_sparse = self.format
 
     def run(self):
-        fdict = {}
-
         try:
             status = self._mpd_command(self.s, "status")
             currentsong = self._mpd_command(self.s, "currentsong")
@@ -102,19 +99,19 @@ class MPD(IntervalModule):
             self.output = {"full_text": "error connecting MPD"}
 
     def on_leftclick(self):
-        with socket.create_connection(("localhost", self.port)) as s:
-            s.recv(8192)
-
-            self._mpd_command(s, "pause %i" %
-                              (0 if self._mpd_command(s, "status")["state"] == "pause" else 1))
+        try:
+            self._mpd_command(self.s, "pause %i" %
+                              (0 if self._mpd_command(self.s, "status")["state"] == "pause" else 1))
+        except Exception as e:
+            pass
 
     def on_rightclick(self):
-        with socket.create_connection(("localhost", self.port)) as s:
-            s.recv(8192)
-
-            vol = int(self._mpd_command(s, "status")["volume"])
+        try:
+            vol = int(self._mpd_command(self.s, "status")["volume"])
             if vol == 0:
-                self._mpd_command(s, "setvol %i" % self.vol)
+                self._mpd_command(self.s, "setvol %i" % self.vol)
             else:
                 self.vol = vol
-                self._mpd_command(s, "setvol 0")
+                self._mpd_command(self.s, "setvol 0")
+        except Exception as e:
+            pass
