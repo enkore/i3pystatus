@@ -41,6 +41,8 @@ class MPD(IntervalModule):
 
     host = "localhost"
     port = 6600
+    s = socket.create_connection((host, port))
+    s.recv(8192)
     format = "{title} {status}"
     format_sparse = None
     status = {
@@ -65,33 +67,29 @@ class MPD(IntervalModule):
             self.format_sparse = self.format
 
     def run(self):
-        with socket.create_connection((self.host, self.port)) as s:
-            # Skip "OK MPD ..."
-            s.recv(8192)
+        fdict = {}
 
-            fdict = {}
+        status = self._mpd_command(self.s, "status")
+        currentsong = self._mpd_command(self.s, "currentsong")
 
-            status = self._mpd_command(s, "status")
-            currentsong = self._mpd_command(s, "currentsong")
+        fdict = {
+            "pos": int(status.get("song", 0)) + 1,
+            "len": int(status["playlistlength"]),
+            "status": self.status[status["state"]],
+            "volume": int(status["volume"]),
 
-            fdict = {
-                "pos": int(status.get("song", 0)) + 1,
-                "len": int(status["playlistlength"]),
-                "status": self.status[status["state"]],
-                "volume": int(status["volume"]),
+            "title": currentsong.get("Title", ""),
+            "album": currentsong.get("Album", ""),
+            "artist": currentsong.get("Artist", ""),
+            "song_length": TimeWrapper(currentsong.get("Time", 0)),
+            "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
+            "bitrate": int(status.get("bitrate", 0)),
 
-                "title": currentsong.get("Title", ""),
-                "album": currentsong.get("Album", ""),
-                "artist": currentsong.get("Artist", ""),
-                "song_length": TimeWrapper(currentsong.get("Time", 0)),
-                "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
-                "bitrate": int(status.get("bitrate", 0)),
+        }
 
-            }
-
-            self.output = {
-                "full_text": formatp(self.format, **fdict).strip(),
-            }
+        self.output = {
+            "full_text": formatp(self.format, **fdict).strip(),
+        }
 
     def on_leftclick(self):
         with socket.create_connection(("localhost", self.port)) as s:
