@@ -41,8 +41,11 @@ class MPD(IntervalModule):
 
     host = "localhost"
     port = 6600
-    s = socket.create_connection((host, port))
-    s.recv(8192)
+    try:
+        s = socket.create_connection((host, port))
+        s.recv(8192)
+    except Exception as e:
+        s = None
     format = "{title} {status}"
     format_sparse = None
     status = {
@@ -54,7 +57,13 @@ class MPD(IntervalModule):
     vol = 100
 
     def _mpd_command(self, sock, command):
-        sock.send((command + "\n").encode("utf-8"))
+        try:
+            sock.send((command + "\n").encode("utf-8"))
+        except Exception as e:
+            self.s = socket.create_connection((self.host, self.port))
+            sock = self.s
+            sock.recv(8192)
+            sock.send((command + "\n").encode("utf-8"))
         reply = sock.recv(16384).decode("utf-8")
         replylines = reply.split("\n")[:-2]
 
@@ -69,8 +78,12 @@ class MPD(IntervalModule):
     def run(self):
         fdict = {}
 
-        status = self._mpd_command(self.s, "status")
-        currentsong = self._mpd_command(self.s, "currentsong")
+        try:
+            status = self._mpd_command(self.s, "status")
+            currentsong = self._mpd_command(self.s, "currentsong")
+        except Exception as e:
+            self.output = {"full_text": "error connecting MPD"}
+            return
 
         fdict = {
             "pos": int(status.get("song", 0)) + 1,
