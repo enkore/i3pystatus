@@ -23,7 +23,6 @@ class Mem(IntervalModule):
     alert_color = "#FF0000"
     warn_percentage = 50
     alert_percentage = 80
-    _round = 2
 
     settings = (
         ("format", "format string used for output."),
@@ -36,7 +35,6 @@ class Mem(IntervalModule):
             "defines the color used wann warn percentage ist exceeded"),
         ("alert_color",
             "defines the color used when alert percentage is exceeded"),
-        ("round", "round byte values to given length behind dot")
     )
 
     def run(self):
@@ -53,10 +51,9 @@ class Mem(IntervalModule):
 
         self.output = {
             "full_text": self.format.format(
-                used_mem=round(used / self.divisor, self._round),
-                avail_mem=round(memory_usage.available / self.divisor,
-                                self._round),
-                total_mem=round(memory_usage.total / self.divisor, self._round),
-                percent_used_mem=int(memory_usage.percent)),
+                used_mem=used / self.divisor,
+                avail_mem=memory_usage.available / self.divisor,
+                total_mem=memory_usage.total / self.divisor,
+                percent_used_mem=memory_usage.percent),
             "color":color
         }

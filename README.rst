@@ -542,7 +542,6 @@ Settings:
 :color: standard color (default: ``#00FF00``)
 :warn_color: defines the color used wann warn percentage ist exceeded (default: ``#FFFF00``)
 :alert_color: defines the color used when alert percentage is exceeded (default: ``#FF0000``)
-:round: round byte values to given length behind dot
 
 
 
