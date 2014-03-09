@@ -74,6 +74,7 @@ class Network(IntervalModule):
         "format_down", "color_down",
         ("detached_down", "If the interface doesn't exist, display it as if it were down"),
         "name",
+        ("mac", "Try and fetch the interface MAC address, default True")
     )
 
     name = interface = "eth0"
@@ -82,6 +83,8 @@ class Network(IntervalModule):
     color_up = "#00FF00"
     color_down = "#FF0000"
     detached_down = False
+    mac = True
+
 
     def init(self):
         if self.interface not in netifaces.interfaces() and not self.detached_down:
@@ -101,8 +104,11 @@ class Network(IntervalModule):
         fdict.update({
             "interface": self.interface,
             "name": self.name,
-            "mac": info[netifaces.AF_PACKET][0]["addr"],
         })
+        if self.mac:
+            fdict["mac"] = info[netifaces.AF_PACKET][0]["addr"]
+        else:
+            fdict["mac"] = "NONE"
 
         if up:
             format = self.format_up
