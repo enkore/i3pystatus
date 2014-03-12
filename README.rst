@@ -285,6 +285,7 @@ Settings:
 :color_muted:  (default: ``#AAAAAA``)
 :color:  (default: ``#FFFFFF``)
 :channel:  (default: ``0``)
+:interval:  (default: ``1``)
 
 
 
@@ -305,6 +306,7 @@ Settings:
 :format: format string, formatters: brightness, max_brightness, percentage (default: ``{brightness}/{max_brightness}``)
 :backlight: backlight, see `/sys/class/backlight/` (default: ``acpi_video0``)
 :color:  (default: ``#FFFFFF``)
+:interval:  (default: ``5``)
 
 
 
@@ -335,6 +337,7 @@ Settings:
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
 :status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}``)
+:interval:  (default: ``5``)
 
 
 
@@ -348,6 +351,7 @@ This class shows a clock
 Settings:
 
 :format: stftime format string, `None` means to use the default, locale-dependent format (default: ``None``)
+:interval:  (default: ``1``)
 
 
 
@@ -368,6 +372,7 @@ Available formatters:
 Settings:
 
 :format: format string (default: ``{usage:02}%``)
+:interval:  (default: ``5``)
 
 
 
@@ -386,6 +391,7 @@ Settings:
 :format:  (default: ``{free}/{avail}``)
 :path:  (required)
 :divisor: divide all byte values by this value, commonly 1024**3 (gigabyte) (default: ``1073741824``)
+:interval:  (default: ``5``)
 
 
 
@@ -432,6 +438,7 @@ Shows system load
 Settings:
 
 :format: format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: ``{avg1} {avg5}``)
+:interval:  (default: ``5``)
 
 
 
@@ -452,6 +459,7 @@ Settings:
 :format:  (default: ``{unread} new email``)
 :format_plural:  (default: ``{unread} new emails``)
 :hide_if_null: Don't output anything if there are no new mails (default: ``True``)
+:interval:  (default: ``5``)
 
 
 imap.IMAP
@@ -542,6 +550,7 @@ Settings:
 :color: standard color (default: ``#00FF00``)
 :warn_color: defines the color used wann warn percentage ist exceeded (default: ``#FFFF00``)
 :alert_color: defines the color used when alert percentage is exceeded (default: ``#FF0000``)
+:interval:  (default: ``5``)
 
 
 
@@ -560,6 +569,7 @@ Settings:
 :color:  (default: ``#7181fe``)
 :username:  (required)
 :password:  (required)
+:interval:  (default: ``5``)
 
 
 
@@ -591,6 +601,7 @@ Settings:
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
 :status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:interval:  (default: ``1``)
 
 
 
@@ -626,6 +637,7 @@ Settings:
 :color_down:  (default: ``#FF0000``)
 :detached_down: If the interface doesn't exist, display it as if it were down (default: ``False``)
 :name:  (default: ``eth0``)
+:interval:  (default: ``5``)
 
 
 
@@ -639,6 +651,7 @@ Settings:
 :instance: Tracker instance
 :format:  (default: ``{name}:{progress}``)
 :name: 
+:interval:  (default: ``20``)
 
 
 
@@ -691,6 +704,7 @@ Settings:
 :download_false:  (default: ``Downloads disabled``)
 :username:  (required)
 :password:  (required)
+:interval:  (default: ``5``)
 
 
 
@@ -709,6 +723,7 @@ Settings:
 :regex:  (required)
 :file: file to search for regex matches
 :flags: Python.re flags (default: ``0``)
+:interval:  (default: ``5``)
 
 
 
@@ -733,6 +748,7 @@ Settings:
 :color_down:  (default: ``#FF0000``)
 :path:  (required)
 :name:  (required)
+:interval:  (default: ``5``)
 
 
 
@@ -751,6 +767,7 @@ Settings:
 :color:  (default: ``#FFFFFF``)
 :color_critical:  (default: ``#FF0000``)
 :high_factor:  (default: ``0.7``)
+:interval:  (default: ``5``)
 
 
 
@@ -787,6 +804,7 @@ Settings:
 :location_code:  (required)
 :units: Celsius (C) or Fahrenheit (F) (default: ``C``)
 :format:  (default: ``{current_temp}``)
+:interval:  (default: ``20``)
 
 
 
@@ -815,6 +833,7 @@ Settings:
 :color_down:  (default: ``#FF0000``)
 :detached_down: If the interface doesn't exist, display it as if it were down (default: ``False``)
 :name:  (default: ``eth0``)
+:interval:  (default: ``5``)
 
 
 

@@ -26,12 +26,6 @@ class SettingsBase:
     """required can list settings which are required"""
 
     def __init__(self, *args, **kwargs):
-        def flatten_setting(setting):
-            return setting[0] if isinstance(setting, tuple) else setting
-
-        def flatten_settings(settings):
-            return tuple(flatten_setting(setting) for setting in settings)
-
         def get_argument_dict(args, kwargs):
             if len(args) == 1 and not kwargs:
                 # User can also pass in a dict for their settings
@@ -39,7 +33,7 @@ class SettingsBase:
                 return args[0]
             return kwargs
 
-        self.settings = flatten_settings(self.settings)
+        self.settings = self.flatten_settings(self.settings)
 
         sm = KeyConstraintDict(self.settings, self.required)
         settings_source = get_argument_dict(args, kwargs)
@@ -64,3 +58,9 @@ class SettingsBase:
         """Convenience method which is called after all settings are set
 
         In case you don't want to type that super()…blabla :-)"""
+
+    @staticmethod
+    def flatten_settings(settings):
+        def flatten_setting(setting):
+            return setting[0] if isinstance(setting, tuple) else setting
+        return tuple(flatten_setting(setting) for setting in settings)

@@ -38,7 +38,18 @@ class Module(SettingsBase):
         pass
 
 
-class IntervalModule(Module):
+class IntervalModuleMeta(type):
+    """Add interval setting to `settings` attribute if it does not exist."""
+
+    def __init__(cls, name, bases, namespace):
+        super(IntervalModuleMeta, cls).__init__(name, bases, namespace)
+        if not hasattr(cls, 'settings'):
+            cls.settings = tuple()
+        if not 'interval' in SettingsBase.flatten_settings(cls.settings):
+            cls.settings += ('interval', )
+
+
+class IntervalModule(Module, metaclass=IntervalModuleMeta):
     interval = 5  # seconds
     managers = {}
 
