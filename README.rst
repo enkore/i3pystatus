@@ -351,6 +351,7 @@ This class shows a clock
 Settings:
 
 :format: stftime format string, `None` means to use the default, locale-dependent format (default: ``None``)
+:color: RGB hexadecimal code color specifier, set to `i3Bar` to use i3 bar default (default: ``#ffffff``)
 :interval:  (default: ``1``)
 
 
