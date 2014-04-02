@@ -98,10 +98,15 @@ class Network(IntervalModule):
         up = netifaces.AF_INET in info or netifaces.AF_INET6 in info
         fdict = dict(
             zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
+
+        try:
+            mac = info[netifaces.AF_PACKET][0]["addr"]
+        except KeyError:
+            mac = "NONE"
         fdict.update({
             "interface": self.interface,
             "name": self.name,
-            "mac": info[netifaces.AF_PACKET][0]["addr"],
+            "mac": mac,
         })
 
         if up:
