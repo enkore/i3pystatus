@@ -803,7 +803,7 @@ Requires pywapi from PyPI.
 Settings:
 
 :location_code:  (required)
-:units: Celsius (C) or Fahrenheit (F) (default: ``C``)
+:units: Celsius (``metric``) or Fahrenheit (``imperial``) (default: ``metric``)
 :format:  (default: ``{current_temp}``)
 :interval:  (default: ``20``)
 
