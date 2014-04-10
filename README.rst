@@ -26,6 +26,8 @@ Packages for your OS
 
 * `Arch Linux <https://aur.archlinux.org/packages/i3pystatus-git/>`_
 
+Do not name your script i3pystatus.py or it will break imports.
+
 Release Notes
 -------------
 
