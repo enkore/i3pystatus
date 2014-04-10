@@ -33,13 +33,14 @@ Release Notes
 +++++++++++++++++++++++
 
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
-    Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/i3pystatus.py``
+    Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/config.py``
 * New options for `mem`_ (thanks Arvedui)
 * Added `cpu\_usage`_
 * Improved error handling
 * Removed ``i3pystatus`` binary
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
 * Code changes
+* Do not name your script i3pystatus.py or it will break imports.
 
 3.27
 ++++

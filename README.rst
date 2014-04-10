@@ -33,13 +33,14 @@ Release Notes
 +++++++++++++++++++++++
 
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
-    Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/i3pystatus.py``
+    Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/config.py``
 * New options for `mem`_ (thanks Arvedui)
 * Added `cpu\_usage`_
 * Improved error handling
 * Removed ``i3pystatus`` binary
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
 * Code changes
+* Do not name your script i3pystatus.py or it will break imports.
 
 3.27
 ++++
@@ -336,7 +337,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 :interval:  (default: ``5``)
 
 
@@ -351,7 +352,7 @@ This class shows a clock
 Settings:
 
 :format: stftime format string, `None` means to use the default, locale-dependent format (default: ``None``)
-:color: RGB hexadecimal code color specifier, set to `i3Bar` to use i3 bar default (default: ``#ffffff``)
+:color: RGB hexadecimal code color specifier, default to #ffffff, set to `i3Bar` to use i3 bar default (default: ``#ffffff``)
 :interval:  (default: ``1``)
 
 
@@ -601,7 +602,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
 :interval:  (default: ``1``)
 
 
@@ -803,7 +804,7 @@ Requires pywapi from PyPI.
 Settings:
 
 :location_code:  (required)
-:units: Celsius (C) or Fahrenheit (F) (default: ``C``)
+:units: Celsius (metric) or Fahrenheit (imperial) (default: ``metric``)
 :format:  (default: ``{current_temp}``)
 :interval:  (default: ``20``)
 
