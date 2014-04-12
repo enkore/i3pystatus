@@ -194,7 +194,7 @@ Formatting
 ++++++++++
 
 All modules let you specifiy the exact output formatting using a
-`format string <http://docs.python.org/3/library/string.html#formatstrings`_, which
+`format string <http://docs.python.org/3/library/string.html#formatstrings>`_, which
 gives you a great deal of flexibility.
 
 If a module gives you a float, it probably has a ton of
@@ -268,5 +268,8 @@ use IntervalModule, which just calls a function repeatedly in a specified interv
 
 The output attribute should be set to a dictionary which represents your modules output,
 the protocol is documented `here <http://i3wm.org/docs/i3bar-protocol.html>`_.
+
+To update this readme run ``python -m i3pystatus.mkdocs`` in the
+repository root and you're done :)
 
 **Patches and pull requests are very welcome :-)**

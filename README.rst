@@ -194,7 +194,7 @@ Formatting
 ++++++++++
 
 All modules let you specifiy the exact output formatting using a
-`format string <http://docs.python.org/3/library/string.html#formatstrings`_, which
+`format string <http://docs.python.org/3/library/string.html#formatstrings>`_, which
 gives you a great deal of flexibility.
 
 If a module gives you a float, it probably has a ton of
@@ -337,7 +337,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}``)
 :interval:  (default: ``5``)
 
 
@@ -615,7 +615,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'stop': '◾', 'play': '▶'}``)
 :interval:  (default: ``1``)
 
 
@@ -861,6 +861,9 @@ use IntervalModule, which just calls a function repeatedly in a specified interv
 
 The output attribute should be set to a dictionary which represents your modules output,
 the protocol is documented `here <http://i3wm.org/docs/i3bar-protocol.html>`_.
+
+To update this readme run ``python -m i3pystatus.mkdocs`` in the
+repository root and you're done :)
 
 **Patches and pull requests are very welcome :-)**
 
