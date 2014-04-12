@@ -492,7 +492,16 @@ Checks for local mail in mbox
 Settings:
 
 
+maildir.MaildirMail
+~~~~~~~~~~~~~
 
+
+Checks for new mail in a Maildir folder
+
+
+Settings:
+
+:directory:  (required, e.g. '/home/foo/mail/INBOX')
 
 
 notmuchmail.Notmuch
