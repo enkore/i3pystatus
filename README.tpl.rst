@@ -29,8 +29,8 @@ Packages for your OS
 Release Notes
 -------------
 
-3.28 (not released yet)
-+++++++++++++++++++++++
+3.28
+++++
 
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/config.py``
@@ -41,6 +41,7 @@ Release Notes
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
 * Code changes
 * Do not name your script i3pystatus.py or it will break imports.
+* Removed DHL tracker of parcel module, because it doesn't work anymore.
 
 3.27
 ++++

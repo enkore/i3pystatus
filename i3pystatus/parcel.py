@@ -18,7 +18,7 @@ class TrackerAPI:
         return {}
 
 
-class DHL(TrackerAPI):
+"""class DHL(TrackerAPI):
     URL = "http://nolp.dhl.de/nextt-online-public/set_identcodes.do?lang=en&idc={idcode}"
 
     def __init__(self, idcode):
@@ -47,7 +47,7 @@ class DHL(TrackerAPI):
 
     def get_url(self):
         return self.url
-
+"""
 
 class UPS(TrackerAPI):
     URL = "http://wwwapps.ups.com/WebTracking/processRequest?HTMLVersion=5.0&Requester=NES&AgreeToTermsAndConditions=yes&loc=en_US&tracknum={idcode}"
@@ -79,10 +79,13 @@ class UPS(TrackerAPI):
 
 
 class ParcelTracker(IntervalModule):
+    """
+    Used to track parcel/shipments.
+    """
     interval = 20
 
     settings = (
-        ("instance", "Tracker instance"),
+        ("instance", "Tracker instance, for example ``parcel.UPS('your_id_code')``"),
         "format",
         "name",
     )

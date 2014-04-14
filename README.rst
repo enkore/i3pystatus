@@ -29,8 +29,8 @@ Packages for your OS
 Release Notes
 -------------
 
-3.28 (not released yet)
-+++++++++++++++++++++++
+3.28
+++++
 
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/config.py``
@@ -41,6 +41,7 @@ Release Notes
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
 * Code changes
 * Do not name your script i3pystatus.py or it will break imports.
+* Removed DHL tracker of parcel module, because it doesn't work anymore.
 
 3.27
 ++++
@@ -337,7 +338,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
 :interval:  (default: ``5``)
 
 
@@ -615,7 +616,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'stop': '◾', 'play': '▶'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
 :interval:  (default: ``1``)
 
 
@@ -660,10 +661,12 @@ parcel
 ++++++
 
 
+Used to track parcel/shipments.
+
 
 Settings:
 
-:instance: Tracker instance
+:instance: Tracker instance, for example ``parcel.UPS('your_id_code')``
 :format:  (default: ``{name}:{progress}``)
 :name: 
 :interval:  (default: ``20``)
