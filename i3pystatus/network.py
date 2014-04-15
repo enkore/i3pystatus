@@ -118,10 +118,12 @@ class Network(IntervalModule):
                 fdict["v4mask"] = v4["netmask"]
                 fdict["v4cidr"] = cidr4(v4["addr"], v4["netmask"])
             if netifaces.AF_INET6 in info:
-                v6 = info[netifaces.AF_INET6][0]
-                fdict["v6"] = v6["addr"]
-                fdict["v6mask"] = v6["netmask"]
-                fdict["v6cidr"] = cidr6(v6["addr"], v6["netmask"])
+                for v6 in info[netifaces.AF_INET6]:
+                    fdict["v6"] = v6["addr"]
+                    fdict["v6mask"] = v6["netmask"]
+                    fdict["v6cidr"] = cidr6(v6["addr"], v6["netmask"])
+                    if not v6["addr"].startswith("fe80::"): # prefer non link-local addresses
+                        break
         else:
             format = self.format_down
             color = self.color_down
