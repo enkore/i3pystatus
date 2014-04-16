@@ -29,18 +29,49 @@ Packages for your OS
 Release Notes
 -------------
 
+Contributors:
+
+* aaron-lebo
+* afics
+* Arvedui
+* enkore (current maintainer)
+* gwarf
+* janoliver (started the project)
+* jasonmhite
+* jedrz
+* jorio
+* micha-a-schmidt
+* philipdexter
+* sbrunner
+* siikamiika
+* talwrii
+* tony
+* yemu
+* zzatkin
+
+3.29
+++++
+
+* `network`_: prefer non link-local v6 addresses
+* `mail`_: Open email client and refresh email with mouse click
+* `disk`_: Add display and critical limit
+* `battery`_: fix errors if CURRENT_NOW is not present
+* `battery`_: add configurable colors
+* `load`_: add configurable colors and limit
+
 3.28
 ++++
 
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/config.py``
-* New options for `mem`_ (thanks Arvedui)
+* Do not name your script i3pystatus.py or it will break imports.
+* New options for `mem`_
 * Added `cpu\_usage`_
 * Improved error handling
 * Removed ``i3pystatus`` binary
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
+* Add maildir backend for mails
 * Code changes
-* Do not name your script i3pystatus.py or it will break imports.
 * Removed DHL tracker of parcel module, because it doesn't work anymore.
 
 3.27

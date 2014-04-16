@@ -29,18 +29,49 @@ Packages for your OS
 Release Notes
 -------------
 
+Contributors:
+
+* aaron-lebo
+* afics
+* Arvedui
+* enkore (current maintainer)
+* gwarf
+* janoliver (started the project)
+* jasonmhite
+* jedrz
+* jorio
+* micha-a-schmidt
+* philipdexter
+* sbrunner
+* siikamiika
+* talwrii
+* tony
+* yemu
+* zzatkin
+
+3.29
+++++
+
+* `network`_: prefer non link-local v6 addresses
+* `mail`_: Open email client and refresh email with mouse click
+* `disk`_: Add display and critical limit
+* `battery`_: fix errors if CURRENT_NOW is not present
+* `battery`_: add configurable colors
+* `load`_: add configurable colors and limit
+
 3.28
 ++++
 
 * **If you're currently using the ``i3pystatus`` command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/config.py``
-* New options for `mem`_ (thanks Arvedui)
+* Do not name your script i3pystatus.py or it will break imports.
+* New options for `mem`_
 * Added `cpu\_usage`_
 * Improved error handling
 * Removed ``i3pystatus`` binary
 * pulseaudio: changed context name to "i3pystatus_pulseaudio"
+* Add maildir backend for mails
 * Code changes
-* Do not name your script i3pystatus.py or it will break imports.
 * Removed DHL tracker of parcel module, because it doesn't work anymore.
 
 3.27
@@ -338,7 +369,9 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
+:color: The text color (default: ``#ffffff``)
+:critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
 
 
@@ -394,6 +427,9 @@ Settings:
 :format:  (default: ``{free}/{avail}``)
 :path:  (required)
 :divisor: divide all byte values by this value, commonly 1024**3 (gigabyte) (default: ``1073741824``)
+:display_limit: limit upper witch one the module isn't display (default: ``inf``)
+:critical_limit: limit under witch one the disk space is critical (default: ``0``)
+:critical_color: the critical color (default: ``#FF0000``)
 :interval:  (default: ``5``)
 
 
@@ -441,6 +477,9 @@ Shows system load
 Settings:
 
 :format: format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: ``{avg1} {avg5}``)
+:color: The text color (default: ``#ffffff``)
+:critical_limit: Limit under witch one the battery is critical (default: ``1``)
+:critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
 
 
@@ -462,6 +501,7 @@ Settings:
 :format:  (default: ``{unread} new email``)
 :format_plural:  (default: ``{unread} new emails``)
 :hide_if_null: Don't output anything if there are no new mails (default: ``True``)
+:email_client: The email client to open on left click (default: ``None``)
 :interval:  (default: ``5``)
 
 
@@ -616,7 +656,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
 :interval:  (default: ``1``)
 
 
