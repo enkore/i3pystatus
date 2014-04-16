@@ -11,6 +11,8 @@ class Load(IntervalModule):
     settings = (
         ("format",
          "format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable)."),
+        ("critical_limit", "Limit under witch one the battery is critical"),
+        ("critical_color", "The critical color"),
     )
 
     file = "/proc/loadavg"
