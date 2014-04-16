@@ -57,15 +57,21 @@ class Battery:
 
 class BatteryCharge(Battery):
     def consumption(self):
-        return self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"]  # V  * A = W
+        if "VOLTAGE_NOW" in self.battery_info and "CURRENT_NOW" in self.battery_info:
+            return self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"]  # V * A = W
+        else:
+            return -1
 
     def _percentage(self, design):
         return self.battery_info["CHARGE_NOW"] / self.battery_info["CHARGE_FULL" + design]
 
     def remaining(self):
         if self.status() == "Discharging":
-            # Ah / A = h * 60 min = min
-            return self.battery_info["CHARGE_NOW"] / self.battery_info["CURRENT_NOW"] * 60
+            if "CHARGE_NOW" in self.battery_info and "CURRENT_NOW" in self.battery_info:
+                # Ah / A = h * 60 min = min
+                return self.battery_info["CHARGE_NOW"] / self.battery_info["CURRENT_NOW"] * 60
+            else:
+                return -1
         else:
             return (self.battery_info["CHARGE_FULL"] - self.battery_info["CHARGE_NOW"]) / self.battery_info["CURRENT_NOW"] * 60
 
