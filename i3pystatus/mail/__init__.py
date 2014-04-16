@@ -1,4 +1,6 @@
 
+import subprocess
+
 from i3pystatus import SettingsBase, IntervalModule
 
 
@@ -26,6 +28,7 @@ class Mail(IntervalModule):
         ("backends", "List of backends (instances of `i3pystatus.mail.xxx.zzz`)"),
         "color", "color_unread", "format", "format_plural",
         ("hide_if_null", "Don't output anything if there are no new mails"),
+        ("email_client", "The email client to open on left click"),
     )
     required = ("backends",)
 
@@ -34,6 +37,7 @@ class Mail(IntervalModule):
     format = "{unread} new email"
     format_plural = "{unread} new emails"
     hide_if_null = True
+    email_client = None
 
     def init(self):
         for backend in self.backends:
@@ -61,3 +65,10 @@ class Mail(IntervalModule):
             "urgent": urgent,
             "color": color,
         }
+
+    def on_leftclick(self):
+        if self.email_client:
+            subprocess.Popen(self.email_client.split())
+
+    def on_rightclick(self):
+        self.run()
