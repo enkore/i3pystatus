@@ -62,7 +62,7 @@ Contributors:
 3.28
 ++++
 
-* **If you're currently using the ``i3pystatus`` command to run your i3bar**:
+* **If you're currently using the i3pystatus command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/config.py``
 * Do not name your script i3pystatus.py or it will break imports.
 * New options for `mem`_
@@ -329,6 +329,7 @@ backlight
 Screen backlight info
 
 Available formatters:
+
 * `{brightness}` — current brightness relative to max_brightness
 * `{max_brightness}` — maximum brightness value
 * `{percentage}` — current brightness in percent
@@ -369,7 +370,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}``)
 :color: The text color (default: ``#ffffff``)
 :critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
@@ -416,19 +417,19 @@ disk
 ++++
 
 
-Gets `{used}`, `{free}`, `{available}` and `{total}` amount of bytes on the given mounted filesystem.
+Gets ``{used}``, ``{free}``, ``{available}`` and ``{total}`` amount of bytes on the given mounted filesystem.
 
-These values can also be expressed in percentages with the `{percentage_used}`, `{percentage_free}`
-and `{percentage_avail}` formats.
+These values can also be expressed as percentages with the ``{percentage_used}``, ``{percentage_free}``
+and ``{percentage_avail}`` formats.
 
 
 Settings:
 
 :format:  (default: ``{free}/{avail}``)
 :path:  (required)
-:divisor: divide all byte values by this value, commonly 1024**3 (gigabyte) (default: ``1073741824``)
-:display_limit: limit upper witch one the module isn't display (default: ``inf``)
-:critical_limit: limit under witch one the disk space is critical (default: ``0``)
+:divisor: divide all byte values by this value, default is 1024**3 (gigabyte) (default: ``1073741824``)
+:display_limit: if more space is available than this limit the module is hidden (default: ``inf``)
+:critical_limit: critical space limit (see critical_color) (default: ``0``)
 :critical_color: the critical color (default: ``#FF0000``)
 :interval:  (default: ``5``)
 
@@ -495,7 +496,7 @@ The `backends` setting determines the backends to use.
 
 Settings:
 
-:backends: List of backends (instances of `i3pystatus.mail.xxx.zzz`)
+:backends: List of backends (instances of ``i3pystatus.mail.xxx.zzz``, i.e. ``i3pystatus.mail.imap.IMAP``)
 :color:  (default: ``#ffffff``)
 :color_unread:  (default: ``#ff0000``)
 :format:  (default: ``{unread} new email``)
@@ -656,7 +657,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'play': '▶', 'pause': '▷'}``)
 :interval:  (default: ``1``)
 
 

@@ -25,7 +25,7 @@ class Mail(IntervalModule):
     _endstring = """!!i3pystatus.mail!!"""
 
     settings = (
-        ("backends", "List of backends (instances of `i3pystatus.mail.xxx.zzz`)"),
+        ("backends", "List of backends (instances of ``i3pystatus.mail.xxx.zzz``, i.e. ``i3pystatus.mail.imap.IMAP``)"),
         "color", "color_unread", "format", "format_plural",
         ("hide_if_null", "Don't output anything if there are no new mails"),
         ("email_client", "The email client to open on left click"),

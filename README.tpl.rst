@@ -62,7 +62,7 @@ Contributors:
 3.28
 ++++
 
-* **If you're currently using the ``i3pystatus`` command to run your i3bar**:
+* **If you're currently using the i3pystatus command to run your i3bar**:
     Replace ``i3pystatus`` command in your i3 configuration with ``python ~/path/to/your/config.py``
 * Do not name your script i3pystatus.py or it will break imports.
 * New options for `mem`_

@@ -7,17 +7,17 @@ from .core.util import round_dict
 class Disk(IntervalModule):
 
     """
-    Gets `{used}`, `{free}`, `{available}` and `{total}` amount of bytes on the given mounted filesystem.
+    Gets ``{used}``, ``{free}``, ``{available}`` and ``{total}`` amount of bytes on the given mounted filesystem.
 
-    These values can also be expressed in percentages with the `{percentage_used}`, `{percentage_free}`
-    and `{percentage_avail}` formats.
+    These values can also be expressed as percentages with the ``{percentage_used}``, ``{percentage_free}``
+    and ``{percentage_avail}`` formats.
     """
 
     settings = (
         "format", "path",
-        ("divisor", "divide all byte values by this value, commonly 1024**3 (gigabyte)"),
-        ("display_limit", "limit upper witch one the module isn't display"),
-        ("critical_limit", "limit under witch one the disk space is critical"),
+        ("divisor", "divide all byte values by this value, default is 1024**3 (gigabyte)"),
+        ("display_limit", "if more space is available than this limit the module is hidden"),
+        ("critical_limit", "critical space limit (see critical_color)"),
         ("critical_color", "the critical color"),
     )
     required = ("path",)

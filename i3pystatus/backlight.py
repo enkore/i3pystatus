@@ -7,6 +7,7 @@ class Backlight(File):
     Screen backlight info
 
     Available formatters:
+
     * `{brightness}` — current brightness relative to max_brightness
     * `{max_brightness}` — maximum brightness value
     * `{percentage}` — current brightness in percent
