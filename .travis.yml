@@ -1,0 +1,5 @@
+language: python
+python:
+  - "3.2"
+install: "pip install py.test"
+script: py.test
