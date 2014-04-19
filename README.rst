@@ -5,6 +5,8 @@
 i3pystatus
 ==========
 
+.. image:: https://travis-ci.org/enkore/i3pystatus.svg?branch=master   :target: https://travis-ci.org/enkore/i3pystatus
+
 i3pystatus is a (hopefully growing) collection of python scripts for 
 status output compatible to i3status / i3bar of the i3 window manager.
 
@@ -657,7 +659,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'play': '▶', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
 :interval:  (default: ``1``)
 
 
