@@ -60,6 +60,7 @@ Contributors:
 * `battery`_: fix errors if CURRENT_NOW is not present
 * `battery`_: add configurable colors
 * `load`_: add configurable colors and limit
+* `parcel`_: rewrote DHL tracker
 
 3.28
 ++++
