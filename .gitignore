@@ -4,3 +4,4 @@ i3pystatus/__main__.py
 build/*
 dist/*
 *.egg-info/*
+*~
