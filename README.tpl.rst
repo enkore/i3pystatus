@@ -1,11 +1,10 @@
-..  Always edit README.tpl.md and create README.md by running
-    python -m i3pystatus.mkdocs You can also let the maintainer do the
-    latter :)
+..  Always edit README.tpl.rst
 
 i3pystatus
 ==========
 
-.. image:: https://travis-ci.org/enkore/i3pystatus.svg?branch=master   :target: https://travis-ci.org/enkore/i3pystatus
+.. image:: https://travis-ci.org/enkore/i3pystatus.svg?branch=master
+    :target: https://travis-ci.org/enkore/i3pystatus
 
 i3pystatus is a (hopefully growing) collection of python scripts for 
 status output compatible to i3status / i3bar of the i3 window manager.
@@ -13,8 +12,11 @@ status output compatible to i3status / i3bar of the i3 window manager.
 Installation
 ------------
 
-Note: i3pystatus requires Python 3.2 or newer and is not compatible with
-Python 2.x.
+.. admonition:: Note
+
+    i3pystatus requires Python 3.2 or newer and is not compatible with
+    Python 2.x. Some modules require additional dependencies
+    documented below (see `Modules`_).
 
 From PyPI package `i3pystatus <https://pypi.python.org/pypi/i3pystatus>`_
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -31,7 +33,8 @@ Packages for your OS
 Release Notes
 -------------
 
-Contributors:
+Contributors
+++++++++++++
 
 * aaron-lebo
 * afics
@@ -106,8 +109,9 @@ Configuration
 
 The config file is just a normal Python script.
 
-A simple configuration file could look like this (note the additional dependencies
-from network, wireless and pulseaudio in this example):
+A simple configuration file could look like this (note the additional
+dependencies from `network`_, `wireless`_ and `pulseaudio`_ in this
+example):
 
 ::
 
@@ -266,7 +270,7 @@ a mere extension of the standard formatting method.
 
 The time format that should be used is specified using the format specifier, i.e.
 with some_time being 3951 seconds a format string like ``{some_time:%h:%m:%s}``
-would produce ``1:5:51``
+would produce ``1:5:51``.
 
 * ``%h``, ``%m`` and ``%s`` are the hours, minutes and seconds without
   leading zeros (i.e. 0 to 59 for minutes and seconds)
@@ -281,7 +285,7 @@ would produce ``1:5:51``
 * When the module in question also uses formatp, 0 seconds counts as
   "not known".
 * The formatted time is stripped, i.e. spaces on both ends of the
-  result are removed
+  result are removed.
 
 Modules
 -------
