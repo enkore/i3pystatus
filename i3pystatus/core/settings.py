@@ -13,14 +13,15 @@ class SettingsBase:
     The constructor is either passed a dictionary containing these settings, or
     keyword arguments specifying the same.
 
-    Settings are stored as attributes of self
+    Settings are stored as attributes of self.
     """
 
     settings = tuple()
     """settings should be tuple containing two types of elements:
-    * bare strings, which must be valid identifiers.
+
+    * bare strings, which must be valid Python identifiers.
     * two-tuples, the first element being a identifier (as above) and the second
-    a docstring for the particular setting"""
+      a docstring for the particular setting"""
 
     required = tuple()
     """required can list settings which are required"""

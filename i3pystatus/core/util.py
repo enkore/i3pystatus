@@ -163,7 +163,7 @@ def formatp(string, **kwargs):
     thus equivalent to a logical or of all enclosing groups with the enclosed
     group.
 
-    Escaped brackets, i.e. \\[ and \\] are copied verbatim to output.
+    Escaped brackets, i.e. \\\\[ and \\\\] are copied verbatim to output.
 
     :param string: Format string
     :param **kwargs: keyword arguments providing data for the format string
@@ -321,9 +321,9 @@ class TimeWrapper:
 
 
 def require(predicate):
-    """
-    Decorator factory for methods requiring a predicate. If the predicate is not fulfilled during a method call, the
-    method call is skipped and None is returned.
+    """Decorator factory for methods requiring a predicate. If the
+    predicate is not fulfilled during a method call, the method call
+    is skipped and None is returned.
 
     :param predicate: A callable returning a truth value
     :returns: Method decorator
@@ -331,6 +331,7 @@ def require(predicate):
     .. seealso::
 
         :py:func:`internet`
+
     """
     def decorator(method):
         @functools.wraps(method)
