@@ -377,7 +377,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}``)
 :color: The text color (default: ``#ffffff``)
 :critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
@@ -664,7 +664,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
 :interval:  (default: ``1``)
 
 
@@ -815,6 +815,25 @@ Settings:
 :path:  (required)
 :name:  (required)
 :interval:  (default: ``5``)
+
+
+
+spotify
++++++++
+
+
+This class shows information from Spotify.
+
+Left click will toggle pause/play of the current song.
+Right click will skip the song.
+
+Dependent on Playerctl ( https://github.com/acrisci/playerctl ) and GLib
+
+
+Settings:
+
+:format: Format string. {artist}, {title}, {album}, {volume}, and {length} are available for output. (default: ``{artist} - {title}``)
+:color: color of the output (default: ``#ffffff``)
 
 
 

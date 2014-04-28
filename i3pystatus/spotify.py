@@ -1,9 +1,11 @@
-from i3pystatus import IntervalModule
+import threading
+import math
 
-import threading, math
+from i3pystatus import Module
 from gi.repository import Playerctl, GLib
 
-class Spotify(IntervalModule):
+
+class Spotify(Module):
 
     """
     This class shows information from Spotify.
@@ -11,7 +13,7 @@ class Spotify(IntervalModule):
     Left click will toggle pause/play of the current song.
     Right click will skip the song.
 
-    Dependent on Playerctl and GLib
+    Dependent on Playerctl ( https://github.com/acrisci/playerctl ) and GLib
     """
 
     format = "{artist} - {title}"
@@ -49,7 +51,8 @@ class Spotify(IntervalModule):
         time = e["mpris:length"] / 60.0e6
         minutes = math.floor(time)
         seconds = round(time % 1 * 60)
-        if seconds < 10:  seconds = "0" + str(seconds)
+        if seconds < 10:
+            seconds = "0" + str(seconds)
         length = "{}:{}".format(minutes, seconds)
 
         self.output = {
@@ -65,7 +68,3 @@ class Spotify(IntervalModule):
 
     def on_rightclick(self):
         self.player.next()
-
-    def run(self):
-        pass
-
