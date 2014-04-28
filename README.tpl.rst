@@ -39,6 +39,7 @@ Contributors
 * aaron-lebo
 * afics
 * Arvedui
+* cganas
 * enkore (current maintainer)
 * gwarf
 * janoliver (started the project)

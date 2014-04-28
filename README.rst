@@ -39,6 +39,7 @@ Contributors
 * aaron-lebo
 * afics
 * Arvedui
+* cganas
 * enkore (current maintainer)
 * gwarf
 * janoliver (started the project)
@@ -664,7 +665,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
 :interval:  (default: ``1``)
 
 
