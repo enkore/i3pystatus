@@ -65,6 +65,7 @@ Contributors
 * `battery`_: add configurable colors
 * `load`_: add configurable colors and limit
 * `parcel`_: rewrote DHL tracker
+* Add `spotify`_ module
 
 3.28
 ++++
