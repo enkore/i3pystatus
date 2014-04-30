@@ -9,7 +9,6 @@ from i3pystatus import IntervalModule
 
 
 class Clock(IntervalModule):
-
     """
     This class shows a clock
     """

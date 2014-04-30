@@ -11,7 +11,7 @@ from i3pystatus import IntervalModule
 
 def count_bits(integer):
     bits = 0
-    while(integer):
+    while (integer):
         integer &= integer - 1
         bits += 1
     return bits
@@ -47,7 +47,6 @@ def cidr4(addr, mask):
 
 
 class Network(IntervalModule):
-
     """
     Display network information about a interface.
 
@@ -122,7 +121,7 @@ class Network(IntervalModule):
                     fdict["v6"] = v6["addr"]
                     fdict["v6mask"] = v6["netmask"]
                     fdict["v6cidr"] = cidr6(v6["addr"], v6["netmask"])
-                    if not v6["addr"].startswith("fe80::"): # prefer non link-local addresses
+                    if not v6["addr"].startswith("fe80::"):  # prefer non link-local addresses
                         break
         else:
             format = self.format_down

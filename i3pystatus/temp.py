@@ -5,7 +5,6 @@ from i3pystatus import IntervalModule
 
 
 class Temperature(IntervalModule):
-
     """
     Shows CPU temperature of Intel processors
 

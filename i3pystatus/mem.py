@@ -27,14 +27,14 @@ class Mem(IntervalModule):
     settings = (
         ("format", "format string used for output."),
         ("divisor",
-            "divide all byte values by this value, default 1024**2(mebibytes"),
+         "divide all byte values by this value, default 1024**2(mebibytes"),
         ("warn_percentage", "minimal percentage for warn state"),
         ("alert_percentage", "minimal percentage for alert state"),
         ("color", "standard color"),
         ("warn_color",
-            "defines the color used wann warn percentage ist exceeded"),
+         "defines the color used wann warn percentage ist exceeded"),
         ("alert_color",
-            "defines the color used when alert percentage is exceeded"),
+         "defines the color used when alert percentage is exceeded"),
     )
 
     def run(self):
@@ -55,5 +55,5 @@ class Mem(IntervalModule):
                 avail_mem=memory_usage.available / self.divisor,
                 total_mem=memory_usage.total / self.divisor,
                 percent_used_mem=memory_usage.percent),
-            "color":color
+            "color": color
         }

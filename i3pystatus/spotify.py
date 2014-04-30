@@ -6,7 +6,6 @@ from gi.repository import Playerctl, GLib
 
 
 class Spotify(Module):
-
     """
     This class shows information from Spotify.
 
@@ -39,7 +38,7 @@ class Spotify(Module):
         except Exception as e:
             self.output = {
                 "full_text": "Error creating new thread!",
-                "color"    : "#FF0000"
+                "color": "#FF0000"
             }
 
     def on_track_change(self, player, e):

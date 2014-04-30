@@ -17,6 +17,7 @@ class ClassFinder:
                 issubclass(obj, self.baseclass) and
                 obj.__module__ == module.__name__
             )
+
         return predicate
 
     def get_matching_classes(self, module):

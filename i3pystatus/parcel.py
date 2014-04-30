@@ -1,4 +1,3 @@
-
 from urllib.request import urlopen
 import webbrowser
 
@@ -10,7 +9,6 @@ from i3pystatus.core.util import internet, require
 
 
 class TrackerAPI:
-
     def __init__(self, idcode):
         pass
 
@@ -41,7 +39,7 @@ class DHL(TrackerAPI):
             if 'active' in picture_link:
                 status = ''.join(element.xpath('./img/@alt'))
 
-                progress = '%i' % (i/len(elements)*100)
+                progress = '%i' % (i / len(elements) * 100)
 
             elif 'default' in picture_link:
                 break
@@ -51,7 +49,6 @@ class DHL(TrackerAPI):
     def status(self):
         ret = {}
         with urlopen(self.url) as page:
-        #with open('/home/marcel/ownCloud/dhl_site/paketzentrum/DHL Sendungsverfolgung.htm', 'r') as page:
             page = lxml.html.fromstring(page.read())
 
             if not self.error(page):

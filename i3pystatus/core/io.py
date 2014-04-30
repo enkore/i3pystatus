@@ -1,4 +1,3 @@
-
 import time
 import json
 import sys
@@ -6,7 +5,6 @@ from contextlib import contextmanager
 
 
 class IOHandler:
-
     def __init__(self, inp=sys.stdin, out=sys.stdout):
         self.inp = inp
         self.out = out
@@ -45,7 +43,6 @@ class IOHandler:
 
 
 class StandaloneIO(IOHandler):
-
     """
     I/O handler for standalone usage of i3pystatus (w/o i3status)
 
@@ -76,7 +73,6 @@ class StandaloneIO(IOHandler):
 
 
 class JSONIO:
-
     def __init__(self, io, skiplines=2):
         self.io = io
         for i in range(skiplines):

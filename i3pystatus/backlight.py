@@ -2,7 +2,6 @@ from i3pystatus.file import File
 
 
 class Backlight(File):
-
     """
     Screen backlight info
 

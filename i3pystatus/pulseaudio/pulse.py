@@ -31,6 +31,8 @@ class pa_format_info(Structure):
 
 class pa_context(Structure):
     pass
+
+
 pa_context._fields_ = [
 ]
 pa_context_notify_cb_t = CFUNCTYPE(None, POINTER(pa_context), c_void_p)
@@ -39,12 +41,16 @@ pa_context_success_cb_t = CFUNCTYPE(None, POINTER(pa_context), c_int, c_void_p)
 
 class pa_proplist(Structure):
     pass
+
+
 pa_context_event_cb_t = CFUNCTYPE(
     None, POINTER(pa_context), STRING, POINTER(pa_proplist), c_void_p)
 
 
 class pa_mainloop_api(Structure):
     pass
+
+
 pa_context_new = _libraries['libpulse.so.0'].pa_context_new
 pa_context_new.restype = POINTER(pa_context)
 pa_context_new.argtypes = [POINTER(pa_mainloop_api), STRING]
@@ -84,6 +90,7 @@ class pa_spawn_api(Structure):
         ('postfork', CFUNCTYPE(None)),
         ('atfork', CFUNCTYPE(None)),
     ]
+
 
 pa_context_connect = _libraries['libpulse.so.0'].pa_context_connect
 pa_context_connect.restype = c_int
@@ -155,6 +162,8 @@ class pa_channel_map(Structure):
         ('channels', c_uint8),
         ('map', pa_channel_position_t * 32),
     ]
+
+
 pa_sink_info._fields_ = [
     ('name', STRING),
     ('index', c_uint32),
@@ -202,6 +211,8 @@ pa_context_get_sink_info_list.argtypes = [
 
 class pa_server_info(Structure):
     pass
+
+
 pa_server_info._fields_ = [
     ('user_name', STRING),
     ('host_name', STRING),
@@ -224,6 +235,8 @@ pa_context_get_server_info.argtypes = [
 
 class pa_threaded_mainloop(Structure):
     pass
+
+
 pa_threaded_mainloop._fields_ = [
 ]
 pa_threaded_mainloop_new = _libraries['libpulse.so.0'].pa_threaded_mainloop_new
@@ -277,7 +290,6 @@ pa_threaded_mainloop_in_thread.argtypes = [POINTER(pa_threaded_mainloop)]
 pa_sw_volume_to_dB = _libraries['libpulse.so.0'].pa_sw_volume_to_dB
 pa_sw_volume_to_dB.restype = c_double
 pa_sw_volume_to_dB.argtypes = [pa_volume_t]
-
 
 pa_operation_unref = _libraries['libpulse.so.0'].pa_operation_unref
 pa_operation_unref.restype = None

@@ -126,6 +126,7 @@ def get_all(module_path, heading, finder=None, ignore=None):
 def generate_doc_for_module(module_path, heading="+", finder=None, ignore=None):
     return "".join(map(str, get_all(module_path, heading, finder, ignore or [])))
 
+
 with open("README.tpl.rst", "r") as template:
     tpl = template.read()
     tpl = tpl.replace(

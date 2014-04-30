@@ -4,7 +4,6 @@ from i3pystatus import IntervalModule
 
 
 class ALSA(IntervalModule):
-
     """
     Shows volume of ALSA mixer. You can also use this for inputs, btw.
 

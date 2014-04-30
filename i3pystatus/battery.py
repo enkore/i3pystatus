@@ -73,7 +73,8 @@ class BatteryCharge(Battery):
             else:
                 return -1
         else:
-            return (self.battery_info["CHARGE_FULL"] - self.battery_info["CHARGE_NOW"]) / self.battery_info["CURRENT_NOW"] * 60
+            return (self.battery_info["CHARGE_FULL"] - self.battery_info["CHARGE_NOW"]) / self.battery_info[
+                "CURRENT_NOW"] * 60
 
 
 class BatteryEnergy(Battery):
@@ -88,7 +89,8 @@ class BatteryEnergy(Battery):
             # Wh / W = h * 60 min = min
             return self.battery_info["ENERGY_NOW"] / self.battery_info["POWER_NOW"] * 60
         else:
-            return (self.battery_info["ENERGY_FULL"] - self.battery_info["ENERGY_NOW"]) / self.battery_info["POWER_NOW"] * 60
+            return (self.battery_info["ENERGY_FULL"] - self.battery_info["ENERGY_NOW"]) / self.battery_info[
+                "POWER_NOW"] * 60
 
 
 class BatteryChecker(IntervalModule):

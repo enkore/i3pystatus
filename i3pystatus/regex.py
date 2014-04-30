@@ -4,7 +4,6 @@ from i3pystatus import IntervalModule
 
 
 class Regex(IntervalModule):
-
     """
     Simple regex file watcher
 

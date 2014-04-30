@@ -1,4 +1,3 @@
-
 import collections
 import functools
 import re
@@ -177,6 +176,7 @@ def formatp(string, **kwargs):
         They also have a string property containing associated text (empty for
         all tokens but String tokens).
         """
+
         class Token:
             string = ""
 
@@ -333,13 +333,16 @@ def require(predicate):
         :py:func:`internet`
 
     """
+
     def decorator(method):
         @functools.wraps(method)
         def wrapper(*args, **kwargs):
             if predicate():
                 return method(*args, **kwargs)
             return None
+
         return wrapper
+
     return decorator
 
 

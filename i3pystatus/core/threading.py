@@ -8,7 +8,6 @@ timer = time.perf_counter if hasattr(time, "perf_counter") else time.clock
 
 
 class Thread(threading.Thread):
-
     def __init__(self, target_interval, workloads=None, start_barrier=1):
         super().__init__()
         self.workloads = workloads or []
@@ -56,7 +55,6 @@ class Thread(threading.Thread):
 
 
 class Wrapper:
-
     def __init__(self, workload):
         self.workload = workload
 
@@ -65,7 +63,6 @@ class Wrapper:
 
 
 class ExceptionWrapper(Wrapper):
-
     def __call__(self):
         try:
             self.workload()
@@ -88,7 +85,6 @@ class WorkloadWrapper(Wrapper):
 
 
 class Manager:
-
     def __init__(self, target_interval):
         self.target_interval = target_interval
         self.upper_bound = target_interval * 1.1

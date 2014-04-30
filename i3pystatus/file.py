@@ -4,12 +4,11 @@ from i3pystatus import IntervalModule
 
 
 class File(IntervalModule):
-
     """
     Rip information from text files
 
     components is a dict of pairs of the form:
-    
+
     ::
 
         name => (callable, file)

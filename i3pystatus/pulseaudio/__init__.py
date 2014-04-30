@@ -4,7 +4,6 @@ from i3pystatus import Module
 
 
 class PulseAudio(Module):
-
     """
     Shows volume of default PulseAudio sink (output).
 
@@ -107,4 +106,5 @@ class PulseAudio(Module):
 
     def on_leftclick(self):
         import subprocess
+
         subprocess.Popen(["pavucontrol"])

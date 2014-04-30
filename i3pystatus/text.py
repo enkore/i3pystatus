@@ -2,7 +2,6 @@ from i3pystatus import Module
 
 
 class Text(Module):
-
     """
     Display static, colored text.
     """

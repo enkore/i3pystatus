@@ -1,4 +1,3 @@
-
 import sys
 import os
 from threading import Thread
@@ -75,8 +74,8 @@ class Status:
                 raise import_error
         except ConfigError as configuration_error:
             return self.modules.append(Text(
-                    color="#FF0000",
-                    text=configuration_error.message))
+                color="#FF0000",
+                text=configuration_error.message))
 
     def run(self):
         self.command_endpoint.start()

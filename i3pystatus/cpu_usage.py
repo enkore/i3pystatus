@@ -15,18 +15,15 @@ class CpuUsage(IntervalModule):
 
     """
 
-
     format = "{usage:02}%"
     settings = (
         ("format", "format string"),
     )
 
-
     def init(self):
         self.prev_idle = 0
         self.prev_busy = 0
         self.interval = 1
-
 
     def get_usage(self):
         """
@@ -43,7 +40,6 @@ class CpuUsage(IntervalModule):
 
         return cpu_total, cpu_busy
 
-
     def run(self):
         cpu_total, cpu_busy = self.get_usage()
 
@@ -58,7 +54,5 @@ class CpuUsage(IntervalModule):
         self.output = {
             "full_text": self.format.format(
                 usage=cpu_busy_percentage
-                )
+            )
         }
-
-

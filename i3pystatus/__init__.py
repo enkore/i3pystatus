@@ -1,4 +1,3 @@
-
 from pkgutil import extend_path
 
 from i3pystatus.core import Status

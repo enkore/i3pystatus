@@ -5,23 +5,25 @@ import sys
 from i3pystatus.mail import Backend
 import subprocess
 
+
 class MaildirMail(Backend):
     """
     Checks for local mail in Maildir
     """
 
     settings = (
-            "directory",
-            )
+        "directory",
+    )
     required = ("directory",)
 
-    directory=""
+    directory = ""
 
     @property
     def unread(self):
-        p = subprocess.Popen(['ls','-l',self.directory+'/new'], stdout=subprocess.PIPE)
+        p = subprocess.Popen(['ls', '-l', self.directory + '/new'], stdout=subprocess.PIPE)
         stdout, stderr = p.communicate()
-        stdout=stdout.decode('utf8')
-        return len(stdout.split('\n'))-2
+        stdout = stdout.decode('utf8')
+        return len(stdout.split('\n')) - 2
+
 
 Backend = MaildirMail

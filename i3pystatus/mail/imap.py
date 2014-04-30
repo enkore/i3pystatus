@@ -8,7 +8,6 @@ from i3pystatus.mail import Backend
 
 
 class IMAP(Backend):
-
     """
     Checks for mail on a IMAP server
     """
@@ -55,5 +54,6 @@ class IMAP(Backend):
             return len(conn.search(None, "UnSeen")[1][0].split())
         else:
             sys.stderr.write("no connection")
+
 
 Backend = IMAP

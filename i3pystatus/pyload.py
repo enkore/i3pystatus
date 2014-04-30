@@ -1,4 +1,3 @@
-
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -10,7 +9,6 @@ from i3pystatus import IntervalModule
 
 
 class pyLoad(IntervalModule):
-
     """
     Shows pyLoad status
 
@@ -46,7 +44,8 @@ class pyLoad(IntervalModule):
         if not data:
             data = {}
         urlencoded = urllib.parse.urlencode(data).encode("ascii")
-        return json.loads(self.opener.open("{address}/api/{method}/".format(address=self.address, method=method), urlencoded).read().decode("utf-8"))
+        return json.loads(self.opener.open("{address}/api/{method}/".format(address=self.address, method=method),
+                                           urlencoded).read().decode("utf-8"))
 
     def init(self):
         self.cj = http.cookiejar.CookieJar()

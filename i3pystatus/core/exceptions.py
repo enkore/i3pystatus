@@ -1,4 +1,3 @@
-
 class ConfigError(Exception):
     """ABC for configuration exceptions"""
 

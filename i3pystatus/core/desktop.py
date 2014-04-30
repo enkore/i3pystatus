@@ -1,4 +1,3 @@
-
 class BaseDesktopNotification:
     """
     Class to display a desktop notification
@@ -25,8 +24,10 @@ class BaseDesktopNotification:
         """
         return False
 
+
 class DesktopNotification(BaseDesktopNotification):
     pass
+
 
 try:
     from gi.repository import Notify

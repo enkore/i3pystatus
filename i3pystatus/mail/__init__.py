@@ -1,11 +1,9 @@
-
 import subprocess
 
 from i3pystatus import SettingsBase, IntervalModule
 
 
 class Backend(SettingsBase):
-
     """Handles the details of checking for mail"""
 
     unread = 0
@@ -15,7 +13,6 @@ class Backend(SettingsBase):
 
 
 class Mail(IntervalModule):
-
     """
     Generic mail checker
 

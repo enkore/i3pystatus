@@ -1,4 +1,3 @@
-
 import socket
 
 from i3pystatus import IntervalModule, formatp
@@ -10,7 +9,6 @@ def format_time(seconds):
 
 
 class MPD(IntervalModule):
-
     """
     Displays various information from MPD (the music player daemon)
 
@@ -101,7 +99,7 @@ class MPD(IntervalModule):
     def on_leftclick(self):
         try:
             self._mpd_command(self.s, "pause %i" %
-                              (0 if self._mpd_command(self.s, "status")["state"] == "pause" else 1))
+                                      (0 if self._mpd_command(self.s, "status")["state"] == "pause" else 1))
         except Exception as e:
             pass
 

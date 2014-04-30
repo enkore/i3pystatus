@@ -3,7 +3,6 @@ from i3pystatus.core.exceptions import ConfigKeyError, ConfigMissingError
 
 
 class SettingsBase:
-
     """
     Support class for providing a nice and flexible settings interface
 
@@ -64,4 +63,5 @@ class SettingsBase:
     def flatten_settings(settings):
         def flatten_setting(setting):
             return setting[0] if isinstance(setting, tuple) else setting
+
         return tuple(flatten_setting(setting) for setting in settings)

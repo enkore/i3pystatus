@@ -1,4 +1,3 @@
-
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.threading import Manager
 from i3pystatus.core.util import convert_position
@@ -45,7 +44,7 @@ class IntervalModuleMeta(type):
         super(IntervalModuleMeta, cls).__init__(name, bases, namespace)
         if not hasattr(cls, 'settings'):
             cls.settings = tuple()
-        if not 'interval' in SettingsBase.flatten_settings(cls.settings):
+        if 'interval' not in SettingsBase.flatten_settings(cls.settings):
             cls.settings += ('interval', )
 
 

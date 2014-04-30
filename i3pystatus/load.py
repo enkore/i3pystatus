@@ -2,7 +2,6 @@ from i3pystatus import IntervalModule
 
 
 class Load(IntervalModule):
-
     """
     Shows system load
     """
