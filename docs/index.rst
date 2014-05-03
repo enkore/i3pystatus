@@ -7,6 +7,7 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
+   module
    i3pystatus.core
 
 
