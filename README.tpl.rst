@@ -55,6 +55,11 @@ Contributors
 * yemu
 * zzatkin
 
+3.30 (next version)
++++++++++++++++++++
+
+* `text`_: add cmd_leftclick and cmd_rightclick options
+
 3.29
 ++++
 

@@ -55,6 +55,11 @@ Contributors
 * yemu
 * zzatkin
 
+3.30 (next version)
++++++++++++++++++++
+
+* `text`_: add cmd_leftclick and cmd_rightclick options
+
 3.29
 ++++
 
@@ -379,7 +384,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
 :color: The text color (default: ``#ffffff``)
 :critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
@@ -666,7 +671,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
 :interval:  (default: ``1``)
 
 
@@ -869,6 +874,8 @@ Settings:
 
 :text:  (required)
 :color: HTML color code #RRGGBB (default: ``None``)
+:cmd_leftclick: Shell command to execute on left click (default: ``test``)
+:cmd_rightclick: Shell command to execute on right click (default: ``test``)
 
 
 
