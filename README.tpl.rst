@@ -313,4 +313,7 @@ the protocol is documented `here <http://i3wm.org/docs/i3bar-protocol.html>`_.
 To update this readme run ``python -m i3pystatus.mkdocs`` in the
 repository root and you're done :)
 
+Developer documentation is available in the source code and `here
+<http://i3pystatus.readthedocs.org/en/latest/>`_.
+
 **Patches and pull requests are very welcome :-)**
