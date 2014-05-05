@@ -40,6 +40,7 @@ Contributors
 * afics
 * Arvedui
 * cganas
+* dubwoc
 * enkore (current maintainer)
 * gwarf
 * janoliver (started the project)
@@ -59,6 +60,7 @@ Contributors
 +++++++++++++++++++
 
 * `text`_: add cmd_leftclick and cmd_rightclick options
+* `weather`_: add colorize option
 
 3.29
 ++++
@@ -384,7 +386,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
 :color: The text color (default: ``#ffffff``)
 :critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
@@ -671,7 +673,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
 :interval:  (default: ``1``)
 
 
@@ -896,6 +898,7 @@ Requires pywapi from PyPI.
 Settings:
 
 :location_code:  (required)
+:colorize: Enable color with temperature and UTF-8 icons. (default: ``False``)
 :units: Celsius (metric) or Fahrenheit (imperial) (default: ``metric``)
 :format:  (default: ``{current_temp}``)
 :interval:  (default: ``20``)

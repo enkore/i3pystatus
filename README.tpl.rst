@@ -40,6 +40,7 @@ Contributors
 * afics
 * Arvedui
 * cganas
+* dubwoc
 * enkore (current maintainer)
 * gwarf
 * janoliver (started the project)
@@ -59,6 +60,7 @@ Contributors
 +++++++++++++++++++
 
 * `text`_: add cmd_leftclick and cmd_rightclick options
+* `weather`_: add colorize option
 
 3.29
 ++++
