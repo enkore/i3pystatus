@@ -27,15 +27,16 @@ class Weather(IntervalModule):
 
     units = "metric"
     format = "{current_temp}"
-    colorize = None
-    color_icons = {"Fair":  (u"\u2600", "#FFCC00"),
-                   "Cloudy": (u"\u2601", "#F8F8FF"),
-                   "Partly Cloudy": (u"\u2601", "#F8F8FF"), # \u26c5 is not in many fonts
-                   "Rainy": (u"\u2614", "#CBD2C0"),
-                   "Sunny": (u"\u263C", "#FFFF00"),
-                   "Snow": (u"\u2603", "#FFFFFF"),
-                   "default": ("", None),
-                  }
+    colorize = False
+    color_icons = {
+        "Fair":  (u"\u2600", "#FFCC00"),
+        "Cloudy": (u"\u2601", "#F8F8FF"),
+        "Partly Cloudy": (u"\u2601", "#F8F8FF"),  # \u26c5 is not in many fonts
+        "Rainy": (u"\u2614", "#CBD2C0"),
+        "Sunny": (u"\u263C", "#FFFF00"),
+        "Snow": (u"\u2603", "#FFFFFF"),
+        "default": ("", None),
+    }
 
     @require(internet)
     def run(self):
@@ -48,12 +49,12 @@ class Weather(IntervalModule):
         current_temp = "{t}°{d} ".format(t=temperature, d=units["temperature"])
 
         if self.colorize:
-          icon, color = self.color_icons.get(conditions["text"],
-                                             self.color_icons["default"])
-          current_temp = "{t}°{d} {i}".format(t=temperature,
-                                              d=units["temperature"],
-                                              i=icon)
-          color = color
+            icon, color = self.color_icons.get(conditions["text"],
+                                               self.color_icons["default"])
+            current_temp = "{t}°{d} {i}".format(t=temperature,
+                                                d=units["temperature"],
+                                                i=icon)
+            color = color
 
         self.output = {
             "full_text": self.format.format(current_temp=current_temp, humidity=humidity),
