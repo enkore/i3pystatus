@@ -30,6 +30,7 @@ class Weather(IntervalModule):
     colorize = None
     color_icons = {'Fair':  (u'\u2600', '#FFCC00'),
                    'Cloudy': (u'\u2601', '#F8F8FF'),
+                   'Partly Cloudy': (u'\u2601', '#F8F8FF'), # \u26c5 is not in many fonts
                    'Rainy': (u'\u2614', '#CBD2C0'),
                    'Sunny': (u'\u263C', '#FFFF00'),
                    'Snow': (u'\u2603', '#FFFFFF'),
