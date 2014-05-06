@@ -4,10 +4,6 @@ from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import TimeWrapper
 
 
-def format_time(seconds):
-    return "{}:{:02}".format(*divmod(int(seconds), 60)) if seconds else ""
-
-
 class MPD(IntervalModule):
     """
     Displays various information from MPD (the music player daemon)
