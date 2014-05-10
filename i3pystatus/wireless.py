@@ -7,7 +7,7 @@ class Wireless(Network):
     """
     Display network information about a interface.
 
-    Requires the PyPI packages `netifaces-py3` and `basiciw`.
+    Requires the PyPI packages `netifaces` and `basiciw`.
 
     This is based on the network module, so all options and formatters are
     the same, except for these additional formatters and that detached_down doesn't work.

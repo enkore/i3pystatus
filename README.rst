@@ -188,7 +188,7 @@ example):
     # If it's down just the interface name (eth0) will be displayed in red
     # (defaults of format_down and color_down)
     #
-    # Note: the network module requires PyPI package netifaces-py3
+    # Note: the network module requires PyPI package netifaces
     status.register("network",
         interface="eth0",
         format_up="{v4cidr}",)
@@ -196,7 +196,7 @@ example):
     # Has all the options of the normal network and adds some wireless specific things
     # like quality and network names.
     #
-    # Note: requires both netifaces-py3 and basiciw
+    # Note: requires both netifaces and basiciw
     status.register("wireless",
         interface="wlan0",
         format_up="{essid} {quality:03.0f}%",)
@@ -684,7 +684,7 @@ network
 
 Display network information about a interface.
 
-Requires the PyPI package `netifaces-py3`.
+Requires the PyPI package `netifaces`.
 
 Available formatters:
 
@@ -911,7 +911,7 @@ wireless
 
 Display network information about a interface.
 
-Requires the PyPI packages `netifaces-py3` and `basiciw`.
+Requires the PyPI packages `netifaces` and `basiciw`.
 
 This is based on the network module, so all options and formatters are
 the same, except for these additional formatters and that detached_down doesn't work.
