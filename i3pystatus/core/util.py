@@ -50,9 +50,14 @@ def partition(iterable, limit, key=lambda x: x):
 def round_dict(dic, places):
     """
     Rounds all values in a dict containing only numeric types to `places` decimal places.
-    """
-    for key, value in dic.items():
-        dic[key] = round(value, places)
+    If places is None, round to INT.
+    """    
+    if places is None:
+        for key, value in dic.items():
+            dic[key] = round(value)
+    else:
+        for key, value in dic.items():
+            dic[key] = round(value, places)
 
 
 class ModuleList(collections.UserList):
