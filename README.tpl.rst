@@ -38,6 +38,7 @@ Contributors
 
 * aaron-lebo
 * afics
+* al45tair
 * Arvedui
 * cganas
 * dubwoc
