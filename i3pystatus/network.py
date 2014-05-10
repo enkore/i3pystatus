@@ -1,7 +1,6 @@
 from itertools import zip_longest
 import subprocess
 
-# PyPI: netifaces-py3
 import netifaces
 
 from i3pystatus import IntervalModule
@@ -50,7 +49,7 @@ class Network(IntervalModule):
     """
     Display network information about a interface.
 
-    Requires the PyPI package `netifaces-py3`.
+    Requires the PyPI package `netifaces`.
 
     Available formatters:
 
