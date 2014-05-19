@@ -62,6 +62,8 @@ Contributors
 
 * `text`_: add cmd_leftclick and cmd_rightclick options
 * `weather`_: add colorize option
+* `disk`_: add color and round_size options
+* `mem`_: add round_size option
 
 3.29
 ++++
@@ -387,7 +389,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'DIS': 'DIS', 'FULL': 'FULL'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
 :color: The text color (default: ``#ffffff``)
 :critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
@@ -448,6 +450,8 @@ Settings:
 :display_limit: if more space is available than this limit the module is hidden (default: ``inf``)
 :critical_limit: critical space limit (see critical_color) (default: ``0``)
 :critical_color: the critical color (default: ``#FF0000``)
+:color: the common color (default: ``#FFFFFF``)
+:round_size: precision, None for INT (default: ``2``)
 :interval:  (default: ``5``)
 
 
@@ -624,6 +628,7 @@ Settings:
 :color: standard color (default: ``#00FF00``)
 :warn_color: defines the color used wann warn percentage ist exceeded (default: ``#FFFF00``)
 :alert_color: defines the color used when alert percentage is exceeded (default: ``#FF0000``)
+:round_size: defines number of digits in round (default: ``1``)
 :interval:  (default: ``5``)
 
 

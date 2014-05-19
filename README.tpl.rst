@@ -62,6 +62,8 @@ Contributors
 
 * `text`_: add cmd_leftclick and cmd_rightclick options
 * `weather`_: add colorize option
+* `disk`_: add color and round_size options
+* `mem`_: add round_size option
 
 3.29
 ++++
