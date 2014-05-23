@@ -3,7 +3,6 @@ import webbrowser
 
 import lxml.html
 from lxml.cssselect import CSSSelector
-from bs4 import BeautifulSoup as BS
 
 from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require
@@ -147,6 +146,7 @@ class Itella(IntervalModule):
     @require(internet)
     def run(self):
         try:
+            from bs4 import BeautifulSoup as BS
             page = BS(urlopen(
                 "http://www.itella.fi/itemtracking/itella/search_by_shipment_id"
                 "?lang={lang}&ShipmentId={s_id}".format(
