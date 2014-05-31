@@ -500,7 +500,7 @@ Settings:
 
 :format: format string used for output. {avg1}, {avg5} and {avg15} are the load average of the last one, five and fifteen minutes, respectively. {tasks} is the number of tasks (i.e. 1/285, which indiciates that one out of 285 total tasks is runnable). (default: ``{avg1} {avg5}``)
 :color: The text color (default: ``#ffffff``)
-:critical_limit: Limit under witch one the battery is critical (default: ``1``)
+:critical_limit: Limit above which the load is considered critical (default: ``1``)
 :critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
 
@@ -679,7 +679,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
 :interval:  (default: ``1``)
 
 
