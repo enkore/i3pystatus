@@ -101,11 +101,6 @@ class MPD(IntervalModule):
 
     def on_rightclick(self):
         try:
-            vol = int(self._mpd_command(self.s, "status")["volume"])
-            if vol == 0:
-                self._mpd_command(self.s, "setvol %i" % self.vol)
-            else:
-                self.vol = vol
-                self._mpd_command(self.s, "setvol 0")
+            self._mpd_command(self.s, "next")
         except Exception as e:
             pass
