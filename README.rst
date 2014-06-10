@@ -868,6 +868,7 @@ Settings:
 :color_critical:  (default: ``#FF0000``)
 :high_factor:  (default: ``0.7``)
 :interval:  (default: ``5``)
+:base_path:  (default: ``/sys/devices/platform/coretemp.0``)
 
 
 

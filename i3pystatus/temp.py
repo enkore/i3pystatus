@@ -21,9 +21,9 @@ class Temperature(IntervalModule):
     color = "#FFFFFF"
     color_high = "#FFFF00"
     color_critical = "#FF0000"
+    base_path = "/sys/devices/platform/coretemp.0"
 
     def init(self):
-        self.base_path = "/sys/devices/platform/coretemp.0"
         input = glob.glob(
             "{base_path}/temp*_input".format(base_path=self.base_path))[0]
         self.input = re.search("temp([0-9]+)_input", input).group(1)
