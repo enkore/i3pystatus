@@ -21,6 +21,7 @@ class ALSA(IntervalModule):
 
     settings = (
         "format",
+        ("format_muted", "optional format string to use when muted"),
         ("mixer", "ALSA mixer"),
         ("mixer_id", "ALSA mixer id"),
         ("card", "ALSA sound card"),
@@ -34,6 +35,7 @@ class ALSA(IntervalModule):
     color_muted = "#AAAAAA"
     color = "#FFFFFF"
     format = "♪: {volume}"
+    format_muted = None
     mixer = "Master"
     mixer_id = 0
     card = 0
@@ -68,7 +70,12 @@ class ALSA(IntervalModule):
         self.fdict["volume"] = self.alsamixer.getvolume()[self.channel]
         self.fdict["muted"] = self.muted if muted else self.unmuted
 
+        if muted and self.format_muted is not None:
+            output_format = self.format_muted
+        else:
+            output_format = self.format
+
         self.output = {
-            "full_text": self.format.format(**self.fdict),
+            "full_text": output_format.format(**self.fdict),
             "color": self.color_muted if muted else self.color,
         }

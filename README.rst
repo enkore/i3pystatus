@@ -329,6 +329,7 @@ Available formatters:
 Settings:
 
 :format:  (default: ``♪: {volume}``)
+:format_muted: optional format string to use when muted (default: ``None``)
 :mixer: ALSA mixer (default: ``Master``)
 :mixer_id: ALSA mixer id (default: ``0``)
 :card: ALSA sound card (default: ``0``)
@@ -753,6 +754,7 @@ Available formatters:
 Settings:
 
 :format:  (default: ``♪: {volume}``)
+:format_muted: optional format string to use when muted (default: ``None``)
 :muted:  (default: ``M``)
 :unmuted:  (default: ````)
 

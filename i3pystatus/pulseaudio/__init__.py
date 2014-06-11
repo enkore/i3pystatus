@@ -17,12 +17,14 @@ class PulseAudio(Module):
 
     settings = (
         "format",
+        ("format_muted", "optional format string to use when muted"),
         "muted", "unmuted"
     )
 
     muted = "M"
     unmuted = ""
     format = "♪: {volume}"
+    format_muted = None
 
     def init(self):
         """Creates context, when context is ready context_notify_cb is called"""
@@ -97,8 +99,13 @@ class PulseAudio(Module):
 
             muted = self.muted if sink_info.mute else self.unmuted
 
+            if muted and self.format_muted is not None:
+                output_format = self.format_muted
+            else:
+                output_format = self.format
+
             self.output = {
-                "full_text": self.format.format(
+                "full_text": output_format.format(
                     muted=muted,
                     volume=volume_percent,
                     db=volume_db),
