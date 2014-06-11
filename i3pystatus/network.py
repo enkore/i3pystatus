@@ -45,6 +45,20 @@ def cidr4(addr, mask):
     return "{addr}/{bits}".format(addr=addr, bits=prefix4(mask))
 
 
+def get_bonded_slaves():
+    try:
+        with open("/sys/class/net/bonding_masters") as f:
+            masters = f.read().split()
+    except FileNotFoundError:
+        return {}
+    slaves = {}
+    for master in masters:
+        with open("/sys/class/net/{}/bonding/slaves".format(master)) as f:
+            for slave in f.read().split():
+                slaves[slave] = master
+    return slaves
+
+
 class Network(IntervalModule):
     """
     Display network information about a interface.
@@ -93,6 +107,18 @@ class Network(IntervalModule):
             return self.color_down, self.format_down, {"interface": self.interface, "name": self.name}, False
 
         info = netifaces.ifaddresses(self.interface)
+        slaves = get_bonded_slaves()
+        try:
+            master = slaves[self.interface]
+        except KeyError:
+            pass
+        else:
+            master_info = netifaces.ifaddresses(master)
+            for af in (netifaces.AF_INET, netifaces.AF_INET6):
+                try:
+                    info[af] = master_info[af]
+                except KeyError:
+                    pass
         up = netifaces.AF_INET in info or netifaces.AF_INET6 in info
         fdict = dict(
             zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
