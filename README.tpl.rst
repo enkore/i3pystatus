@@ -76,6 +76,8 @@ next
   audio is muted.
 * `parcel`_: added support for Itella (Finnish national postal service)
 * `network`_: detached_down is now True by default
+* `temp`_: removed color_critical and high_factor options
+* `temp`_: fixed issue with Linux kernels 3.15 and newer
 
 3.29
 ++++

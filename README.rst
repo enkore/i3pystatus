@@ -76,6 +76,8 @@ next
   audio is muted.
 * `parcel`_: added support for Itella (Finnish national postal service)
 * `network`_: detached_down is now True by default
+* `temp`_: removed color_critical and high_factor options
+* `temp`_: fixed issue with Linux kernels 3.15 and newer
 
 3.29
 ++++
@@ -692,7 +694,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
 :interval:  (default: ``1``)
 
 
@@ -884,10 +886,8 @@ AMD is currently not supported as they can only report a relative temperature, w
 
 Settings:
 
-:format: format string used for output. {temp} is the temperature in degrees celsius, {critical} and {high} are the trip point temps. (default: ``{temp} °C``)
+:format: format string used for output. {temp} is the temperature in degrees celsius (default: ``{temp} °C``)
 :color:  (default: ``#FFFFFF``)
-:color_critical:  (default: ``#FF0000``)
-:high_factor:  (default: ``0.7``)
 :interval:  (default: ``5``)
 
 
