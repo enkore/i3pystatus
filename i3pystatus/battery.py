@@ -49,16 +49,23 @@ class Battery:
         return self._percentage("_DESIGN" if design else "") * 100
 
     def status(self):
-        if self.consumption():
+        if self.consumption() > 0.1:
             return "Discharging" if self.battery_info["STATUS"] == "Discharging" else "Charging"
         else:
             return "Full"
 
+    def consumption(self, val):
+        return val if val > 0.1 else 0
+
 
 class BatteryCharge(Battery):
+    def __init__(self, bi):
+        bi["CHARGE_FULL"] = bi["CHARGE_FULL_DESIGN"] if bi["CHARGE_NOW"] > bi["CHARGE_FULL"] else bi["CHARGE_FULL"]
+        super().__init__(bi)
+
     def consumption(self):
         if "VOLTAGE_NOW" in self.battery_info and "CURRENT_NOW" in self.battery_info:
-            return self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"]  # V * A = W
+            return super().consumption(self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"])  # V * A = W
         else:
             return -1
 
@@ -79,7 +86,7 @@ class BatteryCharge(Battery):
 
 class BatteryEnergy(Battery):
     def consumption(self):
-        return self.battery_info["POWER_NOW"]
+        return super().consumption(self.battery_info["POWER_NOW"])
 
     def _percentage(self, design):
         return self.battery_info["ENERGY_NOW"] / self.battery_info["ENERGY_FULL" + design]
