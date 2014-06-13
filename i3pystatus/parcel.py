@@ -15,6 +15,9 @@ class TrackerAPI:
     def status(self):
         return {}
 
+    def get_url(self):
+        return ""
+
 
 class DHL(TrackerAPI):
     URL = "http://nolp.dhl.de/nextt-online-public/set_identcodes.do?lang=en&idc={idcode}"
@@ -94,11 +97,51 @@ class UPS(TrackerAPI):
         return self.url
 
 
+class Itella(TrackerAPI):
+    def __init__(self, idcode, lang="fi"):
+        self.idcode = idcode
+        self.lang = lang
+
+    def status(self):
+        from bs4 import BeautifulSoup as BS
+        page = BS(urlopen(
+            "http://www.itella.fi/itemtracking/itella/search_by_shipment_id"
+            "?lang={lang}&ShipmentId={s_id}".format(
+                s_id=self.idcode, lang=self.lang)
+        ).read())
+        events = page.find(id="shipment-event-table")
+        newest = events.find(id="shipment-event-table-cell")
+        status = newest.find(
+            "div", {"class": "shipment-event-table-header"}
+        ).text.strip()
+        time, location = [
+            d.text.strip() for d in
+            newest.find_all("span", {"class": "shipment-event-table-data"})
+        ][:2]
+        progress = "{status} {time} {loc}".format(status=status, time=time, loc=location)
+
+        return {
+            "name": self.name,
+            "status": status,
+            "location": location,
+            "time": time,
+            "progress": progress,
+        }
+
+
 class ParcelTracker(IntervalModule):
     """
     Used to track parcel/shipments.
+
+    Supported carriers: DHL, UPS, Itella
+
+    - parcel.UPS("<id_code>")
+    - parcel.DHL("<id_code>")
+    - parcel.Itella("<id_code>"[, "en"|"fi"|"sv"])
+      Second parameter is language. Requires beautiful soup 4 (bs4)
     """
-    interval = 20
+
+    interval = 60
 
     settings = (
         ("instance", "Tracker instance, for example ``parcel.UPS('your_id_code')``"),
@@ -123,55 +166,3 @@ class ParcelTracker(IntervalModule):
 
     def on_leftclick(self):
         webbrowser.open_new_tab(self.instance.get_url())
-
-
-class Itella(IntervalModule):
-
-    interval = 3600 # 1h
-
-    settings = (
-        ("lang", "fi, sv or en (default: fi)"),
-        "name",
-        "idcode",
-        "format",
-        "color",
-    )
-    required = ("idcode",)
-
-    color = "#FFFFFF"
-    format = "{name}:{progress}"
-    lang = "fi"
-    name = ""
-
-    @require(internet)
-    def run(self):
-        try:
-            from bs4 import BeautifulSoup as BS
-            page = BS(urlopen(
-                "http://www.itella.fi/itemtracking/itella/search_by_shipment_id"
-                "?lang={lang}&ShipmentId={s_id}".format(
-                    s_id=self.idcode, lang=self.lang)
-            ).read())
-            events = page.find(id="shipment-event-table")
-            newest = events.find(id="shipment-event-table-cell")
-            status = newest.find(
-                "div", {"class": "shipment-event-table-header"}
-            ).text.strip()
-            time, location = [
-                d.text.strip() for d in
-                newest.find_all("span", {"class": "shipment-event-table-data"})
-            ][:2]
-            progress = "{status} {time} {loc}".format(status=status, time=time, loc=location)
-
-            self.output = {
-                "full_text": self.format.format(
-                    name=self.name,
-                    status=status,
-                    location=location,
-                    time=time,
-                    progress=progress,
-                    ),
-                "color": self.color
-            }
-        except Exception as e:
-            self.output = {"full_text": str(e)}
