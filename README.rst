@@ -692,7 +692,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
 :interval:  (default: ``1``)
 
 
@@ -739,13 +739,20 @@ parcel
 
 Used to track parcel/shipments.
 
+Supported carriers: DHL, UPS, Itella
+
+- parcel.UPS("<id_code>")
+- parcel.DHL("<id_code>")
+- parcel.Itella("<id_code>"[, "en"|"fi"|"sv"])
+  Second parameter is language. Requires beautiful soup 4 (bs4)
+
 
 Settings:
 
 :instance: Tracker instance, for example ``parcel.UPS('your_id_code')``
 :format:  (default: ``{name}:{progress}``)
 :name: 
-:interval:  (default: ``20``)
+:interval:  (default: ``60``)
 
 
 
