@@ -48,22 +48,34 @@ Contributors
 * jasonmhite
 * jedrz
 * jorio
+* mekanix
 * micha-a-schmidt
 * philipdexter
 * sbrunner
 * siikamiika
 * talwrii
+* tomxtobin
 * tony
 * yemu
 * zzatkin
 
-3.30 (next version)
-+++++++++++++++++++
+next
+++++
+
+3.30
+++++
 
 * `text`_: add cmd_leftclick and cmd_rightclick options
 * `weather`_: add colorize option
 * `disk`_: add color and round_size options
 * `mem`_: add round_size option
+* `mpd`_: next song on right click
+* `network`_ and `wireless`_: support interfaces enslaved to a bonding master
+* `alsa`_ and `pulseaudio`_: added optional "formated_muted"
+  setting. If provided, it will be used instead of "format" when the
+  audio is muted.
+* `parcel`_: added support for Itella (Finnish national postal service)
+* `network`_: detached_down is now True by default
 
 3.29
 ++++
@@ -390,7 +402,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
 :color: The text color (default: ``#ffffff``)
 :critical_color: The critical color (default: ``#ff0000``)
 :interval:  (default: ``5``)
@@ -680,7 +692,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
 :interval:  (default: ``1``)
 
 
@@ -715,7 +727,7 @@ Settings:
 :color_up:  (default: ``#00FF00``)
 :format_down:  (default: ``{interface}``)
 :color_down:  (default: ``#FF0000``)
-:detached_down: If the interface doesn't exist, display it as if it were down (default: ``False``)
+:detached_down: If the interface doesn't exist, display it as if it were down (default: ``True``)
 :name:  (default: ``eth0``)
 :interval:  (default: ``5``)
 
@@ -936,7 +948,7 @@ Settings:
 :color_up:  (default: ``#00FF00``)
 :format_down:  (default: ``{interface}``)
 :color_down:  (default: ``#FF0000``)
-:detached_down: If the interface doesn't exist, display it as if it were down (default: ``False``)
+:detached_down: If the interface doesn't exist, display it as if it were down (default: ``True``)
 :name:  (default: ``eth0``)
 :interval:  (default: ``5``)
 

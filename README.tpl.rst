@@ -48,22 +48,34 @@ Contributors
 * jasonmhite
 * jedrz
 * jorio
+* mekanix
 * micha-a-schmidt
 * philipdexter
 * sbrunner
 * siikamiika
 * talwrii
+* tomxtobin
 * tony
 * yemu
 * zzatkin
 
-3.30 (next version)
-+++++++++++++++++++
+next
+++++
+
+3.30
+++++
 
 * `text`_: add cmd_leftclick and cmd_rightclick options
 * `weather`_: add colorize option
 * `disk`_: add color and round_size options
 * `mem`_: add round_size option
+* `mpd`_: next song on right click
+* `network`_ and `wireless`_: support interfaces enslaved to a bonding master
+* `alsa`_ and `pulseaudio`_: added optional "formated_muted"
+  setting. If provided, it will be used instead of "format" when the
+  audio is muted.
+* `parcel`_: added support for Itella (Finnish national postal service)
+* `network`_: detached_down is now True by default
 
 3.29
 ++++
