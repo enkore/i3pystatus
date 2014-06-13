@@ -93,7 +93,7 @@ class Network(IntervalModule):
     format_down = "{interface}"
     color_up = "#00FF00"
     color_down = "#FF0000"
-    detached_down = False
+    detached_down = True
 
     def init(self):
         if self.interface not in netifaces.interfaces() and not self.detached_down:
