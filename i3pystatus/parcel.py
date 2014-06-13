@@ -123,3 +123,55 @@ class ParcelTracker(IntervalModule):
 
     def on_leftclick(self):
         webbrowser.open_new_tab(self.instance.get_url())
+
+
+class Itella(IntervalModule):
+
+    interval = 3600 # 1h
+
+    settings = (
+        ("lang", "fi, sv or en (default: fi)"),
+        "name",
+        "idcode",
+        "format",
+        "color",
+    )
+    required = ("idcode",)
+
+    color = "#FFFFFF"
+    format = "{name}:{progress}"
+    lang = "fi"
+    name = ""
+
+    @require(internet)
+    def run(self):
+        try:
+            from bs4 import BeautifulSoup as BS
+            page = BS(urlopen(
+                "http://www.itella.fi/itemtracking/itella/search_by_shipment_id"
+                "?lang={lang}&ShipmentId={s_id}".format(
+                    s_id=self.idcode, lang=self.lang)
+            ).read())
+            events = page.find(id="shipment-event-table")
+            newest = events.find(id="shipment-event-table-cell")
+            status = newest.find(
+                "div", {"class": "shipment-event-table-header"}
+            ).text.strip()
+            time, location = [
+                d.text.strip() for d in
+                newest.find_all("span", {"class": "shipment-event-table-data"})
+            ][:2]
+            progress = "{status} {time} {loc}".format(status=status, time=time, loc=location)
+
+            self.output = {
+                "full_text": self.format.format(
+                    name=self.name,
+                    status=status,
+                    location=location,
+                    time=time,
+                    progress=progress,
+                    ),
+                "color": self.color
+            }
+        except Exception as e:
+            self.output = {"full_text": str(e)}
