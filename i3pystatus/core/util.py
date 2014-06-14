@@ -362,3 +362,21 @@ def internet():
         return True
     except OSError:
         return False
+
+def make_bar(percentage):
+    """
+    Draws a bar made of unicode box characters.
+
+    :param percentage: A value between 0 and 100
+    :returns: Bar as a string
+    """
+
+    bars = [' ', '▏', '▎', '▍', '▌', '▋', '▋', '▊', '▊', '█']
+    tens = int(percentage / 10)
+    ones = int(percentage) - tens * 10
+    result = tens * '█'
+    if(ones >= 1):
+        result = result + bars[ones]
+    result = result + (10 - len(result)) * ' '
+    return result
+
