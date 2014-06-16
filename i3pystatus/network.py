@@ -59,6 +59,15 @@ def get_bonded_slaves():
     return slaves
 
 
+def sysfs_interface_up(interface):
+    try:
+        with open("/sys/class/net/{}/operstate".format(interface)) as f:
+            status = f.read().strip()
+    except FileNotFoundError:
+        raise RuntimeError("Unknown interface {iface}!".format(iface=interface))
+    return status == "up"
+
+
 class Network(IntervalModule):
     """
     Display network information about a interface.
@@ -113,12 +122,13 @@ class Network(IntervalModule):
         except KeyError:
             pass
         else:
-            master_info = netifaces.ifaddresses(master)
-            for af in (netifaces.AF_INET, netifaces.AF_INET6):
-                try:
-                    info[af] = master_info[af]
-                except KeyError:
-                    pass
+            if sysfs_interface_up(self.interface):
+                master_info = netifaces.ifaddresses(master)
+                for af in (netifaces.AF_INET, netifaces.AF_INET6):
+                    try:
+                        info[af] = master_info[af]
+                    except KeyError:
+                        pass
         up = netifaces.AF_INET in info or netifaces.AF_INET6 in info
         fdict = dict(
             zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
