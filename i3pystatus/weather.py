@@ -10,6 +10,7 @@ class Weather(IntervalModule):
     Available formatters:
 
     * {current_temp}
+    * {current_wind}
     * {humidity}
 
     Requires pywapi from PyPI.
@@ -44,9 +45,11 @@ class Weather(IntervalModule):
         conditions = result["current_conditions"]
         temperature = conditions["temperature"]
         humidity = conditions["humidity"]
+        wind = conditions["wind"]
         units = result["units"]
         color = None
-        current_temp = "{t}°{d} ".format(t=temperature, d=units["temperature"])
+        current_temp = "{t}°{d}".format(t=temperature, d=units["temperature"])
+        current_wind = "{t} {s}{d}".format(t=wind["text"], s=wind["speed"], d=units["speed"])
 
         if self.colorize:
             icon, color = self.color_icons.get(conditions["text"],
@@ -57,6 +60,6 @@ class Weather(IntervalModule):
             color = color
 
         self.output = {
-            "full_text": self.format.format(current_temp=current_temp, humidity=humidity),
+            "full_text": self.format.format(current_temp=current_temp, current_wind=current_wind, humidity=humidity),
             "color": color
         }
