@@ -1,6 +1,14 @@
 # -*- coding:utf-8 -*-
 
+from collections import defaultdict
+from string import Formatter
+
 from i3pystatus import IntervalModule
+
+try:
+    from natsort import natsorted as sorted
+except ImportError:
+    pass
 
 
 class CpuUsage(IntervalModule):
@@ -11,48 +19,102 @@ class CpuUsage(IntervalModule):
 
     Available formatters:
 
-    * {usage}
+    * {usage}       usage average of all cores
+    * {usage_cpu*}  usage of one specific core. replace "*" by core number statring at 0
+    * {usage_all}   usage of all cores separate. usess natsort when available(relevant for more than 10 cores)
 
     """
 
     format = "{usage:02}%"
+    format_all = "{core}:{usage:02}%"
+    exclude_average = False
     settings = (
-        ("format", "format string"),
+        ("format", "format string. Default: {usage:02}%"),
+        ("format_all", ("format string used for {usage_all} per core. "
+                        "Available formaters are {core} and {usage}. "
+                        "Default: {core}:{usage:02}")),
+        ("exclude_average", ("If True usage average of all cores will "
+                             "not be in format_all. Default: False"))
     )
 
     def init(self):
-        self.prev_idle = 0
-        self.prev_busy = 0
+        self.prev_total = defaultdict(int)
+        self.prev_busy = defaultdict(int)
         self.interval = 1
+        self.formatter = Formatter()
+
+    def get_cpu_timings(self):
+        """
+        reads and parses /proc/stat
+        returns dictionary with all available cores invluding global average
+        """
+        timings = {}
+        with open('/proc/stat', 'r') as file_obj:
+            for line in file_obj:
+                if 'cpu' in line:
+                    line = line.strip().split()
+                    timings[line[0]] = [int(x) for x in line[1:]]
+
+        return timings
+
+    def calculate_usage(self, cpu, total, busy):
+        """
+        calculates usage
+        """
+        diff_total = total - self.prev_total[cpu]
+        diff_busy = busy - self.prev_busy[cpu]
+
+        self.prev_total[cpu] = total
+        self.prev_busy[cpu] = busy
+
+        return int(diff_busy / diff_total * 100)
+
+    def gen_format_all(self, usage):
+        """
+        generates string for format all
+        """
+        format_string = " "
+        core_strings = []
+        for core, usage in usage.items():
+            if core == 'usage_cpu' and self.exclude_average:
+                continue
+            elif core == 'usage':
+                continue
+
+            core = core.replace('usage_', '')
+            string = self.formatter.format(format_string=self.format_all,
+                                           core=core,
+                                           usage=usage)
+            core_strings.append(string)
+
+        core_strings = sorted(core_strings)
+
+        return format_string.join(core_strings)
 
     def get_usage(self):
         """
         parses /proc/stat and calcualtes total and busy time
         (more specific USER_HZ see man 5 proc for further informations )
         """
-        with open('/proc/stat', 'r') as file_obj:
-            stats = file_obj.readline().strip().split()
+        usage = {}
 
-        cpu_timings = [int(x) for x in stats[1:]]
-        cpu_total = sum(cpu_timings)
-        del cpu_timings[3:5]
-        cpu_busy = sum(cpu_timings)
+        for cpu, timings in self.get_cpu_timings().items():
+            cpu_total = sum(timings)
+            del timings[3:5]
+            cpu_busy = sum(timings)
+            cpu_usage = self.calculate_usage(cpu, cpu_total, cpu_busy)
 
-        return cpu_total, cpu_busy
+            usage['usage_' + cpu] = cpu_usage
+
+        return usage
 
     def run(self):
-        cpu_total, cpu_busy = self.get_usage()
+        usage = self.get_usage()
+        usage['format_all'] = self.gen_format_all(usage)
 
-        diff_cpu_total = cpu_total - self.prev_idle
-        diff_cpu_busy = cpu_busy - self.prev_busy
-
-        self.prev_idle = cpu_total
-        self.prev_busy = cpu_busy
-
-        cpu_busy_percentage = int(diff_cpu_busy / diff_cpu_total * 100)
+        # for backward compatibility
+        usage['usage'] = usage['usage_cpu']
 
         self.output = {
-            "full_text": self.format.format(
-                usage=cpu_busy_percentage
-            )
+            "full_text": self.format.format_map(usage)
         }
