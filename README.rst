@@ -429,7 +429,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -477,7 +477,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
+:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
 
 
 
@@ -506,13 +506,17 @@ Linux only
 
 Available formatters:
 
-* {usage}
+* {usage}       usage average of all cores
+* {usage_cpu*}  usage of one specific core. replace "*" by core number starting at 0
+* {usage_all}   usage of all cores separate. usess natsort when available(relevant for more than 10 cores)
 
 
 
 Settings:
 
-:format: format string (default: ``{usage:02}%``)
+:format: format string. (default: ``{usage:02}%``)
+:format_all: format string used for {usage_all} per core. Available formaters are {core} and {usage}.  (default: ``{core}:{usage:02}%``)
+:exclude_average: If True usage average of all cores will not be in format_all. (default: ``False``)
 :interval:  (default: ``5``)
 
 
@@ -810,7 +814,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'stop': '◾', 'play': '▶'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
 :color: The color of the text (default: ``#FFFFFF``)
 :interval:  (default: ``1``)
 
@@ -852,6 +856,19 @@ Settings:
 
 
 
+ngb
++++
+
+
+
+Settings:
+
+:username:  (required)
+:password:  (required)
+:interval:  (default: ``5``)
+
+
+
 now_playing
 +++++++++++
 
@@ -877,7 +894,7 @@ Requires python-dbus available from every distros' package manager.
 Settings:
 
 :player: Player name (default: ``None``)
-:status: Dictionary mapping pause, play and stop to output text (default: ``{'pause': '▷', 'stop': '◾', 'play': '▶'}``)
+:status: Dictionary mapping pause, play and stop to output text (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
 :color: Text color (default: ``#FFFFFF``)
 :format: formatp string (default: ``{title} {status}``)
 :interval:  (default: ``1``)

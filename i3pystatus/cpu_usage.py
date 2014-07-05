@@ -20,7 +20,7 @@ class CpuUsage(IntervalModule):
     Available formatters:
 
     * {usage}       usage average of all cores
-    * {usage_cpu*}  usage of one specific core. replace "*" by core number statring at 0
+    * {usage_cpu*}  usage of one specific core. replace "*" by core number starting at 0
     * {usage_all}   usage of all cores separate. usess natsort when available(relevant for more than 10 cores)
 
     """
@@ -29,12 +29,11 @@ class CpuUsage(IntervalModule):
     format_all = "{core}:{usage:02}%"
     exclude_average = False
     settings = (
-        ("format", "format string. Default: {usage:02}%"),
+        ("format", "format string."),
         ("format_all", ("format string used for {usage_all} per core. "
-                        "Available formaters are {core} and {usage}. "
-                        "Default: {core}:{usage:02}")),
+                        "Available formaters are {core} and {usage}. ")),
         ("exclude_average", ("If True usage average of all cores will "
-                             "not be in format_all. Default: False"))
+                             "not be in format_all."))
     )
 
     def init(self):
