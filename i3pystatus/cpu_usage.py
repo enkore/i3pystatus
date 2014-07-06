@@ -45,7 +45,7 @@ class CpuUsage(IntervalModule):
     def get_cpu_timings(self):
         """
         reads and parses /proc/stat
-        returns dictionary with all available cores invluding global average
+        returns dictionary with all available cores including global average
         """
         timings = {}
         with open('/proc/stat', 'r') as file_obj:

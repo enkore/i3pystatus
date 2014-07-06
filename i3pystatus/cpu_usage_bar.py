@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 
-from i3pystatus import IntervalModule
+from i3pystatus.cpu_usage import CpuUsage
 from i3pystatus.core.util import make_bar
 
-class CpuUsageBar(IntervalModule):
+class CpuUsageBar(CpuUsage):
     """
     Shows CPU usage as a bar (made with unicode box characters).
     The first output will be inacurate
@@ -11,7 +11,8 @@ class CpuUsageBar(IntervalModule):
 
     Available formatters:
 
-    * {usage_bar}
+    * {usage_bar}       usage average of all cores
+    * {usage_bar_cpu*}  usage of one specific core. replace "*" by core number starting at 0
 
     """
 
@@ -20,41 +21,21 @@ class CpuUsageBar(IntervalModule):
         ("format", "format string"),
     )
 
-    def init(self):
-        self.prev_idle = 0
-        self.prev_busy = 0
-        self.interval = 1
-
-    def get_usage(self):
-        """
-        parses /proc/stat and calcualtes total and busy time
-        (more specific USER_HZ see man 5 proc for further informations )
-        """
-        with open('/proc/stat', 'r') as file_obj:
-            stats = file_obj.readline().strip().split()
-
-        cpu_timings = [int(x) for x in stats[1:]]
-        cpu_total = sum(cpu_timings)
-        del cpu_timings[3:5]
-        cpu_busy = sum(cpu_timings)
-
-        return cpu_total, cpu_busy
-
     def run(self):
-        cpu_total, cpu_busy = self.get_usage()
+        cpu_usage = self.get_usage()
 
-        diff_cpu_total = cpu_total - self.prev_idle
-        diff_cpu_busy = cpu_busy - self.prev_busy
+        cpu_usage_bar = {}
 
-        self.prev_idle = cpu_total
-        self.prev_busy = cpu_busy
+        for core, usage in cpu_usage.items():
+            core = core.replace('usage', 'usage_bar')
+            cpu_usage_bar[core] = make_bar(usage)
 
-        cpu_busy_percentage = diff_cpu_busy / diff_cpu_total * 100
-        cpu_busy_bar = make_bar(cpu_busy_percentage)
+        cpu_usage.update(cpu_usage_bar)
+
+        # for backward compatibility
+        cpu_usage['usage_bar'] = cpu_usage['usage_bar_cpu']
 
         self.output = {
-            "full_text": self.format.format(
-                usage_bar=cpu_busy_bar
-            )
+            "full_text": self.format.format_map(cpu_usage)
         }
 
