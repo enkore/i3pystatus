@@ -429,7 +429,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -531,7 +531,8 @@ Linux only
 
 Available formatters:
 
-* {usage_bar}
+* {usage_bar}       usage average of all cores
+* {usage_bar_cpu*}  usage of one specific core. replace "*" by core number starting at 0
 
 
 
