@@ -125,6 +125,8 @@ class BatteryChecker(IntervalModule):
         ("path", "Override the default-generated path"),
         ("status", "A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names"),
         ("color", "The text color"),
+        ("full_color", "The full color"),
+        ("charging_color", "The charging color"),
         ("critical_color", "The critical color"),
     )
     battery_ident = "BAT0"
@@ -140,6 +142,8 @@ class BatteryChecker(IntervalModule):
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
     color = "#ffffff"
+    full_color = "#11aa11"
+    charging_color = "#00ff00"
     critical_color = "#ff0000"
 
     path = None
@@ -174,8 +178,10 @@ class BatteryChecker(IntervalModule):
                     color = self.critical_color
             else:
                 fdict["status"] = "CHR"
+                color = self.charging_color
         else:
             fdict["status"] = "FULL"
+            color = self.full_color
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
             DesktopNotification(
