@@ -5,7 +5,7 @@ import re
 import configparser
 
 from i3pystatus import IntervalModule, formatp
-from i3pystatus.core.util import lchop, TimeWrapper
+from i3pystatus.core.util import lchop, TimeWrapper, make_bar
 from i3pystatus.core.desktop import DesktopNotification
 
 
@@ -113,6 +113,7 @@ class BatteryChecker(IntervalModule):
     * `{consumption (Watts)}` — current power flowing into/out of the battery
     * `{status}`
     * `{battery_ident}` — the same as the setting
+    * `{bar}` —bar displaying the percentage graphically
     """
 
     settings = (
@@ -165,6 +166,7 @@ class BatteryChecker(IntervalModule):
             "percentage_design": battery.percentage(design=True),
             "consumption": battery.consumption(),
             "remaining": TimeWrapper(0, "%E%h:%M"),
+            "bar": make_bar(battery.percentage()),
         }
 
         status = battery.status()
@@ -195,7 +197,7 @@ class BatteryChecker(IntervalModule):
         fdict["status"] = self.status[fdict["status"]]
 
         self.output = {
-            "full_text": formatp(self.format, **fdict).strip(),
+            "full_text": formatp(self.format, **fdict),
             "instance": self.battery_ident,
             "urgent": urgent,
             "color": color,
