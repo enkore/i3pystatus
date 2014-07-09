@@ -889,7 +889,7 @@ Settings:
 :format: format string used for output. {temp} is the temperature in degrees celsius (default: ``{temp} °C``)
 :color:  (default: ``#FFFFFF``)
 :interval:  (default: ``5``)
-
+:file: file where the temperature is read from
 
 
 text

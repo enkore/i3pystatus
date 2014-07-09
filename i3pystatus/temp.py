@@ -15,12 +15,11 @@ class Temperature(IntervalModule):
         ("format",
          "format string used for output. {temp} is the temperature in degrees celsius"),
         "color",
+        "file",
     )
     format = "{temp} °C"
     color = "#FFFFFF"
-
-    def init(self):
-        self.file = "/sys/class/thermal/thermal_zone0/temp"
+    file = "/sys/class/thermal/thermal_zone0/temp"
 
     def run(self):
         with open(self.file, "r") as f:
