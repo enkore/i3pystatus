@@ -119,6 +119,7 @@ class BatteryChecker(IntervalModule):
     settings = (
         ("battery_ident", "The name of your battery, usually BAT0 or BAT1"),
         "format",
+        ("not_present_text", "Text displayed if the battery is not present. No formatters are available"),
         ("alert", "Display a libnotify-notification on low battery"),
         "alert_percentage",
         ("alert_format_title", "The title of the notification, all formatters can be used"),
@@ -129,6 +130,7 @@ class BatteryChecker(IntervalModule):
         ("full_color", "The full color"),
         ("charging_color", "The charging color"),
         ("critical_color", "The critical color"),
+        ("not_present_color", "The not present color."),
     )
     battery_ident = "BAT0"
     format = "{status} {remaining}"
@@ -137,6 +139,7 @@ class BatteryChecker(IntervalModule):
         "DIS": "DIS",
         "FULL": "FULL",
     }
+    not_present_text = "Battery not present"
 
     alert = False
     alert_percentage = 10
@@ -146,6 +149,7 @@ class BatteryChecker(IntervalModule):
     full_color = "#11aa11"
     charging_color = "#00ff00"
     critical_color = "#ff0000"
+    not_present_color = "#ffffff"
 
     path = None
 
@@ -158,7 +162,14 @@ class BatteryChecker(IntervalModule):
         urgent = False
         color = self.color
 
-        battery = Battery.create(self.path)
+        try:
+            battery = Battery.create(self.path)
+        except FileNotFoundError:
+            self.output = {
+                "full_text": self.not_present_text,
+                "color": self.not_present_color,
+            }
+            return
 
         fdict = {
             "battery_ident": self.battery_ident,
