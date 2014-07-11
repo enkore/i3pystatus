@@ -60,17 +60,21 @@ def round_dict(dic, places):
             dic[key] = round(value, places)
 
 
-class ModuleList(collections.UserList):
-    def __init__(self, status_handler, class_finder):
+class ModuleList(collections.deque):
+    def __init__(self, status_handler, class_finder, reverse=True):
         self.status_handler = status_handler
         self.finder = class_finder
+        self.reverse= reverse
         super().__init__()
 
     def append(self, module, *args, **kwargs):
         module = self.finder.instanciate_class_from_module(
             module, *args, **kwargs)
         module.registered(self.status_handler)
-        super().append(module)
+        if self.reverse : 
+            super().append(module)
+        else :
+            super().appendleft(module)
         return module
 
     def get(self, find_id):

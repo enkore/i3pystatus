@@ -42,8 +42,8 @@ class Status:
     :param input_stream: A file-like object that provides the input stream, if `standalone` is False.
     """
 
-    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
-        self.modules = util.ModuleList(self, ClassFinder(Module))
+    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin, reversed_register=True):
+        self.modules = util.ModuleList(self, ClassFinder(Module), reverse=reversed_register)
         self.standalone = standalone
         if standalone:
             self.io = io.StandaloneIO(interval)
