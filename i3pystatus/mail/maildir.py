@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
+import os
 from i3pystatus.mail import Backend
-import subprocess
 
 
 class MaildirMail(Backend):
@@ -20,10 +19,8 @@ class MaildirMail(Backend):
 
     @property
     def unread(self):
-        p = subprocess.Popen(['ls', '-l', self.directory + '/new'], stdout=subprocess.PIPE)
-        stdout, stderr = p.communicate()
-        stdout = stdout.decode('utf8')
-        return len(stdout.split('\n')) - 2
+        path = os.path.join(self.directory, "new")
+        return len([name for name in os.listdir(path)])
 
 
 Backend = MaildirMail
