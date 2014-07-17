@@ -380,3 +380,20 @@ def make_bar(percentage):
     result = result + (10 - len(result)) * ' '
     return result
 
+
+def user_open(url_or_command):
+    """Open the specified paramater in the web browser if a URL is detected,
+    othewrise pass the paramater to the shell as a subprocess. This function
+    is inteded to bu used in on_leftclick()/on_rightclick() events.
+
+    :param url_or_command: String containing URL or command
+    """
+    from urllib.parse import urlparse
+    scheme = urlparse(url_or_command).scheme
+    if scheme == 'http' or scheme == 'https':
+        import webbrowser
+        webbrowser.open(url_or_command)
+    else:
+        import subprocess
+        subprocess.Popen(url_or_command, shell=True)
+
