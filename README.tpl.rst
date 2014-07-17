@@ -40,7 +40,9 @@ Contributors
 * afics
 * al45tair
 * Arvedui
+* atalax
 * cganas
+* crwood
 * dubwoc
 * enkore (current maintainer)
 * gwarf
@@ -49,11 +51,13 @@ Contributors
 * jedrz
 * jorio
 * mekanix
+* Mic92
 * micha-a-schmidt
 * philipdexter
 * sbrunner
 * siikamiika
 * talwrii
+* tomkenmag
 * tomxtobin
 * tony
 * yemu
@@ -78,6 +82,14 @@ next
 * `network`_: detached_down is now True by default
 * `temp`_: removed color_critical and high_factor options
 * `temp`_: fixed issue with Linux kernels 3.15 and newer
+* maildir: use os.listdir instead of ls
+* Add `bitcoin`_ module
+* `temp`_: add file setting
+* `battery`_: add bar formatter, add not_present_text, full_color,
+  charging_color, not_present_color settings
+* `wireless`_: Add quality_bar formatter
+* Add `shell`_ module
+
 
 3.29
 ++++

@@ -40,7 +40,9 @@ Contributors
 * afics
 * al45tair
 * Arvedui
+* atalax
 * cganas
+* crwood
 * dubwoc
 * enkore (current maintainer)
 * gwarf
@@ -49,11 +51,13 @@ Contributors
 * jedrz
 * jorio
 * mekanix
+* Mic92
 * micha-a-schmidt
 * philipdexter
 * sbrunner
 * siikamiika
 * talwrii
+* tomkenmag
 * tomxtobin
 * tony
 * yemu
@@ -78,6 +82,14 @@ next
 * `network`_: detached_down is now True by default
 * `temp`_: removed color_critical and high_factor options
 * `temp`_: fixed issue with Linux kernels 3.15 and newer
+* maildir: use os.listdir instead of ls
+* Add `bitcoin`_ module
+* `temp`_: add file setting
+* `battery`_: add bar formatter, add not_present_text, full_color,
+  charging_color, not_present_color settings
+* `wireless`_: Add quality_bar formatter
+* Add `shell`_ module
+
 
 3.29
 ++++
@@ -393,21 +405,68 @@ Available formatters:
 * `{consumption (Watts)}` — current power flowing into/out of the battery
 * `{status}`
 * `{battery_ident}` — the same as the setting
+* `{bar}` —bar displaying the percentage graphically
 
 
 Settings:
 
 :battery_ident: The name of your battery, usually BAT0 or BAT1 (default: ``BAT0``)
 :format:  (default: ``{status} {remaining}``)
+:not_present_text: Text displayed if the battery is not present. No formatters are available (default: ``Battery not present``)
 :alert: Display a libnotify-notification on low battery (default: ``False``)
 :alert_percentage:  (default: ``10``)
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}``)
 :color: The text color (default: ``#ffffff``)
+:full_color: The full color (default: ``#11aa11``)
+:charging_color: The charging color (default: ``#00ff00``)
 :critical_color: The critical color (default: ``#ff0000``)
+:not_present_color: The not present color. (default: ``#ffffff``)
 :interval:  (default: ``5``)
+
+
+
+bitcoin
++++++++
+
+
+This module fetches and displays current Bitcoin market prices and
+optionally monitors transactions to and from a list of user-specified 
+wallet addresses. Market data is pulled from the BitcoinAverage Price
+Index API <https://bitcoinaverage.com> while transaction data is pulled
+from blockchain.info <https://blockchain.info/api/blockchain_api>.
+
+Available formatters:
+
+* {last_price}
+* {ask_price}
+* {bid_price}
+* {daily_average}
+* {volume}
+* {status}
+* {last_tx_type}
+* {last_tx_addr}
+* {last_tx_value}
+* {balance_btc}
+* {balance_fiat}
+
+
+
+Settings:
+
+:format: Format string used for output. (default: ``฿ {status}{last_price}``)
+:currency: Base fiat currency used for pricing. (default: ``USD``)
+:wallet_addresses: List of wallet address(es) to monitor. (default: ````)
+:color: Standard color (default: ``#FFFFFF``)
+:colorize: Enable color change on price increase/decrease (default: ``False``)
+:color_up: Color for price increases (default: ``#00FF00``)
+:color_down: Color for price decreases (default: ``#FF0000``)
+:leftclick: URL to visit or command to run on left click (default: ``electrum``)
+:rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
+:interval: Update interval. (default: ``600``)
+:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
 
 
 
@@ -443,6 +502,27 @@ Available formatters:
 Settings:
 
 :format: format string (default: ``{usage:02}%``)
+:interval:  (default: ``5``)
+
+
+
+cpu_usage_bar
++++++++++++++
+
+
+Shows CPU usage as a bar (made with unicode box characters).
+The first output will be inacurate
+Linux only
+
+Available formatters:
+
+* {usage_bar}
+
+
+
+Settings:
+
+:format: format string (default: ``{usage_bar}``)
 :interval:  (default: ``5``)
 
 
@@ -648,6 +728,30 @@ Settings:
 
 
 
+mem_bar
++++++++
+
+
+Shows memory load as a bar.
+
+Available formatters:
+* {used_mem_bar}
+
+Requires psutil (from PyPI)
+
+
+Settings:
+
+:format: format string used for output. (default: ``{used_mem_bar}``)
+:warn_percentage: minimal percentage for warn state (default: ``50``)
+:alert_percentage: minimal percentage for alert state (default: ``80``)
+:color: standard color (default: ``#00FF00``)
+:warn_color: defines the color used wann warn percentage ist exceeded (default: ``#FFFF00``)
+:alert_color: defines the color used when alert percentage is exceeded (default: ``#FF0000``)
+:interval:  (default: ``5``)
+
+
+
 modsde
 ++++++
 
@@ -694,7 +798,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
 :interval:  (default: ``1``)
 
 
@@ -856,6 +960,22 @@ Settings:
 
 
 
+shell
++++++
+
+
+Shows output of shell command
+
+
+Settings:
+
+:command: command to be executed
+:color: standard color (default: ``#FFFFFF``)
+:error_color: color to use when non zero exit code is returned (default: ``#FF0000``)
+:interval:  (default: ``5``)
+
+
+
 spotify
 +++++++
 
@@ -888,8 +1008,9 @@ Settings:
 
 :format: format string used for output. {temp} is the temperature in degrees celsius (default: ``{temp} °C``)
 :color:  (default: ``#FFFFFF``)
+:file:  (default: ``/sys/class/thermal/thermal_zone0/temp``)
 :interval:  (default: ``5``)
-:file: file where the temperature is read from
+
 
 
 text
@@ -917,6 +1038,7 @@ First, you need to get the code for the location from the www.weather.com
 Available formatters:
 
 * {current_temp}
+* {current_wind}
 * {humidity}
 
 Requires pywapi from PyPI.
@@ -946,6 +1068,7 @@ the same, except for these additional formatters and that detached_down doesn't 
 * `{essid}` — ESSID of currently connected wifi
 * `{freq}` — Current frequency
 * `{quality}` — Link quality in percent
+* `{quality_bar}` —Bar graphically representing link quality
 
 
 Settings:
