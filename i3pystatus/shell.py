@@ -26,9 +26,11 @@ class Shell(IntervalModule):
             color = self.error_color
 
         out = out.decode("UTF-8").replace("\n", " ")
-
-        if out[-1] == " ":
-            out = out[:-1]
+        try:
+            if out[-1] == " ":
+                out = out[:-1]
+        except:
+            out = ""
 
         self.output = {
             "full_text": out,

@@ -87,7 +87,7 @@ class Bitcoin(IntervalModule):
         if self._price_prev and fdict["last_price"] > self._price_prev:
             color = self.color_up
             fdict["status"] = self.status["price_up"]
-        elif self._price_prev and fdict["last_price"] > self._price_prev:
+        elif self._price_prev and fdict["last_price"] < self._price_prev:
             color = self.color_down
             fdict["status"] = self.status["price_down"]
         else:
