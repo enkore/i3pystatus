@@ -30,7 +30,8 @@ class MPD(IntervalModule):
         ("host"),
         ("port", "MPD port"),
         ("format", "formatp string"),
-        ("status", "Dictionary mapping pause, play and stop to output")
+        ("status", "Dictionary mapping pause, play and stop to output"),
+        ("color", "The color of the text"),
     )
 
     host = "localhost"
@@ -43,6 +44,7 @@ class MPD(IntervalModule):
         "play": "▶",
         "stop": "◾",
     }
+    color = "#FFFFFF"
 
     vol = 100
 
@@ -88,9 +90,11 @@ class MPD(IntervalModule):
             }
             self.output = {
                 "full_text": formatp(self.format, **fdict).strip(),
+                "color": self.color,
             }
         except Exception as e:
-            self.output = {"full_text": "error connecting MPD"}
+            self.output = {"full_text": "error connecting MPD",
+                           "color": self.color}
 
     def on_leftclick(self):
         try:
