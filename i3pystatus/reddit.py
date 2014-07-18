@@ -56,7 +56,7 @@ class Reddit(IntervalModule):
     color_orangered = "#FF4500"
     mail_brackets = False
     title_maxlen = 80
-    interval = 60
+    interval = 300
     status = {
         "new_mail": "✉",
         "no_mail": "",
