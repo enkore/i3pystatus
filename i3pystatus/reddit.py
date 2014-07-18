@@ -36,7 +36,7 @@ class Reddit(IntervalModule):
         ("format", "Format string used for output."),
         ("username", "Reddit username."),
         ("password", "Reddit password."),
-        ("subreddit", "Subreddit to monitor. Defaults to frontpage."),
+        ("subreddit", "Subreddit to monitor. Uses frontpage if unspecified."),
         ("sort_by", "'hot', 'new', 'rising', 'controversial', or 'top'."),
         ("color", "Standard color."),
         ("colorize", "Enable color change on new message."),
