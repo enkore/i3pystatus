@@ -20,7 +20,7 @@ class MaildirMail(Backend):
     @property
     def unread(self):
         path = os.path.join(self.directory, "new")
-        return len([name for name in os.listdir(path)])
+        return len(os.listdir(path))
 
 
 Backend = MaildirMail
