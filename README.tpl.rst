@@ -1,4 +1,4 @@
-..  Always edit README.tpl.rst
+..  Always edit README.tpl.rst. Do not change the module reference manually.
 
 i3pystatus
 ==========
@@ -46,13 +46,14 @@ Contributors
 * dubwoc
 * enkore (current maintainer)
 * gwarf
-* janoliver (started the project)
+* janoliver (former maintainer)
 * jasonmhite
 * jedrz
 * jorio
 * mekanix
 * Mic92
 * micha-a-schmidt
+* naglis
 * philipdexter
 * sbrunner
 * siikamiika
@@ -89,6 +90,8 @@ next
   charging_color, not_present_color settings
 * `wireless`_: Add quality_bar formatter
 * Add `shell`_ module
+* `mpd`_: add color setting
+* Add `reddit`_ module
 
 
 3.29

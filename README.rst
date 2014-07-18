@@ -1,4 +1,4 @@
-..  Always edit README.tpl.rst
+..  Always edit README.tpl.rst. Do not change the module reference manually.
 
 i3pystatus
 ==========
@@ -46,13 +46,14 @@ Contributors
 * dubwoc
 * enkore (current maintainer)
 * gwarf
-* janoliver (started the project)
+* janoliver (former maintainer)
 * jasonmhite
 * jedrz
 * jorio
 * mekanix
 * Mic92
 * micha-a-schmidt
+* naglis
 * philipdexter
 * sbrunner
 * siikamiika
@@ -89,6 +90,8 @@ next
   charging_color, not_present_color settings
 * `wireless`_: Add quality_bar formatter
 * Add `shell`_ module
+* `mpd`_: add color setting
+* Add `reddit`_ module
 
 
 3.29
@@ -418,7 +421,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'DIS': 'DIS', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#11aa11``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -466,7 +469,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
+:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
 
 
 
@@ -798,7 +801,8 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
+:color: The color of the text (default: ``#FFFFFF``)
 :interval:  (default: ``1``)
 
 
@@ -913,6 +917,50 @@ Settings:
 :username:  (required)
 :password:  (required)
 :interval:  (default: ``5``)
+
+
+
+reddit
+++++++
+
+
+This module fetches and displays posts and/or user mail/messages from
+reddit.com. Left-clicking on the display text opens the permalink/comments
+page using webbrowser.open() while right-clicking opens the URL of the 
+submission directly. Depends on the Python Reddit API Wrapper (PRAW)
+<https://github.com/praw-dev/praw>.
+
+Available formatters:
+
+* {submission_title}
+* {submission_author}
+* {submission_points}
+* {submission_comments}
+* {submission_permalink}
+* {submission_url}
+* {submission_domain}
+* {submission_subreddit}
+* {message_unread}
+* {message_author}
+* {message_subject}
+* {message_body}
+
+
+
+Settings:
+
+:format: Format string used for output. (default: ``[{submission_subreddit}] {submission_title} ({submission_domain})``)
+:username: Reddit username. (default: ````)
+:password: Reddit password. (default: ````)
+:subreddit: Subreddit to monitor. Uses frontpage if unspecified. (default: ````)
+:sort_by: 'hot', 'new', 'rising', 'controversial', or 'top'. (default: ``hot``)
+:color: Standard color. (default: ``#FFFFFF``)
+:colorize: Enable color change on new message. (default: ``True``)
+:color_orangered: Color for new messages. (default: ``#FF4500``)
+:mail_brackets: Display unread message count in square-brackets. (default: ``False``)
+:title_maxlen: Maximum number of characters to display in title. (default: ``80``)
+:interval: Update interval. (default: ``300``)
+:status: New message indicator. (default: ``{'new_mail': '✉', 'no_mail': ''}``)
 
 
 
