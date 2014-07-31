@@ -70,30 +70,30 @@ next
 3.30
 ++++
 
-* `text`_: add cmd_leftclick and cmd_rightclick options
-* `weather`_: add colorize option
-* `disk`_: add color and round_size options
-* `mem`_: add round_size option
-* `mpd`_: next song on right click
-* `network`_ and `wireless`_: support interfaces enslaved to a bonding master
+* Added `bitcoin`_ module
+* Added `reddit`_ module
+* Added `shell`_ module
 * `alsa`_ and `pulseaudio`_: added optional "formated_muted"
-  setting. If provided, it will be used instead of "format" when the
   audio is muted.
-* `parcel`_: added support for Itella (Finnish national postal service)
-* `network`_: detached_down is now True by default
-* `temp`_: removed color_critical and high_factor options
-* `temp`_: fixed issue with Linux kernels 3.15 and newer
-* maildir: use os.listdir instead of ls
-* Add `bitcoin`_ module
-* `temp`_: add file setting
 * `battery`_: add bar formatter, add not_present_text, full_color,
   charging_color, not_present_color settings
-* `wireless`_: Add quality_bar formatter
-* Add `shell`_ module
+* `disk`_: add color and round_size options
+* maildir: use os.listdir instead of ls
+* `mem`_: add round_size option
 * `mpd`_: add color setting
-* Add `reddit`_ module
-* `network`_: fixed some issues with interface up/down detection
 * `mpd`_: add filename formatter
+* `mpd`_: next song on right click
+* `network`_ and `wireless`_: support interfaces enslaved to a bonding master
+* `network`_: detached_down is now True by default
+* `network`_: fixed some issues with interface up/down detection
+* `parcel`_: added support for Itella (Finnish national postal service)
+  setting. If provided, it will be used instead of "format" when the
+* `temp`_: add file setting
+* `temp`_: fixed issue with Linux kernels 3.15 and newer
+* `temp`_: removed color_critical and high_factor options
+* `text`_: add cmd_leftclick and cmd_rightclick options
+* `weather`_: add colorize option
+* `wireless`_: Add quality_bar formatter
 
 3.29
 ++++

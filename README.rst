@@ -70,30 +70,30 @@ next
 3.30
 ++++
 
-* `text`_: add cmd_leftclick and cmd_rightclick options
-* `weather`_: add colorize option
-* `disk`_: add color and round_size options
-* `mem`_: add round_size option
-* `mpd`_: next song on right click
-* `network`_ and `wireless`_: support interfaces enslaved to a bonding master
+* Added `bitcoin`_ module
+* Added `reddit`_ module
+* Added `shell`_ module
 * `alsa`_ and `pulseaudio`_: added optional "formated_muted"
-  setting. If provided, it will be used instead of "format" when the
   audio is muted.
-* `parcel`_: added support for Itella (Finnish national postal service)
-* `network`_: detached_down is now True by default
-* `temp`_: removed color_critical and high_factor options
-* `temp`_: fixed issue with Linux kernels 3.15 and newer
-* maildir: use os.listdir instead of ls
-* Add `bitcoin`_ module
-* `temp`_: add file setting
 * `battery`_: add bar formatter, add not_present_text, full_color,
   charging_color, not_present_color settings
-* `wireless`_: Add quality_bar formatter
-* Add `shell`_ module
+* `disk`_: add color and round_size options
+* maildir: use os.listdir instead of ls
+* `mem`_: add round_size option
 * `mpd`_: add color setting
-* Add `reddit`_ module
-* `network`_: fixed some issues with interface up/down detection
 * `mpd`_: add filename formatter
+* `mpd`_: next song on right click
+* `network`_ and `wireless`_: support interfaces enslaved to a bonding master
+* `network`_: detached_down is now True by default
+* `network`_: fixed some issues with interface up/down detection
+* `parcel`_: added support for Itella (Finnish national postal service)
+  setting. If provided, it will be used instead of "format" when the
+* `temp`_: add file setting
+* `temp`_: fixed issue with Linux kernels 3.15 and newer
+* `temp`_: removed color_critical and high_factor options
+* `text`_: add cmd_leftclick and cmd_rightclick options
+* `weather`_: add colorize option
+* `wireless`_: Add quality_bar formatter
 
 3.29
 ++++
@@ -422,7 +422,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -470,7 +470,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
+:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
 
 
 
@@ -803,7 +803,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
 :color: The color of the text (default: ``#FFFFFF``)
 :interval:  (default: ``1``)
 
@@ -962,7 +962,7 @@ Settings:
 :mail_brackets: Display unread message count in square-brackets. (default: ``False``)
 :title_maxlen: Maximum number of characters to display in title. (default: ``80``)
 :interval: Update interval. (default: ``300``)
-:status: New message indicator. (default: ``{'new_mail': '✉', 'no_mail': ''}``)
+:status: New message indicator. (default: ``{'no_mail': '', 'new_mail': '✉'}``)
 
 
 
