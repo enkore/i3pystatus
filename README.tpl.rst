@@ -93,7 +93,7 @@ next
 * `mpd`_: add color setting
 * Add `reddit`_ module
 * `network`_: fixed some issues with interface up/down detection
-
+* `mpd`_: add filename formatter
 
 3.29
 ++++

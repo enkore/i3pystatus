@@ -93,7 +93,7 @@ next
 * `mpd`_: add color setting
 * Add `reddit`_ module
 * `network`_: fixed some issues with interface up/down detection
-
+* `mpd`_: add filename formatter
 
 3.29
 ++++
@@ -422,9 +422,9 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
 :color: The text color (default: ``#ffffff``)
-:full_color: The full color (default: ``#11aa11``)
+:full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
 :critical_color: The critical color (default: ``#ff0000``)
 :not_present_color: The not present color. (default: ``#ffffff``)
@@ -470,7 +470,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
+:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
 
 
 
@@ -786,6 +786,7 @@ Available formatters (uses `formatp`_)
 * `{title}` — (the title of the current song)
 * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
 * `{artist}` — (can be empty, too)
+* `{filename}` — (file name with out extension and path; empty unless title is empty)
 * `{song_elapsed}` — (Position in the currently playing song, uses `TimeWrapper`_, default is `%m:%S`)
 * `{song_length}` — (Length of the current song, same as song_elapsed)
 * `{pos}` — (Position of current song in playlist, one-based)
@@ -802,7 +803,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
 :color: The color of the text (default: ``#FFFFFF``)
 :interval:  (default: ``1``)
 
