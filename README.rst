@@ -92,6 +92,7 @@ next
 * Add `shell`_ module
 * `mpd`_: add color setting
 * Add `reddit`_ module
+* `network`_: fixed some issues with interface up/down detection
 
 
 3.29
@@ -421,7 +422,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#11aa11``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -469,7 +470,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
+:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
 
 
 

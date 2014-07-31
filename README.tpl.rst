@@ -92,6 +92,7 @@ next
 * Add `shell`_ module
 * `mpd`_: add color setting
 * Add `reddit`_ module
+* `network`_: fixed some issues with interface up/down detection
 
 
 3.29
