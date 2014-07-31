@@ -1,4 +1,5 @@
 import socket
+from os.path import basename
 
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import TimeWrapper
@@ -13,6 +14,7 @@ class MPD(IntervalModule):
     * `{title}` — (the title of the current song)
     * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
     * `{artist}` — (can be empty, too)
+    * `{filename}` — (empty unless title is empty)
     * `{song_elapsed}` — (Position in the currently playing song, uses `TimeWrapper`_, default is `%m:%S`)
     * `{song_length}` — (Length of the current song, same as song_elapsed)
     * `{pos}` — (Position of current song in playlist, one-based)
@@ -79,7 +81,7 @@ class MPD(IntervalModule):
                 "len": int(status["playlistlength"]),
                 "status": self.status[status["state"]],
                 "volume": int(status["volume"]),
-
+                
                 "title": currentsong.get("Title", ""),
                 "album": currentsong.get("Album", ""),
                 "artist": currentsong.get("Artist", ""),
@@ -88,6 +90,11 @@ class MPD(IntervalModule):
                 "bitrate": int(status.get("bitrate", 0)),
 
             }
+            if not fdict["title"]:
+                fdict["filename"] = '.'.join(
+                        basename(currentsong["file"]).split('.')[:-1])
+            else:
+                fdict["filename"] = ""
             self.output = {
                 "full_text": formatp(self.format, **fdict).strip(),
                 "color": self.color,
