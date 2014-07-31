@@ -146,7 +146,7 @@ class BatteryChecker(IntervalModule):
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
     color = "#ffffff"
-    full_color = "#11aa11"
+    full_color = "#00ff00"
     charging_color = "#00ff00"
     critical_color = "#ff0000"
     not_present_color = "#ffffff"
