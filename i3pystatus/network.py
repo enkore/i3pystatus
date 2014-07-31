@@ -129,7 +129,7 @@ class Network(IntervalModule):
                         info[af] = master_info[af]
                     except KeyError:
                         pass
-        up = netifaces.AF_INET in info or (netifaces.AF_INET6 in info and any(not v6["addr"].startswith("fe80::") for v6 in info[netifaces.AF_INET6]))
+        up = sysfs_interface_up(self.interface)
         fdict = dict(
             zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
 
