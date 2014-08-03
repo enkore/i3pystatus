@@ -37,8 +37,8 @@ class NowPlaying(IntervalModule):
         ("format", "formatp string"),
 
     )
-    required = ("player",)
 
+    player = None
     format = "{title} {status}"
     status = {
         "pause": "▷",
@@ -51,9 +51,21 @@ class NowPlaying(IntervalModule):
         "Stopped": "stop",
     }
     color = "#FFFFFF"
+    old_player = None
+
+    def find_player(self):
+        players = [a for a in dbus.SessionBus().get_object("org.freedesktop.DBus", "/org/freedesktop/DBus").ListNames() if a.startswith("org.mpris.MediaPlayer2.")]
+        if self.old_player in players:
+            return self.old_player
+        self.old_player = players[0]
+        return players[0]
 
     def get_player(self):
-        return dbus.SessionBus().get_object("org.mpris.MediaPlayer2." + self.player, "/org/mpris/MediaPlayer2")
+        if self.player:
+            player = "org.mpris.MediaPlayer2." + self.player
+        else:
+            player = self.find_player()
+        return dbus.SessionBus().get_object(player, "/org/mpris/MediaPlayer2")
 
     def run(self):
         try:

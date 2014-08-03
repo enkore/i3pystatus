@@ -71,6 +71,7 @@ next
 ++++
 
 * Added `bitcoin`_ module
+* Added `now_playing`_ module
 * Added `reddit`_ module
 * Added `shell`_ module
 * `alsa`_ and `pulseaudio`_: added optional "formated_muted"
@@ -422,7 +423,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -470,7 +471,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
+:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
 
 
 
@@ -803,7 +804,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'stop': '◾', 'pause': '▷', 'play': '▶'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
 :color: The color of the text (default: ``#FFFFFF``)
 :interval:  (default: ``1``)
 
@@ -842,6 +843,38 @@ Settings:
 :detached_down: If the interface doesn't exist, display it as if it were down (default: ``True``)
 :name:  (default: ``eth0``)
 :interval:  (default: ``5``)
+
+
+
+now_playing
++++++++++++
+
+
+Shows currently playing track information, supports most media players
+
+Available formatters (uses `formatp`_)
+
+* `{title}` — (the title of the current song)
+* `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
+* `{artist}` — (can be empty, too)
+* `{filename}` — (file name with out extension and path; empty unless title is empty)
+* `{song_elapsed}` — (Position in the currently playing song, uses `TimeWrapper`_, default is `%m:%S`)
+* `{song_length}` — (Length of the current song, same as song_elapsed)
+* `{status}` — (play, pause, stop mapped through the `status` dictionary)
+* `{volume}` — (Volume)
+
+Left click on the module play/pauses, right click goes to the next track.
+
+Requires python-dbus available from every distros' package manager.
+
+
+Settings:
+
+:player: Player name (default: ``None``)
+:status: Dictionary mapping pause, play and stop to output text (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
+:color: Text color (default: ``#FFFFFF``)
+:format: formatp string (default: ``{title} {status}``)
+:interval:  (default: ``1``)
 
 
 
@@ -962,7 +995,7 @@ Settings:
 :mail_brackets: Display unread message count in square-brackets. (default: ``False``)
 :title_maxlen: Maximum number of characters to display in title. (default: ``80``)
 :interval: Update interval. (default: ``300``)
-:status: New message indicator. (default: ``{'no_mail': '', 'new_mail': '✉'}``)
+:status: New message indicator. (default: ``{'new_mail': '✉', 'no_mail': ''}``)
 
 
 
