@@ -71,6 +71,7 @@ next
 ++++
 
 * Added `bitcoin`_ module
+* Added `now_playing`_ module
 * Added `reddit`_ module
 * Added `shell`_ module
 * `alsa`_ and `pulseaudio`_: added optional "formated_muted"
