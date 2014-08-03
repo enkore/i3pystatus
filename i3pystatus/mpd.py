@@ -40,7 +40,6 @@ class MPD(IntervalModule):
     port = 6600
     s = None
     format = "{title} {status}"
-    format_sparse = None
     status = {
         "pause": "▷",
         "play": "▶",
@@ -48,7 +47,6 @@ class MPD(IntervalModule):
     }
     color = "#FFFFFF"
 
-    vol = 100
 
     def _mpd_command(self, sock, command):
         try:
@@ -67,10 +65,6 @@ class MPD(IntervalModule):
             )
         except Exception as e:
             return None
-
-    def init(self):
-        if not self.format_sparse:
-            self.format_sparse = self.format
 
     def run(self):
         try:
