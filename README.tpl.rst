@@ -74,6 +74,7 @@ next
 * Added `now_playing`_ module
 * Added `reddit`_ module
 * Added `shell`_ module
+* Core: fixed custom statusline colors not working properly (see issue #74)
 * `alsa`_ and `pulseaudio`_: added optional "formated_muted"
   audio is muted.
 * `battery`_: add bar formatter, add not_present_text, full_color,

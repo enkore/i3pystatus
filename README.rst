@@ -74,6 +74,7 @@ next
 * Added `now_playing`_ module
 * Added `reddit`_ module
 * Added `shell`_ module
+* Core: fixed custom statusline colors not working properly (see issue #74)
 * `alsa`_ and `pulseaudio`_: added optional "formated_muted"
   audio is muted.
 * `battery`_: add bar formatter, add not_present_text, full_color,
@@ -423,7 +424,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -804,7 +805,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
 :color: The color of the text (default: ``#FFFFFF``)
 :interval:  (default: ``1``)
 
@@ -871,7 +872,7 @@ Requires python-dbus available from every distros' package manager.
 Settings:
 
 :player: Player name (default: ``None``)
-:status: Dictionary mapping pause, play and stop to output text (default: ``{'play': '▶', 'pause': '▷', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output text (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
 :color: Text color (default: ``#FFFFFF``)
 :format: formatp string (default: ``{title} {status}``)
 :interval:  (default: ``1``)
@@ -995,7 +996,7 @@ Settings:
 :mail_brackets: Display unread message count in square-brackets. (default: ``False``)
 :title_maxlen: Maximum number of characters to display in title. (default: ``80``)
 :interval: Update interval. (default: ``300``)
-:status: New message indicator. (default: ``{'new_mail': '✉', 'no_mail': ''}``)
+:status: New message indicator. (default: ``{'no_mail': '', 'new_mail': '✉'}``)
 
 
 
