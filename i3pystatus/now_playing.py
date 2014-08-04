@@ -57,6 +57,8 @@ class NowPlaying(IntervalModule):
         players = [a for a in dbus.SessionBus().get_object("org.freedesktop.DBus", "/org/freedesktop/DBus").ListNames() if a.startswith("org.mpris.MediaPlayer2.")]
         if self.old_player in players:
             return self.old_player
+        if not players:
+            raise dbus.exceptions.DBusException()
         self.old_player = players[0]
         return players[0]
 
@@ -90,14 +92,14 @@ class NowPlaying(IntervalModule):
             "title":currentsong.get("xesam:title", ""),
             "album": currentsong.get("xesam:album", ""),
             "artist": ", ".join(currentsong.get("xesam:artist", "")),
-            "song_length": TimeWrapper(currentsong.get("mpris:length") / 1000**2),
-            "song_elapsed": TimeWrapper(get_prop("Position") / 1000**2),
+            "song_length": TimeWrapper((currentsong.get("mpris:length") or 0) / 1000**2),
+            "song_elapsed": TimeWrapper((get_prop("Position") or 0) / 1000**2),
             "filename": "",
         }
 
         if not fdict["title"]:
             fdict["filename"] = '.'.join(
-                basename(currentsong["xesam:url"]).split('.')[:-1])
+                basename((currentsong.get("xesam:url") or "")).split('.')[:-1])
 
         self.output = {
             "full_text": formatp(self.format, **fdict).strip(),
