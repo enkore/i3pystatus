@@ -15,7 +15,7 @@ class Module(SettingsBase):
             if "name" not in self.output:
                 self.output["name"] = self.__name__
             self.output["instance"] = str(id(self))
-            if self.output.get("color", None) == "#ffffff":
+            if (self.output.get("color", "") or "").lower() == "#ffffff":
                 del self.output["color"]
             json.insert(convert_position(self.position, json), self.output)
 
