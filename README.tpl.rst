@@ -71,7 +71,7 @@ next
 ++++
 
 * Added `bitcoin`_ module
-* Added `now_playing`_ module
+* Added `now\_playing`_ module
 * Added `reddit`_ module
 * Added `shell`_ module
 * Core: fixed custom statusline colors not working properly (see issue #74)
@@ -338,8 +338,10 @@ Modules
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `battery`_ - `backlight`_ - `temp`_
 :Network: `network`_ - `wireless`_
-:Other: `mail`_ - `parcel`_ - `pyload`_ - `weather`_ - `mpd`_ - `text`_
-:Advanced: `file`_ - `regex`_ - `runwatch`_
+:Music: `now\_playing`_ - `mpd`_
+:Websites & stuff: `weather`_ - `bitcoin`_ - `reddit`_ - `parcel`_
+:Other: `mail`_ - `pyload`_ -  `text`_ 
+:Advanced: `file`_ - `regex`_ - `runwatch`_ - `shell`_
 
 !!module_doc!!
 
