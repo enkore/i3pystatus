@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from i3pystatus import IntervalModule
+from i3pystatus import IntervalModule, formatp
+from i3pystatus.core.util import TimeWrapper
 
 class Uptime(IntervalModule):
     """
     Outputs Uptime
-    It's possible to include hours, minutes and seconds as: {h},{m} and {s}
     """
 
     settings = (
@@ -18,7 +18,7 @@ class Uptime(IntervalModule):
     )
 
     file           = "/proc/uptime"
-    format         = "up {h} hours {m} min"
+    format         = "up {uptime}"
     color          = "#ffffff"
     alert          = False
     seconds_alert  = 3600
@@ -26,15 +26,15 @@ class Uptime(IntervalModule):
 
     def run(self):
         with open(self.file,'r') as f:
-            data = f.read().split()[0]
-            seconds = float(data)
-            m, s = divmod(int(seconds), 60)
-            h, m = divmod(int(m), 60)
+            seconds = float(f.read().split()[0])
+            fdict = {
+                "uptime" : TimeWrapper(seconds, "%h:%m"),
+            }
 
         if self.alert:
             if seconds > self.seconds_alert:
                 self.color = self.color_alert
         self.output = {
-            "full_text": self.format.format(h=h,m=m,s=s),
+            "full_text": formatp(self.format, **fdict),
             "color": self.color
         }
