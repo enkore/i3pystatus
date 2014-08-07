@@ -39,6 +39,7 @@ Contributors
 * aaron-lebo
 * afics
 * al45tair
+* Argish42
 * Arvedui
 * atalax
 * cganas
@@ -66,6 +67,8 @@ Contributors
 
 next
 ++++
+
+* Added `uptime`_ module
 
 3.30
 ++++

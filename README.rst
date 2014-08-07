@@ -39,6 +39,7 @@ Contributors
 * aaron-lebo
 * afics
 * al45tair
+* Argish42
 * Arvedui
 * atalax
 * cganas
@@ -66,6 +67,8 @@ Contributors
 
 next
 ++++
+
+* Added `uptime`_ module
 
 3.30
 ++++
@@ -426,7 +429,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'FULL': 'FULL', 'CHR': 'CHR'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -474,7 +477,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
+:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
 
 
 
@@ -807,7 +810,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'stop': '◾', 'play': '▶'}``)
 :color: The color of the text (default: ``#FFFFFF``)
 :interval:  (default: ``1``)
 
@@ -874,7 +877,7 @@ Requires python-dbus available from every distros' package manager.
 Settings:
 
 :player: Player name (default: ``None``)
-:status: Dictionary mapping pause, play and stop to output text (default: ``{'play': '▶', 'stop': '◾', 'pause': '▷'}``)
+:status: Dictionary mapping pause, play and stop to output text (default: ``{'pause': '▷', 'stop': '◾', 'play': '▶'}``)
 :color: Text color (default: ``#FFFFFF``)
 :format: formatp string (default: ``{title} {status}``)
 :interval:  (default: ``1``)
@@ -998,7 +1001,7 @@ Settings:
 :mail_brackets: Display unread message count in square-brackets. (default: ``False``)
 :title_maxlen: Maximum number of characters to display in title. (default: ``80``)
 :interval: Update interval. (default: ``300``)
-:status: New message indicator. (default: ``{'new_mail': '✉', 'no_mail': ''}``)
+:status: New message indicator. (default: ``{'no_mail': '', 'new_mail': '✉'}``)
 
 
 
@@ -1112,6 +1115,24 @@ Settings:
 :color: HTML color code #RRGGBB (default: ``None``)
 :cmd_leftclick: Shell command to execute on left click (default: ``test``)
 :cmd_rightclick: Shell command to execute on right click (default: ``test``)
+
+
+
+uptime
+++++++
+
+
+Outputs Uptime
+
+
+Settings:
+
+:format: Format string (default: ``up {uptime}``)
+:color: String color (default: ``#ffffff``)
+:alert: If you want the string to change color (default: ``False``)
+:seconds_alert: How many seconds necessary to start the alert (default: ``3600``)
+:color_alert: Alert color (default: ``#ff0000``)
+:interval:  (default: ``5``)
 
 
 
