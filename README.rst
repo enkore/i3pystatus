@@ -69,6 +69,8 @@ next
 ++++
 
 * Added `uptime`_ module
+* `cpu\_usage`_: Add multicore support
+* `cpu\_usage\_bar`_: Add multicore support
 
 3.30
 ++++
@@ -860,19 +862,6 @@ Settings:
 
 
 
-ngb
-+++
-
-
-
-Settings:
-
-:username:  (required)
-:password:  (required)
-:interval:  (default: ``5``)
-
-
-
 now_playing
 +++++++++++
 
@@ -1022,7 +1011,7 @@ Settings:
 :mail_brackets: Display unread message count in square-brackets. (default: ``False``)
 :title_maxlen: Maximum number of characters to display in title. (default: ``80``)
 :interval: Update interval. (default: ``300``)
-:status: New message indicator. (default: ``{'no_mail': '', 'new_mail': '✉'}``)
+:status: New message indicator. (default: ``{'new_mail': '✉', 'no_mail': ''}``)
 
 
 

@@ -69,6 +69,8 @@ next
 ++++
 
 * Added `uptime`_ module
+* `cpu\_usage`_: Add multicore support
+* `cpu\_usage\_bar`_: Add multicore support
 
 3.30
 ++++
