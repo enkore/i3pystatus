@@ -6,13 +6,15 @@ from i3pystatus.core.util import make_bar
 class CpuUsageBar(CpuUsage):
     """
     Shows CPU usage as a bar (made with unicode box characters).
-    The first output will be inacurate
+    The first output will be inacurate.
+
     Linux only
 
     Available formatters:
 
     * {usage_bar}       usage average of all cores
-    * {usage_bar_cpu*}  usage of one specific core. replace "*" by core number starting at 0
+    * {usage_bar_cpu*}  usage of one specific core. replace "*"
+    by core number starting at 0
 
     """
 
