@@ -42,11 +42,11 @@ class Status:
     :param input_stream: A file-like object that provides the input stream, if `standalone` is False.
     """
 
-    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
+    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin, click_events=True):
         self.modules = util.ModuleList(self, ClassFinder(Module))
         self.standalone = standalone
         if standalone:
-            self.io = io.StandaloneIO(interval)
+            self.io = io.StandaloneIO(click_events, interval)
             self.command_endpoint = CommandEndpoint(
                 self.modules,
                 lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1))
