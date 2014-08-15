@@ -42,14 +42,16 @@ class Status:
     :param input_stream: A file-like object that provides the input stream, if `standalone` is False.
     """
 
-    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin):
+    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin, click_events=True):
         self.modules = util.ModuleList(self, ClassFinder(Module))
         self.standalone = standalone
+        self.click_events = click_events
         if standalone:
-            self.io = io.StandaloneIO(interval)
-            self.command_endpoint = CommandEndpoint(
-                self.modules,
-                lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1))
+            self.io = io.StandaloneIO(self.click_events, interval)
+            if self.click_events:
+                self.command_endpoint = CommandEndpoint(
+                    self.modules,
+                    lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1))
         else:
             self.io = io.IOHandler(input_stream)
 
@@ -78,7 +80,8 @@ class Status:
                 text=configuration_error.message))
 
     def run(self):
-        self.command_endpoint.start()
+        if self.click_events:
+            self.command_endpoint.start()
         for j in io.JSONIO(self.io).read():
             for module in self.modules:
                 module.inject(j)
