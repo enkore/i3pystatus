@@ -40,6 +40,7 @@ class Status:
     :param standalone: Whether i3pystatus should read i3status-compatible input from `input_stream`
     :param interval: Update interval in seconds
     :param input_stream: A file-like object that provides the input stream, if `standalone` is False.
+    :param click_events: Enable click events
     """
 
     def __init__(self, standalone=False, interval=1, input_stream=sys.stdin, click_events=True):
