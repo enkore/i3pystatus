@@ -9,6 +9,11 @@ i3pystatus
 i3pystatus is a (hopefully growing) collection of python scripts for 
 status output compatible to i3status / i3bar of the i3 window manager.
 
+- `Release Notes`_
+- `Configuration`_
+- `Modules`_
+- `Contribute`_
+
 Installation
 ------------
 
@@ -431,7 +436,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -479,7 +484,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
+:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
 
 
 
@@ -1218,4 +1223,9 @@ Developer documentation is available in the source code and `here
 <http://i3pystatus.readthedocs.org/en/latest/>`_.
 
 **Patches and pull requests are very welcome :-)**
+
+Table of contents
+-----------------
+
+.. contents:: Overview of this rather long README
 
