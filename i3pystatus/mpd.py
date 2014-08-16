@@ -75,7 +75,7 @@ class MPD(IntervalModule):
                 "len": int(status["playlistlength"]),
                 "status": self.status[status["state"]],
                 "volume": int(status["volume"]),
-                
+
                 "title": currentsong.get("Title", ""),
                 "album": currentsong.get("Album", ""),
                 "artist": currentsong.get("Artist", ""),
@@ -84,7 +84,7 @@ class MPD(IntervalModule):
                 "bitrate": int(status.get("bitrate", 0)),
 
             }
-            if not fdict["title"]:
+            if not fdict["title"] and "filename" in fdict:
                 fdict["filename"] = '.'.join(
                         basename(currentsong["file"]).split('.')[:-1])
             else:
