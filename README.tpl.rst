@@ -67,6 +67,7 @@ Contributors
 * tomkenmag
 * tomxtobin
 * tony
+* xals
 * yemu
 * zzatkin
 
@@ -76,6 +77,8 @@ next
 * Added `uptime`_ module
 * `cpu\_usage`_: Add multicore support
 * `cpu\_usage\_bar`_: Add multicore support
+* `network`_: Add unknown_up setting
+* `parcel`_: Document lxml dependency
 
 3.30
 ++++

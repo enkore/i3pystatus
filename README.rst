@@ -67,6 +67,7 @@ Contributors
 * tomkenmag
 * tomxtobin
 * tony
+* xals
 * yemu
 * zzatkin
 
@@ -76,6 +77,8 @@ next
 * Added `uptime`_ module
 * `cpu\_usage`_: Add multicore support
 * `cpu\_usage\_bar`_: Add multicore support
+* `network`_: Add unknown_up setting
+* `parcel`_: Document lxml dependency
 
 3.30
 ++++
@@ -436,7 +439,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -862,6 +865,7 @@ Settings:
 :format_down:  (default: ``{interface}``)
 :color_down:  (default: ``#FF0000``)
 :detached_down: If the interface doesn't exist, display it as if it were down (default: ``True``)
+:unknown_up: If the interface is in unknown state, display it as if it were up (default: ``False``)
 :name:  (default: ``eth0``)
 :interval:  (default: ``5``)
 
@@ -911,6 +915,8 @@ Supported carriers: DHL, UPS, Itella
 - parcel.DHL("<id_code>")
 - parcel.Itella("<id_code>"[, "en"|"fi"|"sv"])
   Second parameter is language. Requires beautiful soup 4 (bs4)
+
+Requires lxml and cssselect.
 
 
 Settings:
@@ -1201,6 +1207,7 @@ Settings:
 :format_down:  (default: ``{interface}``)
 :color_down:  (default: ``#FF0000``)
 :detached_down: If the interface doesn't exist, display it as if it were down (default: ``True``)
+:unknown_up: If the interface is in unknown state, display it as if it were up (default: ``False``)
 :name:  (default: ``eth0``)
 :interval:  (default: ``5``)
 
