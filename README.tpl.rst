@@ -63,6 +63,7 @@ Contributors
 * philipdexter
 * sbrunner
 * siikamiika
+* simon04
 * talwrii
 * tomkenmag
 * tomxtobin
@@ -79,6 +80,7 @@ next
 * `cpu\_usage\_bar`_: Add multicore support
 * `network`_: Add unknown_up setting
 * `parcel`_: Document lxml dependency
+* Added `network\_traffic`_ module
 
 3.30
 ++++

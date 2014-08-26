@@ -34,7 +34,7 @@ class NetworkTraffic(IntervalModule):
     def run(self):
         pnic_before = self.pnic
         self.pnic = psutil.net_io_counters(pernic=True)[self.interface]
-        if not pnic_before: return None
+        if not pnic_before: return
         cdict = {
             "bytes_sent": (self.pnic.bytes_sent - pnic_before.bytes_sent) / self.divisor,
             "bytes_recv": (self.pnic.bytes_recv - pnic_before.bytes_recv) / self.divisor,
