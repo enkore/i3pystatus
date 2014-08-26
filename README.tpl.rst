@@ -47,6 +47,7 @@ Contributors
 * Argish42
 * Arvedui
 * atalax
+* bparmentier
 * cganas
 * crwood
 * dubwoc
@@ -81,6 +82,7 @@ next
 * `network`_: Add unknown_up setting
 * `parcel`_: Document lxml dependency
 * Added `network\_traffic`_ module
+* `mpd`_: Play song on left click even if stopped
 
 3.30
 ++++
