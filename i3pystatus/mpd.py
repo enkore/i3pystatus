@@ -99,8 +99,8 @@ class MPD(IntervalModule):
 
     def on_leftclick(self):
         try:
-            self._mpd_command(self.s, "pause %i" %
-                                      (0 if self._mpd_command(self.s, "status")["state"] == "pause" else 1))
+            self._mpd_command(self.s, "%s" %
+                    ("play" if self._mpd_command(self.s, "status")["state"] in ["pause", "stop"] else "pause"))
         except Exception as e:
             pass
 
