@@ -1,6 +1,7 @@
 import subprocess
 
 from i3pystatus import SettingsBase, IntervalModule
+from i3pystatus.core.util import internet, require
 
 
 class Backend(SettingsBase):
@@ -40,6 +41,7 @@ class Mail(IntervalModule):
         for backend in self.backends:
             pass
 
+    @require(internet)
     def run(self):
         unread = sum(map(lambda backend: backend.unread, self.backends))
 
