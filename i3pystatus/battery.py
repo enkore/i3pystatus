@@ -171,6 +171,12 @@ class BatteryChecker(IntervalModule):
             }
             return
 
+        if battery.percentage() > 99.9:
+          self.output = {
+              "full_text": ""
+          }
+          return
+
         fdict = {
             "battery_ident": self.battery_ident,
             "percentage": battery.percentage(),
