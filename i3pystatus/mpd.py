@@ -47,7 +47,6 @@ class MPD(IntervalModule):
     }
     color = "#FFFFFF"
 
-
     def _mpd_command(self, sock, command):
         try:
             sock.send((command + "\n").encode("utf-8"))
@@ -67,35 +66,31 @@ class MPD(IntervalModule):
             return None
 
     def run(self):
-        try:
-            status = self._mpd_command(self.s, "status")
-            currentsong = self._mpd_command(self.s, "currentsong")
-            fdict = {
-                "pos": int(status.get("song", 0)) + 1,
-                "len": int(status["playlistlength"]),
-                "status": self.status[status["state"]],
-                "volume": int(status["volume"]),
+        status = self._mpd_command(self.s, "status")
+        currentsong = self._mpd_command(self.s, "currentsong")
+        fdict = {
+            "pos": int(status.get("song", 0)) + 1,
+            "len": int(status["playlistlength"]),
+            "status": self.status[status["state"]],
+            "volume": int(status["volume"]),
 
                 "title": currentsong.get("Title", ""),
-                "album": currentsong.get("Album", ""),
-                "artist": currentsong.get("Artist", ""),
-                "song_length": TimeWrapper(currentsong.get("Time", 0)),
-                "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
-                "bitrate": int(status.get("bitrate", 0)),
+            "album": currentsong.get("Album", ""),
+            "artist": currentsong.get("Artist", ""),
+            "song_length": TimeWrapper(currentsong.get("Time", 0)),
+            "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
+            "bitrate": int(status.get("bitrate", 0)),
 
-            }
-            if not fdict["title"] and "filename" in fdict:
-                fdict["filename"] = '.'.join(
-                        basename(currentsong["file"]).split('.')[:-1])
-            else:
-                fdict["filename"] = ""
-            self.output = {
-                "full_text": formatp(self.format, **fdict).strip(),
-                "color": self.color,
-            }
-        except Exception as e:
-            self.output = {"full_text": "error connecting MPD",
-                           "color": self.color}
+        }
+        if not fdict["title"] and "filename" in fdict:
+            fdict["filename"] = '.'.join(
+                basename(currentsong["file"]).split('.')[:-1])
+        else:
+            fdict["filename"] = ""
+        self.output = {
+            "full_text": formatp(self.format, **fdict).strip(),
+            "color": self.color,
+        }
 
     def on_leftclick(self):
         try:

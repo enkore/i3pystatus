@@ -5,6 +5,7 @@ import sys
 import imaplib
 
 from i3pystatus.mail import Backend
+from i3pystatus.core.util import internet
 
 
 class IMAP(Backend):
@@ -34,24 +35,18 @@ class IMAP(Backend):
 
     def get_connection(self):
         if not self.connection:
-            try:
-                self.connection = self.imap_class(self.host, self.port)
-                self.connection.login(self.username, self.password)
-                self.connection.select(self.mailbox)
-            except Exception:
-                self.connection = None
-
-        try:
+            self.connection = self.imap_class(self.host, self.port)
+            self.connection.login(self.username, self.password)
             self.connection.select(self.mailbox)
-        except Exception:
-            self.connection = None
+
+        self.connection.select(self.mailbox)
 
         return self.connection
 
     @property
     def unread(self):
-        conn = self.get_connection()
-        if conn:
+        if internet():
+            conn = self.get_connection()
             self.last = len(conn.search(None, "UnSeen")[1][0].split())
         return self.last
 
