@@ -173,7 +173,7 @@ class BatteryChecker(IntervalModule):
             }
             return
         if self.no_text_full:
-            if battery.percentage() > 99.9:
+            if battery.status() == 'Full':
               self.output = {
                   "full_text": ""
               }
