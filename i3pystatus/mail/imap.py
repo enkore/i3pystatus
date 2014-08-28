@@ -26,6 +26,7 @@ class IMAP(Backend):
 
     imap_class = imaplib.IMAP4
     connection = None
+    last = 0
 
     def init(self):
         if self.ssl:
@@ -51,9 +52,8 @@ class IMAP(Backend):
     def unread(self):
         conn = self.get_connection()
         if conn:
-            return len(conn.search(None, "UnSeen")[1][0].split())
-        else:
-            sys.stderr.write("no connection")
+            self.last = len(conn.search(None, "UnSeen")[1][0].split())
+        return self.last
 
 
 Backend = IMAP
