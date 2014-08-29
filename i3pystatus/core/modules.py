@@ -27,6 +27,10 @@ class Module(SettingsBase):
             self.on_leftclick()
         elif button == 3:  # Right mouse button
             self.on_rightclick()
+        elif button == 4: # mouse wheel up
+            self.on_upscroll()
+        elif button == 5: # mouse wheel down
+            self.on_downscroll()
 
     def move(self, position):
         self.position = position
@@ -38,6 +42,11 @@ class Module(SettingsBase):
     def on_rightclick(self):
         pass
 
+    def on_upscroll(self):
+        pass
+
+    def on_downscroll(self):
+        pass
 
 class IntervalModuleMeta(type):
     """Add interval setting to `settings` attribute if it does not exist."""
