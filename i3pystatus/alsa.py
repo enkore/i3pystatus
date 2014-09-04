@@ -25,6 +25,7 @@ class ALSA(IntervalModule):
         ("mixer", "ALSA mixer"),
         ("mixer_id", "ALSA mixer id"),
         ("card", "ALSA sound card"),
+        ("increment","integer percentage of max volume to in/decrement volume on mousewheel"),
         "muted", "unmuted",
         "color_muted", "color",
         "channel"
@@ -40,6 +41,7 @@ class ALSA(IntervalModule):
     mixer_id = 0
     card = 0
     channel = 0
+    increment = 5
 
     alsamixer = None
     has_mute = True
@@ -79,3 +81,11 @@ class ALSA(IntervalModule):
             "full_text": output_format.format(**self.fdict),
             "color": self.color_muted if muted else self.color,
         }
+
+    def on_upscroll(self):
+        vol = self.alsamixer.getvolume()
+        self.alsamixer.setvolume( vol[0] + self.increment)
+
+    def on_downscroll(self):
+        vol = self.alsamixer.getvolume()
+        self.alsamixer.setvolume( vol[0] - self.increment)
