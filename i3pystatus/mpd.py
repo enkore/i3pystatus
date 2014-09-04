@@ -104,3 +104,15 @@ class MPD(IntervalModule):
             self._mpd_command(self.s, "next")
         except Exception as e:
             pass
+
+    def on_upscroll(self):
+        try:
+            self._mpd_command(self.s, "next")
+        except Exception as e:
+            pass
+
+    def on_downscroll(self):
+        try:
+            self._mpd_command(self.s, "previous")
+        except Exception as e:
+            pass
