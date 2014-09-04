@@ -82,10 +82,18 @@ class ALSA(IntervalModule):
             "color": self.color_muted if muted else self.color,
         }
 
+    def on_leftclick(self):
+        self.on_rightclick()
+
+    def on_rightclick(self):
+        if self.has_mute:
+            muted = self.alsamixer.getmute()[self.channel] 
+            self.alsamixer.setmute( not muted )
+
     def on_upscroll(self):
-        vol = self.alsamixer.getvolume()
-        self.alsamixer.setvolume( vol[0] + self.increment)
+        vol = self.alsamixer.getvolume()[self.channel]
+        self.alsamixer.setvolume( vol + self.increment)
 
     def on_downscroll(self):
-        vol = self.alsamixer.getvolume()
-        self.alsamixer.setvolume( vol[0] - self.increment)
+        vol = self.alsamixer.getvolume()[self.channel]
+        self.alsamixer.setvolume( vol - self.increment)
