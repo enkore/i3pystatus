@@ -66,6 +66,7 @@ Contributors
 * siikamiika
 * simon04
 * talwrii
+* teto
 * tomkenmag
 * tomxtobin
 * tony
@@ -83,6 +84,12 @@ next
 * `parcel`_: Document lxml dependency
 * Added `network\_traffic`_ module
 * `mpd`_: Play song on left click even if stopped
+* Fixed issues with internet-related modules
+* `battery`_: Added no_text_full option
+* Unexpected exceptions are now displayed in the status bar
+* `mail`_: db_path option made optional
+* Core: added mouse wheel handling for upcoming i3 version
+* `alsa`_: mouse wheel changes volume
 
 3.30
 ++++
@@ -384,6 +391,7 @@ Settings:
 :mixer: ALSA mixer (default: ``Master``)
 :mixer_id: ALSA mixer id (default: ``0``)
 :card: ALSA sound card (default: ``0``)
+:increment: integer percentage of max volume to in/decrement volume on mousewheel (default: ``5``)
 :muted:  (default: ``M``)
 :unmuted:  (default: ````)
 :color_muted:  (default: ``#AAAAAA``)
@@ -443,12 +451,13 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'CHR': 'CHR', 'FULL': 'FULL', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
 :critical_color: The critical color (default: ``#ff0000``)
 :not_present_color: The not present color. (default: ``#ffffff``)
+:no_text_full: Don't display text when battery is full - 100% (default: ``False``)
 :interval:  (default: ``5``)
 
 
@@ -491,7 +500,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
+:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
 
 
 
@@ -710,7 +719,7 @@ and "unread"
 
 Settings:
 
-:db_path:  (required)
+:db_path: Path to the directory of your notmuch database (default: ``None``)
 
 
 
@@ -832,7 +841,7 @@ Settings:
 :host:  (default: ``localhost``)
 :port: MPD port (default: ``6600``)
 :format: formatp string (default: ``{title} {status}``)
-:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output (default: ``{'pause': '▷', 'stop': '◾', 'play': '▶'}``)
 :color: The color of the text (default: ``#FFFFFF``)
 :interval:  (default: ``1``)
 
@@ -927,7 +936,7 @@ Requires python-dbus available from every distros' package manager.
 Settings:
 
 :player: Player name (default: ``None``)
-:status: Dictionary mapping pause, play and stop to output text (default: ``{'pause': '▷', 'play': '▶', 'stop': '◾'}``)
+:status: Dictionary mapping pause, play and stop to output text (default: ``{'pause': '▷', 'stop': '◾', 'play': '▶'}``)
 :color: Text color (default: ``#FFFFFF``)
 :format: formatp string (default: ``{title} {status}``)
 :interval:  (default: ``1``)

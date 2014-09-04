@@ -66,6 +66,7 @@ Contributors
 * siikamiika
 * simon04
 * talwrii
+* teto
 * tomkenmag
 * tomxtobin
 * tony
@@ -83,6 +84,12 @@ next
 * `parcel`_: Document lxml dependency
 * Added `network\_traffic`_ module
 * `mpd`_: Play song on left click even if stopped
+* Fixed issues with internet-related modules
+* `battery`_: Added no_text_full option
+* Unexpected exceptions are now displayed in the status bar
+* `mail`_: db_path option made optional
+* Core: added mouse wheel handling for upcoming i3 version
+* `alsa`_: mouse wheel changes volume
 
 3.30
 ++++
