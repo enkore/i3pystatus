@@ -4,6 +4,7 @@
 import os
 import locale
 import datetime
+import pytz
 
 from i3pystatus import IntervalModule
 
@@ -14,13 +15,13 @@ class Clock(IntervalModule):
     """
 
     settings = (
-        ("format", "list of stftime format string, `None` means to use the default, locale-dependent format. Can cycle between formats with mousewheel"),
+        ("format", "list of tuple (stftime format string, optional timezone), `None` means to use the default, locale-dependent format. Can cycle between formats with mousewheel"),
         ("color", "RGB hexadecimal code color specifier, default to #ffffff, set to `i3Bar` to use i3 bar default"),
     )
     format = None
     color = "#ffffff"
     interval = 1
-    currentFormatId = 0
+    current_format_id = 0
 
     def init(self):
         if self.format is None:
@@ -35,21 +36,40 @@ class Clock(IntervalModule):
                 # DMY format - almost all other countries
                 self.format = ["%a %-d %b %X"]
 
-        elif isinstance(self.format,str):
-            self.format=[self.format]
+        elif isinstance(self.format, str):
+            self.format = [self.format]
+
+        self.format = self.expand_formats(self.format)
+
+    @staticmethod
+    def expand_formats(formats):
+        def expand_format(format_):
+            if isinstance(format_, tuple):
+                return (format_[0], format_[1] if len(format_) > 1 else None)
+            return (format_, None)
+
+        return [expand_format(format_) for format_ in formats]
 
     def run(self):
+        # Safest way is to work from utc and localize afterwards
+        if self.format[self.current_format_id][1]:
+            utc_dt = pytz.utc.localize(datetime.datetime.utcnow())
+            tz = pytz.timezone(self.format[self.current_format_id][1])
+            dt = tz.normalize(utc_dt.astimezone(tz))
+        else:
+            dt = datetime.datetime.now()
+
+        output = dt.strftime(self.format[self.current_format_id][0]),
+
         self.output = {
-            # todo find local
-            "full_text": datetime.datetime.now().strftime(self.format[self.currentFormatId]),
+            "full_text": output,
             "urgent": False,
         }
         if self.color != "i3Bar":
             self.output["color"] = self.color
-            
 
     def on_upscroll(self):
-        self.currentFormatId = (self.currentFormatId + 1)% len(self.format)
+        self.current_format_id = (self.current_format_id + 1) % len(self.format)
 
     def on_downscroll(self):
-        self.currentFormatId = (self.currentFormatId - 1)% len(self.format)
+        self.current_format_id = (self.current_format_id - 1) % len(self.format)
