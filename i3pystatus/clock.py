@@ -59,7 +59,7 @@ class Clock(IntervalModule):
         else:
             dt = datetime.datetime.now()
 
-        output = dt.strftime(self.format[self.current_format_id][0]),
+        output = dt.strftime(self.format[self.current_format_id][0])
 
         self.output = {
             "full_text": output,
