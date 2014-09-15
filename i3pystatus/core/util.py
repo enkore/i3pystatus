@@ -353,12 +353,13 @@ def require(predicate):
 
 def internet():
     """
-    Checks for a internet connection by connecting to 8.8.8.8 (Google DNS)
+    Checks for a internet connection by connecting to a Google DNS
+    server.
 
     :returns: True if internet connection is available
     """
     try:
-        socket.create_connection(("www.google.de", 53), 1).close()
+        socket.create_connection(("google-public-dns-a.google.com", 53), 1).close()
         return True
     except OSError:
         return False
