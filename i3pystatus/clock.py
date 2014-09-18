@@ -4,7 +4,6 @@
 import os
 import locale
 import datetime
-import pytz
 
 from i3pystatus import IntervalModule
 
@@ -53,6 +52,10 @@ class Clock(IntervalModule):
     def run(self):
         # Safest way is to work from utc and localize afterwards
         if self.format[self.current_format_id][1]:
+            try:
+                import pytz
+            except ImportError as e:
+                raise RuntimeError("Need pytz for timezones") from e
             utc_dt = pytz.utc.localize(datetime.datetime.utcnow())
             tz = pytz.timezone(self.format[self.current_format_id][1])
             dt = tz.normalize(utc_dt.astimezone(tz))
