@@ -988,6 +988,8 @@ Settings:
 :format_muted: optional format string to use when muted (default: ``None``)
 :muted:  (default: ``M``)
 :unmuted:  (default: ````)
+:color_muted:  (default: ``#FF0000``)
+:color_unmuted:  (default: ``#FFFFFF``)
 
 
 
