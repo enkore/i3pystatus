@@ -57,6 +57,7 @@ Contributors
 * jasonmhite
 * jedrz
 * jorio
+* kageurufu
 * mekanix
 * Mic92
 * micha-a-schmidt
@@ -90,6 +91,7 @@ next
 * `mail`_: db_path option made optional
 * Core: added mouse wheel handling for upcoming i3 version
 * `alsa`_: mouse wheel changes volume
+* `pulseaudio`_: Added color_muted and color_unmuted options
 
 3.30
 ++++

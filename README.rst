@@ -57,6 +57,7 @@ Contributors
 * jasonmhite
 * jedrz
 * jorio
+* kageurufu
 * mekanix
 * Mic92
 * micha-a-schmidt
@@ -90,6 +91,7 @@ next
 * `mail`_: db_path option made optional
 * Core: added mouse wheel handling for upcoming i3 version
 * `alsa`_: mouse wheel changes volume
+* `pulseaudio`_: Added color_muted and color_unmuted options
 
 3.30
 ++++
@@ -451,7 +453,7 @@ Settings:
 :alert_format_title: The title of the notification, all formatters can be used (default: ``Low battery``)
 :alert_format_body: The body text of the notification, all formatters can be used (default: ``Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!``)
 :path: Override the default-generated path (default: ``None``)
-:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'FULL': 'FULL', 'CHR': 'CHR', 'DIS': 'DIS'}``)
+:status: A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names (default: ``{'DIS': 'DIS', 'CHR': 'CHR', 'FULL': 'FULL'}``)
 :color: The text color (default: ``#ffffff``)
 :full_color: The full color (default: ``#00ff00``)
 :charging_color: The charging color (default: ``#00ff00``)
@@ -500,7 +502,7 @@ Settings:
 :leftclick: URL to visit or command to run on left click (default: ``electrum``)
 :rightclick: URL to visit or command to run on right click (default: ``https://bitcoinaverage.com/``)
 :interval: Update interval. (default: ``600``)
-:status:  (default: ``{'price_down': '▼', 'price_up': '▲'}``)
+:status:  (default: ``{'price_up': '▲', 'price_down': '▼'}``)
 
 
 
@@ -513,7 +515,7 @@ This class shows a clock
 
 Settings:
 
-:format: stftime format string, `None` means to use the default, locale-dependent format (default: ``None``)
+:format: list of tuple (stftime format string, optional timezone), `None` means to use the default, locale-dependent format. Can cycle between formats with mousewheel (default: ``None``)
 :color: RGB hexadecimal code color specifier, default to #ffffff, set to `i3Bar` to use i3 bar default (default: ``#ffffff``)
 :interval:  (default: ``1``)
 
@@ -988,6 +990,8 @@ Settings:
 :format_muted: optional format string to use when muted (default: ``None``)
 :muted:  (default: ``M``)
 :unmuted:  (default: ````)
+:color_muted:  (default: ``#FF0000``)
+:color_unmuted:  (default: ``#FFFFFF``)
 
 
 
