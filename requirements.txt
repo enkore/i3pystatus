@@ -1,2 +1,3 @@
 pytest>=2.5
 sphinx>=1.2
+colour>=0.0.5
