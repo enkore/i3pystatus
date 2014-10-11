@@ -30,10 +30,11 @@ Packages for your OS
 
 * `Arch Linux <https://aur.archlinux.org/packages/i3pystatus-git/>`_
 
-Modules
--------
+Documentation
+-------------
 
-The module docs have been moved to `here <TODO: Link?>`_
+`All further user documentation has been moved here. <http://i3pystatus.readthedocs.org/en/latest/index.html>`_
+
 
 Release Notes
 -------------
