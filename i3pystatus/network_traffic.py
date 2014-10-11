@@ -31,15 +31,32 @@ class NetworkTraffic(IntervalModule):
     round_size = None
  
     pnic = None
-    def run(self):
-        pnic_before = self.pnic
+    pnic_before = None
+
+    def update_counters(self):
+        self.pnic_before = self.pnic
         self.pnic = psutil.net_io_counters(pernic=True)[self.interface]
-        if not pnic_before: return
+
+    def get_bytes_sent(self):
+        return (self.pnic.bytes_sent - self.pnic_before.bytes_sent) / self.divisor
+
+    def get_bytes_received(self):
+        return (self.pnic.bytes_recv - self.pnic_before.bytes_recv) / self.divisor
+
+    def get_packets_sent(self):
+        return self.pnic.packets_sent - self.pnic_before.packets_sent
+
+    def get_packets_received(self):
+        return self.pnic.packets_recv - self.pnic_before.packets_recv
+
+    def run(self):
+        self.update_counters()
+        if not self.pnic_before: return
         cdict = {
-            "bytes_sent": (self.pnic.bytes_sent - pnic_before.bytes_sent) / self.divisor,
-            "bytes_recv": (self.pnic.bytes_recv - pnic_before.bytes_recv) / self.divisor,
-            "packets_sent": self.pnic.packets_sent - pnic_before.packets_sent,
-            "packets_recv": self.pnic.packets_recv - pnic_before.packets_recv,
+            "bytes_sent": self.get_bytes_sent(),
+            "bytes_recv": self.get_bytes_received(),
+            "packets_sent": self.get_packets_sent(),
+            "packets_recv": self.get_packets_received(),
         }
         round_dict(cdict, self.round_size)
         cdict["interface"] = self.interface
