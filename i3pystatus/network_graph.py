@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from colour import Color
+from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.network_traffic import NetworkTraffic
 from i3pystatus.core.util import make_graph
 
 
-class NetworkGraph(NetworkTraffic):
+class NetworkGraph(NetworkTraffic, ColorRangeModule):
     """
     Shows Network activity as a Unicode graph
 
@@ -29,8 +29,6 @@ class NetworkGraph(NetworkTraffic):
     )
 
     format = "{network_graph}{kbs}KB/s"
-    start_color = "#00FF00"
-    end_color = 'red'
     graph_type = 'input'
 
     interval = 1
@@ -40,55 +38,6 @@ class NetworkGraph(NetworkTraffic):
     def init(self):
         self.colors = self.get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
         self.kbs_arr = [0.0] * self.graph_width
-
-    @staticmethod
-    def get_hex_color_range(start_color, end_color, quantity):
-        """
-        Generates a list of quantity Hex colors from start_color to end_color.
-
-        :param start_color: Hex or plain English color for start of range
-        :param end_color: Hex or plain English color for end of range
-        :param quantity: Number of colours to return
-        :return: A list of Hex color values
-        """
-        raw_colors = [c.hex for c in list(Color(start_color).range_to(Color(end_color), quantity))]
-        colors = []
-        for color in raw_colors:
-
-            # i3bar expects the full Hex value but for some colors the colour
-            # module only returns partial values. So we need to convert these colors to the full
-            # Hex value.
-            if len(color) == 4:
-                fixed_color = "#"
-                for c in color[1:]:
-                    fixed_color += c * 2
-                colors.append(fixed_color)
-            else:
-                colors.append(color)
-        return colors
-
-    def get_gradient(self, value):
-        """
-        Map a value to a color
-        :param value: Some value
-        :return: A Hex color code
-        """
-        index = int(self.percentage(value, self.upper_limit))
-        if index >= len(self.colors):
-            return self.colors[-1]
-        elif index < 0:
-            return self.colors[0]
-        else:
-            return self.colors[index]
-
-    @staticmethod
-    def percentage(part, whole):
-        """
-        Calculate percentage
-        """
-        if whole == 0:
-            return 0
-        return 100 * float(part) / float(whole)
 
     def run(self):
         self.update_counters()
@@ -106,7 +55,7 @@ class NetworkGraph(NetworkTraffic):
         self.kbs_arr.insert(0, kbs)
         self.kbs_arr = self.kbs_arr[:self.graph_width]
 
-        color = self.get_gradient(kbs)
+        color = self.get_gradient(kbs, self.colors, self.upper_limit)
         network_graph = make_graph(self.kbs_arr, self.upper_limit)
 
         self.output = {
