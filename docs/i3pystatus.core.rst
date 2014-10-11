@@ -75,7 +75,7 @@ core Package
     :show-inheritance:
 
 :mod:`color` Module
-------------------
+-------------------
 
 .. automodule:: i3pystatus.core.color
     :members:
