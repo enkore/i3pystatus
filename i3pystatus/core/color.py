@@ -2,6 +2,11 @@ from colour import Color
 
 
 class ColorRangeModule(object):
+    """
+    Class to dynamically generate and select colors.
+
+    Requires the PyPI package `colour`
+    """
 
     start_color = "#00FF00"
     end_color = 'red'

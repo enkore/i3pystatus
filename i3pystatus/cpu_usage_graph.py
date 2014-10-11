@@ -8,6 +8,8 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
      Shows CPU usage as a Unicode graph.
      The first output will be inacurate.
 
+     Depends on the PyPI colour module - https://pypi.python.org/pypi/colour/0.0.5
+
      Linux only
 
      Available formatters:

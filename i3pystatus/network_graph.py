@@ -10,6 +10,8 @@ class NetworkGraph(NetworkTraffic, ColorRangeModule):
 
     Linux only
 
+    Requires the PyPI packages `psutil` and `colour`.
+
     Available formatters:
 
     {kbs}               Float representing kb\s
