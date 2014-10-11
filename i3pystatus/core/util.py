@@ -170,7 +170,7 @@ def formatp(string, **kwargs):
     Escaped brackets, i.e. \\\\[ and \\\\] are copied verbatim to output.
 
     :param string: Format string
-    :param **kwargs: keyword arguments providing data for the format string
+    :param kwargs: keyword arguments providing data for the format string
     :returns: Formatted string
     """
 
