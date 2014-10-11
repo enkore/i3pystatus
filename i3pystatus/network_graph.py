@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from colour import Color
 from i3pystatus.network_traffic import NetworkTraffic
-from i3pystatus.core.util import make_graph, get_hex_color_range
+from i3pystatus.core.util import make_graph
 
 
 class NetworkGraph(NetworkTraffic):
@@ -37,8 +38,34 @@ class NetworkGraph(NetworkTraffic):
     upper_limit = 150.0
 
     def init(self):
-        self.colors = get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
+        self.colors = self.get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
         self.kbs_arr = [0.0] * self.graph_width
+
+    @staticmethod
+    def get_hex_color_range(start_color, end_color, quantity):
+        """
+        Generates a list of quantity Hex colors from start_color to end_color.
+
+        :param start_color: Hex or plain English color for start of range
+        :param end_color: Hex or plain English color for end of range
+        :param quantity: Number of colours to return
+        :return: A list of Hex color values
+        """
+        raw_colors = [c.hex for c in list(Color(start_color).range_to(Color(end_color), quantity))]
+        colors = []
+        for color in raw_colors:
+
+            # i3bar expects the full Hex value but for some colors the colour
+            # module only returns partial values. So we need to convert these colors to the full
+            # Hex value.
+            if len(color) == 4:
+                fixed_color = "#"
+                for c in color[1:]:
+                    fixed_color += c * 2
+                colors.append(fixed_color)
+            else:
+                colors.append(color)
+        return colors
 
     def get_gradient(self, value):
         """
