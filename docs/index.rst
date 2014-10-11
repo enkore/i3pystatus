@@ -1,14 +1,17 @@
 
-Welcome to i3pystatus's documentation!
-======================================
+Welcome to the i3pystatus documentation!
+========================================
 
 Contents:
 
 .. toctree::
    :maxdepth: 4
 
-   module
+   configuration
+   formatting
+   i3pystatus
    i3pystatus.core
+   module
 
 
 Indices and tables
