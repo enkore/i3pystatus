@@ -20,7 +20,15 @@ sys.path.insert(0, os.path.abspath('..'))
 # requires PyPI mock
 import mock
 
-MOCK_MODULES = ["alsaaudio", "netifaces", "psutil", "lxml", "lxml.html", "lxml.cssselect", "praw", "gi.repository", "pywapi", "basiciw"]
+MOCK_MODULES = [
+    "alsaaudio",
+    "netifaces", "psutil",
+    "lxml", "lxml.html", "lxml.cssselect",
+    "praw",
+    "gi.repository", "dbus",
+    "pywapi", "basiciw"
+]
+
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
