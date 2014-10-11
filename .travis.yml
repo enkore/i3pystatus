@@ -3,7 +3,6 @@ python:
   - "3.3"
 install:
   - "pip install -r requirements.txt"
-  - "pip install sphinx"         # for test-building docs
 script:
   - "PYTHONPATH=. py.test"       # run unit tests
   - "python setup.py install"    # test install
