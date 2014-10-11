@@ -6,4 +6,4 @@ install:
 script:
   - "PYTHONPATH=. py.test"       # run unit tests
   - "python setup.py install"    # test install
-  - "sphinx-build docs html"     # test building docs
+  - "sphinx-build -W docs html"     # test building docs
