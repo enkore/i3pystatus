@@ -12,11 +12,11 @@ status output compatible to i3status / i3bar of the i3 window manager.
 Installation
 ------------
 
-.. admonition:: Note
+.. note:: Supported Python versions
 
     i3pystatus requires Python 3.2 or newer and is not compatible with
     Python 2.x. Some modules require additional dependencies
-    documented below (see `Modules`_).
+    documented in the docs.
 
 From PyPI package `i3pystatus <https://pypi.python.org/pypi/i3pystatus>`_
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
