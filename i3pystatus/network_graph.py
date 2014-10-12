@@ -14,8 +14,8 @@ class NetworkGraph(NetworkTraffic, ColorRangeModule):
 
     .. rubric:: Available formatters
 
-    {kbs}               Float representing kb\s
-    {network_graph}     Unicode network graph
+    * {kbs} – Float representing kb\s
+    * {network_graph} – Unicode network graph
 
     """
     settings = (
