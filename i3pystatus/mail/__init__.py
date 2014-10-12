@@ -1,7 +1,6 @@
 import subprocess
 
 from i3pystatus import SettingsBase, IntervalModule
-from i3pystatus.core.util import internet, require
 
 
 class Backend(SettingsBase):
@@ -27,6 +26,10 @@ class Mail(IntervalModule):
         "color", "color_unread", "format", "format_plural",
         ("hide_if_null", "Don't output anything if there are no new mails"),
         ("email_client", "The email client to open on left click"),
+        ("action_on_click", "The action to take on left click. Allowed values are 'launch' or 'focus'."
+                            "If 'focus' is chosen you must also define the X window class to focus on."
+                            "A quick way to find this is to run 'xprop | grep -i class' and click on your mail client."),
+        ("window_class", "X window class to focus on click.")
     )
     required = ("backends",)
 
@@ -36,6 +39,9 @@ class Mail(IntervalModule):
     format_plural = "{unread} new emails"
     hide_if_null = True
     email_client = None
+
+    action_on_click = 'launch'
+    window_class = None
 
     def init(self):
         for backend in self.backends:
@@ -62,11 +68,17 @@ class Mail(IntervalModule):
             "full_text": format.format(unread=unread),
             "urgent": urgent,
             "color": color,
-        }
+            }
 
     def on_leftclick(self):
-        if self.email_client:
-            subprocess.Popen(self.email_client.split())
+        command = None
+        if self.action_on_click == 'launch' and self.email_client:
+            command = self.email_client
+        elif self.action_on_click == 'focus' and self.window_class:
+            command = 'i3-msg -q [class="^%s$"] focus' % self.window_class
+
+        if command:
+            subprocess.Popen(command.split())
 
     def on_rightclick(self):
         self.run()
