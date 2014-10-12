@@ -15,7 +15,7 @@ class Bitcoin(IntervalModule):
     Index API <https://bitcoinaverage.com> while transaction data is pulled
     from blockchain.info <https://blockchain.info/api/blockchain_api>.
     
-    Available formatters:
+    .. rubric:: Available formatters
 
     * {last_price}
     * {ask_price}

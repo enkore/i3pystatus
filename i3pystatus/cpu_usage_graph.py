@@ -12,7 +12,7 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
 
      Linux only
 
-     Available formatters:
+     .. rubric:: Available formatters
 
      * {cpu_graph}   graph of cpu usage.
      * {usage}       usage average of all cores

@@ -15,7 +15,7 @@ class Reddit(IntervalModule):
     submission directly. Depends on the Python Reddit API Wrapper (PRAW)
     <https://github.com/praw-dev/praw>.
     
-    Available formatters:
+    .. rubric:: Available formatters
 
     * {submission_title}
     * {submission_author}

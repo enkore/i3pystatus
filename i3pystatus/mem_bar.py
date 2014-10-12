@@ -8,7 +8,8 @@ class MemBar(IntervalModule, ColorRangeModule):
     """
     Shows memory load as a bar.
 
-    Available formatters:
+    .. rubric:: Available formatters
+
     * {used_mem_bar}
 
     Requires psutil and colour (from PyPI)

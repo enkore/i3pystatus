@@ -8,7 +8,7 @@ class NetworkTraffic(IntervalModule):
 
     Requires the PyPI packages `psutil`.
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{interface}` — the configured network interface
     * `{bytes_sent}` — bytes sent per second (divided by divisor)

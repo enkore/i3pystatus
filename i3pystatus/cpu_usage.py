@@ -18,7 +18,7 @@ class CpuUsage(IntervalModule):
 
     Linux only
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * {usage}       usage average of all cores
     * {usage_cpu*}  usage of one specific core. replace "*" by core number starting at 0
