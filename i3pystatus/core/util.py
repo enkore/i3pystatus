@@ -389,6 +389,26 @@ def make_graph(values, upper_limit=100.0):
                         for n in values[:len(values)-1])  # Don't show the upper limit value.
     return graph
 
+
+def make_vertical_bar(percentage, width=1):
+    """
+    Draws a vertical bar made of unicode characters.
+
+    :param value: A value between 0 and 100
+    :param width: How many characters wide the bar should be.
+    :returns: Bar as a String
+    """
+    bar = u' _▁▂▃▄▅▆▇█'
+    percentage //= 10
+    if percentage < 0:
+        output = bar[0]
+    elif percentage >= len(bar):
+        output = bar[-1]
+    else:
+        output = bar[percentage]
+    return output * width
+
+
 def make_bar(percentage):
     """
     Draws a bar made of unicode box characters.

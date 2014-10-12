@@ -67,7 +67,10 @@ class CpuUsage(IntervalModule):
         self.prev_total[cpu] = total
         self.prev_busy[cpu] = busy
 
-        return int(diff_busy / diff_total * 100)
+        if diff_total == 0:
+            return 0
+        else:
+            return int(diff_busy / diff_total * 100)
 
     def gen_format_all(self, usage):
         """
