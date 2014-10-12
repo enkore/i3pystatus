@@ -1,3 +1,5 @@
+import os
+import shutil
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import make_vertical_bar, make_bar
 from .pulse import *
@@ -8,6 +10,8 @@ import subprocess
 class PulseAudio(Module, ColorRangeModule):
     """
     Shows volume of default PulseAudio sink (output).
+
+    Requires amixer for toggling mute and incrementing/decrementing volume on scroll. 
 
     Available formatters:
 
@@ -34,6 +38,8 @@ class PulseAudio(Module, ColorRangeModule):
     unmuted = ""
     format = "♪: {volume}"
     format_muted = None
+    currently_muted = False
+    has_amixer = False
     color_muted = "#FF0000"
     color_unmuted = "#FFFFFF"
 
@@ -65,6 +71,9 @@ class PulseAudio(Module, ColorRangeModule):
         pa_threaded_mainloop_start(_mainloop)
 
         self.colors = self.get_hex_color_range(self.color_muted, self.color_unmuted, 100)
+
+        # Check that we have amixer for toggling mute/unmute and incrementing/decrementing volume
+        self.has_amixer = shutil.which('alsamixer') is not None
 
     def request_update(self, context):
         """Requests a sink info update (sink_info_cb is called)"""
@@ -109,6 +118,7 @@ class PulseAudio(Module, ColorRangeModule):
             sink_info = sink_info_p.contents
             volume_percent = int(100 * sink_info.volume.values[0] / 0x10000)
             volume_db = pa_sw_volume_to_dB(sink_info.volume.values[0])
+            self.currently_muted = sink_info.mute
 
             if volume_db == float('-Infinity'):
                 volume_db = "-∞"
@@ -144,6 +154,25 @@ class PulseAudio(Module, ColorRangeModule):
             }
 
     def on_leftclick(self):
-        import subprocess
-
         subprocess.Popen(["pavucontrol"])
+
+    def on_rightclick(self):
+        if self.has_amixer:
+            command = "amixer -q -D pulse sset Master "
+            if self.currently_muted:
+                command += 'unmute'
+            else:
+                command += 'mute'
+            subprocess.Popen(command.split())
+
+    def on_upscroll(self):
+        if self.has_amixer:
+            command = "amixer -q -D pulse sset Master %s%%+" % self.step
+            subprocess.Popen(command.split())
+
+    def on_downscroll(self):
+        if self.has_amixer:
+            command = "amixer -q -D pulse sset Master %s%%-" % self.step
+            subprocess.Popen(command.split())
+    
+
