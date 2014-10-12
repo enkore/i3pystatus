@@ -23,10 +23,11 @@ import mock
 MOCK_MODULES = [
     "alsaaudio",
     "netifaces", "psutil",
-    "lxml", "lxml.html", "lxml.cssselect",
+    "lxml.html", "lxml.cssselect", "lxml",
     "praw",
-    "gi.repository", "dbus",
-    "pywapi", "basiciw"
+    "gi.repository", "dbus.mainloop.glib", "dbus",
+    "pywapi", "basiciw",
+    "i3pystatus.pulseaudio.pulse"
 ]
 
 for mod_name in MOCK_MODULES:
