@@ -110,6 +110,7 @@ def generate_automodules(path, basecls):
     contents.append("")
 
     for mod in modules:
+        contents.append(".. _{}:\n".format(mod[0].split(".")[-1]))
         contents.append(".. automodule:: {}".format(mod[0]))
         contents.append("    :members: {}\n".format(mod[1]))
 
