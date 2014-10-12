@@ -1,9 +1,11 @@
+from i3pystatus.core.color import ColorRangeModule
+from i3pystatus.core.util import make_vertical_bar, make_bar
 from .pulse import *
 
 from i3pystatus import Module
+import subprocess
 
-
-class PulseAudio(Module):
+class PulseAudio(Module, ColorRangeModule):
     """
     Shows volume of default PulseAudio sink (output).
 
@@ -13,13 +15,19 @@ class PulseAudio(Module):
     * `{db}` — volume in decibels relative to 100 %, i.e. 100 % = 0 dB, 50 % = -18 dB, 0 % = -infinity dB
       (the literal value for -infinity is `-∞`)
     * `{muted}` — the value of one of the `muted` or `unmuted` settings
+    * `{volume_bar}` — unicode bar showing volume
     """
 
     settings = (
         "format",
         ("format_muted", "optional format string to use when muted"),
         "muted", "unmuted",
-        "color_muted", "color_unmuted"
+        "color_muted", "color_unmuted",
+        ("step", "percentage to increment volume on scroll"),
+        ("bar_type", "type of volume bar. Allowed values are 'vertical' or 'horizontal'"),
+        ("multi_colors", "whether or not to change the color from "
+                         "'color_muted' to 'color_unmuted' based on volume percentage"),
+        ("vertical_bar_width", "how many characters wide the vertical volume_bar should be")
     )
 
     muted = "M"
@@ -28,6 +36,11 @@ class PulseAudio(Module):
     format_muted = None
     color_muted = "#FF0000"
     color_unmuted = "#FFFFFF"
+
+    step = 5
+    multi_colors = False
+    bar_type = 'vertical'
+    vertical_bar_width = 2
 
     def init(self):
         """Creates context, when context is ready context_notify_cb is called"""
@@ -50,6 +63,8 @@ class PulseAudio(Module):
         pa_context_set_state_callback(context, self._context_notify_cb, None)
         pa_context_connect(context, None, 0, None)
         pa_threaded_mainloop_start(_mainloop)
+
+        self.colors = self.get_hex_color_range(self.color_muted, self.color_unmuted, 100)
 
     def request_update(self, context):
         """Requests a sink info update (sink_info_cb is called)"""
@@ -101,19 +116,31 @@ class PulseAudio(Module):
                 volume_db = int(volume_db)
 
             muted = self.muted if sink_info.mute else self.unmuted
-            color = self.color_muted if sink_info.mute else self.color_unmuted
+
+            if self.multi_colors and not sink_info.mute:
+                color = self.get_gradient(volume_percent, self.colors)
+            else:
+                color = self.color_muted if sink_info.mute else self.color_unmuted
 
             if muted and self.format_muted is not None:
                 output_format = self.format_muted
             else:
                 output_format = self.format
 
+            if self.bar_type == 'vertical':
+                volume_bar = make_vertical_bar(volume_percent, self.vertical_bar_width)
+            elif self.bar_type == 'horizontal':
+                volume_bar = make_bar(volume_percent)
+            else:
+                raise Exception("bar_type must be 'vertical' or 'horizontal'")
+
             self.output = {
                 "color": color,
                 "full_text": output_format.format(
                     muted=muted,
                     volume=volume_percent,
-                    db=volume_db),
+                    db=volume_db,
+                    volume_bar=volume_bar),
             }
 
     def on_leftclick(self):
