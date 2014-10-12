@@ -52,9 +52,10 @@ def process_docstring(app, what, name, obj, options, lines):
             if self.default is self.empty:
                 attrs.append("default: *empty*")
 
-            formatted = "* **{name}** – {doc}".format(name=self.name, doc=self.doc)
-            if attrs:
-                formatted += " ({attrs})".format(attrs=", ".join(attrs))
+            formatted = "* **{name}** {attrsf} {doc}".format(
+                name=self.name,
+                doc="– " + self.doc if self.doc else "",
+                attrsf=" ({attrs})".format(attrs=", ".join(attrs)) if attrs else "")
 
             return formatted
 
@@ -65,13 +66,15 @@ def process_docstring(app, what, name, obj, options, lines):
         for setting in obj.settings:
             lines.append(str(Setting(obj, setting)))
 
+        lines.append("")
+
 
 def process_signature(app, what, name, obj, options, signature, return_annotation):
     if is_module(obj):
         return ("", return_annotation)
 
 
-def get_modules(path):
+def get_modules(path, name):
     modules = []
     for finder, modname, is_package in pkgutil.iter_modules(path):
         if modname not in IGNORE_MODULES:
@@ -84,12 +87,12 @@ def get_module(finder, modname):
     return (modname, finder.find_loader(fullname)[0].load_module(fullname))
 
 
-def get_all(module_path, basecls):
+def get_all(module_path, modname, basecls):
     mods = []
 
     finder = ClassFinder(basecls)
 
-    for name, module in get_modules(module_path):
+    for name, module in get_modules(module_path, modname):
         classes = finder.get_matching_classes(module)
         found = []
         for cls in classes:
@@ -100,8 +103,8 @@ def get_all(module_path, basecls):
     return sorted(mods, key=lambda module: module[0])
 
 
-def generate_automodules(path, basecls):
-    modules = get_all(path, basecls)
+def generate_automodules(path, name, basecls):
+    modules = get_all(path, name, basecls)
 
     contents = []
 
@@ -133,7 +136,7 @@ class AutogenDirective(Directive):
         for e in self.content:
             contents.append(e)
         contents.append("")
-        contents.extend(generate_automodules(modpath, basecls))
+        contents.extend(generate_automodules(modpath, modname, basecls))
 
         node = paragraph()
         self.state.nested_parse(StringList(contents), 0, node)
