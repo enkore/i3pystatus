@@ -12,10 +12,10 @@ class NetworkGraph(NetworkTraffic, ColorRangeModule):
 
     Requires the PyPI packages `psutil` and `colour`.
 
-    Available formatters:
+    .. rubric:: Available formatters
 
-    {kbs}               Float representing kb\s
-    {network_graph}     Unicode network graph
+    * {kbs} – Float representing kb\s
+    * {network_graph} – Unicode network graph
 
     """
     settings = (

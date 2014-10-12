@@ -9,7 +9,7 @@ class ALSA(IntervalModule):
 
     Requires pyalsaaudio
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{volume}` — the current volume in percent
     * `{muted}` — the value of one of the `muted` or `unmuted` settings

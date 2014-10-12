@@ -5,7 +5,7 @@ class Backlight(File):
     """
     Screen backlight info
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{brightness}` — current brightness relative to max_brightness
     * `{max_brightness}` — maximum brightness value

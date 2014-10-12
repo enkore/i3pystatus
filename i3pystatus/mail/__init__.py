@@ -17,7 +17,7 @@ class Mail(IntervalModule):
     """
     Generic mail checker
 
-    The `backends` setting determines the backends to use.
+    The `backends` setting determines the backends to use. For available backends see :ref:`mailbackends`
     """
 
     _endstring = """!!i3pystatus.mail!!"""

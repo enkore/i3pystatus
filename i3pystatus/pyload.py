@@ -12,7 +12,7 @@ class pyLoad(IntervalModule):
     """
     Shows pyLoad status
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{captcha}` (see captcha_true and captcha_false, which are the values filled in for this formatter)
     * `{progress}` (average over all running downloads)

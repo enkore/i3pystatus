@@ -105,7 +105,7 @@ class BatteryChecker(IntervalModule):
     This class uses the /sys/class/power_supply/…/uevent interface to check for the
     battery status
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{remaining}` — remaining time for charging or discharging, uses TimeWrapper formatting, default format is `%E%h:%M`
     * `{percentage}` — battery percentage relative to the last full value

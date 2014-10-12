@@ -9,13 +9,13 @@ class MPD(IntervalModule):
     """
     Displays various information from MPD (the music player daemon)
 
-    Available formatters (uses `formatp`_)
+    Available formatters (uses :ref:`formatp`)
 
     * `{title}` — (the title of the current song)
     * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
     * `{artist}` — (can be empty, too)
     * `{filename}` — (file name with out extension and path; empty unless title is empty)
-    * `{song_elapsed}` — (Position in the currently playing song, uses `TimeWrapper`_, default is `%m:%S`)
+    * `{song_elapsed}` — (Position in the currently playing song, uses :ref:`TimeWrapper`, default is `%m:%S`)
     * `{song_length}` — (Length of the current song, same as song_elapsed)
     * `{pos}` — (Position of current song in playlist, one-based)
     * `{len}` — (Songs in playlist)

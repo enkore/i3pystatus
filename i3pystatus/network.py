@@ -74,7 +74,7 @@ class Network(IntervalModule):
 
     Requires the PyPI package `netifaces`.
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{interface}` — same as setting
     * `{name}` — same as setting

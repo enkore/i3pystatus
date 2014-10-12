@@ -7,7 +7,7 @@ class Mem(IntervalModule):
     """
     Shows memory load
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * {avail_mem}
     * {percent_used_mem}
