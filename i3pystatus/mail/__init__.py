@@ -29,9 +29,9 @@ class Mail(IntervalModule):
         "color", "color_unread", "format", "format_plural",
         ("hide_if_null", "Don't output anything if there are no new mails"),
         ("email_client", "The command to run on left click."
-                             "For example, to launch Thunderbird set command_on_click to 'thunderbird'."
+                             "For example, to launch Thunderbird set email_client to 'thunderbird'."
                              'Alternatively, to bring Thunderbird into focus, '
-                             'set command_on_click to \'i3-msg -q [class="^Thunderbird$"] focus\'.'
+                             'set email_client to \'i3-msg -q [class="^Thunderbird$"] focus\'.'
                              'Hint: To discover the X window class of your email client run \'xprop | grep -i class\''
                              'and click on it\'s window'),
     )
