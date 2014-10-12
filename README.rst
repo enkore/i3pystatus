@@ -94,7 +94,9 @@ next
 * Core: added mouse wheel handling for upcoming i3 version
 * alsa: mouse wheel changes volume
 * pulseaudio: Added color_muted and color_unmuted options
-* 
+* Added network_graph module
+* New module mixin: ip3ystatus.core.color.ColorRangeModule
+* Added cpu_usage_graph module
 
 3.30
 ++++
