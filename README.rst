@@ -53,6 +53,7 @@ Contributors
 * crwood
 * dubwoc
 * enkore (current maintainer)
+* facetoe
 * gwarf
 * janoliver (former maintainer)
 * jasonmhite
