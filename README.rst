@@ -97,6 +97,8 @@ next
 * Added network_graph module
 * New module mixin: ip3ystatus.core.color.ColorRangeModule
 * Added cpu_usage_graph module
+* pulseaudio: Added step, bar_type, multi_colors, vertical_bar_width options
+* pulseaudio: Scroll to change master volume, right click to (un)mute
 
 3.30
 ++++
