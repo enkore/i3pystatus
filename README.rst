@@ -80,62 +80,63 @@ Contributors
 next
 ++++
 
-* Added `uptime`_ module
-* `cpu\_usage`_: Add multicore support
-* `cpu\_usage\_bar`_: Add multicore support
-* `network`_: Add unknown_up setting
-* `parcel`_: Document lxml dependency
-* Added `network\_traffic`_ module
-* `mpd`_: Play song on left click even if stopped
+* Added uptime module
+* cpu\_usage: Add multicore support
+* cpu\_usage\_bar: Add multicore support
+* network: Add unknown_up setting
+* parcel: Document lxml dependency
+* Added network\_traffic module
+* mpd: Play song on left click even if stopped
 * Fixed issues with internet-related modules
-* `battery`_: Added no_text_full option
+* battery: Added no_text_full option
 * Unexpected exceptions are now displayed in the status bar
-* `mail`_: db_path option made optional
+* mail: db_path option made optional
 * Core: added mouse wheel handling for upcoming i3 version
-* `alsa`_: mouse wheel changes volume
-* `pulseaudio`_: Added color_muted and color_unmuted options
+* alsa: mouse wheel changes volume
+* pulseaudio: Added color_muted and color_unmuted options
+* 
 
 3.30
 ++++
 
-* Added `bitcoin`_ module
-* Added `now\_playing`_ module
-* Added `reddit`_ module
-* Added `shell`_ module
+* Added bitcoin module
+* Added now\_playing module
+* Added reddit module
+* Added shell module
 * Core: fixed custom statusline colors not working properly (see issue #74)
-* `alsa`_ and `pulseaudio`_: added optional "formated_muted"
+* alsa and pulseaudio: added optional "formated_muted"
   audio is muted.
-* `battery`_: add bar formatter, add not_present_text, full_color,
+* battery: add bar formatter, add not_present_text, full_color,
   charging_color, not_present_color settings
-* `disk`_: add color and round_size options
+* disk: add color and round_size options
 * maildir: use os.listdir instead of ls
-* `mem`_: add round_size option
-* `mpd`_: add color setting
-* `mpd`_: add filename formatter
-* `mpd`_: next song on right click
-* `network`_ and `wireless`_: support interfaces enslaved to a bonding master
-* `network`_: detached_down is now True by default
-* `network`_: fixed some issues with interface up/down detection
-* `parcel`_: added support for Itella (Finnish national postal service)
+* mem: add round_size option
+* mpd: add color setting
+* mpd: add filename formatter
+* mpd: next song on right click
+* network and wireless: support interfaces enslaved to a bonding master
+* network: detached_down is now True by default
+* network: fixed some issues with interface up/down detection
+* parcel: added support for Itella (Finnish national postal service)
   setting. If provided, it will be used instead of "format" when the
-* `temp`_: add file setting
-* `temp`_: fixed issue with Linux kernels 3.15 and newer
-* `temp`_: removed color_critical and high_factor options
-* `text`_: add cmd_leftclick and cmd_rightclick options
-* `weather`_: add colorize option
-* `wireless`_: Add quality_bar formatter
+* temp: add file setting
+* temp: fixed issue with Linux kernels 3.15 and newer
+* temp: removed color_critical and high_factor options
+* text: add cmd_leftclick and cmd_rightclick options
+* weather: add colorize option
+* wireless: Add quality_bar formatter
 
 3.29
 ++++
 
-* `network`_: prefer non link-local v6 addresses
-* `mail`_: Open email client and refresh email with mouse click
-* `disk`_: Add display and critical limit
-* `battery`_: fix errors if CURRENT_NOW is not present
-* `battery`_: add configurable colors
-* `load`_: add configurable colors and limit
-* `parcel`_: rewrote DHL tracker
-* Add `spotify`_ module
+* network: prefer non link-local v6 addresses
+* mail: Open email client and refresh email with mouse click
+* disk: Add display and critical limit
+* battery: fix errors if CURRENT_NOW is not present
+* battery: add configurable colors
+* load: add configurable colors and limit
+* parcel: rewrote DHL tracker
+* Add spotify module
 
 3.28
 ++++
