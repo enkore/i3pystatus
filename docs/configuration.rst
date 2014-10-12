@@ -4,7 +4,7 @@ Configuration
 The config file is just a normal Python script.
 
 A simple configuration file could look like this (note the additional
-dependencies from :py:mod:`.network`, :py:mod:`.wireless` and :py:mod:`pulseaudio` in this
+dependencies from :py:mod:`.network`, :py:mod:`.wireless` and :py:mod:`.pulseaudio` in this
 example):
 
 ::
