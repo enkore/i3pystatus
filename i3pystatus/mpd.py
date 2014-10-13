@@ -94,7 +94,7 @@ class MPD(IntervalModule):
 
         short_text = formatp(self.format_short, **fdict).strip()
         if len(short_text) > self.short_max_len and self.short_max_len:
-            short_text = short_text[:self.short_max_len] + "…"
+            short_text = short_text[:self.short_max_len-1] + "…"
         self.output = {
             "full_text": formatp(self.format, **fdict).strip(),
             "short_text": short_text,
