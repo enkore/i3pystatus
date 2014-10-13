@@ -49,7 +49,7 @@ class MPD(IntervalModule):
         "stop": "◾",
     }
     color = "#FFFFFF"
-    short_max_len = 50
+    short_max_len = 0
 
     def _mpd_command(self, sock, command):
         try:
