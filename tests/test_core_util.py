@@ -148,7 +148,6 @@ class ModuleListTests(unittest.TestCase):
         with self.assertRaises(ConfigInvalidModuleError):
             self.ml.append(pymod)
 
-
     def test_append_class_inheritance(self):
         in_between = self._create_module_class("in_between")
         cls = self._create_module_class("cls", (in_between,))
