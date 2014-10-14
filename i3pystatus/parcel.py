@@ -139,7 +139,7 @@ class ParcelTracker(IntervalModule):
     - parcel.DHL("<id_code>")
     - parcel.Itella("<id_code>"[, "en"|"fi"|"sv"])
       Second parameter is language. Requires beautiful soup 4 (bs4)
-    
+
     Requires lxml and cssselect.
     """
 
