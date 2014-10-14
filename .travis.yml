@@ -4,6 +4,7 @@ python:
 install:
   - "pip install -r requirements.txt"
 script:
+  - "pep8  --ignore E501 i3pystatus tests"
   - "PYTHONPATH=. py.test"       # run unit tests
   - "python setup.py install"    # test install
   - "sphinx-build -W docs html"     # test building docs
