@@ -51,4 +51,3 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
             "full_text": self.format.format_map(format_options),
             'color': color
         }
-
