@@ -26,8 +26,6 @@ class Mem(IntervalModule):
     alert_percentage = 80
     round_size = 1
 
-    
-
     settings = (
         ("format", "format string used for output."),
         ("divisor",
@@ -54,15 +52,14 @@ class Mem(IntervalModule):
             color = self.warn_color
         else:
             color = self.color
-            
+
         cdict = {
-                "used_mem":used / self.divisor,
-                "avail_mem":memory_usage.available / self.divisor,
-                "total_mem":memory_usage.total / self.divisor,
-                "percent_used_mem":memory_usage.percent,
+            "used_mem": used / self.divisor,
+            "avail_mem": memory_usage.available / self.divisor,
+            "total_mem": memory_usage.total / self.divisor,
+            "percent_used_mem": memory_usage.percent,
         }
         round_dict(cdict, self.round_size)
-
 
         self.output = {
             "full_text": self.format.format(**cdict),
