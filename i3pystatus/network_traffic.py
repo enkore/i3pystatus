@@ -2,6 +2,7 @@ from . import IntervalModule
 from .core.util import round_dict
 import psutil
 
+
 class NetworkTraffic(IntervalModule):
     """
     Network traffic per interface, i.e., packets/bytes sent/received per second.
@@ -24,12 +25,12 @@ class NetworkTraffic(IntervalModule):
         ("divisor", "divide all byte values by this value"),
         ("round_size", "defines number of digits in round"),
     )
- 
+
     format = "{interface} \u2197{bytes_sent}kB/s \u2198{bytes_recv}kB/s"
     interface = "eth0"
     divisor = 1024
     round_size = None
- 
+
     pnic = None
     pnic_before = None
 
@@ -51,7 +52,8 @@ class NetworkTraffic(IntervalModule):
 
     def run(self):
         self.update_counters()
-        if not self.pnic_before: return
+        if not self.pnic_before:
+            return
         cdict = {
             "bytes_sent": self.get_bytes_sent(),
             "bytes_recv": self.get_bytes_received(),
