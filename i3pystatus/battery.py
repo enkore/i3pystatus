@@ -131,8 +131,9 @@ class BatteryChecker(IntervalModule):
         ("charging_color", "The charging color"),
         ("critical_color", "The critical color"),
         ("not_present_color", "The not present color."),
-        ("no_text_full","Don't display text when battery is full - 100%"),
+        ("no_text_full", "Don't display text when battery is full - 100%"),
     )
+
     battery_ident = "BAT0"
     format = "{status} {remaining}"
     status = {
@@ -173,11 +174,11 @@ class BatteryChecker(IntervalModule):
             }
             return
         if self.no_text_full:
-            if battery.status() == 'Full':
-              self.output = {
-                  "full_text": ""
-              }
-              return
+            if battery.status() == "Full":
+                self.output = {
+                    "full_text": ""
+                }
+                return
 
         fdict = {
             "battery_ident": self.battery_ident,
