@@ -5,7 +5,7 @@ import netifaces
 
 from i3pystatus import IntervalModule
 
-# Remainder: if we raise minimum Python version to 3.3, use ipaddress module
+# Reminder: if we raise minimum Python version to 3.3, use ipaddress module
 
 
 def count_bits(integer):
@@ -59,7 +59,7 @@ def get_bonded_slaves():
     return slaves
 
 
-def sysfs_interface_up(interface, unknown_up = False):
+def sysfs_interface_up(interface, unknown_up=False):
     try:
         with open("/sys/class/net/{}/operstate".format(interface)) as f:
             status = f.read().strip()
