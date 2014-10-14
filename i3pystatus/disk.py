@@ -30,7 +30,6 @@ class Disk(IntervalModule):
     critical_limit = 0
     round_size = 2
 
-
     def run(self):
         stat = os.statvfs(self.path)
         available = (stat.f_bsize * stat.f_bavail) / self.divisor
