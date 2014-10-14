@@ -90,15 +90,15 @@ class NowPlaying(IntervalModule):
 
         fdict = {
             "status": self.status[self.statusmap[get_prop("PlaybackStatus")]],
-            "len": 0, # TODO: Use optional(!) TrackList interface for this to gain 100 % mpd<->now_playing compat
+            "len": 0,  # TODO: Use optional(!) TrackList interface for this to gain 100 % mpd<->now_playing compat
             "pos": 0,
             "volume": int(get_prop("Volume") * 100),
 
-            "title":currentsong.get("xesam:title", ""),
+            "title": currentsong.get("xesam:title", ""),
             "album": currentsong.get("xesam:album", ""),
             "artist": ", ".join(currentsong.get("xesam:artist", "")),
-            "song_length": TimeWrapper((currentsong.get("mpris:length") or 0) / 1000**2),
-            "song_elapsed": TimeWrapper((get_prop("Position") or 0) / 1000**2),
+            "song_length": TimeWrapper((currentsong.get("mpris:length") or 0) / 1000 ** 2),
+            "song_elapsed": TimeWrapper((get_prop("Position") or 0) / 1000 ** 2),
             "filename": "",
         }
 
