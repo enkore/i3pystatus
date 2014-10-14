@@ -17,25 +17,23 @@ class Notmuch(Backend):
     """
 
     settings = (
-       ("db_path","Path to the directory of your notmuch database"),
-            )
+        ("db_path", "Path to the directory of your notmuch database"),
+    )
 
-    db_path = None;
+    db_path = None
 
     def init(self):
-        
         if not self.db_path:
-            defaultConfigFilename= os.path.expanduser("~/.notmuch-config")
+            defaultConfigFilename = os.path.expanduser("~/.notmuch-config")
             config = configparser.RawConfigParser()
-            
-            # read tries to read and returns successfully read filenames
-            successful = config.read( [
-                os.environ.get("NOTMUCH_CONFIG",defaultConfigFilename),
-                defaultConfigFilename
-                ] 
-                ) 
 
-            self.db_path = config.get("database","path")
+            # read tries to read and returns successfully read filenames
+            successful = config.read([
+                os.environ.get("NOTMUCH_CONFIG", defaultConfigFilename),
+                defaultConfigFilename
+            ])
+
+            self.db_path = config.get("database", "path")
 
         self.db = notmuch.Database(self.db_path)
 
