@@ -35,9 +35,10 @@ class NowPlaying(IntervalModule):
         ("status", "Dictionary mapping pause, play and stop to output text"),
         ("color", "Text color"),
         ("format", "formatp string"),
-
+        ("hide_no_player", "Hide output if no player is detected"),
     )
 
+    hide_no_player = True
     player = None
     format = "{title} {status}"
     status = {
@@ -51,6 +52,7 @@ class NowPlaying(IntervalModule):
         "Stopped": "stop",
     }
     color = "#FFFFFF"
+
     old_player = None
 
     def find_player(self):
@@ -73,10 +75,13 @@ class NowPlaying(IntervalModule):
         try:
             player = self.get_player()
         except dbus.exceptions.DBusException:
-            self.output = {
-                "full_text": "now_playing: d-bus error",
-                "color": "#ff0000",
-            }
+            if self.hide_no_player:
+                self.output = None
+            else:
+                self.output = {
+                    "full_text": "now_playing: d-bus error",
+                    "color": "#ff0000",
+                }
             return
 
         properties = dbus.Interface(player, "org.freedesktop.DBus.Properties")
