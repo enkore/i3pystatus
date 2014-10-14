@@ -74,7 +74,7 @@ class MPD(IntervalModule):
             "status": self.status[status["state"]],
             "volume": int(status["volume"]),
 
-                "title": currentsong.get("Title", ""),
+            "title": currentsong.get("Title", ""),
             "album": currentsong.get("Album", ""),
             "artist": currentsong.get("Artist", ""),
             "song_length": TimeWrapper(currentsong.get("Time", 0)),
@@ -95,7 +95,7 @@ class MPD(IntervalModule):
     def on_leftclick(self):
         try:
             self._mpd_command(self.s, "%s" %
-                    ("play" if self._mpd_command(self.s, "status")["state"] in ["pause", "stop"] else "pause"))
+                              ("play" if self._mpd_command(self.s, "status")["state"] in ["pause", "stop"] else "pause"))
         except Exception as e:
             pass
 
