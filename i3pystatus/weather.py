@@ -30,7 +30,7 @@ class Weather(IntervalModule):
     format = "{current_temp}"
     colorize = False
     color_icons = {
-        "Fair":  (u"\u2600", "#FFCC00"),
+        "Fair": (u"\u2600", "#FFCC00"),
         "Cloudy": (u"\u2601", "#F8F8FF"),
         "Partly Cloudy": (u"\u2601", "#F8F8FF"),  # \u26c5 is not in many fonts
         "Rainy": (u"\u2614", "#CBD2C0"),
