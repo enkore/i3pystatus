@@ -7,11 +7,12 @@ from .pulse import *
 from i3pystatus import Module
 import subprocess
 
+
 class PulseAudio(Module, ColorRangeModule):
     """
     Shows volume of default PulseAudio sink (output).
 
-    Requires amixer for toggling mute and incrementing/decrementing volume on scroll. 
+    Requires amixer for toggling mute and incrementing/decrementing volume on scroll.
 
     Available formatters:
 
@@ -174,5 +175,3 @@ class PulseAudio(Module, ColorRangeModule):
         if self.has_amixer:
             command = "amixer -q -D pulse sset Master %s%%-" % self.step
             subprocess.Popen(command.split())
-    
-
