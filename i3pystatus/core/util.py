@@ -51,7 +51,7 @@ def round_dict(dic, places):
     """
     Rounds all values in a dict containing only numeric types to `places` decimal places.
     If places is None, round to INT.
-    """    
+    """
     if places is None:
         for key, value in dic.items():
             dic[key] = round(value)
@@ -364,6 +364,7 @@ def internet():
     except OSError:
         return False
 
+
 def make_graph(values, upper_limit=100.0):
     """
     Draws a graph made of unicode characters.
@@ -385,8 +386,8 @@ def make_graph(values, upper_limit=100.0):
     if extent == 0:
         graph = '_' * len(values)
     else:
-        graph = ''.join(bar[int( (n - mn) / extent * bar_count)]
-                        for n in values[:len(values)-1])  # Don't show the upper limit value.
+        graph = ''.join(bar[int((n - mn) / extent * bar_count)]
+                        for n in values[:len(values) - 1])  # Don't show the upper limit value.
     return graph
 
 
@@ -442,4 +443,3 @@ def user_open(url_or_command):
     else:
         import subprocess
         subprocess.Popen(url_or_command, shell=True)
-
