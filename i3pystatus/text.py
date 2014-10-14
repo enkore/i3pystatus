@@ -27,7 +27,6 @@ class Text(Module):
         if self.color:
             self.output["color"] = self.color
 
-
     def on_leftclick(self):
         subprocess.call(self.cmd_leftclick, shell=True)
 
