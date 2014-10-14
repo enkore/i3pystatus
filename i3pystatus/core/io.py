@@ -51,14 +51,15 @@ class StandaloneIO(IOHandler):
     """
 
     n = -1
-    proto = [{"version":1,"click_events":True}, "[", "[]", ",[]",]
+    proto = [
+        {"version": 1, "click_events": True}, "[", "[]", ",[]",
+    ]
 
     def __init__(self, click_events, interval=1):
         super().__init__()
         self.interval = interval
         self.proto[0]['click_events'] = click_events
         self.proto[0] = json.dumps(self.proto[0])
-
 
     def read(self):
         while True:
