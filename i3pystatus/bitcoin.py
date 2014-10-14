@@ -10,11 +10,11 @@ class Bitcoin(IntervalModule):
 
     """
     This module fetches and displays current Bitcoin market prices and
-    optionally monitors transactions to and from a list of user-specified 
+    optionally monitors transactions to and from a list of user-specified
     wallet addresses. Market data is pulled from the BitcoinAverage Price
     Index API <https://bitcoinaverage.com> while transaction data is pulled
     from blockchain.info <https://blockchain.info/api/blockchain_api>.
-    
+
     .. rubric:: Available formatters
 
     * {last_price}
@@ -65,13 +65,12 @@ class Bitcoin(IntervalModule):
         api = "https://api.bitcoinaverage.com/ticker/global/"
         url = "{}{}".format(api, self.currency.upper())
         return json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
-    
+
     def _fetch_blockchain_data(self):
         api = "https://blockchain.info/multiaddr?active="
         addresses = "|".join(self.wallet_addresses)
         url = "{}{}".format(api, addresses)
         return json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
-
 
     @require(internet)
     def run(self):
@@ -98,10 +97,10 @@ class Bitcoin(IntervalModule):
         if not self.colorize:
             color = self.color
 
-        if self.wallet_addresses: 
+        if self.wallet_addresses:
             blockchain_data = self._fetch_blockchain_data()
             wallet_data = blockchain_data["wallet"]
-            balance_btc = wallet_data["final_balance"]/100000000
+            balance_btc = wallet_data["final_balance"] / 100000000
             fdict["balance_btc"] = round(balance_btc, 2)
             balance_fiat = fdict["balance_btc"] * fdict["last_price"]
             fdict["balance_fiat"] = round(balance_fiat, 2)
@@ -112,7 +111,7 @@ class Bitcoin(IntervalModule):
             if fdict["transactions"]:
                 last_tx = blockchain_data["txs"][0]
                 fdict["last_tx_addr"] = last_tx["out"][0]["addr"]
-                fdict["last_tx_value"] = last_tx["out"][0]["value"]/100000000
+                fdict["last_tx_value"] = last_tx["out"][0]["value"] / 100000000
                 if fdict["last_tx_addr"] in self.wallet_addresses:
                     fdict["last_tx_type"] = "recv"
                 else:
@@ -125,6 +124,6 @@ class Bitcoin(IntervalModule):
 
     def on_leftclick(self):
         user_open(self.leftclick)
-    
+
     def on_rightclick(self):
         user_open(self.rightclick)
