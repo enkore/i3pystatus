@@ -1,6 +1,7 @@
 from i3pystatus import IntervalModule
 from subprocess import check_output, CalledProcessError
 
+
 class Shell(IntervalModule):
     """
     Shows output of shell command
