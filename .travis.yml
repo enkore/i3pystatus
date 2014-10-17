@@ -1,11 +1,14 @@
 language: python
 python:
   - "3.3"
-install:
+virtualenv:
+  system_site_packages: true
+before_install:
   - "sudo apt-get install -qq python3-sphinx"
-  - "pip3 install -r .travis-requirements.txt"
+install:
+  - "pip3 install -r dev-requirements.txt"
 script:
   - "pep8  --ignore E501 i3pystatus tests"
-  - "PYTHONPATH=. py.test"       # run unit tests
-  - "python setup.py -q install"    # test install
-  - "sphinx-build -W docs html"  # test building docs
+  - "PYTHONPATH=. py.test"        # run unit tests
+  - "python setup.py -q install"  # test install
+  - "sphinx-build -W docs html"   # test building docs
