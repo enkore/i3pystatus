@@ -3,7 +3,7 @@ python:
   - "3.3"
 cache:
   directories:
-    - /home/travis/virtualenv/python3.3.5/lib/python3.3/site-packages
+    - $HOME/virtualenv/python3.3.5/lib/python3.3/site-packages
 install:
   - "pip install -r dev-requirements.txt"
 script:
