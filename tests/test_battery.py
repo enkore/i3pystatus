@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-import unittest
+import os.path
 
 from i3pystatus import battery
 
 
 def battery_test(path, format, expected):
-    bc = battery.BatteryChecker(path=path, format=format)
+    bc = battery.BatteryChecker(path=os.path.dirname(__file__) + "/" + path, format=format)
     bc.run()
     assert bc.output["full_text"] == expected
 
