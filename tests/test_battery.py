@@ -20,6 +20,7 @@ def test_basic():
         ("test_battery_basic5", "DIS", "11.453", "4h:52m"),
         ("test_battery_basic6", "CHR", "30.764", "0h:20m"),
         ("test_battery_basic7", "DIS", "27.303", "1h:44m"),
+        ("test_battery_132", "DIS", "8.370", "1h:17m"),
         ("test_battery_broken1", "FULL", "0.000", "0h:00m"),
     ]
     for path, status, consumption, remaining in cases:
