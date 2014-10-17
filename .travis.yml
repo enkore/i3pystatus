@@ -3,7 +3,7 @@ python:
   - "3.3"
 install:
   - "sudo apt-get install python3-sphinx"
-  - "pip install -r dev-requirements.txt"
+  - "pip install -r .travis-requirements.txt"
 script:
   - "pep8  --ignore E501 i3pystatus tests"
   - "PYTHONPATH=. py.test"       # run unit tests
