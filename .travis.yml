@@ -2,10 +2,10 @@ language: python
 python:
   - "3.3"
 install:
-  - "sudo apt-get install python3-sphinx"
-  - "pip install -r .travis-requirements.txt"
+  - "sudo apt-get install -qq python3-sphinx"
+  - "pip3 install -r .travis-requirements.txt"
 script:
   - "pep8  --ignore E501 i3pystatus tests"
   - "PYTHONPATH=. py.test"       # run unit tests
-  - "python setup.py install"    # test install
+  - "python setup.py -q install"    # test install
   - "sphinx-build -W docs html"  # test building docs
