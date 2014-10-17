@@ -1,8 +1,6 @@
 language: python
 python:
-  - "3.3_with_system_site_packages"
-before_install:
-  - "sudo apt-get install -qq python3-sphinx"
+  - "3.3"
 install:
   - "pip install -r dev-requirements.txt"
 script:

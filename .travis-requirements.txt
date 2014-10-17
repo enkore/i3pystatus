@@ -1,4 +1,0 @@
-pytest>=2.5
-colour>=0.0.5
-mock>=1.0
-pep8>=1.5
