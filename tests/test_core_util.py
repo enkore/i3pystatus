@@ -29,7 +29,7 @@ def partition(iterable, limit, assrt):
         assert sorted(item) in partitions
 
 
-def partition_test_generator():
+def test_partition():
     cases = [
         ([1, 2, 3, 4], 3, [[1, 2], [3], [4]]),
         ([2, 1, 3, 4], 3, [[1, 2], [3], [4]]),
@@ -38,14 +38,14 @@ def partition_test_generator():
     ]
 
     for iterable, limit, assrt in cases:
-        yield partition, iterable, limit, assrt
+        partition(iterable, limit, assrt)
 
 
 def popwhile(iterable, predicate, assrt):
     assert list(util.popwhile(predicate, iterable)) == assrt
 
 
-def popwhile_test_generator():
+def test_popwhile():
     cases = [
         ([1, 2, 3, 4], lambda x: x < 2, []),
         ([1, 2, 3, 4], lambda x: x < 5 and x > 2, [4, 3]),
@@ -55,7 +55,7 @@ def popwhile_test_generator():
     ]
 
     for iterable, predicate, assrt in cases:
-        yield popwhile, iterable, predicate, assrt
+        popwhile(iterable, predicate, assrt)
 
 
 def keyconstraintdict_missing(valid, required, feedkeys, assrt_missing):
@@ -65,7 +65,7 @@ def keyconstraintdict_missing(valid, required, feedkeys, assrt_missing):
     assert kcd.missing() == set(assrt_missing)
 
 
-def keyconstraintdict_missing_test_generator():
+def test_keyconstraintdict_missing():
     cases = [
         # ( valid,              required, feed,      missing )
         (("foo", "bar", "baz"), ("foo",), ("bar",), ("foo",)),
@@ -76,7 +76,7 @@ def keyconstraintdict_missing_test_generator():
     ]
 
     for valid, required, feed, missing in cases:
-        yield keyconstraintdict_missing, valid, required, feed, missing
+        keyconstraintdict_missing(valid, required, feed, missing)
 
 
 class ModuleListTests(unittest.TestCase):

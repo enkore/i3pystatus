@@ -5,16 +5,13 @@ import unittest
 from i3pystatus import battery
 
 
-def factory(path, format, expected):
-    def test():
-        bc = battery.BatteryChecker(path=path, format=format)
-        bc.run()
-        assert bc.output["full_text"] == expected
-    test.description = path + ":" + format
-    return test
+def battery_test(path, format, expected):
+    bc = battery.BatteryChecker(path=path, format=format)
+    bc.run()
+    assert bc.output["full_text"] == expected
 
 
-def basic_test_generator():
+def test_basic():
     cases = [
         ("test_battery_basic1", "FULL", "0.000", "0h:00m"),
         ("test_battery_basic2", "FULL", "0.000", "0h:00m"),
@@ -26,6 +23,6 @@ def basic_test_generator():
         ("test_battery_broken1", "FULL", "0.000", "0h:00m"),
     ]
     for path, status, consumption, remaining in cases:
-        yield factory(path, "{status}", status)
-        yield factory(path, "{consumption:.3f}", consumption)
-        yield factory(path, "{remaining:%hh:%Mm}", remaining)
+        battery_test(path, "{status}", status)
+        battery_test(path, "{consumption:.3f}", consumption)
+        battery_test(path, "{remaining:%hh:%Mm}", remaining)
