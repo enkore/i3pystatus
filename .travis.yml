@@ -1,14 +1,12 @@
 language: python
 python:
-  - "3.3"
-virtualenv:
   - "3.3_with_system_site_packages"
 before_install:
   - "sudo apt-get install -qq python3-sphinx"
 install:
-  - "pip3 install -r dev-requirements.txt"
+  - "pip install -r dev-requirements.txt"
 script:
-  - "pep8  --ignore E501 i3pystatus tests"
+  - "pep8 --ignore E501 i3pystatus tests"
   - "PYTHONPATH=. py.test"        # run unit tests
   - "python setup.py -q install"  # test install
   - "sphinx-build -W docs html"   # test building docs
