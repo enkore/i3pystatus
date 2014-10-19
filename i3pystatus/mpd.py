@@ -32,20 +32,24 @@ class MPD(IntervalModule):
         ("host"),
         ("port", "MPD port"),
         ("format", "formatp string"),
+        ("format_short", "formatp string for i3bars short_text option"),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
+        ("short_max_len", "maximale length for format_short, string will be truncated and ellipsis willl be placed as indicator, disabled if zero")
     )
 
     host = "localhost"
     port = 6600
     s = None
     format = "{title} {status}"
+    format_short = "{title}"
     status = {
         "pause": "▷",
         "play": "▶",
         "stop": "◾",
     }
     color = "#FFFFFF"
+    short_max_len = 0
 
     def _mpd_command(self, sock, command):
         try:
@@ -87,8 +91,13 @@ class MPD(IntervalModule):
                 basename(currentsong["file"]).split('.')[:-1])
         else:
             fdict["filename"] = ""
+
+        short_text = formatp(self.format_short, **fdict).strip()
+        if len(short_text) > self.short_max_len and self.short_max_len:
+            short_text = short_text[:self.short_max_len-1] + "…"
         self.output = {
             "full_text": formatp(self.format, **fdict).strip(),
+            "short_text": short_text,
             "color": self.color,
         }
 
