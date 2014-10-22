@@ -12,7 +12,10 @@ from i3pystatus import IntervalModule
 
 class Pomodoro(IntervalModule):
   """
-  This class shows a clock
+  This plugin shows Pomodoro timer.
+
+  Left click starts/restarts timer.
+  Right click stops it.
   """
 
   settings = (
