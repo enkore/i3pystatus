@@ -85,27 +85,31 @@ Contributors
 next
 ++++
 
+3.31
+++++
+
+* Added cmus module
+* Added cpu_usage_graph module
+* Added network_graph module
+* Added network_traffic module
+* Added pomodoro module
 * Added uptime module
+* alsa: mouse wheel changes volume
+* battery: Added no_text_full option
+* Core: added mouse wheel handling for upcoming i3 version
 * cpu\_usage: Add multicore support
 * cpu\_usage\_bar: Add multicore support
-* network: Add unknown_up setting
-* parcel: Document lxml dependency
-* Added network\_traffic module
-* mpd: Play song on left click even if stopped
 * Fixed issues with internet-related modules
-* battery: Added no_text_full option
-* Unexpected exceptions are now displayed in the status bar
 * mail: db_path option made optional
-* Core: added mouse wheel handling for upcoming i3 version
-* alsa: mouse wheel changes volume
-* pulseaudio: Added color_muted and color_unmuted options
-* Added network_graph module
+* mpd: Play song on left click even if stopped
+* network: Add unknown_up setting
 * New module mixin: ip3ystatus.core.color.ColorRangeModule
-* Added cpu_usage_graph module
+* parcel: Document lxml dependency
+* pulseaudio: Added color_muted and color_unmuted options
 * pulseaudio: Added step, bar_type, multi_colors, vertical_bar_width options
 * pulseaudio: Scroll to change master volume, right click to (un)mute
-* Added pomodoro module
-* Added cmus module
+* Unexpected exceptions are now displayed in the status bar
+
 
 3.30
 ++++
