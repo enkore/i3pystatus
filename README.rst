@@ -28,7 +28,10 @@ From PyPI package `i3pystatus <https://pypi.python.org/pypi/i3pystatus>`_
 Packages for your OS
 ++++++++++++++++++++
 
-* `Arch Linux <https://aur.archlinux.org/packages/i3pystatus-git/>`_
+* `Arch Linux <https://aur.archlinux.org/packages/i3pystatus/>`_ (stable
+  release)
+* `Arch Linux <https://aur.archlinux.org/packages/i3pystatus-git/>`_ (latest
+  version)
 
 Documentation
 -------------
