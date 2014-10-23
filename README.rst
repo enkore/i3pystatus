@@ -58,6 +58,7 @@ Contributors
 * enkore (current maintainer)
 * facetoe
 * gwarf
+* hobarrera
 * janoliver (former maintainer)
 * jasonmhite
 * jedrz
@@ -68,6 +69,7 @@ Contributors
 * micha-a-schmidt
 * naglis
 * philipdexter
+* rampage644 
 * sbrunner
 * siikamiika
 * simon04
@@ -102,6 +104,8 @@ next
 * Added cpu_usage_graph module
 * pulseaudio: Added step, bar_type, multi_colors, vertical_bar_width options
 * pulseaudio: Scroll to change master volume, right click to (un)mute
+* Added pomodoro module
+* Added cmus module
 
 3.30
 ++++
