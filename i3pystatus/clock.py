@@ -71,8 +71,14 @@ class Clock(IntervalModule):
         if self.color != "i3Bar":
             self.output["color"] = self.color
 
-    def on_upscroll(self):
+    def next_format(self):
         self.current_format_id = (self.current_format_id + 1) % len(self.format)
 
+    def previous_format(self):
+        self.current_format_id = (self.current_format_id + 1) % len(self.format)
+
+    def on_upscroll(self):
+        self.next_format()
+
     def on_downscroll(self):
-        self.current_format_id = (self.current_format_id - 1) % len(self.format)
+        self.previous_format()

@@ -1,8 +1,8 @@
 from i3pystatus.core.util import KeyConstraintDict
 from i3pystatus.core.exceptions import ConfigKeyError, ConfigMissingError
+import inspect
 
-
-class SettingsBase:
+class SettingsBase(object):
     """
     Support class for providing a nice and flexible settings interface
 
@@ -32,8 +32,8 @@ class SettingsBase:
                 # Note: you could do that anyway, with the ** syntax
                 return args[0]
             return kwargs
-
-        self.settings = self.flatten_settings(self.settings)
+        #self.settings
+        self.settings = self.flatten_settings()
 
         sm = KeyConstraintDict(self.settings, self.required)
         settings_source = get_argument_dict(args, kwargs)
@@ -59,8 +59,32 @@ class SettingsBase:
 
         In case you don't want to type that super()…blabla :-)"""
 
-    @staticmethod
-    def flatten_settings(settings):
+    
+    def flatten_settings(self):
+            #type(self),self
+        # print("self",self, self.__class__.__name__)
+        # if not isinstance(object,self):
+        # for cls in inspect.getmro():
+        settings = []
+
+        # print(self.getmro())
+        # print()
+        # print("BAses", self.__class__.__bases__ )
+        # print("MRO:", )
+        for cls in  inspect.getmro(self.__class__):
+            # print("toto",cls)
+            # print("toto", cls)
+            # print("name", cls.__name__)
+            if hasattr(cls,"settings"):
+                # settings = settings + ( super(cls,self).settings, )
+                settings = settings + list( cls.settings )
+        # if hasattr(super(), "flatten_settings" ):
+        # # if issubclass(type(self),SettingsBase) and not (type(self) == SettingsBase):
+        #     print(super())
+        #     settings = settings + ( super().flatten_settings(), )
+            # settings = super().flatten_settings()
+
+        print("Settings after loop: \n", settings)
         def flatten_setting(setting):
             return setting[0] if isinstance(setting, tuple) else setting
 

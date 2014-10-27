@@ -6,6 +6,11 @@ from i3pystatus.core.util import convert_position
 class Module(SettingsBase):
     output = None
     position = 0
+    
+    settings = tuple(
+        ("on_lclick","callback when left clicking")
+        ("on_rclick","callback when left clicking")
+        )
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
@@ -24,9 +29,15 @@ class Module(SettingsBase):
 
     def on_click(self, button):
         if button == 1:  # Left mouse button
-            self.on_leftclick()
+            if self.on_lclick:
+                self.on_lclick.run(self)
+            else:
+                self.on_leftclick()
         elif button == 3:  # Right mouse button
-            self.on_rightclick()
+            if self.on_rclick:
+                self.on_rclick.run(self)
+            else:
+                self.on_rightclick()
         elif button == 4: # mouse wheel up
             self.on_upscroll()
         elif button == 5: # mouse wheel down
@@ -55,8 +66,8 @@ class IntervalModuleMeta(type):
         super(IntervalModuleMeta, cls).__init__(name, bases, namespace)
         if not hasattr(cls, 'settings'):
             cls.settings = tuple()
-        if 'interval' not in SettingsBase.flatten_settings(cls.settings):
-            cls.settings += ('interval', )
+        # if 'interval' not in SettingsBase.flatten_settings(cls.settings):
+        #     cls.settings += ('interval', )
 
 
 class IntervalModule(Module, metaclass=IntervalModuleMeta):
