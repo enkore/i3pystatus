@@ -81,6 +81,7 @@ class Pomodoro(IntervalModule):
     def on_leftclick(self):
         self.state = 'running'
         self.time = datetime.now() + timedelta(seconds=self.pomodoro_duration)
+        self.breaks = 0
 
     def on_rightclick(self):
         self.state = 'stopped'
