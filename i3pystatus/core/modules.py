@@ -7,9 +7,9 @@ class Module(SettingsBase):
     output = None
     position = 0
     
-    settings = tuple(
-        ("on_lclick","callback when left clicking")
-        ("on_rclick","callback when left clicking")
+    settings = (
+        ("on_lclick","callback when left clicking"),
+        ("on_rclick","callback when left clicking"),
         )
 
     def registered(self, status_handler):

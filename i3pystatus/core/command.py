@@ -4,10 +4,12 @@ from subprocess import check_output, CalledProcessError
 
 class Command(object):
 
-    args = []
+    args = None
+    kwargs= None
     command = ""
     def __init__(self, command, *args,**kwargs):
         self.args = args;
+        self.kwargs = kwargs
         self.command = command
 
     def run(self, module):
@@ -15,21 +17,21 @@ class Command(object):
         Returns tuple boolean (success)/ string (error msg, output)
         """
        
-        
+        # print("RUN")
 
         # if it is a python fct, then run it
         if callable(self.command):
-            self.command(self.args)
+            self.command(*self.args)
         #
         elif hasattr(module,self.command):
-            pass
+            getattr(module,self.command)(*self.args,**self.kwargs)
         # it it is a string (as a last resort, then run the process with args
         else:
             return self.run_through_shell(self.command)
 
     # def __call__(self):
 
-    @staticmethod
+    
     # def run_through_shell(module, member,*args):
 
 

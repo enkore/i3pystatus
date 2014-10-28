@@ -84,7 +84,7 @@ class SettingsBase(object):
         #     settings = settings + ( super().flatten_settings(), )
             # settings = super().flatten_settings()
 
-        print("Settings after loop: \n", settings)
+        # print("Settings after loop: \n", settings)
         def flatten_setting(setting):
             return setting[0] if isinstance(setting, tuple) else setting
 

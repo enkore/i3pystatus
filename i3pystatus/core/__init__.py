@@ -7,7 +7,6 @@ from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core import io, util
 from i3pystatus.core.modules import Module
 
-
 class CommandEndpoint:
     """
     Endpoint for i3bar click events: http://i3wm.org/docs/i3bar-protocol.html#_click_events
