@@ -34,8 +34,8 @@ class Cmus(IntervalModule):
     def _query_cmus(self):
         status_dict = {}
         status, error = self._cmus_command('query')
-        status = status.decode('utf-8').split('\n')
         if status != b'cmus-remote: cmus is not running\n':
+            status = status.decode('utf-8').split('\n')
             for item in status:
                 split_item = item.split(' ')
                 if split_item[0] in ['tag', 'set']:
@@ -48,6 +48,12 @@ class Cmus(IntervalModule):
 
     def run(self):
         status = self._query_cmus()
+        if not status:
+            self.output = {
+                "full_text": 'Not running',
+                "color": self.color
+            }
+            return 
         fdict = {
             'file': status.get('file', ''),
             'status': self.status[status["status"]],
