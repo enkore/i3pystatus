@@ -8,6 +8,9 @@ class Pianobar(IntervalModule):
     In pianobar config file must be setted the fifo and event_command options
     (see man pianobar for more information)
 
+    For the event_cmd use:
+    https://github.com/jlucchese/pianobar/blob/master/contrib/pianobar-song-i3.sh
+
     Mouse events:
     - Left click play/pauses
     - Right click plays next song
