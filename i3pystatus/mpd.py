@@ -89,7 +89,7 @@ class MPD(IntervalModule):
 
         for key in self.truncate_fields:
             if len(fdict[key]) > self.text_len:
-                fdict[key] = fdict[key][:self.text_len-1] + "…"
+                fdict[key] = fdict[key][:self.text_len - 1] + "…"
 
         if not fdict["title"] and "filename" in fdict:
             fdict["filename"] = '.'.join(
