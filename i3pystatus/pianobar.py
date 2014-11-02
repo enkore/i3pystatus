@@ -1,10 +1,11 @@
 from i3pystatus import IntervalModule
 
+
 class Pianobar(IntervalModule):
     """
     Shows the title and artist name of the current music
 
-    In pianobar config file must be setted the fifo and event_command options 
+    In pianobar config file must be setted the fifo and event_command options
     (see man pianobar for more information)
 
     Mouse events:
@@ -25,7 +26,7 @@ class Pianobar(IntervalModule):
 
     def run(self):
         with open(self.songfile, "r") as f:
-            contents = f.readlines() 
+            contents = f.readlines()
 
         sn = contents[0].strip()
         sa = contents[1].strip()
@@ -36,13 +37,13 @@ class Pianobar(IntervalModule):
         }
 
     def on_leftclick(self):
-        open(self.ctlfile,"w").write("p")
+        open(self.ctlfile, "w").write("p")
 
     def on_rightclick(self):
-        open(self.ctlfile,"w").write("n")
+        open(self.ctlfile, "w").write("n")
 
     def on_upscroll(self):
-        open(self.ctlfile,"w").write(")")
+        open(self.ctlfile, "w").write(")")
 
     def on_downscroll(self):
-        open(self.ctlfile,"w").write("(")
+        open(self.ctlfile, "w").write("(")
