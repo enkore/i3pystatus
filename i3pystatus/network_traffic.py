@@ -30,7 +30,7 @@ class NetworkTraffic(IntervalModule):
 
     format = "{interface} \u2197{bytes_sent}kB/s \u2198{bytes_recv}kB/s"
     format_down = "{interface} \u2013"
-    hide_down = True
+    hide_down = False
     interface = "eth0"
     divisor = 1024
     round_size = None
