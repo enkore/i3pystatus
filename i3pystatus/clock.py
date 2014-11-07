@@ -11,10 +11,17 @@ from i3pystatus import IntervalModule
 class Clock(IntervalModule):
     """
     This class shows a clock
+
+    format can be passed in four different ways:
+
+    - single string, no timezone, just the strftime-format
+    - one two-tuple, first is the format, second the timezone
+    - list of strings - no timezones
+    - list of two tuples, first is the format, second is timezone
     """
 
     settings = (
-        ("format", "list of tuple (stftime format string, optional timezone), `None` means to use the default, locale-dependent format. Can cycle between formats with mousewheel"),
+        ("format", "`None` means to use the default, locale-dependent format. Can cycle between formats with mousewheel"),
         ("color", "RGB hexadecimal code color specifier, default to #ffffff, set to `i3Bar` to use i3 bar default"),
     )
     format = None
@@ -35,7 +42,7 @@ class Clock(IntervalModule):
                 # DMY format - almost all other countries
                 self.format = ["%a %-d %b %X"]
 
-        elif isinstance(self.format, str):
+        elif isinstance(self.format, str) or isinstance(self.format, tuple):
             self.format = [self.format]
 
         self.format = self.expand_formats(self.format)
