@@ -34,6 +34,8 @@ class MPD(IntervalModule):
         ("format", "formatp string"),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
+        ("text_len", "Defines max length for title, album and artist, if truncated ellipsis are appended as indicator"),
+        ("truncate_fields", "fileds that will be truncated if exceeding text_len"),
     )
 
     host = "localhost"
@@ -46,6 +48,8 @@ class MPD(IntervalModule):
         "stop": "◾",
     }
     color = "#FFFFFF"
+    text_len = 25
+    truncate_fields = ("title", "album", "artist")
 
     def _mpd_command(self, sock, command):
         try:
@@ -82,6 +86,11 @@ class MPD(IntervalModule):
             "bitrate": int(status.get("bitrate", 0)),
 
         }
+
+        for key in self.truncate_fields:
+            if len(fdict[key]) > self.text_len:
+                fdict[key] = fdict[key][:self.text_len - 1] + "…"
+
         if not fdict["title"] and "filename" in fdict:
             fdict["filename"] = '.'.join(
                 basename(currentsong["file"]).split('.')[:-1])
