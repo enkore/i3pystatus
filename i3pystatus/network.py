@@ -5,7 +5,7 @@ import netifaces
 
 from i3pystatus import IntervalModule
 
-# Remainder: if we raise minimum Python version to 3.3, use ipaddress module
+# Reminder: if we raise minimum Python version to 3.3, use ipaddress module
 
 
 def count_bits(integer):
@@ -45,13 +45,36 @@ def cidr4(addr, mask):
     return "{addr}/{bits}".format(addr=addr, bits=prefix4(mask))
 
 
+def get_bonded_slaves():
+    try:
+        with open("/sys/class/net/bonding_masters") as f:
+            masters = f.read().split()
+    except FileNotFoundError:
+        return {}
+    slaves = {}
+    for master in masters:
+        with open("/sys/class/net/{}/bonding/slaves".format(master)) as f:
+            for slave in f.read().split():
+                slaves[slave] = master
+    return slaves
+
+
+def sysfs_interface_up(interface, unknown_up=False):
+    try:
+        with open("/sys/class/net/{}/operstate".format(interface)) as f:
+            status = f.read().strip()
+    except FileNotFoundError:
+        raise RuntimeError("Unknown interface {iface}!".format(iface=interface))
+    return status == "up" or unknown_up and status == "unknown"
+
+
 class Network(IntervalModule):
     """
     Display network information about a interface.
 
     Requires the PyPI package `netifaces`.
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{interface}` — same as setting
     * `{name}` — same as setting
@@ -71,6 +94,7 @@ class Network(IntervalModule):
         "format_up", "color_up",
         "format_down", "color_down",
         ("detached_down", "If the interface doesn't exist, display it as if it were down"),
+        ("unknown_up", "If the interface is in unknown state, display it as if it were up"),
         "name",
     )
 
@@ -79,7 +103,8 @@ class Network(IntervalModule):
     format_down = "{interface}"
     color_up = "#00FF00"
     color_down = "#FF0000"
-    detached_down = False
+    detached_down = True
+    unknown_up = False
 
     def init(self):
         if self.interface not in netifaces.interfaces() and not self.detached_down:
@@ -93,7 +118,20 @@ class Network(IntervalModule):
             return self.color_down, self.format_down, {"interface": self.interface, "name": self.name}, False
 
         info = netifaces.ifaddresses(self.interface)
-        up = netifaces.AF_INET in info or netifaces.AF_INET6 in info
+        slaves = get_bonded_slaves()
+        try:
+            master = slaves[self.interface]
+        except KeyError:
+            pass
+        else:
+            if sysfs_interface_up(self.interface, self.unknown_up):
+                master_info = netifaces.ifaddresses(master)
+                for af in (netifaces.AF_INET, netifaces.AF_INET6):
+                    try:
+                        info[af] = master_info[af]
+                    except KeyError:
+                        pass
+        up = sysfs_interface_up(self.interface, self.unknown_up)
         fdict = dict(
             zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
 

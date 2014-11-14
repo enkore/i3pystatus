@@ -1,4 +1,5 @@
 import socket
+from os.path import basename
 
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import TimeWrapper
@@ -8,12 +9,13 @@ class MPD(IntervalModule):
     """
     Displays various information from MPD (the music player daemon)
 
-    Available formatters (uses `formatp`_)
+    Available formatters (uses :ref:`formatp`)
 
     * `{title}` — (the title of the current song)
     * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
     * `{artist}` — (can be empty, too)
-    * `{song_elapsed}` — (Position in the currently playing song, uses `TimeWrapper`_, default is `%m:%S`)
+    * `{filename}` — (file name with out extension and path; empty unless title is empty)
+    * `{song_elapsed}` — (Position in the currently playing song, uses :ref:`TimeWrapper`, default is `%m:%S`)
     * `{song_length}` — (Length of the current song, same as song_elapsed)
     * `{pos}` — (Position of current song in playlist, one-based)
     * `{len}` — (Songs in playlist)
@@ -30,21 +32,24 @@ class MPD(IntervalModule):
         ("host"),
         ("port", "MPD port"),
         ("format", "formatp string"),
-        ("status", "Dictionary mapping pause, play and stop to output")
+        ("status", "Dictionary mapping pause, play and stop to output"),
+        ("color", "The color of the text"),
+        ("text_len", "Defines max length for title, album and artist, if truncated ellipsis are appended as indicator"),
+        ("truncate_fields", "fileds that will be truncated if exceeding text_len"),
     )
 
     host = "localhost"
     port = 6600
     s = None
     format = "{title} {status}"
-    format_sparse = None
     status = {
         "pause": "▷",
         "play": "▶",
         "stop": "◾",
     }
-
-    vol = 100
+    color = "#FFFFFF"
+    text_len = 25
+    truncate_fields = ("title", "album", "artist")
 
     def _mpd_command(self, sock, command):
         try:
@@ -64,48 +69,59 @@ class MPD(IntervalModule):
         except Exception as e:
             return None
 
-    def init(self):
-        if not self.format_sparse:
-            self.format_sparse = self.format
-
     def run(self):
-        try:
-            status = self._mpd_command(self.s, "status")
-            currentsong = self._mpd_command(self.s, "currentsong")
-            fdict = {
-                "pos": int(status.get("song", 0)) + 1,
-                "len": int(status["playlistlength"]),
-                "status": self.status[status["state"]],
-                "volume": int(status["volume"]),
+        status = self._mpd_command(self.s, "status")
+        currentsong = self._mpd_command(self.s, "currentsong")
+        fdict = {
+            "pos": int(status.get("song", 0)) + 1,
+            "len": int(status["playlistlength"]),
+            "status": self.status[status["state"]],
+            "volume": int(status["volume"]),
 
-                "title": currentsong.get("Title", ""),
-                "album": currentsong.get("Album", ""),
-                "artist": currentsong.get("Artist", ""),
-                "song_length": TimeWrapper(currentsong.get("Time", 0)),
-                "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
-                "bitrate": int(status.get("bitrate", 0)),
+            "title": currentsong.get("Title", ""),
+            "album": currentsong.get("Album", ""),
+            "artist": currentsong.get("Artist", ""),
+            "song_length": TimeWrapper(currentsong.get("Time", 0)),
+            "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
+            "bitrate": int(status.get("bitrate", 0)),
 
-            }
-            self.output = {
-                "full_text": formatp(self.format, **fdict).strip(),
-            }
-        except Exception as e:
-            self.output = {"full_text": "error connecting MPD"}
+        }
+
+        for key in self.truncate_fields:
+            if len(fdict[key]) > self.text_len:
+                fdict[key] = fdict[key][:self.text_len - 1] + "…"
+
+        if not fdict["title"] and "filename" in fdict:
+            fdict["filename"] = '.'.join(
+                basename(currentsong["file"]).split('.')[:-1])
+        else:
+            fdict["filename"] = ""
+        self.output = {
+            "full_text": formatp(self.format, **fdict).strip(),
+            "color": self.color,
+        }
 
     def on_leftclick(self):
         try:
-            self._mpd_command(self.s, "pause %i" %
-                                      (0 if self._mpd_command(self.s, "status")["state"] == "pause" else 1))
+            self._mpd_command(self.s, "%s" %
+                              ("play" if self._mpd_command(self.s, "status")["state"] in ["pause", "stop"] else "pause"))
         except Exception as e:
             pass
 
     def on_rightclick(self):
         try:
-            vol = int(self._mpd_command(self.s, "status")["volume"])
-            if vol == 0:
-                self._mpd_command(self.s, "setvol %i" % self.vol)
-            else:
-                self.vol = vol
-                self._mpd_command(self.s, "setvol 0")
+            self._mpd_command(self.s, "next")
+        except Exception as e:
+            pass
+
+    def on_upscroll(self):
+        try:
+            self._mpd_command(self.s, "next")
+        except Exception as e:
+            pass
+
+    def on_downscroll(self):
+        try:
+            self._mpd_command(self.s, "previous")
         except Exception as e:
             pass

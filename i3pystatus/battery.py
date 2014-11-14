@@ -5,7 +5,7 @@ import re
 import configparser
 
 from i3pystatus import IntervalModule, formatp
-from i3pystatus.core.util import lchop, TimeWrapper
+from i3pystatus.core.util import lchop, TimeWrapper, make_bar
 from i3pystatus.core.desktop import DesktopNotification
 
 
@@ -49,16 +49,23 @@ class Battery:
         return self._percentage("_DESIGN" if design else "") * 100
 
     def status(self):
-        if self.consumption():
+        if self.consumption() > 0.1 and self.percentage() < 99.9:
             return "Discharging" if self.battery_info["STATUS"] == "Discharging" else "Charging"
         else:
             return "Full"
 
+    def consumption(self, val):
+        return val if val > 0.1 else 0
+
 
 class BatteryCharge(Battery):
+    def __init__(self, bi):
+        bi["CHARGE_FULL"] = bi["CHARGE_FULL_DESIGN"] if bi["CHARGE_NOW"] > bi["CHARGE_FULL"] else bi["CHARGE_FULL"]
+        super().__init__(bi)
+
     def consumption(self):
         if "VOLTAGE_NOW" in self.battery_info and "CURRENT_NOW" in self.battery_info:
-            return self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"]  # V * A = W
+            return super().consumption(self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"])  # V * A = W
         else:
             return -1
 
@@ -79,7 +86,7 @@ class BatteryCharge(Battery):
 
 class BatteryEnergy(Battery):
     def consumption(self):
-        return self.battery_info["POWER_NOW"]
+        return super().consumption(self.battery_info["POWER_NOW"])
 
     def _percentage(self, design):
         return self.battery_info["ENERGY_NOW"] / self.battery_info["ENERGY_FULL" + design]
@@ -98,7 +105,7 @@ class BatteryChecker(IntervalModule):
     This class uses the /sys/class/power_supply/…/uevent interface to check for the
     battery status
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{remaining}` — remaining time for charging or discharging, uses TimeWrapper formatting, default format is `%E%h:%M`
     * `{percentage}` — battery percentage relative to the last full value
@@ -106,11 +113,13 @@ class BatteryChecker(IntervalModule):
     * `{consumption (Watts)}` — current power flowing into/out of the battery
     * `{status}`
     * `{battery_ident}` — the same as the setting
+    * `{bar}` —bar displaying the percentage graphically
     """
 
     settings = (
         ("battery_ident", "The name of your battery, usually BAT0 or BAT1"),
         "format",
+        ("not_present_text", "Text displayed if the battery is not present. No formatters are available"),
         ("alert", "Display a libnotify-notification on low battery"),
         "alert_percentage",
         ("alert_format_title", "The title of the notification, all formatters can be used"),
@@ -118,8 +127,13 @@ class BatteryChecker(IntervalModule):
         ("path", "Override the default-generated path"),
         ("status", "A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names"),
         ("color", "The text color"),
+        ("full_color", "The full color"),
+        ("charging_color", "The charging color"),
         ("critical_color", "The critical color"),
+        ("not_present_color", "The not present color."),
+        ("no_text_full", "Don't display text when battery is full - 100%"),
     )
+
     battery_ident = "BAT0"
     format = "{status} {remaining}"
     status = {
@@ -127,13 +141,18 @@ class BatteryChecker(IntervalModule):
         "DIS": "DIS",
         "FULL": "FULL",
     }
+    not_present_text = "Battery not present"
 
     alert = False
     alert_percentage = 10
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
     color = "#ffffff"
+    full_color = "#00ff00"
+    charging_color = "#00ff00"
     critical_color = "#ff0000"
+    not_present_color = "#ffffff"
+    no_text_full = False
 
     path = None
 
@@ -146,7 +165,20 @@ class BatteryChecker(IntervalModule):
         urgent = False
         color = self.color
 
-        battery = Battery.create(self.path)
+        try:
+            battery = Battery.create(self.path)
+        except FileNotFoundError:
+            self.output = {
+                "full_text": self.not_present_text,
+                "color": self.not_present_color,
+            }
+            return
+        if self.no_text_full:
+            if battery.status() == "Full":
+                self.output = {
+                    "full_text": ""
+                }
+                return
 
         fdict = {
             "battery_ident": self.battery_ident,
@@ -154,6 +186,7 @@ class BatteryChecker(IntervalModule):
             "percentage_design": battery.percentage(design=True),
             "consumption": battery.consumption(),
             "remaining": TimeWrapper(0, "%E%h:%M"),
+            "bar": make_bar(battery.percentage()),
         }
 
         status = battery.status()
@@ -167,8 +200,10 @@ class BatteryChecker(IntervalModule):
                     color = self.critical_color
             else:
                 fdict["status"] = "CHR"
+                color = self.charging_color
         else:
             fdict["status"] = "FULL"
+            color = self.full_color
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
             DesktopNotification(
@@ -182,7 +217,7 @@ class BatteryChecker(IntervalModule):
         fdict["status"] = self.status[fdict["status"]]
 
         self.output = {
-            "full_text": formatp(self.format, **fdict).strip(),
+            "full_text": formatp(self.format, **fdict),
             "instance": self.battery_ident,
             "urgent": urgent,
             "color": color,

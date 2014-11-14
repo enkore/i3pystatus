@@ -9,7 +9,7 @@ class ALSA(IntervalModule):
 
     Requires pyalsaaudio
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{volume}` — the current volume in percent
     * `{muted}` — the value of one of the `muted` or `unmuted` settings
@@ -21,9 +21,11 @@ class ALSA(IntervalModule):
 
     settings = (
         "format",
+        ("format_muted", "optional format string to use when muted"),
         ("mixer", "ALSA mixer"),
         ("mixer_id", "ALSA mixer id"),
         ("card", "ALSA sound card"),
+        ("increment", "integer percentage of max volume to in/decrement volume on mousewheel"),
         "muted", "unmuted",
         "color_muted", "color",
         "channel"
@@ -34,10 +36,12 @@ class ALSA(IntervalModule):
     color_muted = "#AAAAAA"
     color = "#FFFFFF"
     format = "♪: {volume}"
+    format_muted = None
     mixer = "Master"
     mixer_id = 0
     card = 0
     channel = 0
+    increment = 5
 
     alsamixer = None
     has_mute = True
@@ -68,7 +72,28 @@ class ALSA(IntervalModule):
         self.fdict["volume"] = self.alsamixer.getvolume()[self.channel]
         self.fdict["muted"] = self.muted if muted else self.unmuted
 
+        if muted and self.format_muted is not None:
+            output_format = self.format_muted
+        else:
+            output_format = self.format
+
         self.output = {
-            "full_text": self.format.format(**self.fdict),
+            "full_text": output_format.format(**self.fdict),
             "color": self.color_muted if muted else self.color,
         }
+
+    def on_leftclick(self):
+        self.on_rightclick()
+
+    def on_rightclick(self):
+        if self.has_mute:
+            muted = self.alsamixer.getmute()[self.channel]
+            self.alsamixer.setmute(not muted)
+
+    def on_upscroll(self):
+        vol = self.alsamixer.getvolume()[self.channel]
+        self.alsamixer.setvolume(min(100, vol + self.increment))
+
+    def on_downscroll(self):
+        vol = self.alsamixer.getvolume()[self.channel]
+        self.alsamixer.setvolume(max(0, vol - self.increment))

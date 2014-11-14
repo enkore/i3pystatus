@@ -1,5 +1,6 @@
 import basiciw
 
+from i3pystatus.core.util import make_bar
 from i3pystatus.network import Network
 
 
@@ -15,6 +16,7 @@ class Wireless(Network):
     * `{essid}` — ESSID of currently connected wifi
     * `{freq}` — Current frequency
     * `{quality}` — Link quality in percent
+    * `{quality_bar}` —Bar graphically representing link quality
     """
 
     interface = "wlan0"
@@ -32,6 +34,7 @@ class Wireless(Network):
             else:
                 fdict["quality"] = quality["quality"]
             fdict["quality"] *= 100
+            fdict["quality_bar"] = make_bar(fdict["quality"])
         else:
             fdict["essid"] = ""
             fdict["freq"] = fdict["quality"] = 0.0

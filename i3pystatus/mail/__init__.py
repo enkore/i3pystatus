@@ -1,6 +1,7 @@
 import subprocess
 
 from i3pystatus import SettingsBase, IntervalModule
+from i3pystatus.core.util import internet, require
 
 
 class Backend(SettingsBase):
@@ -16,16 +17,19 @@ class Mail(IntervalModule):
     """
     Generic mail checker
 
-    The `backends` setting determines the backends to use.
+    The `backends` setting determines the backends to use. For available backends see :ref:`mailbackends`.
     """
 
-    _endstring = """!!i3pystatus.mail!!"""
-
     settings = (
-        ("backends", "List of backends (instances of ``i3pystatus.mail.xxx.zzz``, i.e. ``i3pystatus.mail.imap.IMAP``)"),
+        ("backends", "List of backends (instances of ``i3pystatus.mail.xxx.zzz``, e.g. :py:class:`.imap.IMAP`)"),
         "color", "color_unread", "format", "format_plural",
         ("hide_if_null", "Don't output anything if there are no new mails"),
-        ("email_client", "The email client to open on left click"),
+        ("email_client", "The command to run on left click. "
+                         "For example, to launch Thunderbird set ``email_client` to ``thunderbird``. "
+                         "Alternatively, to bring Thunderbird into focus, "
+                         "set ``email_client`` to ``i3-msg -q [class=\"^Thunderbird$\"] focus``. "
+                         "Hint: To discover the X window class of your email client run 'xprop | grep -i class' "
+                         "and click on it's window\n"),
     )
     required = ("backends",)
 

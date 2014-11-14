@@ -50,9 +50,14 @@ def partition(iterable, limit, key=lambda x: x):
 def round_dict(dic, places):
     """
     Rounds all values in a dict containing only numeric types to `places` decimal places.
+    If places is None, round to INT.
     """
-    for key, value in dic.items():
-        dic[key] = round(value, places)
+    if places is None:
+        for key, value in dic.items():
+            dic[key] = round(value)
+    else:
+        for key, value in dic.items():
+            dic[key] = round(value, places)
 
 
 class ModuleList(collections.UserList):
@@ -165,7 +170,7 @@ def formatp(string, **kwargs):
     Escaped brackets, i.e. \\\\[ and \\\\] are copied verbatim to output.
 
     :param string: Format string
-    :param **kwargs: keyword arguments providing data for the format string
+    :param kwargs: keyword arguments providing data for the format string
     :returns: Formatted string
     """
 
@@ -348,12 +353,93 @@ def require(predicate):
 
 def internet():
     """
-    Checks for a internet connection by connecting to 8.8.8.8 (Google DNS)
+    Checks for a internet connection by connecting to a Google DNS
+    server.
 
     :returns: True if internet connection is available
     """
     try:
-        socket.create_connection(("8.8.8.8", 53), 1).close()
+        socket.create_connection(("google-public-dns-a.google.com", 53), 1).close()
         return True
     except OSError:
         return False
+
+
+def make_graph(values, upper_limit=100.0):
+    """
+    Draws a graph made of unicode characters.
+
+    :param values: An array of values to graph.
+    :param upper_limit: Maximum value for the y axis.
+    :returns: Bar as a string
+    """
+    values = [float(n) for n in values]
+
+    # Add the upper limit to the end of the array so the graph doesn't distort
+    # as high values drop off the end.
+    values.append(float(upper_limit))
+
+    bar = u'_▁▂▃▄▅▆▇█'
+    bar_count = len(bar) - 1
+    mn, mx = min(values), max(values)
+    extent = mx - mn
+    if extent == 0:
+        graph = '_' * len(values)
+    else:
+        graph = ''.join(bar[int((n - mn) / extent * bar_count)]
+                        for n in values[:len(values) - 1])  # Don't show the upper limit value.
+    return graph
+
+
+def make_vertical_bar(percentage, width=1):
+    """
+    Draws a vertical bar made of unicode characters.
+
+    :param value: A value between 0 and 100
+    :param width: How many characters wide the bar should be.
+    :returns: Bar as a String
+    """
+    bar = u' _▁▂▃▄▅▆▇█'
+    percentage //= 10
+    if percentage < 0:
+        output = bar[0]
+    elif percentage >= len(bar):
+        output = bar[-1]
+    else:
+        output = bar[percentage]
+    return output * width
+
+
+def make_bar(percentage):
+    """
+    Draws a bar made of unicode box characters.
+
+    :param percentage: A value between 0 and 100
+    :returns: Bar as a string
+    """
+
+    bars = [' ', '▏', '▎', '▍', '▌', '▋', '▋', '▊', '▊', '█']
+    tens = int(percentage / 10)
+    ones = int(percentage) - tens * 10
+    result = tens * '█'
+    if(ones >= 1):
+        result = result + bars[ones]
+    result = result + (10 - len(result)) * ' '
+    return result
+
+
+def user_open(url_or_command):
+    """Open the specified paramater in the web browser if a URL is detected,
+    othewrise pass the paramater to the shell as a subprocess. This function
+    is inteded to bu used in on_leftclick()/on_rightclick() events.
+
+    :param url_or_command: String containing URL or command
+    """
+    from urllib.parse import urlparse
+    scheme = urlparse(url_or_command).scheme
+    if scheme == 'http' or scheme == 'https':
+        import webbrowser
+        webbrowser.open(url_or_command)
+    else:
+        import subprocess
+        subprocess.Popen(url_or_command, shell=True)

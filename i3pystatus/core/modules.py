@@ -15,6 +15,8 @@ class Module(SettingsBase):
             if "name" not in self.output:
                 self.output["name"] = self.__name__
             self.output["instance"] = str(id(self))
+            if (self.output.get("color", "") or "").lower() == "#ffffff":
+                del self.output["color"]
             json.insert(convert_position(self.position, json), self.output)
 
     def run(self):
@@ -25,6 +27,10 @@ class Module(SettingsBase):
             self.on_leftclick()
         elif button == 3:  # Right mouse button
             self.on_rightclick()
+        elif button == 4:  # mouse wheel up
+            self.on_upscroll()
+        elif button == 5:  # mouse wheel down
+            self.on_downscroll()
 
     def move(self, position):
         self.position = position
@@ -34,6 +40,12 @@ class Module(SettingsBase):
         pass
 
     def on_rightclick(self):
+        pass
+
+    def on_upscroll(self):
+        pass
+
+    def on_downscroll(self):
         pass
 
 

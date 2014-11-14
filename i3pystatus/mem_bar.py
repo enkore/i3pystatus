@@ -1,35 +1,33 @@
 from i3pystatus import IntervalModule
 from psutil import virtual_memory
-from .core.util import round_dict
+from i3pystatus.core.color import ColorRangeModule
+from i3pystatus.core.util import make_bar
 
 
-class Mem(IntervalModule):
+class MemBar(IntervalModule, ColorRangeModule):
     """
-    Shows memory load
+    Shows memory load as a bar.
 
     .. rubric:: Available formatters
 
-    * {avail_mem}
-    * {percent_used_mem}
-    * {used_mem}
-    * {total_mem}
+    * {used_mem_bar}
 
-    Requires psutil (from PyPI)
+    Requires psutil and colour (from PyPI)
     """
 
-    format = "{avail_mem} MiB"
-    divisor = 1024 ** 2
+    format = "{used_mem_bar}"
     color = "#00FF00"
     warn_color = "#FFFF00"
     alert_color = "#FF0000"
     warn_percentage = 50
     alert_percentage = 80
-    round_size = 1
+    multi_colors = False
+
+    def init(self):
+        self.colors = self.get_hex_color_range(self.color, self.alert_color, 100)
 
     settings = (
         ("format", "format string used for output."),
-        ("divisor",
-         "divide all byte values by this value, default 1024**2(mebibytes"),
         ("warn_percentage", "minimal percentage for warn state"),
         ("alert_percentage", "minimal percentage for alert state"),
         ("color", "standard color"),
@@ -37,31 +35,23 @@ class Mem(IntervalModule):
          "defines the color used wann warn percentage ist exceeded"),
         ("alert_color",
          "defines the color used when alert percentage is exceeded"),
-        ("round_size", "defines number of digits in round"),
-
+        ("multi_colors", "whether to use range of colors from 'color' to 'alert_color' based on memory usage."),
     )
 
     def run(self):
         memory_usage = virtual_memory()
-        used = memory_usage.used - memory_usage.cached - memory_usage.buffers
 
-        if memory_usage.percent >= self.alert_percentage:
+        if self.multi_colors:
+            color = self.get_gradient(memory_usage.percent, self.colors)
+        elif memory_usage.percent >= self.alert_percentage:
             color = self.alert_color
-
         elif memory_usage.percent >= self.warn_percentage:
             color = self.warn_color
         else:
             color = self.color
 
-        cdict = {
-            "used_mem": used / self.divisor,
-            "avail_mem": memory_usage.available / self.divisor,
-            "total_mem": memory_usage.total / self.divisor,
-            "percent_used_mem": memory_usage.percent,
-        }
-        round_dict(cdict, self.round_size)
-
         self.output = {
-            "full_text": self.format.format(**cdict),
+            "full_text": self.format.format(
+                used_mem_bar=make_bar(memory_usage.percent)),
             "color": color
         }

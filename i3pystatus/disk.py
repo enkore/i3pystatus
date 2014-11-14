@@ -18,6 +18,8 @@ class Disk(IntervalModule):
         ("display_limit", "if more space is available than this limit the module is hidden"),
         ("critical_limit", "critical space limit (see critical_color)"),
         ("critical_color", "the critical color"),
+        ("color", "the common color"),
+        ("round_size", "precision, None for INT"),
     )
     required = ("path",)
     color = "#FFFFFF"
@@ -26,6 +28,7 @@ class Disk(IntervalModule):
     divisor = 1024 ** 3
     display_limit = float('Inf')
     critical_limit = 0
+    round_size = 2
 
     def run(self):
         stat = os.statvfs(self.path)
@@ -44,7 +47,7 @@ class Disk(IntervalModule):
             "percentage_avail": stat.f_bavail / stat.f_blocks * 100,
             "percentage_used": (stat.f_blocks - stat.f_bfree) / stat.f_blocks * 100,
         }
-        round_dict(cdict, 2)
+        round_dict(cdict, self.round_size)
 
         self.output = {
             "full_text": self.format.format(**cdict),

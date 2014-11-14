@@ -7,9 +7,10 @@ class Weather(IntervalModule):
     """
     This module gets the weather from weather.com using pywapi module
     First, you need to get the code for the location from the www.weather.com
-    Available formatters:
+    .. rubric:: Available formatters
 
     * {current_temp}
+    * {current_wind}
     * {humidity}
 
     Requires pywapi from PyPI.
@@ -29,7 +30,7 @@ class Weather(IntervalModule):
     format = "{current_temp}"
     colorize = False
     color_icons = {
-        "Fair":  (u"\u2600", "#FFCC00"),
+        "Fair": (u"\u2600", "#FFCC00"),
         "Cloudy": (u"\u2601", "#F8F8FF"),
         "Partly Cloudy": (u"\u2601", "#F8F8FF"),  # \u26c5 is not in many fonts
         "Rainy": (u"\u2614", "#CBD2C0"),
@@ -44,9 +45,11 @@ class Weather(IntervalModule):
         conditions = result["current_conditions"]
         temperature = conditions["temperature"]
         humidity = conditions["humidity"]
+        wind = conditions["wind"]
         units = result["units"]
         color = None
-        current_temp = "{t}°{d} ".format(t=temperature, d=units["temperature"])
+        current_temp = "{t}°{d}".format(t=temperature, d=units["temperature"])
+        current_wind = "{t} {s}{d}".format(t=wind["text"], s=wind["speed"], d=units["speed"])
 
         if self.colorize:
             icon, color = self.color_icons.get(conditions["text"],
@@ -57,6 +60,6 @@ class Weather(IntervalModule):
             color = color
 
         self.output = {
-            "full_text": self.format.format(current_temp=current_temp, humidity=humidity),
+            "full_text": self.format.format(current_temp=current_temp, current_wind=current_wind, humidity=humidity),
             "color": color
         }

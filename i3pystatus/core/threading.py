@@ -73,6 +73,11 @@ class ExceptionWrapper(Wrapper):
             ))
             traceback.print_exc(file=sys.stderr)
             sys.stderr.flush()
+            if hasattr(self.workload, "output"):
+                self.workload.output = {
+                    "full_text": "{}: {}".format(self.workload.__class__.__name__, sys.exc_info()[1]),
+                    "color": "#FF0000",
+                }
 
 
 class WorkloadWrapper(Wrapper):
