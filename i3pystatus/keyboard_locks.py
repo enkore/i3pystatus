@@ -17,13 +17,14 @@ class Keyboard_locks(IntervalModule):
     interval = 1
 
     settings = (
-        "format",
-        "caps_on",
-        "caps_off",
-        "num_on",
-        "num_off",
-        "scroll_on",
-        "scroll_off",
+        ("format", "Format string. "
+            "Available formaters are {core} and {usage}."),
+        ("caps_on", "String to show in {caps} when CAPS LOCK is on"),
+        ("caps_off", "String to show in {caps} when CAPS LOCK is off"),
+        ("num_on", "String to show in {num} when NUM LOCK is on"),
+        ("num_off", "String to show in {num} when NUM LOCK is off"),
+        ("scroll_on", "String to show in {scroll} when SCROLL LOCK is on"),
+        ("scroll_off", "String to show in {scroll} when SCROLL LOCK is off"),
         "color"
     )
 
