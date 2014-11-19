@@ -118,7 +118,7 @@ class PulseAudio(Module, ColorRangeModule):
         """Updates self.output"""
         if sink_info_p:
             sink_info = sink_info_p.contents
-            volume_percent = int(100 * sink_info.volume.values[0] / 0x10000)
+            volume_percent = round(100 * sink_info.volume.values[0] / 0x10000)
             volume_db = pa_sw_volume_to_dB(sink_info.volume.values[0])
             self.currently_muted = sink_info.mute
 
