@@ -13,4 +13,3 @@ def test_uname():
         um = uname.Uname(format="{" + key + "}")
         um.init()
         assert um.output["full_text"] == getattr(uref, key)
-
