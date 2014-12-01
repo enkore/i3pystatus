@@ -10,8 +10,9 @@ Contents:
    configuration
    formatting
    i3pystatus
-   i3pystatus.core
+   changelog
    module
+   i3pystatus.core
 
 
 Indices and tables
