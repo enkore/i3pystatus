@@ -6,8 +6,4 @@ cache:
     - $HOME/virtualenv/python3.3.5/lib/python3.3/site-packages
 install:
   - "pip install -r dev-requirements.txt"
-script:
-  - "pep8 --ignore E501 i3pystatus tests"
-  - "PYTHONPATH=. py.test"        # run unit tests
-  - "python setup.py -q install"  # test install
-  - "sphinx-build -W docs html"   # test building docs
+script: "./ci-build.sh"
