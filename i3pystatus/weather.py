@@ -7,6 +7,7 @@ class Weather(IntervalModule):
     """
     This module gets the weather from weather.com using pywapi module
     First, you need to get the code for the location from the www.weather.com
+
     .. rubric:: Available formatters
 
     * {current_temp}
