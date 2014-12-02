@@ -26,4 +26,5 @@ setup(name="i3pystatus",
               "i3pystatus = i3pystatus:main"
           ]
       },
+      zip_safe=True,
       )
