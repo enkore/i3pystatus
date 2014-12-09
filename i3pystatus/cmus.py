@@ -5,6 +5,14 @@ from i3pystatus.core.util import TimeWrapper
 import subprocess
 
 
+def _extract_artist_title(input):
+    for sep in ('-', ' - '):
+        split = input.split(sep)
+        if len(split) == 2:
+            return split[0], split[1]
+    # fallback
+    return (input.split('-') + [''] * 2)[:2]
+
 class Cmus(IntervalModule):
 
     """
@@ -16,7 +24,7 @@ class Cmus(IntervalModule):
         'color'
     )
     color = "#909090"
-    format = "{status} {song_elapsed}/{song_length} {artist}-{title}"
+    format = "{status} {song_elapsed}/{song_length} {artist} - {title}"
     status_text = ''
     interval = 1
     status = {
@@ -68,14 +76,15 @@ class Cmus(IntervalModule):
         }
 
         if fdict['stream']:
-            fdict['artist'], fdict['title'] = (
-                fdict['stream'].split('-') + [''] * 2)[:2]
+            fdict['artist'], fdict['title'] = _extract_artist_title(fdict['stream'])
 
         elif not fdict['title']:
             _, filename = os.path.split(fdict['file'])
             filebase, _ = os.path.splitext(filename)
-            fdict['artist'], fdict['title'] = (
-                filebase.split('-') + [''] * 2)[:2]
+            fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
+
+        fdict['title'] = fdict['title'].strip()
+        fdict['artist'] = fdict['artist'].strip()
 
         self.output = {
             "full_text": formatp(self.format, **fdict),
