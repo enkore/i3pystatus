@@ -13,6 +13,7 @@ def _extract_artist_title(input):
     # fallback
     return (input.split('-') + [''] * 2)[:2]
 
+
 class Cmus(IntervalModule):
 
     """
@@ -61,7 +62,7 @@ class Cmus(IntervalModule):
                 "full_text": 'Not running',
                 "color": self.color
             }
-            return 
+            return
         fdict = {
             'file': status.get('file', ''),
             'status': self.status[status["status"]],
@@ -76,7 +77,8 @@ class Cmus(IntervalModule):
         }
 
         if fdict['stream']:
-            fdict['artist'], fdict['title'] = _extract_artist_title(fdict['stream'])
+            fdict['artist'], fdict[
+                'title'] = _extract_artist_title(fdict['stream'])
 
         elif not fdict['title']:
             _, filename = os.path.split(fdict['file'])
