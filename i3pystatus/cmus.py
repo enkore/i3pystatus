@@ -15,6 +15,7 @@ def _extract_artist_title(input):
 
 
 class Cmus(IntervalModule):
+
     """
     Gets the status and current song info using cmus-remote
 
