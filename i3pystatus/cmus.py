@@ -27,7 +27,7 @@ class Cmus(IntervalModule):
     * `{title}` — title
     * `{album}` — album
     * `{tracknumber}` — tracknumber
-    * `{file}` — file or url name 
+    * `{file}` — file or url name
     * `{stream}` — song name from stream
     * `{bitrate}` — bitrate
     """
