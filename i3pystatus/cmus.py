@@ -15,9 +15,20 @@ def _extract_artist_title(input):
 
 
 class Cmus(IntervalModule):
-
     """
-    gets the status and current song info using cmus-remote
+    Gets the status and current song info using cmus-remote
+
+    .. rubric:: Available formatters
+    * `{status}` — current status icon (paused/playing/stopped)
+    * `{song_elapsed}` — song elapsed time (mm:ss format)
+    * `{song_length}` — total song duration (mm:ss format)
+    * `{artist}` — artist
+    * `{title}` — title
+    * `{album}` — album
+    * `{tracknumber}` — tracknumber
+    * `{file}` — file or url name 
+    * `{stream}` — song name from stream
+    * `{bitrate}` — bitrate
     """
 
     settings = (
