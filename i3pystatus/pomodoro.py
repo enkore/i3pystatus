@@ -24,8 +24,8 @@ class Pomodoro(IntervalModule):
          'Path to sound file to play as alarm. Played by "aplay" utility'),
         ('pomodoro_duration',
          'Working (pomodoro) interval duration in seconds'),
-        ('break_duration', 'Short break duration in secods'),
-        ('long_break_duration', 'Long break duration in secods'),
+        ('break_duration', 'Short break duration in seconds'),
+        ('long_break_duration', 'Long break duration in seconds'),
         ('short_break_count', 'Short break count before first long break'),
         ('format', 'format string, available formatters: current_pomodoro, '
                    'total_pomodoro, time')
