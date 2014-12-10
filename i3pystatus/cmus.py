@@ -32,8 +32,10 @@ class Cmus(IntervalModule):
     """
 
     settings = (
-        'format',
-        'color'
+        ('format', 'format string, available formatters: status, song_elapsed, '
+                   'song_length, artist, title, album, tracknumber, file, '
+                   'stream, bitrate'),
+        'color',
     )
     color = "#909090"
     format = "{status} {song_elapsed}/{song_length} {artist} - {title}"
