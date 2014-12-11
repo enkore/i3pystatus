@@ -20,6 +20,7 @@ class Cmus(IntervalModule):
     Gets the status and current song info using cmus-remote
 
     .. rubric:: Available formatters
+    
     * `{status}` — current status icon (paused/playing/stopped)
     * `{song_elapsed}` — song elapsed time (mm:ss format)
     * `{song_length}` — total song duration (mm:ss format)
