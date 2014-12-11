@@ -5,18 +5,42 @@ from i3pystatus.core.util import TimeWrapper
 import subprocess
 
 
+def _extract_artist_title(input):
+    for sep in ('-', ' - '):
+        split = input.split(sep)
+        if len(split) == 2:
+            return split[0], split[1]
+    # fallback
+    return (input.split('-') + [''] * 2)[:2]
+
+
 class Cmus(IntervalModule):
 
     """
-    gets the status and current song info using cmus-remote
+    Gets the status and current song info using cmus-remote
+
+    .. rubric:: Available formatters
+
+    * `{status}` — current status icon (paused/playing/stopped)
+    * `{song_elapsed}` — song elapsed time (mm:ss format)
+    * `{song_length}` — total song duration (mm:ss format)
+    * `{artist}` — artist
+    * `{title}` — title
+    * `{album}` — album
+    * `{tracknumber}` — tracknumber
+    * `{file}` — file or url name
+    * `{stream}` — song name from stream
+    * `{bitrate}` — bitrate
     """
 
     settings = (
-        'format',
-        'color'
+        ('format', 'format string, available formatters: status, song_elapsed, '
+                   'song_length, artist, title, album, tracknumber, file, '
+                   'stream, bitrate'),
+        'color',
     )
     color = "#909090"
-    format = "{status} {song_elapsed}/{song_length} {artist}-{title}"
+    format = "{status} {song_elapsed}/{song_length} {artist} - {title}"
     status_text = ''
     interval = 1
     status = {
@@ -34,8 +58,8 @@ class Cmus(IntervalModule):
     def _query_cmus(self):
         status_dict = {}
         status, error = self._cmus_command('query')
-        status = status.decode('utf-8').split('\n')
         if status != b'cmus-remote: cmus is not running\n':
+            status = status.decode('utf-8').split('\n')
             for item in status:
                 split_item = item.split(' ')
                 if split_item[0] in ['tag', 'set']:
@@ -48,6 +72,12 @@ class Cmus(IntervalModule):
 
     def run(self):
         status = self._query_cmus()
+        if not status:
+            self.output = {
+                "full_text": 'Not running',
+                "color": self.color
+            }
+            return
         fdict = {
             'file': status.get('file', ''),
             'status': self.status[status["status"]],
@@ -62,14 +92,16 @@ class Cmus(IntervalModule):
         }
 
         if fdict['stream']:
-            fdict['artist'], fdict['title'] = (
-                fdict['stream'].split('-') + [''] * 2)[:2]
+            fdict['artist'], fdict[
+                'title'] = _extract_artist_title(fdict['stream'])
 
         elif not fdict['title']:
             _, filename = os.path.split(fdict['file'])
             filebase, _ = os.path.splitext(filename)
-            fdict['artist'], fdict['title'] = (
-                filebase.split('-') + [''] * 2)[:2]
+            fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
+
+        fdict['title'] = fdict['title'].strip()
+        fdict['artist'] = fdict['artist'].strip()
 
         self.output = {
             "full_text": formatp(self.format, **fdict),

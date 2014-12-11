@@ -24,9 +24,11 @@ class Pomodoro(IntervalModule):
          'Path to sound file to play as alarm. Played by "aplay" utility'),
         ('pomodoro_duration',
          'Working (pomodoro) interval duration in seconds'),
-        ('break_duration', 'Short break duration in secods'),
-        ('long_break_duration', 'Long break duration in secods'),
+        ('break_duration', 'Short break duration in seconds'),
+        ('long_break_duration', 'Long break duration in seconds'),
         ('short_break_count', 'Short break count before first long break'),
+        ('format', 'format string, available formatters: current_pomodoro, '
+                   'total_pomodoro, time')
     )
 
     color_stopped = '#2ECCFA'
@@ -34,6 +36,7 @@ class Pomodoro(IntervalModule):
     color_break = '#37FF00'
     interval = 1
     short_break_count = 3
+    format = '☯ {current_pomodoro}/{total_pomodoro} {time}'
 
     pomodoro_duration = 25 * 60
     break_duration = 5 * 60
@@ -56,8 +59,8 @@ class Pomodoro(IntervalModule):
                 else:
                     self.time = datetime.now() + \
                         timedelta(seconds=self.break_duration)
+                    self.breaks += 1
                 text = 'Go for a break!'
-                self.breaks += 1
             else:
                 self.state = 'running'
                 self.time = datetime.now() + \
@@ -70,17 +73,27 @@ class Pomodoro(IntervalModule):
             text = '{:02}:{:02}'.format(int(min), int(sec))
             color = self.color_running if self.state == 'running' else self.color_break
         else:
-            text = 'Stopped'
-            color = self.color_stopped
+            self.output = {
+                'full_text': 'Stopped',
+                'color': self.color_stopped
+            }
+            return
+
+        sdict = {
+            'time': text,
+            'current_pomodoro': self.breaks,
+            'total_pomodoro': self.short_break_count + 1,
+        }
 
         self.output = {
-            'full_text': text,
+            'full_text': self.format.format(**sdict),
             'color': color
         }
 
     def on_leftclick(self):
         self.state = 'running'
         self.time = datetime.now() + timedelta(seconds=self.pomodoro_duration)
+        self.breaks = 0
 
     def on_rightclick(self):
         self.state = 'stopped'
