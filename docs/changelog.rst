@@ -5,6 +5,20 @@ Changelog
 master branch
 +++++++++++++
 
+3.32
+++++
+
+* Added keyboard_locks module
+* Added pianobar module
+* Added uname module
+* cmus: enhanced artist/title detection from filenames
+* cmus: fixed issue when cmus is not running
+* mpd: added text_len and truncate_fields options to truncate long artist, album or song names
+* network_traffic: added hide_down and format_down options
+* pomodoro: added format option
+* pomodoro: reset timer on left click
+* pulseaudio: fix rounding error of percentage volume
+
 3.31
 ++++
 

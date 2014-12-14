@@ -3,8 +3,8 @@
 from setuptools import setup
 
 setup(name="i3pystatus",
-      version="3.31",
-      description="Like i3status, this generates status line for i3bar / i3wm",
+      version="3.32",
+      description="A complete replacement for i3status",
       url="http://github.com/enkore/i3pystatus",
       license="MIT",
       classifiers=[
