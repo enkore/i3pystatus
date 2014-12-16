@@ -1,8 +1,10 @@
 from i3pystatus.core.util import KeyConstraintDict
 from i3pystatus.core.exceptions import ConfigKeyError, ConfigMissingError
+import inspect
 
 
 class SettingsBase:
+
     """
     Support class for providing a nice and flexible settings interface
 
@@ -15,15 +17,20 @@ class SettingsBase:
     Settings are stored as attributes of self.
     """
 
-    settings = tuple()
+    settings = (
+        ("enable_log", "Set to true to log error to .i3pystatus-<pid> file"),
+    )
+
     """settings should be tuple containing two types of elements:
 
     * bare strings, which must be valid Python identifiers.
-    * two-tuples, the first element being a identifier (as above) and the second
-      a docstring for the particular setting"""
+    * two-tuples, the first element being a identifier (as above)
+    and the second a docstring for the particular setting"""
 
     required = tuple()
     """required can list settings which are required"""
+
+    enable_log = False
 
     def __init__(self, *args, **kwargs):
         def get_argument_dict(args, kwargs):
@@ -33,9 +40,20 @@ class SettingsBase:
                 return args[0]
             return kwargs
 
-        self.settings = self.flatten_settings(self.settings)
+        def merge_with_parents_settings():
 
-        sm = KeyConstraintDict(self.settings, self.required)
+            settings = tuple()
+
+            # getmro returns base classes according to Method Resolution Order
+            for cls in inspect.getmro(self.__class__):
+                if hasattr(cls, "settings"):
+                    settings = settings + cls.settings
+            return settings
+
+        settings = merge_with_parents_settings()
+        settings = self.flatten_settings(settings)
+
+        sm = KeyConstraintDict(settings, self.required)
         settings_source = get_argument_dict(args, kwargs)
 
         try:
