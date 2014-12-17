@@ -2,6 +2,7 @@ import subprocess
 
 from i3pystatus import SettingsBase, IntervalModule
 from i3pystatus.core.util import internet, require
+from i3pystatus.core.command import run_through_shell
 
 
 class Backend(SettingsBase):
@@ -69,7 +70,8 @@ class Mail(IntervalModule):
 
     def on_leftclick(self):
         if self.email_client:
-            subprocess.Popen(self.email_client.split())
+            run_through_shell(self.email_client,self.enable_log)
+            
 
     def on_rightclick(self):
         self.run()
