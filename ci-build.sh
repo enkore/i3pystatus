@@ -1,5 +1,9 @@
 #!/bin/bash -xe
 
+python3 --version
+py.test --version
+pep8 --version
+
 # Target directory for all build files
 BUILD=${1:-ci-build}
 mkdir -p $BUILD
