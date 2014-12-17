@@ -8,13 +8,12 @@ from i3pystatus.core.util import formatp
 import logging
 import os
 
-h=logging.FileHandler(".i3pystatus-" + str(os.getpid()));
+h = logging.FileHandler(".i3pystatus-" + str(os.getpid()), delay=True)
 
 logger = logging.getLogger("i3pystatus")
 logger.addHandler(h)
 logger.setLevel(logging.DEBUG)
-#~/.i3pystatus-<pid>-<module>
-logger.error("Start !")
+
 
 __path__ = extend_path(__path__, __name__)
 

@@ -1,5 +1,5 @@
 from i3pystatus import IntervalModule
-from subprocess import check_output, CalledProcessError
+from i3pystatus.core.command import run_through_shell
 
 
 class Shell(IntervalModule):
@@ -19,21 +19,8 @@ class Shell(IntervalModule):
     required = ("command",)
 
     def run(self):
-        try:
-            out = check_output(self.command, shell=True)
-            color = self.color
-        except CalledProcessError as e:
-            out = e.output
-            color = self.error_color
-
-        out = out.decode("UTF-8").replace("\n", " ")
-        try:
-            if out[-1] == " ":
-                out = out[:-1]
-        except:
-            out = ""
-
+        out, success = run_through_shell(self.command, self.enable_log, enable_shell=True)
         self.output = {
             "full_text": out,
-            "color": color
+            "color": self.color if success else self.error_color
         }
