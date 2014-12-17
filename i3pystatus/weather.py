@@ -56,8 +56,8 @@ class Weather(IntervalModule):
             icon, color = self.color_icons.get(conditions["text"],
                                                self.color_icons["default"])
             current_temp = "{t}°{d} {i}".format(t=temperature,
-                                                d=units["temperature"],
-                                                i=icon)
+                                                 d=units["temperature"],
+                                                 i=icon)
             color = color
 
         self.output = {
