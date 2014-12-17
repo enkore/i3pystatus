@@ -24,8 +24,9 @@ class SettingsBase:
     """settings should be tuple containing two types of elements:
 
     * bare strings, which must be valid Python identifiers.
-    * two-tuples, the first element being a identifier (as above)
-    and the second a docstring for the particular setting"""
+    * two-tuples, the first element being a identifier (as above) and the second a docstring for the particular setting
+
+    """
 
     required = tuple()
     """required can list settings which are required"""
