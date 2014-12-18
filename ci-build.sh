@@ -2,13 +2,13 @@
 
 python3 --version
 py.test --version
-pep8 --version
+python3 -mpep8 --version
 
 # Target directory for all build files
 BUILD=${1:-ci-build}
 mkdir -p $BUILD
 
-pep8 --ignore E501 i3pystatus tests
+python3 -mpep8 --ignore E501 i3pystatus tests
 
 # Check that the setup.py script works
 rm -rf ${BUILD}/test-install ${BUILD}/test-install-bin
