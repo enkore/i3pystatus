@@ -20,9 +20,9 @@ class IntervalModuleMetaTest(unittest.TestCase):
                          (('option', 'desc'), 'interval'))
 
     def test_settings_with_interval(self):
-        class SettingsInteval(IntervalModule):
+        class SettingsInterval(IntervalModule):
             settings = ('option', 'interval')
-        self.assertEqual(SettingsInteval.settings, ('option', 'interval'))
+        self.assertEqual(SettingsInterval.settings, ('option', 'interval'))
 
     def test_settings_with_interval_desc(self):
         class SetttingsIntervalDesc(IntervalModule):
