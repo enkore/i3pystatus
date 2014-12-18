@@ -11,7 +11,8 @@ class IntervalModuleMetaTest(unittest.TestCase):
     def test_no_settings(self):
         class NoSettings(IntervalModule):
             pass
-        self.assertTrue('interval' in NoSettings.settings)
+        for element in ('interval', ):
+            self.assertIn(element, NoSettings.settings)
 
     def test_no_interval_setting(self):
         class NoIntervalSetting(IntervalModule):

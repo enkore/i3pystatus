@@ -67,7 +67,9 @@ class Mail(IntervalModule):
 
     def on_leftclick(self):
         if self.email_client:
-            run_through_shell(self.email_client, self.enable_log)
+            retcode, _, stderr = run_through_shell(self.email_client)
+            if retcode != 0 and stderr:
+                self.logger.error(stderr)
 
     def on_rightclick(self):
         self.run()

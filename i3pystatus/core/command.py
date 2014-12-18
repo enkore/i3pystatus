@@ -1,32 +1,29 @@
-from subprocess import CalledProcessError
+# from subprocess import CalledProcessError
 import subprocess
-from i3pystatus import logger
 
 
-def run_through_shell(command, enable_log, enable_shell=False):
+def run_through_shell(command, enable_shell=False):
     """
-    Retrieves output of shell command
-    Returns tuple boolean (success)/ string (error msg, output)
+    Retrieves output of command
+    Returns tuple success (boolean)/ stdout(string) / stderr (string)
+
+    Don't use this function with programs that outputs lots of data since the output is saved
+    in one variable
     """
-    result = False
+    returncode = None
     try:
         proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=enable_shell)
 
         out, stderr = proc.communicate()
-        if stderr and enable_log:
-            logger.error(stderr)
+        out = out.decode("UTF-8")
+        stderr = stderr.decode("UTF-8")
 
-        result = True
+        returncode = proc.returncode
 
-    except CalledProcessError as e:
+    except OSError as e:
+        out = e.strerror
+        stderr = e.strerror
+    except subprocess.CalledProcessError as e:
         out = e.output
-        # color = self.error_color
 
-    out = out.decode("UTF-8").replace("\n", " ")
-    try:
-        if out[-1] == " ":
-            out = out[:-1]
-    except:
-        out = ""
-
-    return out, result
+    return returncode, out, stderr

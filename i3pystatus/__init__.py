@@ -12,7 +12,7 @@ h = logging.FileHandler(".i3pystatus-" + str(os.getpid()), delay=True)
 
 logger = logging.getLogger("i3pystatus")
 logger.addHandler(h)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.CRITICAL)
 
 
 __path__ = extend_path(__path__, __name__)
@@ -22,7 +22,6 @@ __all__ = [
     "Module", "IntervalModule",
     "SettingsBase",
     "formatp",
-    "logger",
 ]
 
 

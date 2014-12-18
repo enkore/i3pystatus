@@ -1,5 +1,8 @@
 from i3pystatus import IntervalModule
 from i3pystatus.core.command import run_through_shell
+import logging
+
+# logger = logging.getLogger(__name__)
 
 
 class Shell(IntervalModule):
@@ -19,8 +22,17 @@ class Shell(IntervalModule):
     required = ("command",)
 
     def run(self):
-        out, success = run_through_shell(self.command, self.enable_log, enable_shell=True)
+        retvalue, out, stderr = run_through_shell(self.command, enable_shell=True)
+
+        if retvalue != 0:
+            self.logger.error(stderr if stderr else "Unknown error")
+
+        if out:
+            out.replace("\n", " ").strip()
+        elif stderr:
+            out = stderr
+
         self.output = {
-            "full_text": out,
-            "color": self.color if success else self.error_color
+            "full_text": out if out else "Command `%s` returned %d" % (self.command, retvalue),
+            "color": self.color if retvalue == 0 else self.error_color
         }

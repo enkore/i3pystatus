@@ -1,6 +1,7 @@
 from i3pystatus.core.util import KeyConstraintDict
 from i3pystatus.core.exceptions import ConfigKeyError, ConfigMissingError
 import inspect
+import logging
 
 
 class SettingsBase:
@@ -18,7 +19,7 @@ class SettingsBase:
     """
 
     settings = (
-        ("enable_log", "Set to true to log error to .i3pystatus-<pid> file"),
+        ("log_level", "Set to true to log error to .i3pystatus-<pid> file"),
     )
 
     """settings should be tuple containing two types of elements:
@@ -31,7 +32,8 @@ class SettingsBase:
     required = tuple()
     """required can list settings which are required"""
 
-    enable_log = False
+    log_level = logging.NOTSET
+    logger = None
 
     def __init__(self, *args, **kwargs):
         def get_argument_dict(args, kwargs):
@@ -71,6 +73,8 @@ class SettingsBase:
         self.__name__ = "{}.{}".format(
             self.__module__, self.__class__.__name__)
 
+        self.logger = logging.getLogger(self.__name__)
+        self.logger.setLevel(self.log_level)
         self.init()
 
     def init(self):
