@@ -1,5 +1,8 @@
 from i3pystatus import IntervalModule
-from subprocess import check_output, CalledProcessError
+from i3pystatus.core.command import run_through_shell
+import logging
+
+# logger = logging.getLogger(__name__)
 
 
 class Shell(IntervalModule):
@@ -19,21 +22,17 @@ class Shell(IntervalModule):
     required = ("command",)
 
     def run(self):
-        try:
-            out = check_output(self.command, shell=True)
-            color = self.color
-        except CalledProcessError as e:
-            out = e.output
-            color = self.error_color
+        retvalue, out, stderr = run_through_shell(self.command, enable_shell=True)
 
-        out = out.decode("UTF-8").replace("\n", " ")
-        try:
-            if out[-1] == " ":
-                out = out[:-1]
-        except:
-            out = ""
+        if retvalue != 0:
+            self.logger.error(stderr if stderr else "Unknown error")
+
+        if out:
+            out.replace("\n", " ").strip()
+        elif stderr:
+            out = stderr
 
         self.output = {
-            "full_text": out,
-            "color": color
+            "full_text": out if out else "Command `%s` returned %d" % (self.command, retvalue),
+            "color": self.color if retvalue == 0 else self.error_color
         }
