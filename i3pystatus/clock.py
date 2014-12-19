@@ -28,6 +28,8 @@ class Clock(IntervalModule):
     color = "#ffffff"
     interval = 1
     current_format_id = 0
+    on_scrollup = "next_format"
+    on_scrolldown = "next_format"
 
     def init(self):
         if self.format is None:
@@ -78,8 +80,8 @@ class Clock(IntervalModule):
         if self.color != "i3Bar":
             self.output["color"] = self.color
 
-    def on_upscroll(self):
+    def next_format(self):
         self.current_format_id = (self.current_format_id + 1) % len(self.format)
 
-    def on_downscroll(self):
+    def previous_format(self):
         self.current_format_id = (self.current_format_id - 1) % len(self.format)

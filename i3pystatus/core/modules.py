@@ -7,6 +7,22 @@ class Module(SettingsBase):
     output = None
     position = 0
 
+    settings = (
+                'on_lclick', "Callback called on left click",
+                'on_rclick', "Callback called on right click",
+                'on_scrollup', "Callback called on scrolling up",
+                'on_scrolldown', "Callback called on scrolling down",
+                )
+
+    # this allows for backward compatibility
+    on_lclick = None
+    on_rclick = None
+    on_scrollup = None
+    on_scrolldown = None
+    # on_rclick = "on_rightclick"
+    # on_scrollup = "on_upscroll"
+    # on_scrolldown = "on_downscroll"
+
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
 
@@ -23,14 +39,22 @@ class Module(SettingsBase):
         pass
 
     def on_click(self, button):
+        cb = None
         if button == 1:  # Left mouse button
-            self.on_leftclick()
+            cb = self.on_lclick or "on_leftclick"
         elif button == 3:  # Right mouse button
-            self.on_rightclick()
+            cb = self.on_rclick or "on_rightclick"
         elif button == 4:  # mouse wheel up
-            self.on_upscroll()
+            cb = self.on_scrollup or "on_upscroll"
         elif button == 5:  # mouse wheel down
-            self.on_downscroll()
+            cb = self.on_scrolldown or "on_downscroll"
+
+        if callable(cb):
+            return cb(self)
+        elif hasattr(self, cb):
+            return getattr(self, cb)()
+        else:
+            return run_through_shell(cb)
 
     def move(self, position):
         self.position = position
