@@ -43,6 +43,10 @@ class Mail(IntervalModule):
             pass
 
     def run(self):
+        """
+        Returns the sum of unread messages across all registered backends
+        """
+
         unread = sum(map(lambda backend: backend.unread, self.backends))
 
         if not unread:

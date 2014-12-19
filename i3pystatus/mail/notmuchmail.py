@@ -35,11 +35,12 @@ class Notmuch(Backend):
 
             self.db_path = config.get("database", "path")
 
-        self.db = notmuch.Database(self.db_path)
-
     @property
     def unread(self):
-        return notmuch.Query(self.db, "tag:unread and tag:inbox").count_messages()
+        db = notmuch.Database(self.db_path)
+        result = notmuch.Query(db, "tag:unread and tag:inbox").count_messages()
+        db.close()
+        return result
 
 
 Backend = Notmuch
