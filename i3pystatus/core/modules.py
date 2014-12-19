@@ -1,14 +1,14 @@
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.threading import Manager
 from i3pystatus.core.util import convert_position
+from i3pystatus.core.command import run_through_shell
 
 
 class Module(SettingsBase):
     output = None
     position = 0
 
-    settings = (
-                'on_lclick', "Callback called on left click",
+    settings = ('on_lclick', "Callback called on left click",
                 'on_rclick', "Callback called on right click",
                 'on_scrollup', "Callback called on scrolling up",
                 'on_scrolldown', "Callback called on scrolling down",
@@ -48,6 +48,9 @@ class Module(SettingsBase):
             cb = self.on_scrollup or "on_upscroll"
         elif button == 5:  # mouse wheel down
             cb = self.on_scrolldown or "on_downscroll"
+        else:
+            self.logger.debug("Button not handled")
+            return
 
         if callable(cb):
             return cb(self)
