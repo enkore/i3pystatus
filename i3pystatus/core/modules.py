@@ -47,17 +47,19 @@ class Module(SettingsBase):
         'on_rightclick', 'on_upscroll', 'on_downscroll'.
 
         For instance, you can test with:
-        status.register("clock",
-                format=[
-                    ("Format 0",'Europe/London'),
-                    ("%a %-d Format 1",'Europe/Dublin'),
-                    "%a %-d %b %X format 2",
-                    ("%a %-d %b %X format 3", 'Europe/Paris'),
-                ],
-                on_leftclick= ["urxvtc"] , # launch urxvtc on left click
-                on_rightclick= ["scroll_format", 2] , # update format by steps of 2
-                log_level=logging.DEBUG,
-                )
+        ::
+
+            status.register("clock",
+                    format=[
+                        ("Format 0",'Europe/London'),
+                        ("%a %-d Format 1",'Europe/Dublin'),
+                        "%a %-d %b %X format 2",
+                        ("%a %-d %b %X format 3", 'Europe/Paris'),
+                    ],
+                    on_leftclick= ["urxvtc"] , # launch urxvtc on left click
+                    on_rightclick= ["scroll_format", 2] , # update format by steps of 2
+                    log_level=logging.DEBUG,
+                    )
         """
 
         def split_callback_and_args(cb):
