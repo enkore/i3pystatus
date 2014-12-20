@@ -54,6 +54,8 @@ class NowPlaying(IntervalModule):
     color = "#FFFFFF"
 
     old_player = None
+    on_leftclick = "playpause"
+    on_rightclick = "next_song"
 
     def find_player(self):
         players = [a for a in dbus.SessionBus().get_object("org.freedesktop.DBus", "/org/freedesktop/DBus").ListNames() if a.startswith("org.mpris.MediaPlayer2.")]
@@ -111,8 +113,8 @@ class NowPlaying(IntervalModule):
             "color": self.color,
         }
 
-    def on_leftclick(self):
+    def playpause(self):
         self.get_player().PlayPause()
 
-    def on_rightclick(self):
+    def next_song(self):
         self.get_player().Next()

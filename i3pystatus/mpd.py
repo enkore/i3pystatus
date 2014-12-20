@@ -50,6 +50,10 @@ class MPD(IntervalModule):
     color = "#FFFFFF"
     text_len = 25
     truncate_fields = ("title", "album", "artist")
+    on_leftclick = "switch_playpause"
+    on_rightclick = "next_song"
+    on_upscroll = on_rightclick
+    on_downscroll = "previous_song"
 
     def _mpd_command(self, sock, command):
         try:
@@ -101,26 +105,20 @@ class MPD(IntervalModule):
             "color": self.color,
         }
 
-    def on_leftclick(self):
+    def switch_playpause(self):
         try:
             self._mpd_command(self.s, "%s" %
                               ("play" if self._mpd_command(self.s, "status")["state"] in ["pause", "stop"] else "pause"))
         except Exception as e:
             pass
 
-    def on_rightclick(self):
+    def next_song(self):
         try:
             self._mpd_command(self.s, "next")
         except Exception as e:
             pass
 
-    def on_upscroll(self):
-        try:
-            self._mpd_command(self.s, "next")
-        except Exception as e:
-            pass
-
-    def on_downscroll(self):
+    def previous_song(self):
         try:
             self._mpd_command(self.s, "previous")
         except Exception as e:

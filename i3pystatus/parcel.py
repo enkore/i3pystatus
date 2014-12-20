@@ -153,6 +153,7 @@ class ParcelTracker(IntervalModule):
     required = ("instance",)
 
     format = "{name}:{progress}"
+    on_leftclick = "open_browser"
 
     @require(internet)
     def run(self):
@@ -166,5 +167,5 @@ class ParcelTracker(IntervalModule):
             "instance": self.name,
         }
 
-    def on_leftclick(self):
+    def open_browser(self):
         webbrowser.open_new_tab(self.instance.get_url())

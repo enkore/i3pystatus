@@ -61,6 +61,9 @@ class Reddit(IntervalModule):
         "no_mail": "",
     }
 
+    on_leftclick = "open_permalink"
+    on_click = "open_link"
+
     _permalink = ""
     _url = ""
 
@@ -133,8 +136,8 @@ class Reddit(IntervalModule):
             "color": color,
         }
 
-    def on_leftclick(self):
+    def open_permalink(self):
         user_open(self._permalink)
 
-    def on_rightclick(self):
+    def open_link(self):
         user_open(self._url)

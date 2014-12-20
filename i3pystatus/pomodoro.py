@@ -42,6 +42,9 @@ class Pomodoro(IntervalModule):
     break_duration = 5 * 60
     long_break_duration = 15 * 60
 
+    on_rightclick = "stop"
+    on_leftclick = "start"
+
     def init(self):
         # state could be either running/break or stopped
         self.state = 'stopped'
@@ -90,12 +93,12 @@ class Pomodoro(IntervalModule):
             'color': color
         }
 
-    def on_leftclick(self):
+    def start(self):
         self.state = 'running'
         self.time = datetime.now() + timedelta(seconds=self.pomodoro_duration)
         self.breaks = 0
 
-    def on_rightclick(self):
+    def stop(self):
         self.state = 'stopped'
         self.time = None
 

@@ -59,6 +59,9 @@ class Bitcoin(IntervalModule):
         "price_down": "▼",
     }
 
+    on_leftclick = "handle_leftclick"
+    on_rightclick = "handle_rightclick"
+
     _price_prev = 0
 
     def _fetch_price_data(self):
@@ -122,8 +125,8 @@ class Bitcoin(IntervalModule):
             "color": color,
         }
 
-    def on_leftclick(self):
+    def handle_leftclick(self):
         user_open(self.leftclick)
 
-    def on_rightclick(self):
+    def handle_rightclick(self):
         user_open(self.rightclick)

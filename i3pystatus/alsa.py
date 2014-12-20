@@ -46,10 +46,10 @@ class ALSA(IntervalModule):
     alsamixer = None
     has_mute = True
 
-    on_scrollup = "increase_volume"
-    on_scrolldown = "decrease_volume"
-    on_lclick = "switch_mute"
-    on_rclick = on_lclick
+    on_upscroll = "increase_volume"
+    on_downscroll = "decrease_volume"
+    on_leftclick = "switch_mute"
+    on_rightclick = on_leftclick
 
     def init(self):
         self.create_mixer()

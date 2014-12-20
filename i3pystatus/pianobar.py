@@ -27,6 +27,11 @@ class Pianobar(IntervalModule):
     required = ("format", "songfile", "ctlfile")
     color = "#FFFFFF"
 
+    on_leftclick = "playpause"
+    on_rightclick = "next_song"
+    on_upscroll = "increase_volume"
+    on_downscroll = "decrease_volume"
+
     def run(self):
         with open(self.songfile, "r") as f:
             contents = f.readlines()
@@ -39,14 +44,14 @@ class Pianobar(IntervalModule):
             "color": self.color
         }
 
-    def on_leftclick(self):
+    def playpause(self):
         open(self.ctlfile, "w").write("p")
 
-    def on_rightclick(self):
+    def next_song(self):
         open(self.ctlfile, "w").write("n")
 
-    def on_upscroll(self):
+    def increase_volume(self):
         open(self.ctlfile, "w").write(")")
 
-    def on_downscroll(self):
+    def decrease_volume(self):
         open(self.ctlfile, "w").write("(")

@@ -105,6 +105,7 @@ class Network(IntervalModule):
     color_down = "#FF0000"
     detached_down = True
     unknown_up = False
+    on_leftclick = "nm-connection-editor"
 
     def init(self):
         if self.interface not in netifaces.interfaces() and not self.detached_down:
@@ -174,6 +175,3 @@ class Network(IntervalModule):
             "color": color,
             "instance": self.interface
         }
-
-    def on_leftclick(self):
-        subprocess.Popen(["nm-connection-editor"])
