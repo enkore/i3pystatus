@@ -40,8 +40,8 @@ class Module(SettingsBase):
         It then triggers the callback depending on the nature (ie type) of
         the callback variable:
         1. if null callback, do nothing
-        2. if it's a python function
-        3. if it's a method of the current module
+        2. if it's a python function ()
+        3. if it's the name of a method of the current module (string)
 
         To setup the callbacks, you can set the settings 'on_leftclick',
         'on_rightclick', 'on_upscroll', 'on_downscroll'.
@@ -58,6 +58,7 @@ class Module(SettingsBase):
                     ],
                     on_leftclick= ["urxvtc"] , # launch urxvtc on left click
                     on_rightclick= ["scroll_format", 2] , # update format by steps of 2
+                    on_upscroll= [print, "hello world"] , # call python function print
                     log_level=logging.DEBUG,
                     )
         """
