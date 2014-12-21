@@ -35,6 +35,8 @@ class ModsDeChecker(IntervalModule):
     cj = None
     logged_in = False
 
+    on_leftclick = "open_browser"
+
     def init(self):
         self.cj = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(
@@ -94,5 +96,5 @@ class ModsDeChecker(IntervalModule):
             return True
         return False
 
-    def on_leftclick(self):
+    def open_browser(self):
         webbrowser.open_new_tab("http://forum.mods.de/bb/")

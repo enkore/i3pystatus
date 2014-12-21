@@ -38,6 +38,8 @@ class Mail(IntervalModule):
     hide_if_null = True
     email_client = None
 
+    on_leftclick = "open_client"
+
     def init(self):
         for backend in self.backends:
             pass
@@ -69,11 +71,8 @@ class Mail(IntervalModule):
             "color": color,
         }
 
-    def on_leftclick(self):
+    def open_client(self):
         if self.email_client:
             retcode, _, stderr = run_through_shell(self.email_client)
             if retcode != 0 and stderr:
                 self.logger.error(stderr)
-
-    def on_rightclick(self):
-        self.run()

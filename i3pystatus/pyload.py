@@ -39,6 +39,7 @@ class pyLoad(IntervalModule):
     captcha_false = ""
     download_true = "Downloads enabled"
     download_false = "Downloads disabled"
+    on_leftclick = "open_webbrowser"
 
     def _rpc_call(self, method, data=None):
         if not data:
@@ -83,5 +84,5 @@ class pyLoad(IntervalModule):
             "instance": self.address,
         }
 
-    def on_leftclick(self):
+    def open_webbrowser(self):
         webbrowser.open_new_tab(self.address)

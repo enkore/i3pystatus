@@ -49,6 +49,11 @@ class Cmus(IntervalModule):
         "stopped": "◾",
     }
 
+    on_leftclick = "playpause"
+    on_rightclick = "next_song"
+    on_upscroll = "next_song"
+    on_downscroll = "previous_song"
+
     def _cmus_command(self, command):
         p = subprocess.Popen('cmus-remote --{command}'.format(command=command), shell=True,
                              stdout=subprocess.PIPE,
@@ -108,7 +113,7 @@ class Cmus(IntervalModule):
             "color": self.color
         }
 
-    def on_leftclick(self):
+    def playpause(self):
         status = self._query_cmus().get('status', '')
         if status == 'playing':
             self._cmus_command('pause')
@@ -117,11 +122,8 @@ class Cmus(IntervalModule):
         if status == 'stopped':
             self._cmus_command('play')
 
-    def on_rightclick(self):
+    def next_song(self):
         self._cmus_command("next")
 
-    def on_upscroll(self):
-        self._cmus_command("next")
-
-    def on_downscroll(self):
+    def previous_song(self):
         self._cmus_command("prev")

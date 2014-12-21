@@ -23,6 +23,9 @@ class Spotify(Module):
         ("color", "color of the output"),
     )
 
+    on_leftclick = "switch_playpause"
+    on_rightclick = "next_song"
+
     def main_loop(self):
         """ Mainloop blocks so we thread it."""
         self.player = Playerctl.Player()
@@ -62,8 +65,8 @@ class Spotify(Module):
             "color": self.color
         }
 
-    def on_leftclick(self):
+    def switch_playpause(self):
         self.player.play_pause()
 
-    def on_rightclick(self):
+    def next_song(self):
         self.player.next()

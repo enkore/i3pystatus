@@ -431,7 +431,7 @@ def make_bar(percentage):
 def user_open(url_or_command):
     """Open the specified paramater in the web browser if a URL is detected,
     othewrise pass the paramater to the shell as a subprocess. This function
-    is inteded to bu used in on_leftclick()/on_rightclick() events.
+    is inteded to bu used in on_leftclick/on_rightclick callbacks.
 
     :param url_or_command: String containing URL or command
     """

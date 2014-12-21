@@ -50,6 +50,11 @@ class PulseAudio(Module, ColorRangeModule):
     bar_type = 'vertical'
     vertical_bar_width = 2
 
+    on_rightclick = "switch_mute"
+    on_leftclick = "pavucontrol"
+    on_upscroll = "increase_volume"
+    on_downscroll = "decrease_volume"
+
     def init(self):
         """Creates context, when context is ready context_notify_cb is called"""
         # Wrap callback methods in appropriate ctypefunc instances so
@@ -155,10 +160,7 @@ class PulseAudio(Module, ColorRangeModule):
                     volume_bar=volume_bar),
             }
 
-    def on_leftclick(self):
-        subprocess.Popen(["pavucontrol"])
-
-    def on_rightclick(self):
+    def switch_mute(self):
         if self.has_amixer:
             command = "amixer -q -D pulse sset Master "
             if self.currently_muted:
@@ -167,12 +169,12 @@ class PulseAudio(Module, ColorRangeModule):
                 command += 'mute'
             subprocess.Popen(command.split())
 
-    def on_upscroll(self):
+    def increase_volume(self):
         if self.has_amixer:
             command = "amixer -q -D pulse sset Master %s%%+" % self.step
             subprocess.Popen(command.split())
 
-    def on_downscroll(self):
+    def decrease_volume(self):
         if self.has_amixer:
             command = "amixer -q -D pulse sset Master %s%%-" % self.step
             subprocess.Popen(command.split())
