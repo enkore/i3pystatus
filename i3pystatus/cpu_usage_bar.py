@@ -21,7 +21,7 @@ class CpuUsageBar(CpuUsage, ColorRangeModule):
 
     format = "{usage_bar}"
     bar_type = 'horizontal'
-    cpu = 'usage_bar'
+    cpu = 'usage_cpu'
 
     settings = (
         ("format", "format string"),
