@@ -7,7 +7,7 @@ Module reference
 :System: `clock`_ - `disk`_ - `load`_ - `mem`_  - `cpu_usage`_
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `battery`_ - `backlight`_ - `temp`_
-:Network: `network`_ - `wireless`_
+:Network: `network`_ 
 :Music: `now_playing`_ - `mpd`_
 :Websites & stuff: `weather`_ - `bitcoin`_ - `reddit`_ - `parcel`_
 :Other: `mail`_ - `pyload`_ -  `text`_ 

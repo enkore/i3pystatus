@@ -228,7 +228,6 @@ class Network(IntervalModule, ColorRangeModule):
 
     Network Information Formatters:
     * `{interface}` — same as setting
-    * `{name}` — same as setting
     * `{v4}` — IPv4 address
     * `{v4mask}` — subnet mask
     * `{v4cidr}` — IPv4 address in cidr notation (i.e. 192.168.2.204/24)
@@ -263,7 +262,6 @@ class Network(IntervalModule, ColorRangeModule):
         ("round_size", "defines number of digits in round"),
         ("detached_down", "If the interface doesn't exist, display it as if it were down"),
         ("unknown_up", "If the interface is in unknown state, display it as if it were up"),
-        "name",
     )
 
     interval = 1
