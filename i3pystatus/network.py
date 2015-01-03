@@ -1,6 +1,4 @@
 from itertools import zip_longest
-import subprocess
-
 import netifaces
 
 from i3pystatus import IntervalModule
@@ -91,6 +89,8 @@ class Network(IntervalModule):
 
     settings = (
         ("interface", "Interface to obtain information for"),
+        ("ignore_interfaces", "Array of interfaces to ignore when cycling through "
+                              "with right click. Eg, 'lo'"),
         "format_up", "color_up",
         "format_down", "color_down",
         ("detached_down", "If the interface doesn't exist, display it as if it were down"),
@@ -99,6 +99,7 @@ class Network(IntervalModule):
     )
 
     name = interface = "eth0"
+    ignore_interfaces = ["lo"]
     format_up = "{interface}: {v4}"
     format_down = "{interface}"
     color_up = "#00FF00"
@@ -106,6 +107,8 @@ class Network(IntervalModule):
     detached_down = True
     unknown_up = False
     on_leftclick = "nm-connection-editor"
+    on_rightclick = "cycle_interface"
+    interval = 1
 
     def init(self):
         if self.interface not in netifaces.interfaces() and not self.detached_down:
@@ -166,6 +169,14 @@ class Network(IntervalModule):
             color = self.color_down
 
         return color, format, fdict, up
+
+    def cycle_interface(self):
+        interfaces = [i for i in netifaces.interfaces() if i not in self.ignore_interfaces]
+        if self.interface in interfaces:
+            next_index = (interfaces.index(self.interface) + 1) % len(interfaces)
+            self.interface = interfaces[next_index]
+        elif len(interfaces) > 0:
+            self.interface = interfaces[0]
 
     def run(self):
         color, format, fdict, up = self.collect()
