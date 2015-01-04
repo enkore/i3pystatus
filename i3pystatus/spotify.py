@@ -29,7 +29,11 @@ class Spotify(Module):
     def main_loop(self):
         """ Mainloop blocks so we thread it."""
         self.player = Playerctl.Player()
-        self.player.on('metadata', self.on_track_change)
+        self.player.on('metadata', self.set_status)
+
+        if self.player.props.status != "":
+            self.set_status(self.player)
+
         main = GLib.MainLoop()
         main.run()
 
@@ -44,18 +48,20 @@ class Spotify(Module):
                 "color": "#FF0000"
             }
 
-    def on_track_change(self, player, e):
+    def set_status(self, player, e=None):
         artist = player.get_artist()
         title = player.get_title()
         album = player.get_album()
         volume = player.props.volume
 
-        time = e["mpris:length"] / 60.0e6
-        minutes = math.floor(time)
-        seconds = round(time % 1 * 60)
-        if seconds < 10:
-            seconds = "0" + str(seconds)
-        length = "{}:{}".format(minutes, seconds)
+        length = ""
+        if e is not None:
+            time = e["mpris:length"] / 60.0e6
+            minutes = math.floor(time)
+            seconds = round(time % 1 * 60)
+            if seconds < 10:
+                seconds = "0" + str(seconds)
+            length = "{}:{}".format(minutes, seconds)
 
         self.output = {
             "full_text": self.format.format(
