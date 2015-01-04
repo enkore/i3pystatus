@@ -2,77 +2,74 @@
 import netifaces
 import basiciw
 import psutil
-from itertools import zip_longest
 from i3pystatus import IntervalModule
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import make_graph, round_dict, make_bar
 
 
-class NetUtil(object):
-    @staticmethod
-    def count_bits(integer):
-        bits = 0
-        while (integer):
-            integer &= integer - 1
-            bits += 1
-        return bits
-
-    @staticmethod
-    def v6_to_int(v6):
-        return int(v6.replace(":", ""), 16)
-
-    @staticmethod
-    def prefix6(mask):
-        return NetUtil.count_bits(NetUtil.v6_to_int(mask))
-
-    @staticmethod
-    def cidr6(addr, mask):
-        return "{addr}/{bits}".format(addr=addr, bits=NetUtil.prefix6(mask))
-
-    @staticmethod
-    def v4_to_int(v4):
-        sum = 0
-        mul = 1
-        for part in reversed(v4.split(".")):
-            sum += int(part) * mul
-            mul *= 2 ** 8
-        return sum
-
-    @staticmethod
-    def prefix4(mask):
-        return NetUtil.count_bits(NetUtil.v4_to_int(mask))
-
-    @staticmethod
-    def cidr4(addr, mask):
-        return "{addr}/{bits}".format(addr=addr, bits=NetUtil.prefix4(mask))
-
-    @staticmethod
-    def get_bonded_slaves():
-        try:
-            with open("/sys/class/net/bonding_masters") as f:
-                masters = f.read().split()
-        except FileNotFoundError:
-            return {}
-        slaves = {}
-        for master in masters:
-            with open("/sys/class/net/{}/bonding/slaves".format(master)) as f:
-                for slave in f.read().split():
-                    slaves[slave] = master
-        return slaves
-
-    @staticmethod
-    def sysfs_interface_up(interface, unknown_up=False):
-        try:
-            with open("/sys/class/net/{}/operstate".format(interface)) as f:
-                status = f.read().strip()
-        except FileNotFoundError:
-            # Interface doesn't exist
-            return False
-
-        return status == "up" or unknown_up and status == "unknown"
+def count_bits(integer):
+    bits = 0
+    while (integer):
+        integer &= integer - 1
+        bits += 1
+    return bits
 
 
-class NetworkInfo(object):
+def v6_to_int(v6):
+    return int(v6.replace(":", ""), 16)
+
+
+def prefix6(mask):
+    return count_bits(v6_to_int(mask))
+
+
+def cidr6(addr, mask):
+    return "{addr}/{bits}".format(addr=addr, bits=prefix6(mask))
+
+
+def v4_to_int(v4):
+    sum = 0
+    mul = 1
+    for part in reversed(v4.split(".")):
+        sum += int(part) * mul
+        mul *= 2 ** 8
+    return sum
+
+
+def prefix4(mask):
+    return count_bits(v4_to_int(mask))
+
+
+def cidr4(addr, mask):
+    return "{addr}/{bits}".format(addr=addr, bits=prefix4(mask))
+
+
+def get_bonded_slaves():
+    try:
+        with open("/sys/class/net/bonding_masters") as f:
+            masters = f.read().split()
+    except FileNotFoundError:
+        return {}
+    slaves = {}
+    for master in masters:
+        with open("/sys/class/net/{}/bonding/slaves".format(master)) as f:
+            for slave in f.read().split():
+                slaves[slave] = master
+    return slaves
+
+
+def sysfs_interface_up(interface, unknown_up=False):
+    try:
+        with open("/sys/class/net/{}/operstate".format(interface)) as f:
+            status = f.read().strip()
+    except FileNotFoundError:
+        # Interface doesn't exist
+        return False
+
+    return status == "up" or unknown_up and status == "unknown"
+
+
+class NetworkInfo():
     """
     Retrieve network information.
     """
@@ -87,21 +84,19 @@ class NetworkInfo(object):
         self.unknown_up = unknown_up
 
     def get_info(self, interface):
-        format_dict = dict(
-            zip_longest(["v4", "v4mask", "v4cidr", "v6", "v6mask", "v6cidr"], [], fillvalue=""))
-
-        iface_up = NetUtil.sysfs_interface_up(interface, self.unknown_up)
+        format_dict = dict(v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="")
+        iface_up = sysfs_interface_up(interface, self.unknown_up)
         if not iface_up:
             return format_dict
 
         network_info = netifaces.ifaddresses(interface)
-        slaves = NetUtil.get_bonded_slaves()
+        slaves = get_bonded_slaves()
         try:
             master = slaves[interface]
         except KeyError:
             pass
         else:
-            if NetUtil.sysfs_interface_up(interface, self.unknown_up):
+            if sysfs_interface_up(interface, self.unknown_up):
                 master_info = netifaces.ifaddresses(master)
                 for af in (netifaces.AF_INET, netifaces.AF_INET6):
                     try:
@@ -128,25 +123,25 @@ class NetworkInfo(object):
             v4 = network_info[netifaces.AF_INET][0]
             info["v4"] = v4["addr"]
             info["v4mask"] = v4["netmask"]
-            info["v4cidr"] = NetUtil.cidr4(v4["addr"], v4["netmask"])
+            info["v4cidr"] = cidr4(v4["addr"], v4["netmask"])
         if netifaces.AF_INET6 in network_info:
             for v6 in network_info[netifaces.AF_INET6]:
                 info["v6"] = v6["addr"]
                 info["v6mask"] = v6["netmask"]
-                info["v6cidr"] = NetUtil.cidr6(v6["addr"], v6["netmask"])
+                info["v6cidr"] = cidr6(v6["addr"], v6["netmask"])
                 if not v6["addr"].startswith("fe80::"):  # prefer non link-local addresses
                     break
         return info
 
     @staticmethod
     def extract_wireless_info(interface):
+        info = dict(essid="", freq="", quality=0.0, quality_bar="")
         try:
             iwi = basiciw.iwinfo(interface)
         except Exception:
             # Not a wireless interface
-            return dict(essid="", freq="", quality=0.0, quality_bar="")
+            return info
 
-        info = dict()
         info["essid"] = iwi["essid"]
         info["freq"] = iwi["freq"]
         quality = iwi["quality"]
@@ -160,7 +155,7 @@ class NetworkInfo(object):
         return info
 
 
-class NetworkTraffic(object):
+class NetworkTraffic():
     """
     Retrieve network traffic information
     """
@@ -198,7 +193,7 @@ class NetworkTraffic(object):
         self.update_counters(interface)
         usage = dict(bytes_sent=0, bytes_recv=0, packets_sent=0, packets_recv=0)
 
-        if not NetUtil.sysfs_interface_up(interface, self.unknown_up) or not self.pnic_before:
+        if not sysfs_interface_up(interface, self.unknown_up) or not self.pnic_before:
             return usage
         else:
             usage["bytes_sent"] = self.get_bytes_sent()
@@ -330,11 +325,11 @@ class Network(IntervalModule, ColorRangeModule):
         else:
             raise Exception("graph_type must be either 'input' or 'output'!")
 
-        format_values['interface'] = self.interface
         format_values['network_graph'] = self.get_network_graph(kbs)
         format_values['kbs'] = "{0:.1f}".format(round(kbs, 2)).rjust(6)
+        format_values['interface'] = self.interface
 
-        if NetUtil.sysfs_interface_up(self.interface, self.unknown_up):
+        if sysfs_interface_up(self.interface, self.unknown_up):
             if self.dynamic_color:
                 color = self.get_gradient(kbs, self.colors, self.upper_limit)
             else:
