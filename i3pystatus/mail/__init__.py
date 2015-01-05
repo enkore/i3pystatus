@@ -6,9 +6,10 @@ class Backend(SettingsBase):
     """Handles the details of checking for mail"""
 
     unread = 0
+    settings = ("account", )
     # required = ("account", )
 
-    # account = "Default account"
+    account = "Default account"
 
     """Number of unread mails
 
@@ -38,13 +39,14 @@ class Mail(IntervalModule):
     color = "#ffffff"
     color_unread = "#ff0000"
     format = "{unread} new email"
-    format_plural = "{unread} new emails"
+    format_plural = "{account} : {current_unread}/{unread} new emails"
     hide_if_null = True
     email_client = None
 
     on_leftclick = "open_client"
+    on_upscroll = ["scroll_backend", 1]
+    on_downscroll = ["scroll_backend", -1]
 
-    current_unread = 0
     current_backend = 0
 
     def init(self):
@@ -55,8 +57,14 @@ class Mail(IntervalModule):
         """
         Returns the sum of unread messages across all registered backends
         """
-
-        unread = sum(map(lambda backend: backend.unread, self.backends))
+        unread = 0
+        current_unread = 0
+        for id, backend in enumerate(self.backends):
+            temp = backend.unread
+            unread = unread + backend.unread
+            if id == self.current_backend:
+                current_unread = temp
+        # unread = sum(map(lambda backend: backend.unread, self.backends))
 
         if not unread:
             color = self.color
@@ -72,11 +80,17 @@ class Mail(IntervalModule):
         if unread > 1:
             format = self.format_plural
 
+        account_name = getattr(self.backends[self.current_backend], "account", "No name")
+
+        # TODO pass account name as well, as setting or via the dict
         self.output = {
-            "full_text": format.format(unread=unread),
+            "full_text": format.format(unread=unread, current_unread=current_unread, account=account_name),
             "urgent": urgent,
             "color": color,
         }
+
+    def scroll_backend(self, step):
+        self.current_backend = (self.current_backend + step) % len(self.backends)
 
     def open_client(self):
         if self.email_client:
