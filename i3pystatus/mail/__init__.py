@@ -6,6 +6,10 @@ class Backend(SettingsBase):
     """Handles the details of checking for mail"""
 
     unread = 0
+    # required = ("account", )
+
+    # account = "Default account"
+
     """Number of unread mails
 
     You'll probably implement that as a property"""
@@ -39,6 +43,9 @@ class Mail(IntervalModule):
     email_client = None
 
     on_leftclick = "open_client"
+
+    current_unread = 0
+    current_backend = 0
 
     def init(self):
         for backend in self.backends:
