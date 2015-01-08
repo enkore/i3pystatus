@@ -6,7 +6,7 @@ class Backend(SettingsBase):
     """Handles the details of checking for mail"""
 
     unread = 0
-    settings = ("account", )
+    settings = ("account", "Account name")
     # required = ("account", )
 
     account = "Default account"
@@ -64,7 +64,6 @@ class Mail(IntervalModule):
             unread = unread + backend.unread
             if id == self.current_backend:
                 current_unread = temp
-        # unread = sum(map(lambda backend: backend.unread, self.backends))
 
         if not unread:
             color = self.color
@@ -82,7 +81,6 @@ class Mail(IntervalModule):
 
         account_name = getattr(self.backends[self.current_backend], "account", "No name")
 
-        # TODO pass account name as well, as setting or via the dict
         self.output = {
             "full_text": format.format(unread=unread, current_unread=current_unread, account=account_name),
             "urgent": urgent,

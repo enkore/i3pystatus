@@ -51,6 +51,8 @@ class Battery:
     def status(self):
         if self.consumption() > 0.1 and self.percentage() < 99.9:
             return "Discharging" if self.battery_info["STATUS"] == "Discharging" else "Charging"
+        elif self.consumption() == 0 and self.percentage() == 0.00:
+            return "Depleted"
         else:
             return "Full"
 
@@ -125,7 +127,7 @@ class BatteryChecker(IntervalModule):
         ("alert_format_title", "The title of the notification, all formatters can be used"),
         ("alert_format_body", "The body text of the notification, all formatters can be used"),
         ("path", "Override the default-generated path"),
-        ("status", "A dictionary mapping ('DIS', 'CHR', 'FULL') to alternative names"),
+        ("status", "A dictionary mapping ('DPL', 'DIS', 'CHR', 'FULL') to alternative names"),
         ("color", "The text color"),
         ("full_color", "The full color"),
         ("charging_color", "The charging color"),
@@ -137,6 +139,7 @@ class BatteryChecker(IntervalModule):
     battery_ident = "BAT0"
     format = "{status} {remaining}"
     status = {
+        "DPL": "DPL",
         "CHR": "CHR",
         "DIS": "DIS",
         "FULL": "FULL",
@@ -201,6 +204,9 @@ class BatteryChecker(IntervalModule):
             else:
                 fdict["status"] = "CHR"
                 color = self.charging_color
+        elif status == 'Depleted':
+            fdict["status"] = "DPL"
+            color = self.critical_color
         else:
             fdict["status"] = "FULL"
             color = self.full_color

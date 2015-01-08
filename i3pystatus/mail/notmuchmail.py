@@ -19,15 +19,10 @@ class Notmuch(Backend):
     settings = (
         ("db_path", "Path to the directory of your notmuch database"),
         ("query", "Same query notmuch would accept, by default 'tag:unread and tag:inbox'"),
-        ("account", "Account name"),
     )
-
-    # required = tuple( ("account", "Name available to formatter"), )
 
     db_path = None
     query = "tag:unread and tag:inbox"
-
-    account = "Default"
 
     def init(self):
         if not self.db_path:
