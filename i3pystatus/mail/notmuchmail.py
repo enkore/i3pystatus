@@ -18,9 +18,11 @@ class Notmuch(Backend):
 
     settings = (
         ("db_path", "Path to the directory of your notmuch database"),
+        ("query", "Same query notmuch would accept, by default 'tag:unread and tag:inbox'"),
     )
 
     db_path = None
+    query = "tag:unread and tag:inbox"
 
     def init(self):
         if not self.db_path:
@@ -38,7 +40,7 @@ class Notmuch(Backend):
     @property
     def unread(self):
         db = notmuch.Database(self.db_path)
-        result = notmuch.Query(db, "tag:unread and tag:inbox").count_messages()
+        result = notmuch.Query(db, self.query).count_messages()
         db.close()
         return result
 
