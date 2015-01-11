@@ -7,6 +7,9 @@ from i3pystatus.core.util import user_open, internet, require
 
 class Github(IntervalModule):
     """
+    Check Github for pending notifications. 
+    Requires `requests`
+
     Formatters:
 
     * `{unread}`        - contains the value of unread_marker when there are pending notifications
