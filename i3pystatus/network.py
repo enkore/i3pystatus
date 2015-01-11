@@ -289,6 +289,8 @@ class Network(IntervalModule, ColorRangeModule):
 
     on_leftclick = "nm-connection-editor"
     on_rightclick = "cycle_interface"
+    on_upscroll = ['cycle_interface', 1]
+    on_downscroll = ['cycle_interface', -1]
 
     def init(self):
         # Don't require importing basiciw unless using the functionality it offers.
@@ -311,10 +313,10 @@ class Network(IntervalModule, ColorRangeModule):
         self.colors = self.get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
         self.kbs_arr = [0.0] * self.graph_width
 
-    def cycle_interface(self):
+    def cycle_interface(self, increment=1):
         interfaces = [i for i in netifaces.interfaces() if i not in self.ignore_interfaces]
         if self.interface in interfaces:
-            next_index = (interfaces.index(self.interface) + 1) % len(interfaces)
+            next_index = (interfaces.index(self.interface) + increment) % len(interfaces)
             self.interface = interfaces[next_index]
         elif len(interfaces) > 0:
             self.interface = interfaces[0]
