@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import netifaces
-import basiciw
 import psutil
 from i3pystatus import IntervalModule
 from i3pystatus.core.color import ColorRangeModule
@@ -74,7 +73,7 @@ class NetworkInfo():
     Retrieve network information.
     """
 
-    def __init__(self, interface, ignore_interfaces, detached_down, unknown_up):
+    def __init__(self, interface, ignore_interfaces, detached_down, unknown_up, get_wifi_info=False):
         if interface not in netifaces.interfaces() and not detached_down:
             raise RuntimeError(
                 "Unknown interface {iface}!".format(iface=interface))
@@ -82,6 +81,7 @@ class NetworkInfo():
         self.ignore_interfaces = ignore_interfaces
         self.detached_down = detached_down
         self.unknown_up = unknown_up
+        self.get_wifi_info = get_wifi_info
 
     def get_info(self, interface):
         format_dict = dict(v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="")
@@ -133,9 +133,13 @@ class NetworkInfo():
                     break
         return info
 
-    @staticmethod
-    def extract_wireless_info(interface):
+    def extract_wireless_info(self, interface):
         info = dict(essid="", freq="", quality=0.0, quality_bar="")
+        if not self.get_wifi_info:
+            return info
+
+        import basiciw
+
         try:
             iwi = basiciw.iwinfo(interface)
         except Exception:
@@ -284,8 +288,15 @@ class Network(IntervalModule, ColorRangeModule):
     on_rightclick = "cycle_interface"
 
     def init(self):
+        # Don't require importing basiciw unless using the functionality it offers.
+        if any(s in self.format_up or s in self.format_up for s in ['essid', 'freq', 'quality', 'quality_bar']):
+            get_wifi_info = True
+        else:
+            get_wifi_info = False
+
+        self.network_info = NetworkInfo(self.interface, self.ignore_interfaces, self.detached_down, self.unknown_up,
+                                        get_wifi_info)
         self.network_traffic = NetworkTraffic(self.unknown_up, self.divisor, self.round_size)
-        self.network_info = NetworkInfo(self.interface, self.ignore_interfaces, self.detached_down, self.unknown_up)
 
         self.colors = self.get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
         self.kbs_arr = [0.0] * self.graph_width
