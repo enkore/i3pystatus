@@ -46,7 +46,7 @@ class PulseAudio(Module, ColorRangeModule):
     color_unmuted = "#FFFFFF"
 
     step = 5
-    step_db = False
+    step_in_db = False
     multi_colors = False
     bar_type = 'vertical'
     vertical_bar_width = 2
@@ -80,7 +80,7 @@ class PulseAudio(Module, ColorRangeModule):
 
         self.colors = self.get_hex_color_range(self.color_muted, self.color_unmuted, 100)
         self.sink_utf = None
-        self.unit = "dB" if self.step_db else "%"
+        self.unit = "dB" if self.step_in_db else "%"
 
     def request_update(self, context):
         """Requests a sink info update (sink_info_cb is called)"""
