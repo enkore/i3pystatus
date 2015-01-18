@@ -120,7 +120,7 @@ class NowPlaying(IntervalModule):
             else:
                 self.output = {
                     "full_text": self.format_no_player,
-                    "color": self.color,
+                    "color": self.color_no_player,
                 }
             return
 
@@ -135,7 +135,17 @@ class NowPlaying(IntervalModule):
             return
 
     def playpause(self):
-        dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player").PlayPause()
+        try:
+            dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player").PlayPause()
+        except NoPlayerException:
+            return
+        except dbus.exceptions.DBusException:
+            return
 
     def next_song(self):
-        dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player").Next()
+        try:
+            dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player").Next()
+        except NoPlayerException:
+            return
+        except dbus.exceptions.DBusException:
+            return
