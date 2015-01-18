@@ -12,6 +12,7 @@ class PulseAudio(Module, ColorRangeModule):
     """
     Shows volume of default PulseAudio sink (output).
 
+    - Requires amixer for toggling mute and incrementing/decrementing volume on scroll.
     - Depends on the PyPI colour module - https://pypi.python.org/pypi/colour/0.0.5
 
     .. rubric:: Available formatters:
@@ -28,8 +29,7 @@ class PulseAudio(Module, ColorRangeModule):
         ("format_muted", "optional format string to use when muted"),
         "muted", "unmuted",
         "color_muted", "color_unmuted",
-        ("step_in_db", "change step unit from percentage to decibels"),
-        ("step", "percentage (or decibel value) to increment volume on scroll"),
+        ("step", "percentage to increment volume on scroll"),
         ("bar_type", "type of volume bar. Allowed values are 'vertical' or 'horizontal'"),
         ("multi_colors", "whether or not to change the color from "
                          "'color_muted' to 'color_unmuted' based on volume percentage"),
@@ -46,7 +46,6 @@ class PulseAudio(Module, ColorRangeModule):
     color_unmuted = "#FFFFFF"
 
     step = 5
-    step_in_db = False
     multi_colors = False
     bar_type = 'vertical'
     vertical_bar_width = 2
@@ -79,8 +78,9 @@ class PulseAudio(Module, ColorRangeModule):
         pa_threaded_mainloop_start(_mainloop)
 
         self.colors = self.get_hex_color_range(self.color_muted, self.color_unmuted, 100)
-        self.sink_utf = None
-        self.unit = "dB" if self.step_in_db else "%"
+
+        # Check that we have amixer for toggling mute/unmute and incrementing/decrementing volume
+        self.has_amixer = shutil.which('alsamixer') is not None
 
     def request_update(self, context):
         """Requests a sink info update (sink_info_cb is called)"""
@@ -95,8 +95,6 @@ class PulseAudio(Module, ColorRangeModule):
         server_info = server_info_p.contents
 
         self.sink = server_info.default_sink_name
-        self.sink_utf = server_info.default_sink_name
-        self.sink_utf = self.sink_utf.decode("UTF-8").strip()
 
         self.request_update(context)
 
@@ -163,15 +161,20 @@ class PulseAudio(Module, ColorRangeModule):
             }
 
     def switch_mute(self):
-        command = "pactl -- set-sink-mute {sink} toggle".format(sink=self.sink_utf)
-        subprocess.Popen(command.split())
+        if self.has_amixer:
+            command = "amixer -q -D pulse sset Master "
+            if self.currently_muted:
+                command += 'unmute'
+            else:
+                command += 'mute'
+            subprocess.Popen(command.split())
 
     def increase_volume(self):
-        command = "pactl -- set-sink-volume {sink} +{step}{unit}".format(
-                  sink=self.sink_utf, step=self.step, unit=self.unit)
-        subprocess.Popen(command.split())
+        if self.has_amixer:
+            command = "amixer -q -D pulse sset Master %s%%+" % self.step
+            subprocess.Popen(command.split())
 
     def decrease_volume(self):
-        command = "pactl -- set-sink-volume {sink} -{step}{unit}".format(
-                  sink=self.sink_utf, step=self.step, unit=self.unit)
-        subprocess.Popen(command.split())
+        if self.has_amixer:
+            command = "amixer -q -D pulse sset Master %s%%-" % self.step
+            subprocess.Popen(command.split())
