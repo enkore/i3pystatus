@@ -28,7 +28,8 @@ MOCK_MODULES = [
     "gi.repository", "dbus.mainloop.glib", "dbus",
     "pywapi", "basiciw",
     "i3pystatus.pulseaudio.pulse",
-    "notmuch"
+    "notmuch",
+    "requests",
 ]
 
 for mod_name in MOCK_MODULES:
