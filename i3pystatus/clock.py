@@ -32,11 +32,12 @@ class Clock(IntervalModule):
     on_downscroll = ["scroll_format", -1]
 
     def init(self):
+        lang, enc = os.environ.get('LANG', None).split('.', 1)
+        if lang != locale.getlocale(locale.LC_TIME)[0]:
+            # affects datetime.time.strftime() in whole program
+            locale.setlocale(locale.LC_TIME, (lang, enc))
+
         if self.format is None:
-            lang = os.environ.get('LANG', None)
-            if lang:
-                locale.setlocale(locale.LC_ALL, lang)
-            lang = locale.getlocale()[0]
             if lang == 'en_US':
                 # MDY format - United States of America
                 self.format = ["%a %b %-d %X"]
