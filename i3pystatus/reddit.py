@@ -62,7 +62,6 @@ class Reddit(IntervalModule):
     }
 
     on_leftclick = "open_permalink"
-    on_click = "open_link"
 
     _permalink = ""
     _url = ""
@@ -135,6 +134,9 @@ class Reddit(IntervalModule):
             "full_text": full_text,
             "color": color,
         }
+
+    def open_mail(self):
+        user_open('https://www.reddit.com/message/unread/')
 
     def open_permalink(self):
         user_open(self._permalink)

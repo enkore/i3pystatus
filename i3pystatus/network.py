@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import netifaces
-import basiciw
-import psutil
 from i3pystatus import IntervalModule
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import make_graph, round_dict, make_bar
@@ -74,7 +72,7 @@ class NetworkInfo():
     Retrieve network information.
     """
 
-    def __init__(self, interface, ignore_interfaces, detached_down, unknown_up):
+    def __init__(self, interface, ignore_interfaces, detached_down, unknown_up, get_wifi_info=False):
         if interface not in netifaces.interfaces() and not detached_down:
             raise RuntimeError(
                 "Unknown interface {iface}!".format(iface=interface))
@@ -82,6 +80,7 @@ class NetworkInfo():
         self.ignore_interfaces = ignore_interfaces
         self.detached_down = detached_down
         self.unknown_up = unknown_up
+        self.get_wifi_info = get_wifi_info
 
     def get_info(self, interface):
         format_dict = dict(v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="")
@@ -133,9 +132,15 @@ class NetworkInfo():
                     break
         return info
 
-    @staticmethod
-    def extract_wireless_info(interface):
+    def extract_wireless_info(self, interface):
         info = dict(essid="", freq="", quality=0.0, quality_bar="")
+
+        # Just return empty values if we're not using any Wifi functionality
+        if not self.get_wifi_info:
+            return info
+
+        import basiciw
+
         try:
             iwi = basiciw.iwinfo(interface)
         except Exception:
@@ -169,6 +174,8 @@ class NetworkTraffic():
         self.round_size = round_size
 
     def update_counters(self, interface):
+        import psutil
+
         self.pnic_before = self.pnic
         counters = psutil.net_io_counters(pernic=True)
         self.pnic = counters[interface] if interface in counters else None
@@ -282,24 +289,41 @@ class Network(IntervalModule, ColorRangeModule):
 
     on_leftclick = "nm-connection-editor"
     on_rightclick = "cycle_interface"
+    on_upscroll = ['cycle_interface', 1]
+    on_downscroll = ['cycle_interface', -1]
 
     def init(self):
-        self.network_traffic = NetworkTraffic(self.unknown_up, self.divisor, self.round_size)
-        self.network_info = NetworkInfo(self.interface, self.ignore_interfaces, self.detached_down, self.unknown_up)
+        # Don't require importing basiciw unless using the functionality it offers.
+        if any(s in self.format_up or s in self.format_up for s in
+               ['essid', 'freq', 'quality', 'quality_bar']):
+            get_wifi_info = True
+        else:
+            get_wifi_info = False
+
+        self.network_info = NetworkInfo(self.interface, self.ignore_interfaces, self.detached_down, self.unknown_up,
+                                        get_wifi_info)
+
+        # Don't require importing psutil unless using the functionality it offers.
+        if any(s in self.format_up or s in self.format_down for s in
+               ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph']):
+            self.network_traffic = NetworkTraffic(self.unknown_up, self.divisor, self.round_size)
+        else:
+            self.network_traffic = None
 
         self.colors = self.get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
         self.kbs_arr = [0.0] * self.graph_width
 
-    def cycle_interface(self):
+    def cycle_interface(self, increment=1):
         interfaces = [i for i in netifaces.interfaces() if i not in self.ignore_interfaces]
         if self.interface in interfaces:
-            next_index = (interfaces.index(self.interface) + 1) % len(interfaces)
+            next_index = (interfaces.index(self.interface) + increment) % len(interfaces)
             self.interface = interfaces[next_index]
         elif len(interfaces) > 0:
             self.interface = interfaces[0]
 
-        self.network_traffic.clear_counters()
-        self.kbs_arr = [0.0] * self.graph_width
+        if self.network_traffic:
+            self.network_traffic.clear_counters()
+            self.kbs_arr = [0.0] * self.graph_width
 
     def get_network_graph(self, kbs):
         # Cycle array by inserting at the start and chopping off the last element
@@ -311,28 +335,27 @@ class Network(IntervalModule, ColorRangeModule):
         format_values = dict(kbs="", network_graph="", bytes_sent="", bytes_recv="", packets_sent="", packets_recv="",
                              interface="", v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="", mac="",
                              essid="", freq="", quality="", quality_bar="")
+        color = None
+        if self.network_traffic:
+            network_usage = self.network_traffic.get_usage(self.interface)
+            format_values.update(network_usage)
+            if self.graph_type == 'input':
+                kbs = network_usage['bytes_recv']
+            elif self.graph_type == 'output':
+                kbs = network_usage['bytes_sent']
+            else:
+                raise Exception("graph_type must be either 'input' or 'output'!")
 
-        network_usage = self.network_traffic.get_usage(self.interface)
-        format_values.update(network_usage)
+            format_values['network_graph'] = self.get_network_graph(kbs)
+            format_values['kbs'] = "{0:.1f}".format(round(kbs, 2)).rjust(6)
+            color = self.get_gradient(kbs, self.colors, self.upper_limit)
 
         network_info = self.network_info.get_info(self.interface)
         format_values.update(network_info)
 
-        if self.graph_type == 'input':
-            kbs = network_usage['bytes_recv']
-        elif self.graph_type == 'output':
-            kbs = network_usage['bytes_sent']
-        else:
-            raise Exception("graph_type must be either 'input' or 'output'!")
-
-        format_values['network_graph'] = self.get_network_graph(kbs)
-        format_values['kbs'] = "{0:.1f}".format(round(kbs, 2)).rjust(6)
         format_values['interface'] = self.interface
-
         if sysfs_interface_up(self.interface, self.unknown_up):
-            if self.dynamic_color:
-                color = self.get_gradient(kbs, self.colors, self.upper_limit)
-            else:
+            if not self.dynamic_color:
                 color = self.color_up
 
             self.output = {

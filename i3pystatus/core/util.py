@@ -439,7 +439,16 @@ def user_open(url_or_command):
     scheme = urlparse(url_or_command).scheme
     if scheme == 'http' or scheme == 'https':
         import webbrowser
-        webbrowser.open(url_or_command)
+        import os
+        # webbrowser.open() sometimes prints a message for some reason and confuses i3
+        # Redirect stdout briefly to prevent this from happening.
+        savout = os.dup(1)
+        os.close(1)
+        os.open(os.devnull, os.O_RDWR)
+        try:
+            webbrowser.open(url_or_command)
+        finally:
+            os.dup2(savout, 1)
     else:
         import subprocess
         subprocess.Popen(url_or_command, shell=True)
