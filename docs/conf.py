@@ -30,6 +30,7 @@ MOCK_MODULES = [
     "i3pystatus.pulseaudio.pulse",
     "notmuch",
     "requests",
+    "beautifulsoup4"
 ]
 
 for mod_name in MOCK_MODULES:
