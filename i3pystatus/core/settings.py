@@ -18,6 +18,7 @@ class SettingsBase:
     Settings are stored as attributes of self.
     """
 
+    __PROTECTED_SETTINGS = ["password", "email", "username"]
     settings = (
         ("log_level", "Set to true to log error to .i3pystatus-<pid> file"),
     )
@@ -75,7 +76,24 @@ class SettingsBase:
 
         self.logger = logging.getLogger(self.__name__)
         self.logger.setLevel(self.log_level)
+
+        for setting_name in self.__PROTECTED_SETTINGS:
+            if hasattr(self, setting_name) and not getattr(self, setting_name):
+                setting = self.get_protected_setting("%s.%s" % (self.__name__, setting_name))
+                if setting:
+                    setattr(self, setting_name, setting)
+
         self.init()
+
+    @staticmethod
+    def get_protected_setting(setting_name):
+        import getpass
+        try:
+            import keyring
+        except ImportError:
+            keyring = None
+        else:
+            return keyring.get_password(setting_name, getpass.getuser())
 
     def init(self):
         """Convenience method which is called after all settings are set
