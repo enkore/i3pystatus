@@ -2,6 +2,7 @@ from i3pystatus.core.util import KeyConstraintDict
 from i3pystatus.core.exceptions import ConfigKeyError, ConfigMissingError
 import inspect
 import logging
+import getpass
 
 
 class SettingsBase:
@@ -19,6 +20,7 @@ class SettingsBase:
     """
 
     __PROTECTED_SETTINGS = ["password", "email", "username"]
+
     settings = (
         ("log_level", "Set to true to log error to .i3pystatus-<pid> file"),
     )
@@ -45,7 +47,6 @@ class SettingsBase:
             return kwargs
 
         def merge_with_parents_settings():
-
             settings = tuple()
 
             # getmro returns base classes according to Method Resolution Order
@@ -76,22 +77,27 @@ class SettingsBase:
 
         self.logger = logging.getLogger(self.__name__)
         self.logger.setLevel(self.log_level)
+        self.set_protected_settings()
+        self.init()
 
+    def set_protected_settings(self):
         for setting_name in self.__PROTECTED_SETTINGS:
             if hasattr(self, setting_name) and not getattr(self, setting_name):
+                print("%s.%s" % (self.__name__, setting_name))
                 setting = self.get_protected_setting("%s.%s" % (self.__name__, setting_name))
                 if setting:
                     setattr(self, setting_name, setting)
 
-        self.init()
+    def get_protected_setting(self, setting_name):
+        # If a custom keyring backend has been defined, use it.
+        if hasattr(self, 'keyring_backend') and self.keyring_backend:
+            return self.keyring_backend.get_password(setting_name, getpass.getuser())
 
-    @staticmethod
-    def get_protected_setting(setting_name):
-        import getpass
+        # Otherwise try and use defualt keyring.
         try:
             import keyring
         except ImportError:
-            keyring = None
+            pass
         else:
             return keyring.get_password(setting_name, getpass.getuser())
 
