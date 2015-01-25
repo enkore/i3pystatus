@@ -83,7 +83,6 @@ class SettingsBase:
     def set_protected_settings(self):
         for setting_name in self.__PROTECTED_SETTINGS:
             if hasattr(self, setting_name) and not getattr(self, setting_name):
-                print("%s.%s" % (self.__name__, setting_name))
                 setting = self.get_protected_setting("%s.%s" % (self.__name__, setting_name))
                 if setting:
                     setattr(self, setting_name, setting)
