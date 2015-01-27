@@ -254,6 +254,7 @@ class Network(IntervalModule, ColorRangeModule):
         ("start_color", "Hex or English name for start of color range, eg '#00FF00' or 'green'"),
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
         ("graph_width", "Width of the network traffic graph"),
+        ("graph_style", "Graph style, currently 'blocks' or 'braille'"),
         ("upper_limit",
          "Expected max kb/s. This value controls how the network traffic graph is drawn and in what color"),
         ("graph_type", "Whether to draw the network traffic graph for input or output. "
@@ -276,6 +277,7 @@ class Network(IntervalModule, ColorRangeModule):
     dynamic_color = True
     graph_type = 'input'
     graph_width = 15
+    graph_style = 'blocks'
     upper_limit = 150.0
 
     # Network traffic settings
@@ -329,7 +331,7 @@ class Network(IntervalModule, ColorRangeModule):
         # Cycle array by inserting at the start and chopping off the last element
         self.kbs_arr.insert(0, kbs)
         self.kbs_arr = self.kbs_arr[:self.graph_width]
-        return make_graph(self.kbs_arr, self.upper_limit)
+        return make_graph(self.kbs_arr, self.upper_limit, self.graph_style)
 
     def run(self):
         format_values = dict(kbs="", network_graph="", bytes_sent="", bytes_recv="", packets_sent="", packets_recv="",

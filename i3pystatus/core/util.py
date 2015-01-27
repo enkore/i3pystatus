@@ -365,24 +365,40 @@ def internet():
         return False
 
 
-def make_graph(values, upper_limit=100.0):
+def make_graph(values, upper_limit=100.0, style="blocks"):
     """
     Draws a graph made of unicode characters.
 
     :param values: An array of values to graph.
     :param upper_limit: Maximum value for the y axis.
+    :param style: Drawing style (currently 'blocks' or 'braille').
     :returns: Bar as a string
     """
     values = [float(n) for n in values]
-
-    bar = u'_▁▂▃▄▅▆▇█'
-    bar_count = len(bar) - 1
-    mn, mx = min(values), float(upper_limit)
+    mn, mx = min(values), max(max(values), float(upper_limit))
     extent = mx - mn
-    if extent == 0:
-        graph = '_' * len(values)
+    if style == 'blocks':
+        bar = u'_▁▂▃▄▅▆▇█'
+        bar_count = len(bar) - 1
+        if extent == 0:
+            graph = '_' * len(values)
+        else:
+            graph = ''.join(bar[int((n - mn) / extent * bar_count)] for n in values)
+    elif style == 'braille':
+        #idea from https://github.com/asciimoo/drawille
+        #unicode values from http://en.wikipedia.org/wiki/Braille
+        v2 = values if len(values) % 2 == 0 else values + [mn]
+        l = len(v2) // 2
+        if extent == 0:
+            graph = chr(0x2800) * l #should be visually equiv to ' '
+        else:
+            graph = ''
+            for i in range(0, l, 2):
+                b1 = [ 0, 0x40, 0x44, 0x46, 0x47 ][ round(4 * (v2[i] - mn) / extent) ]
+                b2 = [ 0, 0x80, 0xa0, 0xb0, 0xb8 ][ round(4 * (v2[i + 1] - mn) / extent) ]
+                graph += chr(0x2800 + b1 + b2)
     else:
-        graph = ''.join(bar[int((n - mn) / extent * bar_count)] for n in values)
+        raise NotImplementedError("Graph drawing style '%s' unimplemented." % style)
     return graph
 
 
