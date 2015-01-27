@@ -375,19 +375,14 @@ def make_graph(values, upper_limit=100.0):
     """
     values = [float(n) for n in values]
 
-    # Add the upper limit to the end of the array so the graph doesn't distort
-    # as high values drop off the end.
-    values.append(float(upper_limit))
-
     bar = u'_▁▂▃▄▅▆▇█'
     bar_count = len(bar) - 1
-    mn, mx = min(values), max(values)
+    mn, mx = min(values), float(upper_limit)
     extent = mx - mn
     if extent == 0:
         graph = '_' * len(values)
     else:
-        graph = ''.join(bar[int((n - mn) / extent * bar_count)]
-                        for n in values[:len(values) - 1])  # Don't show the upper limit value.
+        graph = ''.join(bar[int((n - mn) / extent * bar_count)] for n in values)
     return graph
 
 
