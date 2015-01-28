@@ -26,7 +26,7 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
         ("start_color", "Hex or English name for start of color range, eg '#00FF00' or 'green'"),
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
         ("graph_width", "Width of the cpu usage graph"),
-        ("graph_style", "Graph style, currently 'blocks' or 'braille'"),
+        ("graph_style", "Graph style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake')"),
     )
 
     graph_width = 15

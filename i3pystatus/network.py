@@ -254,7 +254,7 @@ class Network(IntervalModule, ColorRangeModule):
         ("start_color", "Hex or English name for start of color range, eg '#00FF00' or 'green'"),
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
         ("graph_width", "Width of the network traffic graph"),
-        ("graph_style", "Graph style, currently 'blocks' or 'braille'"),
+        ("graph_style", "Graph style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake')"),
         ("upper_limit",
          "Expected max kb/s. This value controls how the network traffic graph is drawn and in what color"),
         ("graph_type", "Whether to draw the network traffic graph for input or output. "
