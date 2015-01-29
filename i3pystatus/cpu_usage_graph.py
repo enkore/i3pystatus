@@ -46,7 +46,7 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
         self.cpu_readings.insert(0, core_reading)
         self.cpu_readings = self.cpu_readings[:self.graph_width]
 
-        graph = make_graph(self.cpu_readings, 100.0, self.graph_style)
+        graph = make_graph(self.cpu_readings, 0.0, 100.0, self.graph_style)
         format_options.update({'cpu_graph': graph})
 
         color = self.get_gradient(core_reading, self.colors)

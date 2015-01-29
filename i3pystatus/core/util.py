@@ -365,18 +365,23 @@ def internet():
         return False
 
 
-def make_graph(values, upper_limit=100.0, style="blocks"):
+def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
     """
     Draws a graph made of unicode characters.
 
     :param values: An array of values to graph.
-    :param upper_limit: Maximum value for the y axis.
+    :param lower_limit: Minimum value for the y axis (or None for dynamic).
+    :param upper_limit: Maximum value for the y axis (or None for dynamic).
     :param style: Drawing style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake').
     :returns: Bar as a string
     """
+
     values = [float(n) for n in values]
-    mn, mx = min(values), max(max(values), float(upper_limit))
+    mn, mx = min(values), max(values)
+    mn = mn if lower_limit == None else min(mn, float(lower_limit))
+    mx = mx if upper_limit == None else max(mx, float(upper_limit))
     extent = mx - mn
+
     if style == 'blocks':
         bar = u'_▁▂▃▄▅▆▇█'
         bar_count = len(bar) - 1

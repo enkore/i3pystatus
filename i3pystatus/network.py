@@ -331,7 +331,7 @@ class Network(IntervalModule, ColorRangeModule):
         # Cycle array by inserting at the start and chopping off the last element
         self.kbs_arr.insert(0, kbs)
         self.kbs_arr = self.kbs_arr[:self.graph_width]
-        return make_graph(self.kbs_arr, self.upper_limit, self.graph_style)
+        return make_graph(self.kbs_arr, 0.0, self.upper_limit, self.graph_style)
 
     def run(self):
         format_values = dict(kbs="", network_graph="", bytes_sent="", bytes_recv="", packets_sent="", packets_recv="",
