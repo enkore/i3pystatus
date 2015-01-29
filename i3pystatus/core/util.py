@@ -378,8 +378,8 @@ def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
 
     values = [float(n) for n in values]
     mn, mx = min(values), max(values)
-    mn = mn if lower_limit == None else min(mn, float(lower_limit))
-    mx = mx if upper_limit == None else max(mx, float(upper_limit))
+    mn = mn if lower_limit is None else min(mn, float(lower_limit))
+    mx = mx if upper_limit is None else max(mx, float(upper_limit))
     extent = mx - mn
 
     if style == 'blocks':
