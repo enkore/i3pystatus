@@ -10,12 +10,6 @@ from i3pystatus import Module, SettingsBase
 from i3pystatus.core import ClassFinder
 from collections import defaultdict, OrderedDict
 
-try:
-    input = raw_input
-except NameError:
-    pass
-
-
 def signal_handler(signal, frame):
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
