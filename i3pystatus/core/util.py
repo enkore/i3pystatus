@@ -365,29 +365,66 @@ def internet():
         return False
 
 
-def make_graph(values, upper_limit=100.0):
+def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
     """
     Draws a graph made of unicode characters.
 
     :param values: An array of values to graph.
-    :param upper_limit: Maximum value for the y axis.
+    :param lower_limit: Minimum value for the y axis (or None for dynamic).
+    :param upper_limit: Maximum value for the y axis (or None for dynamic).
+    :param style: Drawing style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake').
     :returns: Bar as a string
     """
+
     values = [float(n) for n in values]
-
-    # Add the upper limit to the end of the array so the graph doesn't distort
-    # as high values drop off the end.
-    values.append(float(upper_limit))
-
-    bar = u'_▁▂▃▄▅▆▇█'
-    bar_count = len(bar) - 1
     mn, mx = min(values), max(values)
+    mn = mn if lower_limit is None else min(mn, float(lower_limit))
+    mx = mx if upper_limit is None else max(mx, float(upper_limit))
     extent = mx - mn
-    if extent == 0:
-        graph = '_' * len(values)
+
+    if style == 'blocks':
+        bar = u'_▁▂▃▄▅▆▇█'
+        bar_count = len(bar) - 1
+        if extent == 0:
+            graph = '_' * len(values)
+        else:
+            graph = ''.join(bar[int((n - mn) / extent * bar_count)] for n in values)
+    elif style in ['braille-fill', 'braille-peak', 'braille-snake']:
+        # idea from https://github.com/asciimoo/drawille
+        # unicode values from http://en.wikipedia.org/wiki/Braille
+
+        vpad = values if len(values) % 2 == 0 else values + [mn]
+        vscale = [round(4 * (vp - mn) / extent) for vp in vpad]
+        l = len(vscale) // 2
+
+        # do the 2-character collapse separately for clarity
+        if 'fill' in style:
+            vbits = [[0, 0x40, 0x44, 0x46, 0x47][vs] for vs in vscale]
+        elif 'peak' in style:
+            vbits = [[0, 0x40, 0x04, 0x02, 0x01][vs] for vs in vscale]
+        else:
+            assert('snake' in style)
+            # there are a few choices for what to put last in vb2.
+            # arguable vscale[-1] from the _previous_ call is best.
+            vb2 = [vscale[0]] + vscale + [0]
+            vbits = []
+            for i in range(1, l + 1):
+                c = 0
+                for j in range(min(vb2[i - 1], vb2[i], vb2[i + 1]), vb2[i] + 1):
+                    c |= [0, 0x40, 0x04, 0x02, 0x01][j]
+                vbits.append(c)
+
+        # 2-character collapse
+        graph = ''
+        for i in range(0, l, 2):
+            b1 = vbits[i]
+            b2 = vbits[i + 1]
+            if b2 & 0x40:
+                b2 = b2 - 0x30
+            b2 = b2 << 3
+            graph += chr(0x2800 + b1 + b2)
     else:
-        graph = ''.join(bar[int((n - mn) / extent * bar_count)]
-                        for n in values[:len(values) - 1])  # Don't show the upper limit value.
+        raise NotImplementedError("Graph drawing style '%s' unimplemented." % style)
     return graph
 
 
