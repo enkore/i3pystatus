@@ -42,6 +42,16 @@ for module_name in modules:
         if any([hasattr(clazz, setting) for setting in protected_settings]):
             credential_modules[clazz.__name__]['credentials'] = list(set(protected_settings) & set(members))
             credential_modules[clazz.__name__]['key'] = "%s.%s" % (clazz.__module__, clazz.__name__)
+        elif hasattr(clazz, 'required'):
+            protected = []
+            required = getattr(clazz, 'required')
+            for setting in protected_settings:
+                if setting in required:
+                    protected.append(setting)
+            if protected:
+                credential_modules[clazz.__name__]['credentials'] = protected
+                credential_modules[clazz.__name__]['key'] = "%s.%s" % (clazz.__module__, clazz.__name__)
+
     except ImportError:
         continue
 
