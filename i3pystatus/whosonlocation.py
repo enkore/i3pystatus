@@ -71,6 +71,7 @@ class WOL(IntervalModule):
         'email',
         'password'
     )
+    keyring_backend = None
 
     color_on_site = '#00FF00'
     color_off_site = '#ff0000'

@@ -48,6 +48,7 @@ class Reddit(IntervalModule):
     format = "[{submission_subreddit}] {submission_title} ({submission_domain})"
     username = ""
     password = ""
+    keyring_backend = None
     subreddit = ""
     sort_by = "hot"
     color = "#FFFFFF"

@@ -23,6 +23,7 @@ class Github(IntervalModule):
     password = ''
     format = '{unread}'
     interval = 600
+    keyring_backend = None
 
     on_leftclick = 'open_github'
 

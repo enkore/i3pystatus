@@ -20,6 +20,7 @@ class IMAP(Backend):
         "mailbox",
     )
     required = ("host", "username", "password")
+    keyring_backend = None
 
     port = 993
     ssl = True

@@ -24,6 +24,7 @@ class ModsDeChecker(IntervalModule):
         "color", "username", "password"
     )
     required = ("username", "password")
+    keyring_backend = None
 
     color = "#7181fe"
     offset = 0
