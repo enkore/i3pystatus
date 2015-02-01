@@ -6,7 +6,6 @@ import getpass
 
 
 class SettingsBase:
-
     """
     Support class for providing a nice and flexible settings interface
 
@@ -48,18 +47,23 @@ class SettingsBase:
 
         def merge_with_parents_settings():
             settings = tuple()
-
             # getmro returns base classes according to Method Resolution Order
             for cls in inspect.getmro(self.__class__):
                 if hasattr(cls, "settings"):
                     settings = settings + cls.settings
             return settings
 
+        self.__name__ = "{}.{}".format(
+            self.__module__, self.__class__.__name__)
+
         settings = merge_with_parents_settings()
         settings = self.flatten_settings(settings)
 
         sm = KeyConstraintDict(settings, self.required)
         settings_source = get_argument_dict(args, kwargs)
+
+        protected = self.get_protected_settings()
+        settings_source.update(protected)
 
         try:
             sm.update(settings_source)
@@ -72,20 +76,21 @@ class SettingsBase:
             raise ConfigMissingError(
                 type(self).__name__, missing=exc.keys) from exc
 
-        self.__name__ = "{}.{}".format(
-            self.__module__, self.__class__.__name__)
-
         self.logger = logging.getLogger(self.__name__)
         self.logger.setLevel(self.log_level)
-        self.set_protected_settings()
         self.init()
 
-    def set_protected_settings(self):
+    def get_protected_settings(self):
+        found_settings = dict()
         for setting_name in self.__PROTECTED_SETTINGS:
-            if hasattr(self, setting_name) and not getattr(self, setting_name):
+            setting = None
+            if hasattr(self, 'required') and setting_name in getattr(self, 'required'):
                 setting = self.get_protected_setting("%s.%s" % (self.__name__, setting_name))
-                if setting:
-                    setattr(self, setting_name, setting)
+            elif hasattr(self, setting_name) and not getattr(self, setting_name):
+                setting = self.get_protected_setting("%s.%s" % (self.__name__, setting_name))
+            if setting:
+                found_settings.update({setting_name: setting})
+        return found_settings
 
     def get_protected_setting(self, setting_name):
         # If a custom keyring backend has been defined, use it.
