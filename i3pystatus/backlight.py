@@ -28,7 +28,7 @@ class Backlight(File):
         "max_brightness": (int, "max_brightness"),
     }
     transforms = {
-        "percentage": lambda cdict: (cdict["brightness"] / cdict["max_brightness"]) * 100,
+        "percentage": lambda cdict: round((cdict["brightness"] / cdict["max_brightness"]) * 100),
     }
 
     def init(self):

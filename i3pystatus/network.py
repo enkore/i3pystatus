@@ -156,6 +156,7 @@ class NetworkInfo():
             info["quality"] = quality["quality"]
         info["quality"] *= 100
         info["quality_bar"] = make_bar(info["quality"])
+        info["quality"]='{0:.{1}f}'.format(info["quality"],0)
 
         return info
 
