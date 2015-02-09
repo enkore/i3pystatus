@@ -28,6 +28,7 @@ class Bitcoin(IntervalModule):
     * {last_tx_value}
     * {balance_btc}
     * {balance_fiat}
+    * {symbol}
 
     """
 
@@ -42,10 +43,12 @@ class Bitcoin(IntervalModule):
         ("leftclick", "URL to visit or command to run on left click"),
         ("rightclick", "URL to visit or command to run on right click"),
         ("interval", "Update interval."),
+        ("symbol", "Symbol for bitcoin sign"),
         "status"
     )
-    format = "฿ {status}{last_price}"
+    format = "{symbol} {status}{last_price}"
     currency = "USD"
+    symbol = "฿"
     wallet_addresses = ""
     color = "#FFFFFF"
     colorize = False
@@ -79,6 +82,7 @@ class Bitcoin(IntervalModule):
     def run(self):
         price_data = self._fetch_price_data()
         fdict = {
+            "symbol": self.symbol,
             "daily_average": price_data["24h_avg"],
             "ask_price": price_data["ask"],
             "bid_price": price_data["bid"],
