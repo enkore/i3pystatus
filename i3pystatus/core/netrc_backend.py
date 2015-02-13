@@ -1,6 +1,4 @@
 import os
-
-__author__ = 'facetoe'
 from keyring.backend import KeyringBackend
 
 

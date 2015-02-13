@@ -29,6 +29,7 @@ class Github(IntervalModule):
 
     settings = (
         ('format', 'format string'),
+        ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
         ('unread_marker', 'sets the string that the "unread" formatter shows when there are pending notifications'),
         ("username", ""),
         ("password", ""),

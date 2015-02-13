@@ -29,7 +29,8 @@ class pyLoad(IntervalModule):
         "format",
         "captcha_true", "captcha_false",
         "download_true", "download_false",
-        "username", "password"
+        "username", "password",
+        ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
     )
     required = ("username", "password")
     keyring_backend = None

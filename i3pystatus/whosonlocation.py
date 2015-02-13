@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 
 
 class WhosOnLocation():
-
     email = None
     password = None
     session = None
@@ -68,6 +67,7 @@ class WOL(IntervalModule):
     password = None
 
     settings = (
+        ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
         'email',
         'password'
     )
