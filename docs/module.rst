@@ -14,6 +14,9 @@ tools for this which make this even easier:
   periodically.
 - Settings (already built into above classes) allow you to easily
   specify user-modifiable attributes of your class for configuration.
+- For modules that require credentials, it is recommended to add a
+  keyring_backend setting to allow users to specify their own backends
+  for retrieving sensitive credentials. 
 
   Required settings and default values are also handled.
 

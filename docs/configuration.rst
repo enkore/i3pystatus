@@ -122,3 +122,13 @@ Also change your i3wm config to the following:
         position          top
         workspace_buttons yes
     }
+
+Settings that require credentials can utilize the keyring module to keep sensitive information out of config files.
+To take advantage of this feature, simply use the setting_util.py script to set the credentials for a module. Once this
+is done you can add the module to your config without specifying the credentials, eg:
+
+::
+
+    status.register('github')
+
+i3pystatus will locate and set the credentials during the module loading process. Currently supported credentals are "password", "email" and "username".

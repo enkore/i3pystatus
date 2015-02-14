@@ -93,6 +93,10 @@ class SettingsBase:
         return found_settings
 
     def get_protected_setting(self, setting_name):
+        """
+        Retrieves a protected setting from keyring
+        :param setting_name: setting_name must be in the format package.module.Class.setting
+        """
         # If a custom keyring backend has been defined, use it.
         if hasattr(self, 'keyring_backend') and self.keyring_backend:
             return self.keyring_backend.get_password(setting_name, getpass.getuser())
