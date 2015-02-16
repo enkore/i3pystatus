@@ -62,7 +62,7 @@ class SettingsBase:
         sm = KeyConstraintDict(settings, self.required)
         settings_source = get_argument_dict(args, kwargs)
 
-        protected = self.get_protected_settings()
+        protected = self.get_protected_settings(settings_source)
         settings_source.update(protected)
 
         try:
@@ -80,34 +80,43 @@ class SettingsBase:
         self.logger.setLevel(self.log_level)
         self.init()
 
-    def get_protected_settings(self):
+    def get_protected_settings(self, settings_source):
+        """
+        Attempt to retrieve protected settings from keyring if they are not already set.
+        """
+        user_backend = settings_source.get('keyring_backend')
         found_settings = dict()
         for setting_name in self.__PROTECTED_SETTINGS:
-            setting = None
-            if hasattr(self, 'required') and setting_name in getattr(self, 'required'):
-                setting = self.get_protected_setting("%s.%s" % (self.__name__, setting_name))
-            elif hasattr(self, setting_name) and not getattr(self, setting_name):
-                setting = self.get_protected_setting("%s.%s" % (self.__name__, setting_name))
-            if setting:
-                found_settings.update({setting_name: setting})
+                # Nothing to do if the setting is already defined.
+                if settings_source.get(setting_name):
+                    continue
+
+                setting = None
+                identifier = "%s.%s" % (self.__name__, setting_name)
+                if hasattr(self, 'required') and setting_name in getattr(self, 'required'):
+                    setting = self.get_setting_from_keyring(identifier, user_backend)
+                elif hasattr(self, setting_name):
+                    setting = self.get_setting_from_keyring(identifier, user_backend)
+                if setting:
+                    found_settings.update({setting_name: setting})
         return found_settings
 
-    def get_protected_setting(self, setting_name):
+    def get_setting_from_keyring(self, setting_identifier, keyring_backend=None):
         """
         Retrieves a protected setting from keyring
-        :param setting_name: setting_name must be in the format package.module.Class.setting
+        :param setting_identifier: must be in the format package.module.Class.setting
         """
         # If a custom keyring backend has been defined, use it.
-        if hasattr(self, 'keyring_backend') and self.keyring_backend:
-            return self.keyring_backend.get_password(setting_name, getpass.getuser())
+        if keyring_backend:
+            return keyring_backend.get_password(setting_identifier, getpass.getuser())
 
-        # Otherwise try and use defualt keyring.
+        # Otherwise try and use default keyring.
         try:
             import keyring
         except ImportError:
             pass
         else:
-            return keyring.get_password(setting_name, getpass.getuser())
+            return keyring.get_password(setting_identifier, getpass.getuser())
 
     def init(self):
         """Convenience method which is called after all settings are set
