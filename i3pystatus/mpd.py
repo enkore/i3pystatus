@@ -37,7 +37,7 @@ class MPD(IntervalModule):
         ("color", "The color of the text"),
         ("max_field_len", "Defines max length for in truncate_fields defined fields, if truncated, ellipsis are appended as indicator. It's applied *before* max_len. Value of 0 disables this."),
         ("max_len", "Defines max length for the hole string, if exceeding fields specefied in truncate_fields are truncated equaly. If truncated, ellipsis are appended as indicator. It's applied *after* max_field_len. Value of 0 disables this."),
-        ("truncate_fields", "fields that will be truncated if exceeding max_field_len or max_len, whatever catches first takes effect"),
+        ("truncate_fields", "fields that will be truncated if exceeding max_field_len or max_len."),
 
     )
 
