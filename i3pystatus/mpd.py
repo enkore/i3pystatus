@@ -109,8 +109,8 @@ class MPD(IntervalModule):
         full_text = formatp(self.format, **fdict).strip()
         full_text_len = len(full_text)
         if full_text_len > self.max_len and self.max_len > 0:
-            shrink = floor((self.max_len - full_text_len)
-                           / len(self.truncate_fields)) - 1
+            shrink = floor((self.max_len - full_text_len) /
+                           len(self.truncate_fields)) - 1
 
             for key in self.truncate_fields:
                 fdict[key] = fdict[key][:shrink] + "…"
