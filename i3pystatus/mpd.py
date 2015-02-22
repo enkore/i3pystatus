@@ -101,13 +101,14 @@ class MPD(IntervalModule):
         else:
             fdict["filename"] = ""
 
-        for key in self.truncate_fields:
-            if len(fdict[key]) > self.max_field_len:
-                fdict[key] = fdict[key][:self.max_field_len - 1] + "…"
+        if self.max_field_len > 0:
+            for key in self.truncate_fields:
+                if len(fdict[key]) > self.max_field_len:
+                    fdict[key] = fdict[key][:self.max_field_len - 1] + "…"
 
         full_text = formatp(self.format, **fdict).strip()
         full_text_len = len(full_text)
-        if full_text_len > self.max_len:
+        if full_text_len > self.max_len and self.max_len > 0:
             shrink = floor((self.max_len - full_text_len)
                            / len(self.truncate_fields)) - 1
 
