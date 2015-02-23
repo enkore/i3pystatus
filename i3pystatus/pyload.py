@@ -29,9 +29,11 @@ class pyLoad(IntervalModule):
         "format",
         "captcha_true", "captcha_false",
         "download_true", "download_false",
-        "username", "password"
+        "username", "password",
+        ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
     )
     required = ("username", "password")
+    keyring_backend = None
 
     address = "http://127.0.0.1:8000"
     format = "{captcha} {progress_all:.1f}% {speed:.1f} kb/s"
