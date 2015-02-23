@@ -1,5 +1,6 @@
 import socket
 from os.path import basename
+from math import floor
 
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import TimeWrapper
@@ -34,8 +35,10 @@ class MPD(IntervalModule):
         ("format", "formatp string"),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
-        ("text_len", "Defines max length for title, album and artist, if truncated ellipsis are appended as indicator"),
-        ("truncate_fields", "fileds that will be truncated if exceeding text_len"),
+        ("max_field_len", "Defines max length for in truncate_fields defined fields, if truncated, ellipsis are appended as indicator. It's applied *before* max_len. Value of 0 disables this."),
+        ("max_len", "Defines max length for the hole string, if exceeding fields specefied in truncate_fields are truncated equaly. If truncated, ellipsis are appended as indicator. It's applied *after* max_field_len. Value of 0 disables this."),
+        ("truncate_fields", "fields that will be truncated if exceeding max_field_len or max_len."),
+
     )
 
     host = "localhost"
@@ -48,7 +51,8 @@ class MPD(IntervalModule):
         "stop": "◾",
     }
     color = "#FFFFFF"
-    text_len = 25
+    max_field_len = 25
+    max_len = 100
     truncate_fields = ("title", "album", "artist")
     on_leftclick = "switch_playpause"
     on_rightclick = "next_song"
@@ -91,17 +95,30 @@ class MPD(IntervalModule):
 
         }
 
-        for key in self.truncate_fields:
-            if len(fdict[key]) > self.text_len:
-                fdict[key] = fdict[key][:self.text_len - 1] + "…"
-
         if not fdict["title"] and "filename" in fdict:
             fdict["filename"] = '.'.join(
                 basename(currentsong["file"]).split('.')[:-1])
         else:
             fdict["filename"] = ""
+
+        if self.max_field_len > 0:
+            for key in self.truncate_fields:
+                if len(fdict[key]) > self.max_field_len:
+                    fdict[key] = fdict[key][:self.max_field_len - 1] + "…"
+
+        full_text = formatp(self.format, **fdict).strip()
+        full_text_len = len(full_text)
+        if full_text_len > self.max_len and self.max_len > 0:
+            shrink = floor((self.max_len - full_text_len) /
+                           len(self.truncate_fields)) - 1
+
+            for key in self.truncate_fields:
+                fdict[key] = fdict[key][:shrink] + "…"
+
+            full_text = formatp(self.format, **fdict).strip()
+
         self.output = {
-            "full_text": formatp(self.format, **fdict).strip(),
+            "full_text": full_text,
             "color": self.color,
         }
 
