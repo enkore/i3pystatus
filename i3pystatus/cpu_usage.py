@@ -40,7 +40,6 @@ class CpuUsage(IntervalModule):
     def init(self):
         self.prev_total = defaultdict(int)
         self.prev_busy = defaultdict(int)
-        self.interval = 1
         self.formatter = Formatter()
 
     def get_cpu_timings(self):
