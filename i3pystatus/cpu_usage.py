@@ -29,6 +29,7 @@ class CpuUsage(IntervalModule):
     format = "{usage:02}%"
     format_all = "{core}:{usage:02}%"
     exclude_average = False
+    interval = 1
     settings = (
         ("format", "format string."),
         ("format_all", ("format string used for {usage_all} per core. "
