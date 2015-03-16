@@ -383,7 +383,7 @@ def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
     extent = mx - mn
 
     if style == 'blocks':
-        bar = u'_▁▂▃▄▅▆▇█'
+        bar = '_▁▂▃▄▅▆▇█'
         bar_count = len(bar) - 1
         if extent == 0:
             graph = '_' * len(values)
@@ -436,7 +436,7 @@ def make_vertical_bar(percentage, width=1):
     :param width: How many characters wide the bar should be.
     :returns: Bar as a String
     """
-    bar = u' _▁▂▃▄▅▆▇█'
+    bar = ' _▁▂▃▄▅▆▇█'
     percentage //= 10
     if percentage < 0:
         output = bar[0]

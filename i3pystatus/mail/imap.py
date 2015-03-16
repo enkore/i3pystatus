@@ -16,10 +16,12 @@ class IMAP(Backend):
     settings = (
         "host", "port",
         "username", "password",
+        ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
         "ssl",
         "mailbox",
     )
     required = ("host", "username", "password")
+    keyring_backend = None
 
     port = 993
     ssl = True

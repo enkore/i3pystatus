@@ -338,7 +338,6 @@ class Network(IntervalModule, ColorRangeModule):
         format_values = dict(kbs="", network_graph="", bytes_sent="", bytes_recv="", packets_sent="", packets_recv="",
                              interface="", v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="", mac="",
                              essid="", freq="", quality="", quality_bar="")
-        color = None
         if self.network_traffic:
             network_usage = self.network_traffic.get_usage(self.interface)
             format_values.update(network_usage)
@@ -352,22 +351,22 @@ class Network(IntervalModule, ColorRangeModule):
             format_values['network_graph'] = self.get_network_graph(kbs)
             format_values['kbs'] = "{0:.1f}".format(round(kbs, 2)).rjust(6)
             color = self.get_gradient(kbs, self.colors, self.upper_limit)
+        else:
+            color = None
+
+        if sysfs_interface_up(self.interface, self.unknown_up):
+            if not color:
+                color = self.color_up
+            format_str = self.format_up
+        else:
+            color = self.color_down
+            format_str = self.format_down
 
         network_info = self.network_info.get_info(self.interface)
         format_values.update(network_info)
-
         format_values['interface'] = self.interface
-        if sysfs_interface_up(self.interface, self.unknown_up):
-            if not self.dynamic_color:
-                color = self.color_up
 
-            self.output = {
-                "full_text": self.format_up.format(**format_values),
-                'color': color,
-            }
-        else:
-            color = self.color_down
-            self.output = {
-                "full_text": self.format_down.format(**format_values),
-                'color': color,
-            }
+        self.output = {
+            "full_text": format_str.format(**format_values),
+            'color': color,
+        }

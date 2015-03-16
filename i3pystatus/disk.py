@@ -38,6 +38,8 @@ class Disk(IntervalModule):
             self.output = {}
             return
 
+        critical = available < self.critical_limit
+
         cdict = {
             "total": (stat.f_bsize * stat.f_blocks) / self.divisor,
             "free": (stat.f_bsize * stat.f_bfree) / self.divisor,
@@ -51,6 +53,6 @@ class Disk(IntervalModule):
 
         self.output = {
             "full_text": self.format.format(**cdict),
-            "color": self.color if available > self.critical_limit else self.critical_color,
-            "urgent": available > self.critical_limit
+            "color": self.critical_color if critical else self.color,
+            "urgent": critical
         }

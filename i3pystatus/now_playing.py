@@ -80,9 +80,13 @@ class NowPlaying(IntervalModule):
     def get_player(self):
         if self.player:
             player = "org.mpris.MediaPlayer2." + self.player
+            try:
+                return dbus.SessionBus().get_object(player, "/org/mpris/MediaPlayer2")
+            except dbus.exceptions.DBusException:
+                raise NoPlayerException()
         else:
             player = self.find_player()
-        return dbus.SessionBus().get_object(player, "/org/mpris/MediaPlayer2")
+            return dbus.SessionBus().get_object(player, "/org/mpris/MediaPlayer2")
 
     def run(self):
         try:

@@ -16,18 +16,20 @@ class Github(IntervalModule):
     * `{unread_count}`  - number of unread notifications, empty if 0
     """
 
-    unread_marker = u"●"
+    unread_marker = "●"
     unread = ''
     color = '#78EAF2'
     username = ''
     password = ''
     format = '{unread}'
     interval = 600
+    keyring_backend = None
 
     on_leftclick = 'open_github'
 
     settings = (
         ('format', 'format string'),
+        ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
         ('unread_marker', 'sets the string that the "unread" formatter shows when there are pending notifications'),
         ("username", ""),
         ("password", ""),

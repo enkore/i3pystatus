@@ -20,10 +20,12 @@ class ModsDeChecker(IntervalModule):
     settings = (
         ("format",
          """Use {unread} as the formatter for number of unread posts"""),
+        ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
         ("offset", """subtract number of posts before output"""),
         "color", "username", "password"
     )
     required = ("username", "password")
+    keyring_backend = None
 
     color = "#7181fe"
     offset = 0
