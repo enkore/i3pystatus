@@ -16,7 +16,7 @@ class Github(IntervalModule):
     * `{unread_count}`  - number of unread notifications, empty if 0
     """
 
-    unread_marker = u"●"
+    unread_marker = "●"
     unread = ''
     color = '#78EAF2'
     username = ''
