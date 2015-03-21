@@ -156,6 +156,7 @@ class NetworkInfo():
             info["quality"] = quality["quality"]
         info["quality"] *= 100
         info["quality_bar"] = make_bar(info["quality"])
+        info["quality"] = round(info["quality"])
 
         return info
 
