@@ -29,6 +29,7 @@ class CpuUsage(IntervalModule):
     format = "{usage:02}%"
     format_all = "{core}:{usage:02}%"
     exclude_average = False
+    interval = 1
     settings = (
         ("format", "format string."),
         ("format_all", ("format string used for {usage_all} per core. "
@@ -40,7 +41,6 @@ class CpuUsage(IntervalModule):
     def init(self):
         self.prev_total = defaultdict(int)
         self.prev_busy = defaultdict(int)
-        self.interval = 1
         self.formatter = Formatter()
 
     def get_cpu_timings(self):
