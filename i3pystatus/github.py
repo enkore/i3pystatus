@@ -48,7 +48,10 @@ class Github(IntervalModule):
 
         # Bad credentials
         if isinstance(data, dict):
-            raise ConfigError(data['message'])
+            err_msg = data['message']
+            if len(err_msg) > 10:
+                err_msg = "%s%s" % (err_msg[:10], '...')
+            raise ConfigError(err_msg)
 
         unread = len(data)
         if unread > 0:
