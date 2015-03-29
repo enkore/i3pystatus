@@ -1,5 +1,8 @@
 from i3pystatus import IntervalModule
-from os import cpu_count
+try:
+    from os import cpu_count
+except ImportError:
+    from multiprocessing import cpu_count
 
 
 class Load(IntervalModule):
