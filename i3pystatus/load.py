@@ -1,4 +1,5 @@
 from i3pystatus import IntervalModule
+from multiprocessing import cpu_count
 
 
 class Load(IntervalModule):
@@ -17,7 +18,7 @@ class Load(IntervalModule):
 
     file = "/proc/loadavg"
     color = "#ffffff"
-    critical_limit = 1
+    critical_limit = cpu_count()
     critical_color = "#ff0000"
 
     def run(self):
