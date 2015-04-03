@@ -313,6 +313,8 @@ class Network(IntervalModule, ColorRangeModule):
         else:
             self.network_traffic = None
 
+        if not self.dynamic_color:
+            self.end_color = self.start_color
         self.colors = self.get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
         self.kbs_arr = [0.0] * self.graph_width
 
