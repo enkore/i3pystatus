@@ -16,6 +16,7 @@ class Github(IntervalModule):
     * `{unread_count}`  - number of unread notifications, empty if 0
     """
 
+    max_error_len = 50
     unread_marker = "●"
     unread = ''
     color = '#78EAF2'
@@ -49,8 +50,6 @@ class Github(IntervalModule):
         # Bad credentials
         if isinstance(data, dict):
             err_msg = data['message']
-            if len(err_msg) > 10:
-                err_msg = "%s%s" % (err_msg[:10], '...')
             raise ConfigError(err_msg)
 
         unread = len(data)

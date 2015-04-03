@@ -75,9 +75,17 @@ class ExceptionWrapper(Wrapper):
             sys.stderr.flush()
             if hasattr(self.workload, "output"):
                 self.workload.output = {
-                    "full_text": "{}: {}".format(self.workload.__class__.__name__, sys.exc_info()[1]),
+                    "full_text": "{}: {}".format(self.workload.__class__.__name__,
+                                                 self.format_error(str(sys.exc_info()[1]))),
                     "color": "#FF0000",
                 }
+
+    def format_error(self, exception_message):
+        if hasattr(self.workload, 'max_error_len'):
+            error_len = self.workload.max_error_len
+            return exception_message[:error_len] + '...' if len(exception_message) > error_len else exception_message
+        else:
+            return exception_message
 
 
 class WorkloadWrapper(Wrapper):
