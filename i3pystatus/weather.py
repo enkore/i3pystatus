@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ElementTree
 
 WEATHER_COM_URL = 'http://wxdata.weather.com/wxdata/weather/local/%s?unit=%s&cc=*'
 
+
 class Weather(IntervalModule):
     """
     This module gets the weather from weather.com.
@@ -61,13 +62,16 @@ class Weather(IntervalModule):
                 text=doc.findtext('cc/t'),
                 temperature=doc.findtext('cc/tmp'),
                 humidity=doc.findtext('cc/hmid'),
-                wind=dict(text=doc.findtext('cc/wind/t'), speed=doc.findtext('cc/wind/s'))
+                wind=dict(
+                    text=doc.findtext('cc/wind/t'),
+                    speed=doc.findtext('cc/wind/s'),
                 ),
+            ),
             units=dict(
                 temperature=doc.findtext('head/ut'),
                 speed=doc.findtext('head/us'),
-                ),
-            )
+            ),
+        )
 
     @require(internet)
     def run(self):
@@ -94,6 +98,6 @@ class Weather(IntervalModule):
                 current_temp=current_temp,
                 current_wind=current_wind,
                 humidity=humidity,
-                ),
+            ),
             "color": color
         }
