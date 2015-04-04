@@ -42,7 +42,10 @@ class Weather(IntervalModule):
 
     @require(internet)
     def run(self):
-        result = pywapi.get_weather_from_weather_com(self.location_code, self.units)
+        try:
+            result = pywapi.get_weather_from_weather_com(self.location_code, self.units)
+        except AttributeError:
+            return False
         conditions = result["current_conditions"]
         temperature = conditions["temperature"]
         humidity = conditions["humidity"]
