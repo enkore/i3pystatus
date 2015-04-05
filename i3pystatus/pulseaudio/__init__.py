@@ -113,10 +113,15 @@ class PulseAudio(Module, ColorRangeModule):
             pa_context_set_subscribe_callback(context, self._update_cb, None)
 
             pa_operation_unref(pa_context_subscribe(
-                context, PA_SUBSCRIPTION_EVENT_CHANGE | PA_SUBSCRIPTION_MASK_SINK, self._success_cb, None))
+                context, PA_SUBSCRIPTION_EVENT_CHANGE | PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SERVER, self._success_cb, None))
 
     def update_cb(self, context, t, idx, userdata):
         """A sink property changed, calls request_update"""
+
+        if t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK == PA_SUBSCRIPTION_EVENT_SERVER:
+            pa_operation_unref(
+                pa_context_get_server_info(context, self._server_info_cb, None))
+
         self.request_update(context)
 
     def sink_info_cb(self, context, sink_info_p, _, __):
