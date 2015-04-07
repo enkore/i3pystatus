@@ -20,9 +20,9 @@ class CpuUsage(IntervalModule):
 
     .. rubric:: Available formatters
 
-    * {usage}       usage average of all cores
-    * {usage_cpu*}  usage of one specific core. replace "*" by core number starting at 0
-    * {usage_all}   usage of all cores separate. usess natsort when available(relevant for more than 10 cores)
+    * `{usage}`      — usage average of all cores
+    * `{usage_cpu*}` — usage of one specific core. replace "*" by core number starting at 0
+    * `{usage_all}`  — usage of all cores separate. usess natsort when available(relevant for more than 10 cores)
 
     """
 

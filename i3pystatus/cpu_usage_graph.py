@@ -14,10 +14,10 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
 
      .. rubric:: Available formatters
 
-     * {cpu_graph}   graph of cpu usage.
-     * {usage}       usage average of all cores
-     * {usage_cpu*}  usage of one specific core. replace "*" by core number starting at 0
-     * {usage_all}   usage of all cores separate. usess natsort when available(relevant for more than 10 cores)
+     * `{cpu_graph}`  — graph of cpu usage.
+     * `{usage}`      — usage average of all cores
+     * `{usage_cpu*}` — usage of one specific core. replace "*" by core number starting at 0
+     * `{usage_all}`  — usage of all cores separate. usess natsort when available(relevant for more than 10 cores)
      """
 
     settings = (

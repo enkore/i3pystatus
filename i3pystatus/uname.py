@@ -7,13 +7,13 @@ class Uname(Module):
     """
     uname(1) like module.
 
-    Formatters:
+    .. rubric:: Available formatters
 
-    - {sysname}: operating system name
-    - {nodename}: name of machine on network (implementation-defined)
-    - {release}: operating system release
-    - {version}: operating system version
-    - {machine}: hardware identifier
+    * `{sysname}` — operating system name
+    * `{nodename}` — name of machine on network (implementation-defined)
+    * `{release}` — operating system release
+    * `{version}` — operating system version
+    * `{machine}` — hardware identifier
     """
 
     format = "{sysname} {release}"

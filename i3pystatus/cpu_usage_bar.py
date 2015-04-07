@@ -15,8 +15,8 @@ class CpuUsageBar(CpuUsage, ColorRangeModule):
 
     .. rubric:: Available formatters
 
-    * {usage_bar}       usage average of all cores
-    * {usage_bar_cpuN}  usage of one specific core. replace "N" by core number starting at 0
+    * `{usage_bar}`      — usage average of all cores
+    * `{usage_bar_cpu*}` — usage of one specific core. replace "*" by core number starting at 0
     """
 
     format = "{usage_bar}"

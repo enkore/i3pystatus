@@ -221,6 +221,7 @@ class Network(IntervalModule, ColorRangeModule):
     .. rubric:: Available formatters
 
     Network Traffic Formatters:
+
     * `{interface}` — the configured network interface
     * `{kbs}` – Float representing kb\s
     * `{network_graph}` – Unicode graph representing network usage
@@ -230,6 +231,7 @@ class Network(IntervalModule, ColorRangeModule):
     * `{packets_recv}` — bytes received per second (divided by divisor)
 
     Network Information Formatters:
+
     * `{interface}` — same as setting
     * `{v4}` — IPv4 address
     * `{v4mask}` — subnet mask
@@ -240,6 +242,7 @@ class Network(IntervalModule, ColorRangeModule):
     * `{mac}` — MAC of interface
 
     Wireless Information Formatters:
+
     * `{essid}` — ESSID of currently connected wifi
     * `{freq}` — Current frequency
     * `{quality}` — Link quality in percent

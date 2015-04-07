@@ -15,7 +15,7 @@ class PulseAudio(Module, ColorRangeModule):
     - Requires amixer for toggling mute and incrementing/decrementing volume on scroll.
     - Depends on the PyPI colour module - https://pypi.python.org/pypi/colour/0.0.5
 
-    .. rubric:: Available formatters:
+    .. rubric:: Available formatters
 
     * `{volume}` — volume in percent (0...100)
     * `{db}` — volume in decibels relative to 100 %, i.e. 100 % = 0 dB, 50 % = -18 dB, 0 % = -infinity dB

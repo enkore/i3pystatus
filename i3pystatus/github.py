@@ -12,8 +12,8 @@ class Github(IntervalModule):
 
     Formatters:
 
-    * `{unread}`        - contains the value of unread_marker when there are pending notifications
-    * `{unread_count}`  - number of unread notifications, empty if 0
+    * `{unread}`        — contains the value of unread_marker when there are pending notifications
+    * `{unread_count}`  — number of unread notifications, empty if 0
     """
 
     max_error_len = 50
