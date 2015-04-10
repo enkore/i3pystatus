@@ -5,26 +5,28 @@ from urllib.request import urlopen
 import re
 import xml.etree.ElementTree as ElementTree
 
-WEATHER_COM_URL = 'http://wxdata.weather.com/wxdata/weather/local/%s?unit=%s&cc=*'
+WEATHER_COM_URL = 'http://wxdata.weather.com/wxdata/weather/local/%s?unit=%s&dayf=1&cc=*'
 
 
 class Weather(IntervalModule):
     """
     This module gets the weather from weather.com.
-    First, you need to get the code for the location from the www.weather.com
+    First, you need to get the code for the location from www.weather.com
 
     .. rubric:: Available formatters
 
-    * {current_temp}
-    * {current_wind}
-    * {humidity}
+    * `{current_temp}` — current temperature including unit (and symbol if colorize is true)
+    * `{min_temp}` — today's minimum temperature including unit
+    * `{max_temp}` — today's maximum temperature including unit
+    * `{current_wind}` — current wind direction, speed including unit
+    * `{humidity}` — current humidity excluding percentage symbol
 
     """
 
     interval = 20
 
     settings = (
-        "location_code",
+        ("location_code", "Location code from www.weather.com"),
         ("colorize", "Enable color with temperature and UTF-8 icons."),
         ("units", "Celsius (metric) or Fahrenheit (imperial)"),
         "format",
@@ -67,6 +69,10 @@ class Weather(IntervalModule):
                     speed=doc.findtext('cc/wind/s'),
                 ),
             ),
+            today=dict(
+                min_temperature=doc.findtext('dayf/day[@d="0"]/low'),
+                max_temperature=doc.findtext('dayf/day[@d="0"]/hi'),
+            ),
             units=dict(
                 temperature=doc.findtext('head/ut'),
                 speed=doc.findtext('head/us'),
@@ -83,6 +89,8 @@ class Weather(IntervalModule):
         units = result["units"]
         color = None
         current_temp = "{t}°{d}".format(t=temperature, d=units["temperature"])
+        min_temp = "{t}°{d}".format(t=result["today"]["min_temperature"], d=units["temperature"])
+        max_temp = "{t}°{d}".format(t=result["today"]["max_temperature"], d=units["temperature"])
         current_wind = "{t} {s}{d}".format(t=wind["text"], s=wind["speed"], d=units["speed"])
 
         if self.colorize:
@@ -98,6 +106,8 @@ class Weather(IntervalModule):
                 current_temp=current_temp,
                 current_wind=current_wind,
                 humidity=humidity,
+                min_temp=min_temp,
+                max_temp=max_temp,
             ),
             "color": color
         }
