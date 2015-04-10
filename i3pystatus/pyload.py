@@ -14,13 +14,13 @@ class pyLoad(IntervalModule):
 
     .. rubric:: Available formatters
 
-    * `{captcha}` (see captcha_true and captcha_false, which are the values filled in for this formatter)
-    * `{progress}` (average over all running downloads)
-    * `{progress_all}` (percentage of completed files/links in queue)
-    * `{speed}` (kilobytes/s)
-    * `{download}` (downloads enabled, also see download_true and download_false)
-    * `{total}` (number of downloads)
-    * `{free_space}` (free space in download directory in gigabytes)
+    * `{captcha}` — see captcha_true and captcha_false, which are the values filled in for this formatter
+    * `{progress}` — average over all running downloads
+    * `{progress_all}` — percentage of completed files/links in queue
+    * `{speed}` — kilobytes/s
+    * `{download}` — downloads enabled, also see download_true and download_false
+    * `{total}` — number of downloads
+    * `{free_space}` — free space in download directory in gigabytes
     """
     interval = 5
 

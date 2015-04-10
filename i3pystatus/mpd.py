@@ -10,7 +10,7 @@ class MPD(IntervalModule):
     """
     Displays various information from MPD (the music player daemon)
 
-    Available formatters (uses :ref:`formatp`)
+    .. rubric:: Available formatters (uses :ref:`formatp`)
 
     * `{title}` — (the title of the current song)
     * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))

@@ -20,7 +20,7 @@ class NowPlaying(IntervalModule):
 
     Left click on the module play/pauses, right click goes to the next track.
 
-    Available formatters (uses :ref:`formatp`)
+    .. rubric:: Available formatters (uses :ref:`formatp`)
 
     * `{title}` — (the title of the current song)
     * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))

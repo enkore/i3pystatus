@@ -7,7 +7,7 @@ class Keyboard_locks(IntervalModule):
     """
     Shows the status of CAPS LOCK, NUM LOCK and SCROLL LOCK
 
-    Available formatters:
+    .. rubric:: Available formatters
 
     * `{caps}` — the current status of CAPS LOCK
     * `{num}` — the current status of NUM LOCK
@@ -17,8 +17,7 @@ class Keyboard_locks(IntervalModule):
     interval = 1
 
     settings = (
-        ("format", "Format string. "
-            "Available formaters are {core} and {usage}."),
+        ("format", "Format string"),
         ("caps_on", "String to show in {caps} when CAPS LOCK is on"),
         ("caps_off", "String to show in {caps} when CAPS LOCK is off"),
         ("num_on", "String to show in {num} when NUM LOCK is on"),

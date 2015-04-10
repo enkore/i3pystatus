@@ -12,7 +12,10 @@ class RunWatch(IntervalModule):
     You can use this to check if a specific application,
     such as a VPN client or your DHCP client is running.
 
-    Available formatters are {pid} and {name}.
+    .. rubric:: Available formatters
+
+    * {pid}
+    * {name}
     """
 
     format_up = "{name}"

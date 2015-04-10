@@ -29,7 +29,7 @@ class Mem(IntervalModule):
     settings = (
         ("format", "format string used for output."),
         ("divisor",
-         "divide all byte values by this value, default 1024**2(mebibytes"),
+         "divide all byte values by this value, default is 1024**2 (megabytes)"),
         ("warn_percentage", "minimal percentage for warn state"),
         ("alert_percentage", "minimal percentage for alert state"),
         ("color", "standard color"),
