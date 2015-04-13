@@ -10,7 +10,7 @@ from i3pystatus import IntervalModule
 
 class Clock(IntervalModule):
     """
-    This class shows a clock
+    This class shows a clock.
 
     format can be passed in four different ways:
 
@@ -18,11 +18,39 @@ class Clock(IntervalModule):
     - one two-tuple, first is the format, second the timezone
     - list of strings - no timezones
     - list of two tuples, first is the format, second is timezone
+
+    Use mousewheel to cycle between formats.
+
+    For complete time format specification see:
+
+    ::
+
+        man strftime
+
+    All available timezones are located in directory:
+
+    ::
+
+        /usr/share/zoneinfo/
+
+    .. rubric:: Format examples
+
+    ::
+
+        # one format, local timezone
+        format = '%a %b %-d %b %X'
+        # multiple formats, local timezone
+        format = [ '%a %b %-d %b %X', '%X' ]
+        # one format, specified timezone
+        format = ('%a %b %-d %b %X', 'Europe/Bratislava')
+        # multiple formats, specified timezones
+        format = [ ('%a %b %-d %b %X', 'America/New_York'), ('%X', 'Etc/GMT+9') ]
+
     """
 
     settings = (
-        ("format", "`None` means to use the default, locale-dependent format. Can cycle between formats with mousewheel"),
-        ("color", "RGB hexadecimal code color specifier, default to #ffffff, set to `i3Bar` to use i3 bar default"),
+        ("format", "`None` means to use the default, locale-dependent format."),
+        ("color", "RGB hexadecimal code color specifier, default to #ffffff"),
     )
     format = None
     color = "#ffffff"
@@ -75,7 +103,7 @@ class Clock(IntervalModule):
         return [expand_format(format_) for format_ in formats]
 
     def run(self):
-        # set correct timezone
+        # set timezone
         if time.tzname[0] is not self.format[self.current_format_id][1]:
             os.environ.putenv('TZ', self.format[self.current_format_id][1])
             time.tzset()
