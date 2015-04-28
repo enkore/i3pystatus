@@ -28,7 +28,7 @@ class Shell(IntervalModule):
             self.logger.error(stderr if stderr else "Unknown error")
 
         if out:
-            out.replace("\n", " ").strip()
+            out = out.replace("\n", " ").strip()
         elif stderr:
             out = stderr
 
