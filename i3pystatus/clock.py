@@ -3,14 +3,14 @@
 
 import os
 import locale
-import datetime
+import time
 
 from i3pystatus import IntervalModule
 
 
 class Clock(IntervalModule):
     """
-    This class shows a clock
+    This class shows a clock.
 
     format can be passed in four different ways:
 
@@ -18,11 +18,39 @@ class Clock(IntervalModule):
     - one two-tuple, first is the format, second the timezone
     - list of strings - no timezones
     - list of two tuples, first is the format, second is timezone
+
+    Use mousewheel to cycle between formats.
+
+    For complete time format specification see:
+
+    ::
+
+        man strftime
+
+    All available timezones are located in directory:
+
+    ::
+
+        /usr/share/zoneinfo/
+
+    .. rubric:: Format examples
+
+    ::
+
+        # one format, local timezone
+        format = '%a %b %-d %b %X'
+        # multiple formats, local timezone
+        format = [ '%a %b %-d %b %X', '%X' ]
+        # one format, specified timezone
+        format = ('%a %b %-d %b %X', 'Europe/Bratislava')
+        # multiple formats, specified timezones
+        format = [ ('%a %b %-d %b %X', 'America/New_York'), ('%X', 'Etc/GMT+9') ]
+
     """
 
     settings = (
-        ("format", "`None` means to use the default, locale-dependent format. Can cycle between formats with mousewheel"),
-        ("color", "RGB hexadecimal code color specifier, default to #ffffff, set to `i3Bar` to use i3 bar default"),
+        ("format", "`None` means to use the default, locale-dependent format."),
+        ("color", "RGB hexadecimal code color specifier, default to #ffffff"),
     )
     format = None
     color = "#ffffff"
@@ -45,7 +73,7 @@ class Clock(IntervalModule):
             lang = (None, None)
 
         if lang != locale.getlocale(locale.LC_TIME):
-            # affects datetime.time.strftime() in whole program
+            # affects time.strftime() in whole program
             locale.setlocale(locale.LC_TIME, lang)
 
         if self.format is None:
@@ -65,32 +93,26 @@ class Clock(IntervalModule):
     def expand_formats(formats):
         def expand_format(format_):
             if isinstance(format_, tuple):
-                return (format_[0], format_[1] if len(format_) > 1 else None)
-            return (format_, None)
+                # check if timezone exists (man tzset)
+                if len(format_) > 1 and os.path.isfile('/usr/share/zoneinfo/' + format_[1]):
+                    return (format_[0], format_[1])
+                else:
+                    return (format_[0], time.tzname[0])
+            return (format_, time.tzname[0])
 
         return [expand_format(format_) for format_ in formats]
 
     def run(self):
-        # Safest way is to work from utc and localize afterwards
-        if self.format[self.current_format_id][1]:
-            try:
-                import pytz
-            except ImportError as e:
-                raise RuntimeError("Need pytz for timezones") from e
-            utc_dt = pytz.utc.localize(datetime.datetime.utcnow())
-            tz = pytz.timezone(self.format[self.current_format_id][1])
-            dt = tz.normalize(utc_dt.astimezone(tz))
-        else:
-            dt = datetime.datetime.now()
-
-        output = dt.strftime(self.format[self.current_format_id][0])
+        # set timezone
+        if time.tzname[0] is not self.format[self.current_format_id][1]:
+            os.environ.putenv('TZ', self.format[self.current_format_id][1])
+            time.tzset()
 
         self.output = {
-            "full_text": output,
+            "full_text": time.strftime(self.format[self.current_format_id][0]),
+            "color": self.color,
             "urgent": False,
         }
-        if self.color != "i3Bar":
-            self.output["color"] = self.color
 
     def scroll_format(self, step=1):
         self.current_format_id = (self.current_format_id + step) % len(self.format)
