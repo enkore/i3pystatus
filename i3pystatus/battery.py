@@ -119,6 +119,8 @@ class BatteryChecker(IntervalModule):
     """
     This class uses the /sys/class/power_supply/…/uevent interface to check for the
     battery status
+    It provides the "ALL" battery_ident which will summarise all available batteries
+    for the moment and aggregate the % as well as the time remaining on the charge.
 
     .. rubric:: Available formatters
 
