@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import re
 import configparser
 
@@ -74,6 +75,12 @@ class BatteryCharge(Battery):
     def _percentage(self, design):
         return self.battery_info["CHARGE_NOW"] / self.battery_info["CHARGE_FULL" + design]
 
+    def wh_remaining(self):
+        return self.battery_info['CHARGE_NOW'] * self.battery_info['VOLTAGE_NOW']
+
+    def wh_depleted(self):
+        return (self.battery_info['CHARGE_FULL'] - self.battery_info['CHARGE_NOW']) * self.battery_info['VOLTAGE_NOW']
+
     def remaining(self):
         if self.status() == "Discharging":
             if "CHARGE_NOW" in self.battery_info and "CURRENT_NOW" in self.battery_info:
@@ -92,6 +99,12 @@ class BatteryEnergy(Battery):
 
     def _percentage(self, design):
         return self.battery_info["ENERGY_NOW"] / self.battery_info["ENERGY_FULL" + design]
+
+    def wh_remaining(self):
+        return self.battery_info['ENERGY_NOW']
+
+    def wh_depleted(self):
+        return self.battery_info['ENERGY_FULL'] - self.battery_info['ENERGY_NOW']
 
     def remaining(self):
         if self.status() == "Discharging":
@@ -114,6 +127,7 @@ class BatteryChecker(IntervalModule):
     * `{percentage_design}` — absolute battery charge percentage
     * `{consumption (Watts)}` — current power flowing into/out of the battery
     * `{status}`
+    # `{no_of_batteries}` — The number of batteries included
     * `{battery_ident}` — the same as the setting
     * `{bar}` —bar displaying the percentage graphically
     """
@@ -133,10 +147,11 @@ class BatteryChecker(IntervalModule):
         ("charging_color", "The charging color"),
         ("critical_color", "The critical color"),
         ("not_present_color", "The not present color."),
+        ("no_present_text", "The text to display when the battery is not present. Provides {battery_ident} as formatting option"),
         ("no_text_full", "Don't display text when battery is full - 100%"),
     )
 
-    battery_ident = "BAT0"
+    battery_ident = "ALL"
     format = "{status} {remaining}"
     status = {
         "DPL": "DPL",
@@ -144,7 +159,7 @@ class BatteryChecker(IntervalModule):
         "DIS": "DIS",
         "FULL": "FULL",
     }
-    not_present_text = "Battery not present"
+    not_present_text = "Battery {battery_ident} not present"
 
     alert = False
     alert_percentage = 10
@@ -158,21 +173,73 @@ class BatteryChecker(IntervalModule):
     no_text_full = False
 
     path = None
+    paths = []
+
+    def percentage(self, batteries, design=False):
+        total = 0
+        for battery in batteries:
+            total += battery.percentage(design)
+        return total / len(batteries)
+
+    def consumption(self, batteries):
+        return sum([bat.consumption() for bat in batteries])
+
+    def abs_consumption(self, batteries):
+        abs_consumption = 0
+        for battery in batteries:
+            if battery.status() == 'Discharging':
+                abs_consumption -= battery.consumption()
+            elif battery.status() == 'Charging':
+                abs_consumption += battery.consumption()
+        return abs_consumption
+
+    def battery_status(self, batteries):
+        abs_consumption = self.abs_consumption(batteries)
+        if abs_consumption > 0:
+            return 'Charging'
+        if abs_consumption < 0:
+            return 'Discharging'
+        else:
+            return batteries.pop().status()
+
+    def remaining(self, batteries):
+        wh_depleted = 0
+        wh_remaining = 0
+        abs_consumption = self.abs_consumption(batteries)
+        for battery in batteries:
+            wh_remaining += battery.wh_remaining()
+            wh_depleted += battery.wh_depleted()
+        if abs_consumption == 0:
+            return 0
+        elif abs_consumption > 0:
+            return wh_depleted / self.consumption(batteries) * 60
+        elif abs_consumption < 0:
+            return wh_remaining / self.consumption(batteries) * 60
 
     def init(self):
-        if not self.path:
-            self.path = "/sys/class/power_supply/{0}/uevent".format(
-                self.battery_ident)
+        if not self.paths:
+            bat_dir = '/sys/class/power_supply'
+            _, dirs, _ = next(os.walk(bat_dir))
+            all_bats = [x for x in dirs if x.startswith('BAT')]
+            for bat in all_bats:
+                self.paths.append(os.path.join(bat_dir, bat, 'uevent'))
 
     def run(self):
         urgent = False
         color = self.color
+        batteries = []
 
-        try:
-            battery = Battery.create(self.path)
-        except FileNotFoundError:
+        for path in self.paths:
+            if self.battery_ident == 'ALL' or path.find(self.battery_ident) >= 0:
+                try:
+                    batteries.append(Battery.create(path))
+                except FileNotFoundError:
+                    pass
+
+        if not batteries:
+            format_dict = {'battery_ident': self.battery_ident}
             self.output = {
-                "full_text": self.not_present_text,
+                "full_text": formatp(self.not_present_text, **format_dict),
                 "color": self.not_present_color,
             }
             return
@@ -182,23 +249,30 @@ class BatteryChecker(IntervalModule):
                     "full_text": ""
                 }
                 return
+        if not batteries:
+            self.output = {
+                "full_text": self.not_present_text,
+                "color": self.not_present_color,
+            }
+            return
 
         fdict = {
             "battery_ident": self.battery_ident,
-            "percentage": battery.percentage(),
-            "percentage_design": battery.percentage(design=True),
-            "consumption": battery.consumption(),
+            "no_of_batteries": len(batteries),
+            "percentage": self.percentage(batteries),
+            "percentage_design": self.percentage(batteries, design=True),
+            "consumption": self.consumption(batteries),
             "remaining": TimeWrapper(0, "%E%h:%M"),
-            "bar": make_bar(battery.percentage()),
+            "bar": make_bar(self.percentage(batteries)),
         }
 
-        status = battery.status()
+        status = self.battery_status(batteries)
         if status in ["Charging", "Discharging"]:
-            remaining = battery.remaining()
+            remaining = self.remaining(batteries)
             fdict["remaining"] = TimeWrapper(remaining * 60, "%E%h:%M")
             if status == "Discharging":
                 fdict["status"] = "DIS"
-                if battery.percentage() <= self.alert_percentage:
+                if self.percentage(batteries) <= self.alert_percentage:
                     urgent = True
                     color = self.critical_color
             else:
