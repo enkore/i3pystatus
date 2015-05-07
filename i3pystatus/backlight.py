@@ -1,6 +1,7 @@
 from i3pystatus.file import File
-import shutils
-import subprocesss
+from i3pystatus import Module
+import shutil
+import subprocess
 
 
 class Backlight(File):
@@ -34,16 +35,15 @@ class Backlight(File):
     }
     on_upscroll = "lighter"
     on_downscroll = "darker"
-
     def init(self):
         self.base_path = self.base_path.format(backlight=self.backlight)
-        self.has_xbacklight = shutils.which("xbacklight") is not None
-        super().init()
+        self.has_xbacklight = shutil.which("xbacklight") is not None
+        super(Backlight, self).init()
 
     def lighter(self):
         if self.has_xbacklight:
-            subprocess.Popen(["backlight", '+5'])
+            subprocess.Popen(["xbacklight", '+5'])
 
     def darker(self):
         if self.has_xbacklight:
-            subprocess.Popen(["backlight", '-5'])
+            subprocess.Popen(["xbacklight", '-5'])
