@@ -8,6 +8,8 @@ class Backlight(File):
     """
     Screen backlight info
 
+    - Reuqire `xbacklight` installed to change the backlight through the scollwheel.
+
     .. rubric:: Available formatters
 
     * `{brightness}` — current brightness relative to max_brightness
@@ -35,15 +37,16 @@ class Backlight(File):
     }
     on_upscroll = "lighter"
     on_downscroll = "darker"
+
     def init(self):
         self.base_path = self.base_path.format(backlight=self.backlight)
         self.has_xbacklight = shutil.which("xbacklight") is not None
-        super(Backlight, self).init()
+        super().init()
 
     def lighter(self):
         if self.has_xbacklight:
-            subprocess.Popen(["xbacklight", '+5'])
+            subprocess.Popen(["xbacklight", "+5"])
 
     def darker(self):
         if self.has_xbacklight:
-            subprocess.Popen(["xbacklight", '-5'])
+            subprocess.Popen(["xbacklight", "-5"])
