@@ -1,4 +1,6 @@
 from i3pystatus.file import File
+import shutils
+import subprocesss
 
 
 class Backlight(File):
@@ -30,8 +32,18 @@ class Backlight(File):
     transforms = {
         "percentage": lambda cdict: (cdict["brightness"] / cdict["max_brightness"]) * 100,
     }
+    on_upscroll = "lighter"
+    on_downscroll = "darker"
 
     def init(self):
         self.base_path = self.base_path.format(backlight=self.backlight)
-
+        self.has_xbacklight = shutils.which("xbacklight") is not None
         super().init()
+
+    def lighter(self):
+        if self.has_xbacklight:
+            subprocess.Popen(["backlight", '+5'])
+
+    def darker(self):
+        if self.has_xbacklight:
+            subprocess.Popen(["backlight", '-5'])
