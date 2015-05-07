@@ -1,7 +1,7 @@
 from i3pystatus.file import File
 from i3pystatus import Module
+from i3pystatus.core.command import run_through_shell
 import shutil
-import subprocess
 
 
 class Backlight(File):
@@ -45,8 +45,8 @@ class Backlight(File):
 
     def lighter(self):
         if self.has_xbacklight:
-            subprocess.Popen(["xbacklight", "+5"])
+            run_through_shell(["xbacklight", "+5"])
 
     def darker(self):
         if self.has_xbacklight:
-            subprocess.Popen(["xbacklight", "-5"])
+            run_through_shell(["xbacklight", "-5"])
