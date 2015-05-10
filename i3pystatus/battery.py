@@ -151,7 +151,7 @@ class BatteryChecker(IntervalModule):
         ("charging_color", "The charging color"),
         ("critical_color", "The critical color"),
         ("not_present_color", "The not present color."),
-        ("no_present_text", "The text to display when the battery is not present. Provides {battery_ident} as formatting option"),
+        ("not_present_text", "The text to display when the battery is not present. Provides {battery_ident} as formatting option"),
         ("no_text_full", "Don't display text when battery is full - 100%"),
     )
 
