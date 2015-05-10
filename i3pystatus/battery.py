@@ -142,7 +142,9 @@ class BatteryChecker(IntervalModule):
         "alert_percentage",
         ("alert_format_title", "The title of the notification, all formatters can be used"),
         ("alert_format_body", "The body text of the notification, all formatters can be used"),
-        ("path", "Override the default-generated path"),
+        ("path", "Override the default-generated path and specify the full path for a single battery"),
+        ("base_path", "Override the default base path for searching for batteries"),
+        ("battery_prefix", "Override the default battery prefix"),
         ("status", "A dictionary mapping ('DPL', 'DIS', 'CHR', 'FULL') to alternative names"),
         ("color", "The text color"),
         ("full_color", "The full color"),
@@ -174,6 +176,8 @@ class BatteryChecker(IntervalModule):
     not_present_color = "#ffffff"
     no_text_full = False
 
+    battery_prefix = 'BAT'
+    base_path = '/sys/class/power_supply'
     path = None
     paths = []
 
@@ -199,7 +203,7 @@ class BatteryChecker(IntervalModule):
         abs_consumption = self.abs_consumption(batteries)
         if abs_consumption > 0:
             return 'Charging'
-        if abs_consumption < 0:
+        elif abs_consumption < 0:
             return 'Discharging'
         else:
             return batteries.pop().status()
@@ -219,12 +223,15 @@ class BatteryChecker(IntervalModule):
             return wh_remaining / self.consumption(batteries) * 60
 
     def init(self):
-        if not self.paths:
-            bat_dir = '/sys/class/power_supply'
-            _, dirs, _ = next(os.walk(bat_dir))
-            all_bats = [x for x in dirs if x.startswith('BAT')]
-            for bat in all_bats:
-                self.paths.append(os.path.join(bat_dir, bat, 'uevent'))
+        if not self.paths or (self.path and self.path not in self.paths):
+            bat_dir = self.base_path
+            if os.path.exists(bat_dir) and not self.path:
+                _, dirs, _ = next(os.walk(bat_dir))
+                all_bats = [x for x in dirs if x.startswith(self.battery_prefix)]
+                for bat in all_bats:
+                    self.paths.append(os.path.join(bat_dir, bat, 'uevent'))
+            if self.path:
+                self.paths = [self.path]
 
     def run(self):
         urgent = False
@@ -246,17 +253,11 @@ class BatteryChecker(IntervalModule):
             }
             return
         if self.no_text_full:
-            if battery.status() == "Full":
+            if self.battery_status(batteries) == "Full":
                 self.output = {
                     "full_text": ""
                 }
                 return
-        if not batteries:
-            self.output = {
-                "full_text": self.not_present_text,
-                "color": self.not_present_color,
-            }
-            return
 
         fdict = {
             "battery_ident": self.battery_ident,
