@@ -8,7 +8,7 @@ class Backlight(File):
     """
     Screen backlight info
 
-    - Requires `xbacklight` to change the backlight brightness with the scollwheel.
+    - (Optional) requires `xbacklight` to change the backlight brightness with the scollwheel.
 
     .. rubric:: Available formatters
 
