@@ -10,14 +10,23 @@ from docutils.statemachine import StringList
 import i3pystatus.core.settings
 import i3pystatus.core.modules
 from i3pystatus.core.imputil import ClassFinder
+from i3pystatus.core.color import ColorRangeModule
 
 IGNORE_MODULES = ("__main__", "core")
 
 
 def is_module(obj):
-    return isinstance(obj, type) \
-            and issubclass(obj, i3pystatus.core.settings.SettingsBase) \
-            and not obj.__module__.startswith("i3pystatus.core.")
+    return (isinstance(obj, type)
+            and issubclass(obj, i3pystatus.core.settings.SettingsBase)
+            and not obj.__module__.startswith("i3pystatus.core."))
+
+
+def fail_on_missing_dependency_hints(obj, lines):
+    # We can automatically check in some cases if we forgot something
+    if issubclass(obj, ColorRangeModule):
+        if all("`colour`" not in line for line in lines):
+            raise ValueError(">>> Module <{}> uses ColorRangeModule and should document it <<<\n"
+                             "> Requires the PyPI package `colour`".format(obj.__name__))
 
 
 def process_docstring(app, what, name, obj, options, lines):
@@ -60,6 +69,8 @@ def process_docstring(app, what, name, obj, options, lines):
             return formatted
 
     if is_module(obj) and obj.settings:
+        fail_on_missing_dependency_hints(obj, lines)
+
         lines.append(".. rubric:: Settings")
         lines.append("")
 
