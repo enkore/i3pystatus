@@ -5,6 +5,45 @@ Changelog
 master branch
 +++++++++++++
 
+* Errors can now be logged to ``~/.i3pystatus-<pid>``
+    - ``log_level`` setting
+* Added new callback system
+* Added credentials storage
+* Added deadbeef module
+* Added github module
+* Added whosonlocation module
+* Added openvpn module
+* backlight: add xbacklight support for changing brightness with mouse wheel
+* battery: added support for depleted batteries
+* battery: added support for multiple batteries
+* battery: added option to treat all batteries as one large battery (ALL)
+* cpu_usage: removed hard coded interval setting
+* cpu_usage_bar: fixed wrong default setting
+* clock: removed optional pytz dependency
+* network: cycle available interfaces on click
+* network: centralized network modules
+    - Removed ``network_graph``
+    - Removed ``network_traffic``
+    - Removed ``wireless``
+* network: ``basiciw`` is only required if it is used (wireless)
+* network: ``psutil`` is only required if it is used (traffic)
+* network: scrolling changes displayed interface
+* network: fixed bug that prevented color_up being shown if the user is not using network_traffic
+* network: various other enhancements
+* notmuch: fixed sync issue with database
+* now_playing: added custom format and color when no player is running
+* now_playing: differentiates between D-Bus errors and no players running
+* now_playing: fixed D-Bus compatibility with players
+* mail: added capability to display unread messages per account individually
+* mpd: various enhancements and fixes
+* pulseaudio: detect default sink changes in pulseaudio
+* reddit: can open users mailbox now
+* shell: fixed module not stripping newlines
+* spotify: check for metadata on start
+* temp: alert temperatures
+* weather: removed pywapi dependency
+* weather: add min_temp and max_temp formatters for daily min/max temperature
+
 3.32
 ++++
 
