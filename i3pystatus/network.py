@@ -311,7 +311,7 @@ class Network(IntervalModule, ColorRangeModule):
 
         # Don't require importing psutil unless using the functionality it offers.
         if any(s in self.format_up or s in self.format_down for s in
-               ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph']):
+               ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph', 'kbs']):
             self.network_traffic = NetworkTraffic(self.unknown_up, self.divisor, self.round_size)
         else:
             self.network_traffic = None
