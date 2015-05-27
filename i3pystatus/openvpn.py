@@ -18,7 +18,7 @@ class OpenVPN(IntervalModule):
 
     """
 
-    colour_up = "#00ff00 "
+    colour_up = "#00ff00"
     colour_down = "#FF0000"
     format = "{label} {vpn_name} {status}"
     status_command = "bash -c \"systemctl show openvpn@%(vpn_name)s | grep -oP 'ActiveState=\K(\w+)'\""
