@@ -24,9 +24,9 @@ def is_module(obj):
 def fail_on_missing_dependency_hints(obj, lines):
     # We can automatically check in some cases if we forgot something
     if issubclass(obj, ColorRangeModule):
-        if all("`colour`" not in line for line in lines):
+        if all("colour" not in line for line in lines):
             raise ValueError(">>> Module <{}> uses ColorRangeModule and should document it <<<\n"
-                             "> Requires the PyPI package `colour`".format(obj.__name__))
+                             "> Requires the PyPI package ``colour``".format(obj.__name__))
 
 
 def process_docstring(app, what, name, obj, options, lines):
