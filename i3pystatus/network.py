@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import netifaces
+
 from i3pystatus import IntervalModule
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import make_graph, round_dict, make_bar
@@ -216,19 +217,10 @@ class Network(IntervalModule, ColorRangeModule):
     """
     Displays network information for an interface.
 
-    Requires the PyPI packages `psutil`, `colour`, `netifaces` and `basiciw`
+    Requires the PyPI packages `colour`, `netifaces`, `psutil` (optional, see below)
+    and `basiciw` (optional, see below).
 
     .. rubric:: Available formatters
-
-    Network Traffic Formatters:
-
-    * `{interface}` — the configured network interface
-    * `{kbs}` – Float representing kb\s
-    * `{network_graph}` – Unicode graph representing network usage
-    * `{bytes_sent}` — bytes sent per second (divided by divisor)
-    * `{bytes_recv}` — bytes received per second (divided by divisor)
-    * `{packets_sent}` — bytes sent per second (divided by divisor)
-    * `{packets_recv}` — bytes received per second (divided by divisor)
 
     Network Information Formatters:
 
@@ -241,12 +233,22 @@ class Network(IntervalModule, ColorRangeModule):
     * `{v6cidr}` — IPv6 address in cidr notation
     * `{mac}` — MAC of interface
 
-    Wireless Information Formatters:
+    Wireless Information Formatters (requires PyPI package `basiciw`):
 
     * `{essid}` — ESSID of currently connected wifi
     * `{freq}` — Current frequency
     * `{quality}` — Link quality in percent
     * `{quality_bar}` —Bar graphically representing link quality
+
+    Network Traffic Formatters (requires PyPI pacakge `psutil`):
+
+    * `{interface}` — the configured network interface
+    * `{kbs}` – Float representing kb\s
+    * `{network_graph}` – Unicode graph representing network usage
+    * `{bytes_sent}` — bytes sent per second (divided by divisor)
+    * `{bytes_recv}` — bytes received per second (divided by divisor)
+    * `{packets_sent}` — bytes sent per second (divided by divisor)
+    * `{packets_recv}` — bytes received per second (divided by divisor)
     """
     settings = (
         ("format_up", "format string"),
