@@ -49,42 +49,63 @@ Changelog
 Contributors
 ------------
 
-* aaron-lebo
-* afics
-* al45tair
-* Argish42
-* Arvedui
-* atalax
-* bparmentier
-* cganas
-* crwood
-* dubwoc
-* enkore (current maintainer)
-* facetoe
-* gwarf
-* hobarrera
-* janoliver (former maintainer)
-* jasonmhite
-* jedrz
-* jorio
-* kageurufu
-* mekanix
-* Mic92
-* micha-a-schmidt
-* naglis
-* philipdexter
-* rampage644 
-* sbrunner
-* siikamiika
-* simon04
-* talwrii
-* teto
-* tomkenmag
-* tomxtobin
-* tony
-* xals
-* yemu
-* zzatkin
+*  aaron-lebo
+*  Alastair Houghton
+*  Alexis Lahouze
+*  Alex Timmermann
+*  Andrés Martano
+*  Argish42
+*  Armin Fisslthaler
+*  Arvedui
+*  Baptiste Grenier
+*  bparmentier
+*  Cezary Biele
+*  cganas
+*  Christopher Ganas
+*  Chris Wood
+*  David Foucher
+*  David Garcia Quintas
+*  dubwoc
+*  eBrnd
+*  enkore (current maintainer)
+*  facetoe
+*  Frank Tackitt
+*  gacekjk
+*  Goran Mekić
+*  Gordon Schulz
+*  Hugo Osvaldo Barrera
+*  Iliyas Jorio
+*  Jan Oliver Oelerich (former maintainer)
+*  Jason Hite
+*  Joaquin Ignacio Barotto
+*  Jörg Thalheim
+*  Josef Gajdusek
+*  Júlio Rieger Lucchese
+*  Kenneth Lyons
+*  krypt-n
+*  Lukáš Mandák
+*  Łukasz Jędrzejewski
+*  Matthias Pronk
+*  Matthieu Coudron
+*  Matus Telgarsky
+*  Michael Schmidt
+*  Mikael Knutsson
+*  Naglis Jonaitis
+*  Pandada8
+*  philipdexter
+*  Philip Dexter
+*  Sergei Turukin
+*  siikamiika
+*  Simon
+*  Simon Legner
+*  Stéphane Brunner
+*  Talwrii
+*  theswitch
+*  tomasm
+*  Tom X. Tobin
+*  tyjak
+*  Tyjak
+*  Zack Gold
 
 Contribute
 ----------
