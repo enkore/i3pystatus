@@ -20,6 +20,7 @@ setup(name="i3pystatus",
           "i3pystatus.core",
           "i3pystatus.mail",
           "i3pystatus.pulseaudio",
+          "i3pystatus.updates",
       ],
       entry_points={
           "console_scripts": [
