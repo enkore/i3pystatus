@@ -19,6 +19,22 @@ class Updates(IntervalModule):
 
     * `{count}` — Sum of all available updates from all backends.
 
+    .. rubric:: Usage example
+
+    ::
+
+        from i3pystatus import Status
+        from i3pystatus.updates import pacman, cower
+
+        status = Status(standalone=True)
+
+        status.register("updates",
+                        format = "Updates: {count}",
+                        format_no_updates = "No updates",
+                        backends = [pacman.Pacman(), cower.Cower()])
+
+        status.run()
+
     """
 
     interval = 3600
