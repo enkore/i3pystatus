@@ -7,10 +7,10 @@ Module reference
 :System: `clock`_ - `disk`_ - `load`_ - `mem`_  - `cpu_usage`_
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `battery`_ - `backlight`_ - `temp`_
-:Network: `network`_ 
+:Network: `network`_
 :Music: `now_playing`_ - `mpd`_
 :Websites & stuff: `weather`_ - `bitcoin`_ - `reddit`_ - `parcel`_
-:Other: `mail`_ - `pyload`_ -  `text`_ 
+:Other: `mail`_ - `pyload`_ - `text`_ - `updates`_
 :Advanced: `file`_ - `regex`_ - `runwatch`_ - `shell`_
 
 .. autogen:: i3pystatus Module
@@ -25,3 +25,12 @@ Mail Backends
 .. autogen:: i3pystatus.mail SettingsBase
 
    .. nothin'
+
+.. _updatebackends:
+
+Update Backends
+---------------
+
+.. autogen:: i3pystatus.updates SettingsBase
+
+    .. nothin'

@@ -2,33 +2,39 @@ from i3pystatus import SettingsBase, IntervalModule, formatp
 
 
 class Backend(SettingsBase):
-    """
-    TODO: doc
-    """
-
+    settings = ()
     updates = 0
 
 
 class Updates(IntervalModule):
     """
-    Generic update checker
+    Generic update checker.
+    To use select appropriate backend(s) for your system.
+    For list of all available backends see :ref:`updatebackends`.
 
-    TODO: doc
+    Left clicking on the module will refresh the count of upgradeable packages.
+    This may be used to dismiss the notification after updating your system.
+
+    .. rubric:: Available formatters
+
+    * `{count}` — Sum of all available updates from all backends.
+
     """
 
-    interval = 60 * 5  # 5 minutes
+    interval = 3600
 
     settings = (
-        ("backends", "List of backends used to check for updates."),
-        ("format", ""),
-        ("format_no_updates", ""),
-        ("color", ""),
-        ("color_no_updates", ""),
+        ("backends", "Required list of backends used to check for updates."),
+        ("format", "String shown when updates are availible. May contain formatters."),
+        ("format_no_updates", "String that is shown if no updates are available. If not set the module will be hidden if no updates are available."),
+        "color",
+        "color_no_updates",
+        ("interval", "Default interval is set to one hour."),
     )
     required = ("backends",)
 
     backends = None
-    format = "U {count}"
+    format = "Updates: {count}"
     format_no_updates = None
     color = "#00DD00"
     color_no_updates = "#FFFFFF"
