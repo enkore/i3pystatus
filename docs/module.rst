@@ -14,6 +14,8 @@ tools for this which make this even easier:
   periodically.
 - Settings (already built into above classes) allow you to easily
   specify user-modifiable attributes of your class for configuration.
+
+  See :py:class:`i3pystatus.core.settings.SettingsBase` for details.
 - For modules that require credentials, it is recommended to add a
   keyring_backend setting to allow users to specify their own backends
   for retrieving sensitive credentials. 
@@ -24,14 +26,33 @@ Check out i3pystatus' source code for plenty of (`simple
 <https://github.com/enkore/i3pystatus/blob/master/i3pystatus/mem.py>`_)
 examples on how to build modules.
 
-Also note that the settings system is built to ease documentation. If
-you specify two-tuples ``("setting", "description")`` description then
-:py:mod:`i3pystatus.mkdocs` will automatically generate a nice table
-listing each option, it's default value and description.
+The settings system is built to ease documentation. If you specify
+two-tuples like ``("setting", "description")`` then Sphinx will
+automatically generate a nice table listing each option, it's default
+value and description.
 
 The docstring of your module class is automatically used as the
-restructuredtext description for your module in the README file.
+reStructuredText description for your module in the README file.
 
 .. seealso::
 
     :py:class:`i3pystatus.core.settings.SettingsBase` for a detailed description of the settings system
+
+Handling Dependencies
+---------------------
+
+To make it as easy as possible to use i3pystatus we explicitly
+document all dependencies in the docstring of a module.
+
+The wording usually used goes like this:
+
+.. code:: rst
+
+   Requires the PyPI package `colour`
+
+To allow automatic generation of the docs without having all
+requirements of every module installed mocks are used. To make this
+work simply add all modules you import to the ``MOCK_MODULES`` list in
+``docs/conf.py``. This needs to be the actual name of the imported
+module, so for example if you have ``from somepkg.mod import AClass``,
+you need to add ``somepkg.mod`` to the list.
