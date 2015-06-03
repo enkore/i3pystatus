@@ -20,7 +20,8 @@ class Openstack_vms(IntervalModule):
         ("crit_color", "Display color when non-active VMs are => `threshold`"),
         ("threshold", "Set critical indicators when non-active VM pass this "
             "number"),
-        ("horizon_url", "When clicked, open this URL in a browser")
+        ("horizon_url", "When clicked, open this URL in a browser"),
+        "format"
     )
     required = ("auth_url", "password", "tenant_name", "username")
     color = "#00FF00"
