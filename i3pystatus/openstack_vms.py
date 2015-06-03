@@ -9,6 +9,7 @@ class Openstack_vms(IntervalModule):
     """
     Displays the number of VMs in an openstack cluster in ACTIVE and
     non-ACTIVE states.
+    Requires: python-novaclient
     """
 
     settings = (

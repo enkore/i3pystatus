@@ -30,7 +30,8 @@ MOCK_MODULES = [
     "i3pystatus.pulseaudio.pulse",
     "notmuch",
     "requests",
-    "bs4"
+    "bs4",
+    "python-novaclient"
 ]
 
 for mod_name in MOCK_MODULES:
