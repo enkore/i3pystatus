@@ -19,9 +19,9 @@ class AptGet(Backend):
             os.mkdir(cache_dir)
 
         command = "apt-get update -o Dir::State::Lists=" + cache_dir
-        run_through_shell(command)
+        run_through_shell(command.split())
         command = "apt-get upgrade -s -o Dir::State::Lists=" + cache_dir
-        apt = run_through_shell(command)
+        apt = run_through_shell(command.split())
 
         update_count = 0
         for line in apt.out.split("\n"):

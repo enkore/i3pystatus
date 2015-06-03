@@ -63,7 +63,6 @@ class Updates(IntervalModule):
     def init(self):
         if not isinstance(self.backends, list):
             self.backends = [self.backends]
-        return
 
     def run(self):
         if not internet():
@@ -88,4 +87,3 @@ class Updates(IntervalModule):
             "full_text": formatp(self.format, **fdict).strip(),
             "color": self.color,
         }
-        return

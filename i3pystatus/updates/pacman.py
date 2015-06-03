@@ -12,8 +12,6 @@ class Pacman(Backend):
     def updates(self):
         command = ["checkupdates"]
         checkupdates = run_through_shell(command)
-        out = checkupdates.out.strip()
-
-        return len(out.split("\n")) if len(out) > 0 else 0
+        return checkupdates.out.count('\n')
 
 Backend = Pacman

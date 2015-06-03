@@ -13,8 +13,6 @@ class Cower(Backend):
     def updates(self):
         command = ["cower", "-u"]
         cower = run_through_shell(command)
-        out = cower.out.strip()
-
-        return len(out.split("\n")) if len(out) > 0 else 0
+        return cower.out.count('\n')
 
 Backend = Cower
