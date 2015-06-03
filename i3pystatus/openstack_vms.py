@@ -18,7 +18,7 @@ class Openstack_vms(IntervalModule):
         ("password", "Password for Openstack authentication (OS_PASSWORD)"),
         ("tenant_name", "Tenant/Project name to view (OS_TENANT_NAME)"),
         ("color", "Display color when non-active VMs are =< `threshold`"),
-        ("crit_color", "Display color when non-active VMs are => `threshold`").
+        ("crit_color", "Display color when non-active VMs are => `threshold`"),
         ("threshold", "Set critical indicators when non-active VM pass this "
             "number"),
         ("horizon_url", "When clicked, open this URL in a browser")
