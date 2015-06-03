@@ -1,5 +1,4 @@
 from i3pystatus import IntervalModule
-from .core.util import round_dict
 # requires python-novaclient
 from novaclient.v2 import client
 import webbrowser
