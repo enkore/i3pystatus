@@ -27,8 +27,8 @@ class Openstack_vms(IntervalModule):
     crit_color = "#FF0000"
     threshold = 0
     horizon_url = None
-    format = "{tenant_name}: {active_servers} active, "\
-        "{nonactive_servers} non-active"
+    format = "{tenant_name}: {active_servers} up, "\
+        "{nonactive_servers} down"
 
     on_leftclick = "openurl"
 
