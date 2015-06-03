@@ -31,7 +31,7 @@ MOCK_MODULES = [
     "notmuch",
     "requests",
     "bs4",
-    "python-novaclient"
+    "novaclient.v2"
 ]
 
 for mod_name in MOCK_MODULES:
