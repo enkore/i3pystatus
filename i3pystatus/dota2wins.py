@@ -4,9 +4,8 @@ from i3pystatus import IntervalModule
 
 class Dota2wins(IntervalModule):
     """
-    Displays the number of VMs in an openstack cluster in ACTIVE and
-    non-ACTIVE states.
-    Requires: python-novaclient
+    Displays the win/loss ratio of a given Dota account.
+    Requires: dota2py
     """
 
     settings = (
