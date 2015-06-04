@@ -64,7 +64,7 @@ class Dota2wins(IntervalModule):
 
         wins = outcomes.count(1)
         losses = outcomes.count(0)
-        win_percent = float(sum(outcomes) / float(len(outcomes)))*100
+        win_percent = float(sum(outcomes) / float(len(outcomes))) * 100
 
         if win_percent >= float(self.good_threshold):
             color = self.good_color
