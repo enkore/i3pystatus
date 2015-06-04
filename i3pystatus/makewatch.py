@@ -10,7 +10,6 @@ class MakeWatch(IntervalModule):
     """
 
     settings = (
-        ("user", "Specifies which user to track. Null means all users"),
         ("name", "Listen for a job other than 'make' jobs"),
         ("running_color", "Text color while the job is running"),
         ("idle_color", "Text color while the job is not running"),
