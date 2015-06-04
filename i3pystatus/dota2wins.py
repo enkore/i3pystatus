@@ -24,6 +24,9 @@ class Dota2wins(IntervalModule):
             "bad_threshold"),
         ("cation_color", "Color of text while win precentage is between good "
             "and bad thresholds"),
+        ("screenname", "If set to 'retrieve', requests for the users's "
+            "screenname via API calls. Else, use the supplied string as the "
+            "user's screename"),
         "format"
     )
     required = ("steamid", "steam_api_key")
@@ -34,7 +37,8 @@ class Dota2wins(IntervalModule):
     bad_threshold = 45
     matches = 25
     interval = 1800
-    format = "{wins}W:{losses}L {win_percent}%"
+    screenname = 'retrieve'
+    format = "{screenname} {wins}W:{losses}L {win_percent}%"
 
     def run(self):
         api.set_api_key(self.steam_api_key)
@@ -78,7 +82,18 @@ class Dota2wins(IntervalModule):
         else:
             color = self.caution_color
 
+        if self.screenname == 'retrieve':
+            from urllib.request import urlopen
+            import json
+            response = urlopen(
+                'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamids=%s' %
+                (self.steam_api_key, self.steamid))
+            screenname = json.loads(bytes.decode(response.read()))['response']['players'][0]['personaname']
+        else:
+            screenname = self.screenname
+
         cdict = {
+            "screenname": screenname,
             "wins": wins,
             "losses": losses,
             "win_percent": win_percent,
