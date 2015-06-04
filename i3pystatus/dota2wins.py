@@ -12,12 +12,18 @@ class Dota2wins(IntervalModule):
         ("matches", "Number of recent matches to calculate"),
         ("steamid", "Steam user to track"),
         ("steam_api_key", "Steam API key "
-            "(http://steamcommunity.com/dev/apikey"),
+            "(http://steamcommunity.com/dev/apikey)"),
         ("good_threshold", "Win percentage (or higher) which you are happy "
             "with"),
         ("bad_threshold", "Win percentage you want to be alerted (difference "
             "between good_threshold and bad_threshold is cautious_threshold)"),
         ("interval", "Update interval (games usually last at least 20 min)."),
+        ("good_color", "Color of text while win percentage is above "
+            "good_threshold"),
+        ("bad_color", "Color of text while win percentage is below "
+            "bad_threshold"),
+        ("cation_color", "Color of text while win precentage is between good "
+            "and bad thresholds"),
         "format"
     )
     required = ("steamid", "steam_api_key")
