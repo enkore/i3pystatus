@@ -31,7 +31,8 @@ MOCK_MODULES = [
     "notmuch",
     "requests",
     "bs4",
-    "novaclient.v2"
+    "novaclient.v2",
+    "psutil", "getpass"
 ]
 
 for mod_name in MOCK_MODULES:
