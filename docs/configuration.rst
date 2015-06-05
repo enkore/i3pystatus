@@ -9,8 +9,6 @@ example):
 
 .. code:: python
 
-    # -*- coding: utf-8 -*-
-
     import subprocess
 
     from i3pystatus import Status
