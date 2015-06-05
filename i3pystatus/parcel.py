@@ -150,7 +150,7 @@ class ParcelTracker(IntervalModule):
         "format",
         "name",
     )
-    required = ("instance",)
+    required = ("instance", "name")
 
     format = "{name}:{progress}"
     on_leftclick = "open_browser"
