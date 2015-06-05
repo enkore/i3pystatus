@@ -1,6 +1,11 @@
+# coding=utf-8
+"""
+Basic tests for the cpu_freq module
+"""
 #!/usr/bin/env python3
 
 import os
+
 from i3pystatus import cpu_freq
 
 
@@ -11,8 +16,12 @@ def cpu_freq_test(tfpath, tformat, expected):
 
 
 def test_basic():
+    """
+    Tests against the pre-prepared file
+    """
     cases = [
-        ('cpufreq01', '1240.382', '1236.828', '1203.007', '1264.859', '1236.269', '1.24', '1.24', '1.20', '1.26', '1.24'),
+        ('cpufreq01', '1240.382', '1236.828', '1203.007', '1264.859', '1236.269', '1.24', '1.24', '1.20', '1.26',
+         '1.24'),
     ]
     for path, core0, core1, core2, core3, avg, core0g, core1g, core2g, core3g, avgg in cases:
         cpu_freq_test(path, "{avg}", avg)
