@@ -78,11 +78,8 @@ example):
         interface="eth0",
         format_up="{v4cidr}",)
 
-    # Has all the options of the normal network and adds some wireless specific things
-    # like quality and network names.
-    #
-    # Note: requires both netifaces and basiciw
-    status.register("wireless",
+    # Note: requires both netifaces and basiciw (for essid and quality)
+    status.register("network",
         interface="wlan0",
         format_up="{essid} {quality:03.0f}%",)
 
