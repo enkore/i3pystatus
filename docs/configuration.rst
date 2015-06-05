@@ -7,7 +7,7 @@ A simple configuration file could look like this (note the additional
 dependencies from :py:mod:`.network` and :py:mod:`.pulseaudio` in this
 example):
 
-::
+.. code:: python
 
     # -*- coding: utf-8 -*-
 
