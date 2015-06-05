@@ -6,8 +6,7 @@ class Backend(SettingsBase):
     """Handles the details of checking for mail"""
 
     unread = 0
-    settings = ("account", "Account name")
-    # required = ("account", )
+    settings = (("account", "Account name"),)
 
     account = "Default account"
 
