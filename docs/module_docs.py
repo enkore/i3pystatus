@@ -29,6 +29,16 @@ def fail_on_missing_dependency_hints(obj, lines):
                              "> Requires the PyPI package ``colour``".format(obj.__name__))
 
 
+def check_settings_consistency(obj, settings):
+    errs = []
+    for setting in settings:
+        if not setting.required and setting.default is setting.sentinel:
+            errs.append("<" + setting.name + ">")
+    if errs:
+        raise ValueError(">>> Module <{}> has non-required setting(s) {} with no default! <<<\n"
+                         .format(obj.__name__, ", ".join(errs)))
+
+
 def process_docstring(app, what, name, obj, options, lines):
     class Setting:
         doc = ""
@@ -42,8 +52,7 @@ def process_docstring(app, what, name, obj, options, lines):
                 self.doc = setting[1]
             else:
                 self.name = setting
-
-            if setting in cls.required:
+            if self.name in cls.required:
                 self.required = True
             elif hasattr(cls, self.name):
                 default = getattr(cls, self.name)
@@ -74,8 +83,11 @@ def process_docstring(app, what, name, obj, options, lines):
         lines.append(".. rubric:: Settings")
         lines.append("")
 
-        for setting in obj.settings:
-            lines.append(str(Setting(obj, setting)))
+        settings = [Setting(obj, setting) for setting in obj.settings]
+
+        lines += map(str, settings)
+
+        check_settings_consistency(obj, settings)
 
         lines.append("")
 
