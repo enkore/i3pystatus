@@ -1,6 +1,7 @@
 from i3pystatus import IntervalModule
 from i3pystatus.core.command import run_through_shell
 
+
 class DPMS(IntervalModule):
     """
     Shows and toggles status of DPMS which prevents screen from blanking.
@@ -17,7 +18,7 @@ class DPMS(IntervalModule):
     settings = (
         "format",
         "color",
-        "color_disabled", 
+        "color_disabled",
     )
 
     color_disabled = "#AAAAAA"
