@@ -8,14 +8,13 @@ updates it's info periodically, like checking for a network link or
 displaying the status of some service, then we have prepared common
 tools for this which make this even easier:
 
-- Common base classes: :py:class:`i3pystatus.core.modules.Module` for
-  everything and :py:class:`i3pystatus.core.modules.IntervalModule`
-  specifically for the aforementioned usecase of updating stuff
-  periodically.
+- Common base classes: :py:class:`.Module` for everything and
+  :py:class:`.IntervalModule` specifically for the aforementioned
+  usecase of updating stuff periodically.
 - Settings (already built into above classes) allow you to easily
   specify user-modifiable attributes of your class for configuration.
 
-  See :py:class:`i3pystatus.core.settings.SettingsBase` for details.
+  See :py:class:`.SettingsBase` for details.
 - For modules that require credentials, it is recommended to add a
   keyring_backend setting to allow users to specify their own backends
   for retrieving sensitive credentials. 
@@ -36,7 +35,7 @@ reStructuredText description for your module in the README file.
 
 .. seealso::
 
-    :py:class:`i3pystatus.core.settings.SettingsBase` for a detailed description of the settings system
+    :py:class:`.SettingsBase` for a detailed description of the settings system
 
 Handling Dependencies
 ---------------------

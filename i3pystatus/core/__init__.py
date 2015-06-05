@@ -57,7 +57,15 @@ class Status:
             self.io = io.IOHandler(input_stream)
 
     def register(self, module, *args, **kwargs):
-        """Register a new module."""
+        """
+        Register a new module.
+
+        :param module: Either a string module name, or a module class,
+                       or a module instance (in which case args and kwargs are
+                       invalid).
+        :param kwargs: Settings for the module.
+        :returns: module instance
+        """
         from i3pystatus.text import Text
 
         if not module:
@@ -81,6 +89,9 @@ class Status:
                 text=configuration_error.message))
 
     def run(self):
+        """
+        Run main loop.
+        """
         if self.click_events:
             self.command_endpoint.start()
         for j in io.JSONIO(self.io).read():

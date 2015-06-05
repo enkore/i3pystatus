@@ -2,7 +2,7 @@ Configuration
 =============
 
 The configuration file is a normal Python script. The status bar is controlled by a central
-status object, which individual *modules* like a :py:mod:`.clock` or a :py:mod:`.battery`
+:py:class:`.Status` object, which individual *modules* like a :py:mod:`.clock` or a :py:mod:`.battery`
 monitor are added to with the ``register`` method.
 
 A typical configuration file could look like this (note the additional

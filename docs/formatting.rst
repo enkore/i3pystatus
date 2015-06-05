@@ -15,8 +15,9 @@ decimal dot
 formatp
 -------
 
-Some modules use an extended format string syntax (the mpd module, for example).
-Given the format string below the output adapts itself to the available data.
+Some modules use an extended format string syntax (the :py:mod:`.mpd`
+module, for example).  Given the format string below the output adapts
+itself to the available data.
 
 ::
 
@@ -33,14 +34,14 @@ Inside a group always all format specifiers must evaluate to true (logical and).
 You can nest groups. The inner group will only become part of the output if both
 the outer group and the inner group are eligible for output.
 
-
 .. _TimeWrapper:
 
 TimeWrapper
 -----------
 
-Some modules that output times use TimeWrapper to format these. TimeWrapper is
-a mere extension of the standard formatting method.
+Some modules that output times use :py:class:`.TimeWrapper` to format
+these. TimeWrapper is a mere extension of the standard formatting
+method.
 
 The time format that should be used is specified using the format specifier, i.e.
 with some_time being 3951 seconds a format string like ``{some_time:%h:%m:%s}``
