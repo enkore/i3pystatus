@@ -13,7 +13,7 @@ class MakeWatch(IntervalModule):
         ("name", "Listen for a job other than 'make' jobs"),
         ("running_color", "Text color while the job is running"),
         ("idle_color", "Text color while the job is not running"),
-        "format", "idle_format"
+        "format",
     )
     running_color = "#FF0000"  # red
     idle_color = "#00FF00"   # green
