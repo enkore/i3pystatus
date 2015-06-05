@@ -1,8 +1,8 @@
+#!/usr/bin/env python3
 # coding=utf-8
 """
 Basic tests for the cpu_freq module
 """
-#!/usr/bin/env python3
 
 import os
 
