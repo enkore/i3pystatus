@@ -6,10 +6,10 @@ class DPMS(IntervalModule):
     """
     Shows and toggles status of DPMS which prevents screen from blanking.
 
-
     .. rubric:: Available formatters
 
     * `{status}` — the current status of DPMS
+
     @author Georg Sieber <g.sieber AT gmail.com>
     """
 
