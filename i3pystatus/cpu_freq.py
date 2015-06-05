@@ -1,6 +1,3 @@
-"""
-The module gathers information by default from `/proc/cpuinfo` about the current cpu frequency
-"""
 # coding=utf-8
 from i3pystatus import IntervalModule
 
@@ -13,8 +10,8 @@ class CpuFreq(IntervalModule):
 
     * `{avg}` - mean from all cores in MHz `4.3f`
     * `{avgg}` - mean from all cores in GHz `1.2f`
-    * `{corex}` - frequency of a selected core in MHz `4.3f`
-    * `{corexg}` - frequesncy of a selscted core in GHz `1.2f`
+    * `{coreX}` - frequency of core number `X` in MHz (format `4.3f`), where 0 <= `X` <= number of cores - 1
+    * `{coreXg}` - frequency of core number `X` in GHz (fromat `1.2f`), where 0 <= `X` <= number of cores - 1
 
     """
     format = "{avgg}"
