@@ -30,6 +30,7 @@ class Pomodoro(IntervalModule):
         ('format', 'format string, available formatters: current_pomodoro, '
                    'total_pomodoro, time')
     )
+    required = ('sound',)
 
     color_stopped = '#2ECCFA'
     color_running = '#FFFF00'
