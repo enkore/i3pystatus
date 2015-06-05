@@ -52,7 +52,8 @@ The wording usually used goes like this:
 
 To allow automatic generation of the docs without having all
 requirements of every module installed mocks are used. To make this
-work simply add all modules you import to the ``MOCK_MODULES`` list in
-``docs/conf.py``. This needs to be the actual name of the imported
+work simply add all modules of dependencies (so no standard library modules
+or modules provided by i3pystatus) you import to the ``MOCK_MODULES``
+list in ``docs/conf.py``. This needs to be the actual name of the imported
 module, so for example if you have ``from somepkg.mod import AClass``,
 you need to add ``somepkg.mod`` to the list.
