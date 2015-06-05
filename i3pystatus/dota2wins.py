@@ -22,7 +22,7 @@ class Dota2wins(IntervalModule):
             "good_threshold"),
         ("bad_color", "Color of text while win percentage is below "
             "bad_threshold"),
-        ("cation_color", "Color of text while win precentage is between good "
+        ("caution_color", "Color of text while win precentage is between good "
             "and bad thresholds"),
         ("screenname", "If set to 'retrieve', requests for the users's "
             "screenname via API calls. Else, use the supplied string as the "
