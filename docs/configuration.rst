@@ -120,6 +120,9 @@ Also change your i3wm config to the following:
         workspace_buttons yes
     }
 
+.. note::
+    Don't name your config file ``i3pystatus.py``
+
 Settings that require credentials can utilize the keyring module to keep sensitive information out of config files.
 To take advantage of this feature, simply use the setting_util.py script to set the credentials for a module. Once this
 is done you can add the module to your config without specifying the credentials, eg:
