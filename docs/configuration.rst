@@ -1,15 +1,15 @@
 Configuration
 =============
 
-The config file is just a normal Python script.
+The config file is a normal Python script. The status bar is controlled by a central
+status object, which individual *modules* like a clock or a battery monitor are added to
+with the :py:`register` method.
 
-A simple configuration file could look like this (note the additional
+A typical configuration file could look like this (note the additional
 dependencies from :py:mod:`.network` and :py:mod:`.pulseaudio` in this
 example):
 
 .. code:: python
-
-    import subprocess
 
     from i3pystatus import Status
 
@@ -36,8 +36,10 @@ example):
     # And like this if full:
     # =14.22W 100.0% [91.21%]
     #
-    # This would also display a desktop notification (via dbus) if the percentage
+    # This would also display a desktop notification (via D-Bus) if the percentage
     # goes below 5 percent while discharging. The block will also color RED.
+    # If you don't have a desktop notification demon yet, take a look at dunst:
+    #   http://www.knopwob.org/dunst/
     status.register("battery",
         format="{status}/{consumption:.2f}W {percentage:.2f}% [{percentage_design:.2f}%] {remaining:%E%hh:%Mm}",
         alert=True,
