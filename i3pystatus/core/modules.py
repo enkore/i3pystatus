@@ -38,8 +38,9 @@ class Module(SettingsBase):
             if (self.output.get("color", "") or "").lower() == "#ffffff":
                 del self.output["color"]
             if self.hints:
-                h = {i: self.hints[i] for i in self.hints if i not in self.output}
-                self.output.update(h)
+                for key, val in self.hints.items():
+                    if key not in self.output:
+                        self.output.update({key: val})
             json.insert(convert_position(self.position, json), self.output)
 
     def run(self):
