@@ -5,7 +5,34 @@ import logging
 import getpass
 
 
-class SettingsBase:
+class SettingsBaseMeta(type):
+    """Add interval setting to `settings` attribute if it does not exist."""
+
+    def __init__(cls, name, bases, namespace):
+        super().__init__(name, bases, namespace)
+
+        cls.settings, cls.required = SettingsBaseMeta.get_merged_settings(cls)
+
+    @staticmethod
+    def get_merged_settings(cls):
+        def unique(settings):
+            def name(s):
+                return s[0] if isinstance(s, tuple) else s
+            seen = set()
+            return [setting for setting in settings if not (
+                name(setting) in seen or seen.add(name(setting)))]
+
+        settings = tuple()
+        required = tuple()
+        # getmro returns base classes according to Method Resolution Order,
+        # which always includes the class itself as the first element.
+        for base in inspect.getmro(cls):
+            settings += tuple(getattr(base, "settings", []))
+            required += tuple(getattr(base, "required", []))
+        return unique(settings), required
+
+
+class SettingsBase(metaclass=SettingsBaseMeta):
     """
     Support class for providing a nice and flexible settings interface
 
@@ -37,24 +64,6 @@ class SettingsBase:
     log_level = logging.NOTSET
     logger = None
 
-    @classmethod
-    def get_merged_settings(cls):
-        def unique(settings):
-            def name(s):
-                return s[0] if isinstance(s, tuple) else s
-            seen = set()
-            return [setting for setting in settings if not (
-                name(setting) in seen or seen.add(name(setting)))]
-
-        settings = tuple()
-        required = tuple()
-        # getmro returns base classes according to Method Resolution Order,
-        # which always includes the class itself as the first element.
-        for base in inspect.getmro(cls):
-            settings += getattr(base, "settings", tuple())
-            required += getattr(base, "required", tuple())
-        return unique(settings), required
-
     def __init__(self, *args, **kwargs):
         def get_argument_dict(args, kwargs):
             if len(args) == 1 and not kwargs:
@@ -65,10 +74,9 @@ class SettingsBase:
 
         self.__name__ = "{}.{}".format(self.__module__, self.__class__.__name__)
 
-        settings, required = self.get_merged_settings()
-        settings = self.flatten_settings(settings)
+        settings = self.flatten_settings(self.settings)
 
-        sm = KeyConstraintDict(settings, required)
+        sm = KeyConstraintDict(settings, self.required)
         settings_source = get_argument_dict(args, kwargs)
 
         protected = self.get_protected_settings(settings_source)
