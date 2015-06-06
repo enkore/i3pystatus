@@ -6,7 +6,7 @@ python3 -mpep8 --version
 
 # Target directory for all build files
 BUILD=${1:-ci-build}
-rm -r ${BUILD}/
+rm -rf ${BUILD}/
 mkdir -p $BUILD
 
 python3 -mpep8 --ignore E501 i3pystatus tests
