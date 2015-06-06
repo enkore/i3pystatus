@@ -38,7 +38,10 @@ class MPD(IntervalModule):
         ("max_field_len", "Defines max length for in truncate_fields defined fields, if truncated, ellipsis are appended as indicator. It's applied *before* max_len. Value of 0 disables this."),
         ("max_len", "Defines max length for the hole string, if exceeding fields specefied in truncate_fields are truncated equaly. If truncated, ellipsis are appended as indicator. It's applied *after* max_field_len. Value of 0 disables this."),
         ("truncate_fields", "fields that will be truncated if exceeding max_field_len or max_len."),
-
+        ("on_leftclick", "The action executed on left click. Default is 'switch_playpause', other possible values are 'next_song' and 'previous_song'."),
+        ("on_rightclick", "The action executed on right click. Default is 'next_song', other possible values are 'switch_playpause' and 'previous_song'."),
+        ("on_upscroll", "The action executed on scrolling up. Default is 'next_song', other possible values are 'switch_playpause' and 'previous_song'."),
+        ("on_downscroll", "The action executed on scrolling down. Default is 'previous_song', other possible values are 'switch_playpause' and 'next_song'.")
     )
 
     host = "localhost"
