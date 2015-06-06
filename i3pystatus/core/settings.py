@@ -37,6 +37,24 @@ class SettingsBase:
     log_level = logging.NOTSET
     logger = None
 
+    @classmethod
+    def get_merged_settings(cls):
+        def unique(settings):
+            def name(s):
+                return s[0] if isinstance(s, tuple) else s
+            seen = set()
+            return [setting for setting in settings if not (
+                name(setting) in seen or seen.add(name(setting)))]
+
+        settings = tuple()
+        required = tuple()
+        # getmro returns base classes according to Method Resolution Order,
+        # which always includes the class itself as the first element.
+        for base in inspect.getmro(cls):
+            settings += getattr(base, "settings", tuple())
+            required += getattr(base, "required", tuple())
+        return unique(settings), required
+
     def __init__(self, *args, **kwargs):
         def get_argument_dict(args, kwargs):
             if len(args) == 1 and not kwargs:
@@ -45,21 +63,12 @@ class SettingsBase:
                 return args[0]
             return kwargs
 
-        def merge_with_parents_settings():
-            settings = tuple()
-            # getmro returns base classes according to Method Resolution Order
-            for cls in inspect.getmro(self.__class__):
-                if hasattr(cls, "settings"):
-                    settings = settings + cls.settings
-            return settings
+        self.__name__ = "{}.{}".format(self.__module__, self.__class__.__name__)
 
-        self.__name__ = "{}.{}".format(
-            self.__module__, self.__class__.__name__)
-
-        settings = merge_with_parents_settings()
+        settings, required = self.get_merged_settings()
         settings = self.flatten_settings(settings)
 
-        sm = KeyConstraintDict(settings, self.required)
+        sm = KeyConstraintDict(settings, required)
         settings_source = get_argument_dict(args, kwargs)
 
         protected = self.get_protected_settings(settings_source)

@@ -8,11 +8,12 @@ class Module(SettingsBase):
     output = None
     position = 0
 
-    settings = ('on_leftclick', "Callback called on left click (string)",
-                'on_rightclick', "Callback called on right click (string)",
-                'on_upscroll', "Callback called on scrolling up (string)",
-                'on_downscroll', "Callback called on scrolling down (string)",
-                )
+    settings = (
+        ('on_leftclick', "Callback called on left click (string)"),
+        ('on_rightclick', "Callback called on right click (string)"),
+        ('on_upscroll', "Callback called on scrolling up (string)"),
+        ('on_downscroll', "Callback called on scrolling down (string)"),
+    )
 
     on_leftclick = None
     on_rightclick = None
