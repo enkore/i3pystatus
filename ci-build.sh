@@ -20,6 +20,7 @@ test -f ${BUILD}/test-install-bin/i3pystatus
 PYTHONPATH=${BUILD}/test-install py.test --junitxml ${BUILD}/testlog.xml tests
 
 # Check that the docs build w/o warnings (-W flag)
+rm -r ${BUILD}/docs/
 sphinx-build -b html -W docs ${BUILD}/docs/
 
 
