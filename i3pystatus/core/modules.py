@@ -13,12 +13,19 @@ class Module(SettingsBase):
         ('on_rightclick', "Callback called on right click (string)"),
         ('on_upscroll', "Callback called on scrolling up (string)"),
         ('on_downscroll', "Callback called on scrolling down (string)"),
+        ('hints', "Additional hints for module. TODO"),
     )
 
     on_leftclick = None
     on_rightclick = None
     on_upscroll = None
     on_downscroll = None
+
+    hints = None
+    """
+    TODO
+    `min_width`, `align`, `separator`, `separator_block_width`
+    """
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
@@ -30,6 +37,9 @@ class Module(SettingsBase):
             self.output["instance"] = str(id(self))
             if (self.output.get("color", "") or "").lower() == "#ffffff":
                 del self.output["color"]
+            if self.hints:
+                h = {i: self.hints[i] for i in self.hints if i not in self.output}
+                self.output.update(h)
             json.insert(convert_position(self.position, json), self.output)
 
     def run(self):
