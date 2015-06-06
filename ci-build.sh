@@ -6,6 +6,7 @@ python3 -mpep8 --version
 
 # Target directory for all build files
 BUILD=${1:-ci-build}
+rm -r ${BUILD}/
 mkdir -p $BUILD
 
 python3 -mpep8 --ignore E501 i3pystatus tests
@@ -20,7 +21,4 @@ test -f ${BUILD}/test-install-bin/i3pystatus
 PYTHONPATH=${BUILD}/test-install py.test --junitxml ${BUILD}/testlog.xml tests
 
 # Check that the docs build w/o warnings (-W flag)
-rm -r ${BUILD}/docs/
 sphinx-build -b html -W docs ${BUILD}/docs/
-
-
