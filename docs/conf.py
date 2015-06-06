@@ -31,6 +31,7 @@ MOCK_MODULES = [
     "notmuch",
     "requests",
     "bs4",
+    "dota2py",
     "novaclient.v2"
 ]
 
