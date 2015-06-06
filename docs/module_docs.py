@@ -52,8 +52,7 @@ def process_docstring(app, what, name, obj, options, lines):
                 self.doc = setting[1]
             else:
                 self.name = setting
-            _, required = cls.get_merged_settings()
-            if self.name in required:
+            if self.name in cls.required:
                 self.required = True
             elif hasattr(cls, self.name):
                 default = getattr(cls, self.name)
@@ -84,7 +83,7 @@ def process_docstring(app, what, name, obj, options, lines):
         lines.append(".. rubric:: Settings")
         lines.append("")
 
-        settings = [Setting(obj, setting) for setting in obj.get_merged_settings()[0]]
+        settings = [Setting(obj, setting) for setting in obj.settings]
 
         lines += map(str, settings)
 
