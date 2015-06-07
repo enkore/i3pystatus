@@ -110,16 +110,13 @@ Contributors
 Contribute
 ----------
 
-To contribute a module, make sure it uses one of the Module classes. Most modules
-use IntervalModule, which just calls a function repeatedly in a specified interval.
+To contribute a module, make sure it uses one of the ``Module`` classes. Most modules
+use ``IntervalModule``, which just calls a function repeatedly in a specified interval.
 
-The output attribute should be set to a dictionary which represents your modules output,
+The ``output`` attribute should be set to a dictionary which represents your modules output,
 the protocol is documented `here <http://i3wm.org/docs/i3bar-protocol.html>`_.
 
-To update this readme run ``python -m i3pystatus.mkdocs`` in the
-repository root and you're done :)
-
 Developer documentation is available in the source code and `here
-<http://i3pystatus.readthedocs.org/en/latest/>`_.
+<http://docs.enkore.de/i3pystatus>`_.
 
 **Patches and pull requests are very welcome :-)**
