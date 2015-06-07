@@ -1,5 +1,3 @@
-..  Always edit README.tpl.rst. Do not change the module reference manually.
-
 i3pystatus
 ==========
 
@@ -9,7 +7,7 @@ i3pystatus
 .. image:: https://travis-ci.org/enkore/i3pystatus.svg?branch=master
     :target: https://travis-ci.org/enkore/i3pystatus
 
-i3pystatus is a (hopefully growing) collection of python scripts for 
+i3pystatus is a growing collection of python scripts for 
 status output compatible to i3status / i3bar of the i3 window manager.
 
 Installation
