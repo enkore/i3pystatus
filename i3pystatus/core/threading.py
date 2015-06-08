@@ -67,23 +67,26 @@ class ExceptionWrapper(Wrapper):
         try:
             self.workload()
         except:
-            sys.stderr.write("Exception in {thread} at {time}\n".format(
+            message = "\n> Exception in {thread} at {time}, module {name}".format(
                 thread=threading.current_thread().name,
-                time=time.strftime("%c")
-            ))
-            traceback.print_exc(file=sys.stderr)
-            sys.stderr.flush()
-            if hasattr(self.workload, "output"):
-                self.workload.output = {
-                    "full_text": "{}: {}".format(self.workload.__class__.__name__,
-                                                 self.format_error(str(sys.exc_info()[1]))),
-                    "color": "#FF0000",
-                }
+                time=time.strftime("%c"),
+                name=self.workload.__class__.__name__
+            )
+            if hasattr(self.workload, "logger"):
+                self.workload.logger.error(message, exc_info=True)
+            self.workload.output = {
+                "full_text": "{}: {}".format(self.workload.__class__.__name__,
+                                             self.format_error(str(sys.exc_info()[1]))),
+                "color": "#FF0000",
+            }
 
     def format_error(self, exception_message):
         if hasattr(self.workload, 'max_error_len'):
             error_len = self.workload.max_error_len
-            return exception_message[:error_len] + '...' if len(exception_message) > error_len else exception_message
+            if len(exception_message) > error_len:
+                return exception_message[:error_len] + '…'
+            else:
+                return exception_message
         else:
             return exception_message
 
