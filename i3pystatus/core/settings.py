@@ -23,12 +23,18 @@ class SettingsBaseMeta(type):
                 name(setting) in seen or seen.add(name(setting)))]
 
         settings = tuple()
-        required = tuple()
+        required = set()
         # getmro returns base classes according to Method Resolution Order,
         # which always includes the class itself as the first element.
         for base in inspect.getmro(cls):
             settings += tuple(getattr(base, "settings", []))
-            required += tuple(getattr(base, "required", []))
+            required |= set(getattr(base, "required", []))
+        # if a derived class defines a default for a setting it is not
+        # required anymore.
+        for base in inspect.getmro(cls):
+            for r in list(required):
+                if hasattr(base, r):
+                    required.remove(r)
         return unique(settings), required
 
 
