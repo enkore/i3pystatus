@@ -8,13 +8,6 @@ from i3pystatus.core.util import formatp
 import logging
 import os
 
-h = logging.FileHandler(".i3pystatus-" + str(os.getpid()), delay=True)
-
-logger = logging.getLogger("i3pystatus")
-logger.addHandler(h)
-logger.setLevel(logging.CRITICAL)
-
-
 __path__ = extend_path(__path__, __name__)
 
 __all__ = [
@@ -23,6 +16,12 @@ __all__ = [
     "SettingsBase",
     "formatp",
 ]
+
+logpath = os.path.join(os.path.expanduser("~"), ".i3pystatus-%s" % os.getpid())
+handler = logging.FileHandler(logpath, delay=True)
+logger = logging.getLogger("i3pystatus")
+logger.addHandler(handler)
+logger.setLevel(logging.CRITICAL)
 
 
 def main():
