@@ -32,7 +32,8 @@ MOCK_MODULES = [
     "requests",
     "bs4",
     "dota2py",
-    "novaclient.v2"
+    "novaclient.v2",
+    "speedtest_cli"
 ]
 
 for mod_name in MOCK_MODULES:
