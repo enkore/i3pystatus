@@ -54,7 +54,7 @@ class SettingsBase(metaclass=SettingsBaseMeta):
     __PROTECTED_SETTINGS = ["password", "email", "username"]
 
     settings = (
-        ("log_level", "Set to true to log error to .i3pystatus-<pid> file"),
+        ("log_level", "Set to true to log error to .i3pystatus-<pid> file."),
     )
 
     """settings should be tuple containing two types of elements:
@@ -67,7 +67,7 @@ class SettingsBase(metaclass=SettingsBaseMeta):
     required = tuple()
     """required can list settings which are required"""
 
-    log_level = logging.NOTSET
+    log_level = logging.WARNING
     logger = None
 
     def __init__(self, *args, **kwargs):
