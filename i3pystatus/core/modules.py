@@ -13,7 +13,7 @@ class Module(SettingsBase):
         ('on_rightclick', "Callback called on right click (string)"),
         ('on_upscroll', "Callback called on scrolling up (string)"),
         ('on_downscroll', "Callback called on scrolling down (string)"),
-        ('hints', "Additional hints for module. TODO"),
+        ('hints', "Additional output blocks for module output (dict)"),
     )
 
     on_leftclick = None
@@ -21,10 +21,26 @@ class Module(SettingsBase):
     on_upscroll = None
     on_downscroll = None
 
-    hints = None
+    hints = {"markup": "none"}
     """
-    TODO
-    `min_width`, `align`, `separator`, `separator_block_width`
+    A dictionary containing additional output blocks used to customize output of
+    a module.
+
+    Blocks will be applied only if `self.output` does not contain a block with
+    the same name already.
+
+    All blocks are described in i3bar protocol documentation located at
+    http://i3wm.org/docs/i3bar-protocol.html#_blocks_in_detail.
+    It is recommended to use only the following blocks:
+
+    * `min_width` and `align` blocks are used to set minimal width of output and
+      text aligment if text width is shorter than minimal width.
+    * `separator` and `separator_block_width` blocks are used to remove the
+      vertical bar that is separating modules.
+    * `markup` block can be set to `"none"` or `"pango"`.
+      Pango is a markup language providing additional formatting options
+      to advanced users.
+
     """
 
     def registered(self, status_handler):
@@ -41,6 +57,9 @@ class Module(SettingsBase):
                 for key, val in self.hints.items():
                     if key not in self.output:
                         self.output.update({key: val})
+            if self.output.get("markup") == "pango":
+                self.__text_to_pango()
+
             json.insert(convert_position(self.position, json), self.output)
 
     def run(self):
@@ -111,6 +130,18 @@ class Module(SettingsBase):
     def move(self, position):
         self.position = position
         return self
+
+    def __text_to_pango(self):
+        """
+        Replaces all ampersands in `"full_text"` and `"short_text"` blocks` in
+        `self.output` with `&amp;`.
+        """
+        if "full_text" in self.output.keys():
+            out = self.output["full_text"].replace("&", "&amp;")
+            self.output.update({"full_text": out})
+        if "short_text" in self.output.keys():
+            out = self.output["short_text"].replace("&", "&amp;")
+            self.output.update({"short_text": out})
 
 
 class IntervalModule(Module):
