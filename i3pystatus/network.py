@@ -199,12 +199,18 @@ class NetworkTraffic():
         return self.pnic.packets_recv - self.pnic_before.packets_recv
 
     def get_rx_tot_Mbytes(self, interface):
-        with open("/sys/class/net/{}/statistics/rx_bytes".format(interface)) as f:
-            return int(f.readline().split('\n')[0]) / (1024 * 1024)
+        try:
+            with open("/sys/class/net/{}/statistics/rx_bytes".format(interface)) as f:
+                return int(f.readline().split('\n')[0]) / (1024 * 1024)
+        except FileNotFoundError:
+            return False
 
     def get_tx_tot_Mbytes(self, interface):
-        with open("/sys/class/net/{}/statistics/tx_bytes".format(interface)) as f:
-            return int(f.readline().split('\n')[0]) / (1024 * 1024)
+        try:
+            with open("/sys/class/net/{}/statistics/tx_bytes".format(interface)) as f:
+                return int(f.readline().split('\n')[0]) / (1024 * 1024)
+        except FileNotFoundError:
+            return False
 
     def get_usage(self, interface):
         self.update_counters(interface)
