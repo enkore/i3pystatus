@@ -10,6 +10,7 @@ from i3pystatus import Module, SettingsBase
 from i3pystatus.core import ClassFinder
 from collections import defaultdict, OrderedDict
 
+
 def signal_handler(signal, frame):
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
@@ -17,7 +18,11 @@ signal.signal(signal.SIGINT, signal_handler)
 
 def get_int_in_range(prompt, _range):
     while True:
-        answer = input(prompt)
+        try:
+            answer = input(prompt)
+        except EOFError:
+            print()
+            sys.exit(0)
         try:
             n = int(answer.strip())
             if n in _range:
