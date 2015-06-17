@@ -218,3 +218,41 @@ would produce ``1:5:51``.
   "not known".
 * The formatted time is stripped, i.e. spaces on both ends of the
   result are removed.
+
+Logging
+-------
+
+Errors do happen and to ease debugging i3pystatus includes a logging
+facility.  By default i3pystatus will log exceptions raised by modules
+to files in your home directory named
+``.i3pystatus-<pid-of-thread>``. Some modules might log additional
+information.
+
+.. rubric:: Log level
+
+Every module has a ``log_level`` option which sets the *minimum*
+severity required for an event to be logged.
+
+The numeric values of logging levels are given in the following
+table.
+
++--------------+---------------+
+| Level        | Numeric value |
++==============+===============+
+| ``CRITICAL`` | 50            |
++--------------+---------------+
+| ``ERROR``    | 40            |
++--------------+---------------+
+| ``WARNING``  | 30            |
++--------------+---------------+
+| ``INFO``     | 20            |
++--------------+---------------+
+| ``DEBUG``    | 10            |
++--------------+---------------+
+| ``NOTSET``   | 0             |
++--------------+---------------+
+
+Exceptions raised by modules are of severity ``ERROR`` by default. The
+default ``log_level`` in i3pystatus (some modules might redefine the
+default, see the reference of the module in question) is 30
+(``WARNING``).
