@@ -8,7 +8,6 @@ Contents:
    :maxdepth: 4
 
    configuration
-   formatting
    i3pystatus
    changelog
    module
