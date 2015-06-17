@@ -123,6 +123,8 @@ Also change your i3wm config to the following:
 .. note:: Don't name your config file ``i3pystatus.py``, as it would
     make ``i3pystatus`` un-importable and lead to errors.
 
+.. _credentials:
+
 Credentials
 -----------
 
@@ -218,6 +220,8 @@ would produce ``1:5:51``.
   "not known".
 * The formatted time is stripped, i.e. spaces on both ends of the
   result are removed.
+
+.. _logging:
 
 Logging
 -------

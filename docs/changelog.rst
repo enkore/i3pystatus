@@ -6,9 +6,10 @@ master branch
 +++++++++++++
 
 * Errors can now be logged to ``~/.i3pystatus-<pid>``
-    - ``log_level`` setting
+    - See :ref:`logging`
 * Added new callback system
 * Added credentials storage
+    - See :ref:`credentials`
 * Added deadbeef module
 * Added github module
 * Added whosonlocation module
