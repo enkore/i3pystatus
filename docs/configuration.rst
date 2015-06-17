@@ -120,12 +120,18 @@ Also change your i3wm config to the following:
         workspace_buttons yes
     }
 
-.. note::
-    Don't name your config file ``i3pystatus.py``
+.. note:: Don't name your config file ``i3pystatus.py``, as it would
+    make ``i3pystatus`` un-importable and lead to errors.
 
-Settings that require credentials can utilize the keyring module to keep sensitive information out of config files.
-To take advantage of this feature, simply use the setting_util.py script to set the credentials for a module. Once this
-is done you can add the module to your config without specifying the credentials, eg:
+Credentials
+-----------
+
+Settings that require credentials can utilize the keyring module to
+keep sensitive information out of config files.  To take advantage of
+this feature, simply use the ``i3pystatus-setting-util`` script
+installed along i3pystatus to set the credentials for a module. Once
+this is done you can add the module to your config without specifying
+the credentials, e.g.:
 
 .. code:: python
 
@@ -141,4 +147,10 @@ If you don't want to use the default you can set a specific keyring like so:
     from keyring.backends.file import PlaintextKeyring
     status.register('github', keyring_backend=PlaintextKeyring())
 
-i3pystatus will locate and set the credentials during the module loading process. Currently supported credentals are "password", "email" and "username".
+i3pystatus will locate and set the credentials during the module
+loading process. Currently supported credentals are "password",
+"email" and "username".
+
+.. note:: Credential handling requires the PyPI package
+   ``keyring``. Many distributions have it pre-packaged available as
+   ``python-keyring``.
