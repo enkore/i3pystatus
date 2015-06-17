@@ -50,6 +50,8 @@ def get_modules():
 
 
 def get_credential_modules():
+    verbose = "-v" in sys.argv
+
     protected_settings = SettingsBase._SettingsBase__PROTECTED_SETTINGS
     class_finder = ClassFinder(Module)
     credential_modules = defaultdict(dict)
@@ -57,6 +59,8 @@ def get_credential_modules():
         try:
             module = class_finder.get_module(module_name)
         except ImportError:
+            if verbose:
+                print("ImportError while importing", module_name)
             continue
         clazz = class_finder.get_class(module)
         members = [m[0] for m in inspect.getmembers(clazz) if not m[0].startswith('_')]
@@ -82,9 +86,23 @@ def main():
 This allows you to edit keyring-protected settings of
 i3pystatus modules, which are stored globally (independent
 of your i3pystatus configuration) in your keyring.
+
+Options:
+    -l: list all stored settings (no values are printed)
+    -v: print informational messages
 """ % os.path.basename(sys.argv[0]))
 
     credential_modules = get_credential_modules()
+
+    if "-l" in sys.argv:
+        for name, module in credential_modules.items():
+            print(name)
+            for credential in enumerate_choices(module["credentials"]):
+                if keyring.get_password("%s.%s" % (module["key"], credential), getpass.getuser()):
+                    print(" - %s: set" % credential)
+            else:
+                print(" (none stored)")    
+        return
 
     choices = list(credential_modules.keys())
     prompt = "Choose a module to edit:\n"
