@@ -342,6 +342,7 @@ class Network(IntervalModule, ColorRangeModule):
         self.kbs_arr = [0.0] * self.graph_width
 
     def cycle_interface(self, increment=1):
+        """Cycle through available interfaces in `increment` steps. Sign indicates direction."""
         interfaces = [i for i in netifaces.interfaces() if i not in self.ignore_interfaces]
         if self.interface in interfaces:
             next_index = (interfaces.index(self.interface) + increment) % len(interfaces)
