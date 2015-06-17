@@ -101,7 +101,7 @@ Options:
                 if keyring.get_password("%s.%s" % (module["key"], credential), getpass.getuser()):
                     print(" - %s: set" % credential)
             else:
-                print(" (none stored)")    
+                print(" (none stored)")
         return
 
     choices = list(credential_modules.keys())
