@@ -36,6 +36,14 @@ modules = [os.path.basename(m.replace('.py', ''))
            for m in glob.glob(os.path.join(os.path.dirname(__file__), "i3pystatus", "*.py"))
            if not os.path.basename(m).startswith('_')]
 
+
+def enumerate_choices(choices):
+    lines = []
+    for index, choice in enumerate(choices, start=1):
+        lines.append(" %d - %s\n" % (index, choice))
+    return "".join(lines)
+
+
 protected_settings = SettingsBase._SettingsBase__PROTECTED_SETTINGS
 class_finder = ClassFinder(Module)
 credential_modules = defaultdict(dict)
@@ -60,24 +68,28 @@ for module_name in modules:
     except ImportError:
         continue
 
-choices = [k for k in credential_modules.keys()]
-for idx, module in enumerate(choices, start=1):
-    print("%s - %s" % (idx, module))
 
 print("""setting_util.py - part of i3pystatus
 This allows you to edit keyring-protected settings of
 i3pystatus modules, which are stored globally (independent
 of your i3pystatus configuration) in your keyring.
 """)
-index = get_int_in_range("Choose module:\n> ", range(1, len(choices) + 1))
+
+choices = list(credential_modules.keys())
+prompt = "Choose a module to edit:\n"
+prompt += enumerate_choices(choices)
+prompt += "> "
+
+index = get_int_in_range(prompt, range(1, len(choices) + 1))
 module_name = choices[index - 1]
 module = credential_modules[module_name]
 
-for idx, setting in enumerate(module['credentials'], start=1):
-    print("%s - %s" % (idx, setting))
+prompt = "Choose setting of %s to edit:\n" % module_name
+prompt += enumerate_choices(module["credentials"])
+prompt += "> "
 
 choices = module['credentials']
-index = get_int_in_range("Choose setting for %s:\n> " % module_name, range(1, len(choices) + 1))
+index = get_int_in_range(prompt, range(1, len(choices) + 1))
 setting = choices[index - 1]
 
 answer = getpass.getpass("Enter value for %s:\n> " % setting)
