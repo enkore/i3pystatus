@@ -148,7 +148,7 @@ If you don't want to use the default you can set a specific keyring like so:
     status.register('github', keyring_backend=PlaintextKeyring())
 
 i3pystatus will locate and set the credentials during the module
-loading process. Currently supported credentals are "password",
+loading process. Currently supported credentials are "password",
 "email" and "username".
 
 .. note:: Credential handling requires the PyPI package
