@@ -17,6 +17,7 @@ mkdir ${BUILD}/test-install ${BUILD}/test-install-bin
 PYTHONPATH=${BUILD}/test-install python3 setup.py --quiet install --install-lib ${BUILD}/test-install --install-scripts ${BUILD}/test-install-bin
 
 test -f ${BUILD}/test-install-bin/i3pystatus
+test -f ${BUILD}/test-install-bin/i3pystatus-setting-util
 
 PYTHONPATH=${BUILD}/test-install py.test --junitxml ${BUILD}/testlog.xml tests
 

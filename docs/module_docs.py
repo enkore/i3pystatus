@@ -12,7 +12,7 @@ import i3pystatus.core.modules
 from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core.color import ColorRangeModule
 
-IGNORE_MODULES = ("__main__", "core")
+IGNORE_MODULES = ("__main__", "core", "tools")
 
 
 def is_module(obj):

@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-#!/usr/bin/env python
 import glob
 import inspect
 import os
 import getpass
 import sys
 import signal
+import pkgutil
 from collections import defaultdict, OrderedDict
 
 import keyring
 
+import i3pystatus
 from i3pystatus import Module, SettingsBase
 from i3pystatus.core import ClassFinder
 
@@ -34,10 +35,6 @@ def get_int_in_range(prompt, _range):
         except ValueError:
             print("Invalid input!")
 
-modules = [os.path.basename(m.replace('.py', ''))
-           for m in glob.glob(os.path.join(os.path.dirname(__file__), "i3pystatus", "*.py"))
-           if not os.path.basename(m).startswith('_')]
-
 
 def enumerate_choices(choices):
     lines = []
@@ -46,12 +43,21 @@ def enumerate_choices(choices):
     return "".join(lines)
 
 
-protected_settings = SettingsBase._SettingsBase__PROTECTED_SETTINGS
-class_finder = ClassFinder(Module)
-credential_modules = defaultdict(dict)
-for module_name in modules:
-    try:
-        module = class_finder.get_module(module_name)
+def get_modules():
+    for importer, modname, ispkg in pkgutil.iter_modules(i3pystatus.__path__):
+        if modname not in ["core", "tools"]:
+            yield modname
+
+
+def get_credential_modules():
+    protected_settings = SettingsBase._SettingsBase__PROTECTED_SETTINGS
+    class_finder = ClassFinder(Module)
+    credential_modules = defaultdict(dict)
+    for module_name in get_modules():
+        try:
+            module = class_finder.get_module(module_name)
+        except ImportError:
+            continue
         clazz = class_finder.get_class(module)
         members = [m[0] for m in inspect.getmembers(clazz) if not m[0].startswith('_')]
         if any([hasattr(clazz, setting) for setting in protected_settings]):
@@ -66,9 +72,7 @@ for module_name in modules:
             if protected:
                 credential_modules[clazz.__name__]['credentials'] = protected
                 credential_modules[clazz.__name__]['key'] = "%s.%s" % (clazz.__module__, clazz.__name__)
-
-    except ImportError:
-        continue
+    return credential_modules
 
 
 def main():
@@ -78,7 +82,9 @@ def main():
 This allows you to edit keyring-protected settings of
 i3pystatus modules, which are stored globally (independent
 of your i3pystatus configuration) in your keyring.
-""" % os.path.baename(sys.argv[0]))
+""" % os.path.basename(sys.argv[0]))
+
+    credential_modules = get_credential_modules()
 
     choices = list(credential_modules.keys())
     prompt = "Choose a module to edit:\n"
