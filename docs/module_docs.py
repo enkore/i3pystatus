@@ -132,7 +132,7 @@ def generate_automodules(path, name, basecls):
     contents = []
 
     for mod in modules:
-        contents.append("    *  :py:mod:`~{}`".format(mod[0]))
+        contents.append("*  :py:mod:`~{}`".format(mod[0]))
     contents.append("")
 
     for mod in modules:
