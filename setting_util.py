@@ -64,6 +64,11 @@ choices = [k for k in credential_modules.keys()]
 for idx, module in enumerate(choices, start=1):
     print("%s - %s" % (idx, module))
 
+print("""setting_util.py - part of i3pystatus
+This allows you to edit keyring-protected settings of
+i3pystatus modules, which are stored globally (independent
+of your i3pystatus configuration) in your keyring.
+""")
 index = get_int_in_range("Choose module:\n> ", range(1, len(choices) + 1))
 module_name = choices[index - 1]
 module = credential_modules[module_name]
