@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import netifaces
 
 from i3pystatus import IntervalModule

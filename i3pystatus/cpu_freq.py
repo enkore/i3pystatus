@@ -1,4 +1,3 @@
-# coding=utf-8
 from i3pystatus import IntervalModule
 
 
