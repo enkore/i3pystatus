@@ -260,3 +260,41 @@ Exceptions raised by modules are of severity ``ERROR`` by default. The
 default ``log_level`` in i3pystatus (some modules might redefine the
 default, see the reference of the module in question) is 30
 (``WARNING``).
+
+.. _callbacks:
+
+Callbacks
+---------
+
+Callbacks are used for click-events (merged into i3bar since i3 4.6,
+mouse wheel events are merged since 4.8), that is, you click (or
+scroll) on the output of a module in your i3bar and something
+happens. What happens is defined by these settings for each module
+individually:
+
+- ``on_leftclick``
+- ``on_rightclick``
+- ``on_upscroll``
+- ``on_downscroll``
+
+The global default action for all settings is ``None`` (do nothing),
+but many modules define other defaults, which are documented in the
+module reference.
+
+The settings can be of different types, namely
+
+- a list referring to a method of the module, e.g.
+
+  .. code:: python
+
+	    status.register("clock",
+	      on_leftclick=["scroll_format", 1])
+
+  ``scroll_format`` is a method of the ``clock`` module, the ``1`` is
+  passed as a parameter and indicates the direction in this case.
+- as a special case of the above: a string referring to a method, no
+  parameters are passed.
+- a list where the first element is a callable and the following
+  elements are passed as arguments to the callable
+- again a special case of the above: just a callable, no parameters
+- a string which is run in a shell

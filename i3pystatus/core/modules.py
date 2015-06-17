@@ -9,10 +9,10 @@ class Module(SettingsBase):
     position = 0
 
     settings = (
-        ('on_leftclick', "Callback called on left click (string)"),
-        ('on_rightclick', "Callback called on right click (string)"),
-        ('on_upscroll', "Callback called on scrolling up (string)"),
-        ('on_downscroll', "Callback called on scrolling down (string)"),
+        ('on_leftclick', "Callback called on left click (see :ref:`callbacks`)"),
+        ('on_rightclick', "Callback called on right click (see :ref:`callbacks`)"),
+        ('on_upscroll', "Callback called on scrolling up (see :ref:`callbacks`)"),
+        ('on_downscroll', "Callback called on scrolling down (see :ref:`callbacks`)"),
     )
 
     on_leftclick = None
