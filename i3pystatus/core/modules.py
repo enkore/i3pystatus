@@ -29,17 +29,18 @@ class Module(SettingsBase):
     Blocks will be applied only if `self.output` does not contain a block with
     the same name already.
 
-    All blocks are described in i3bar protocol documentation located at
-    http://i3wm.org/docs/i3bar-protocol.html#_blocks_in_detail.
-    It is recommended to use only the following blocks:
+    All blocks are described in `i3bar protocol documentation
+    <http://i3wm.org/docs/i3bar-protocol.html#_blocks_in_detail>`_
+    but it is recommended to use only the following blocks:
 
     * `min_width` and `align` blocks are used to set minimal width of output and
       text aligment if text width is shorter than minimal width.
     * `separator` and `separator_block_width` blocks are used to remove the
       vertical bar that is separating modules.
     * `markup` block can be set to `"none"` or `"pango"`.
-      Pango is a markup language providing additional formatting options
-      to advanced users.
+      `Pango markup
+      <https://developer.gnome.org/pango/stable/PangoMarkupFormat.html>`_
+      provides additional formatting options for advanced users.
 
     """
 
