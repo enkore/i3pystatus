@@ -18,13 +18,15 @@ setup(name="i3pystatus",
       packages=[
           "i3pystatus",
           "i3pystatus.core",
+          "i3pystatus.tools",
           "i3pystatus.mail",
           "i3pystatus.pulseaudio",
           "i3pystatus.updates",
       ],
       entry_points={
           "console_scripts": [
-              "i3pystatus = i3pystatus:main"
+              "i3pystatus = i3pystatus:main",
+              "i3pystatus-setting-util = i3pystatus.tools.setting_util:main"
           ]
       },
       zip_safe=True,

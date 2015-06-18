@@ -1,6 +1,3 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-#
 # This plugin listens for dbus signals emitted by the
 # thunderbird-dbus-sender extension for TB:
 # https://github.com/janoliver/thunderbird-dbus-sender

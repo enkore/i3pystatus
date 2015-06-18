@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 # note that this needs the notmuch python bindings. For more info see:
 # http://notmuchmail.org/howto/#index4h2
 import notmuch

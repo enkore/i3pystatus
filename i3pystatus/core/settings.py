@@ -23,12 +23,18 @@ class SettingsBaseMeta(type):
                 name(setting) in seen or seen.add(name(setting)))]
 
         settings = tuple()
-        required = tuple()
+        required = set()
         # getmro returns base classes according to Method Resolution Order,
         # which always includes the class itself as the first element.
         for base in inspect.getmro(cls):
             settings += tuple(getattr(base, "settings", []))
-            required += tuple(getattr(base, "required", []))
+            required |= set(getattr(base, "required", []))
+        # if a derived class defines a default for a setting it is not
+        # required anymore.
+        for base in inspect.getmro(cls):
+            for r in list(required):
+                if hasattr(base, r):
+                    required.remove(r)
         return unique(settings), required
 
 
@@ -48,7 +54,7 @@ class SettingsBase(metaclass=SettingsBaseMeta):
     __PROTECTED_SETTINGS = ["password", "email", "username"]
 
     settings = (
-        ("log_level", "Set to true to log error to .i3pystatus-<pid> file"),
+        ("log_level", "Set to true to log error to .i3pystatus-<pid> file."),
     )
 
     """settings should be tuple containing two types of elements:
@@ -61,7 +67,7 @@ class SettingsBase(metaclass=SettingsBaseMeta):
     required = tuple()
     """required can list settings which are required"""
 
-    log_level = logging.NOTSET
+    log_level = logging.WARNING
     logger = None
 
     def __init__(self, *args, **kwargs):

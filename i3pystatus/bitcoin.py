@@ -40,8 +40,6 @@ class Bitcoin(IntervalModule):
         ("colorize", "Enable color change on price increase/decrease"),
         ("color_up", "Color for price increases"),
         ("color_down", "Color for price decreases"),
-        ("leftclick", "URL to visit or command to run on left click"),
-        ("rightclick", "URL to visit or command to run on right click"),
         ("interval", "Update interval."),
         ("symbol", "Symbol for bitcoin sign"),
         "status"
@@ -54,16 +52,14 @@ class Bitcoin(IntervalModule):
     colorize = False
     color_up = "#00FF00"
     color_down = "#FF0000"
-    leftclick = "electrum"
-    rightclick = "https://bitcoinaverage.com/"
     interval = 600
     status = {
         "price_up": "▲",
         "price_down": "▼",
     }
 
-    on_leftclick = "handle_leftclick"
-    on_rightclick = "handle_rightclick"
+    on_leftclick = "electrum"
+    on_rightclick = [user_open, "https://bitcoinaverage.com/"]
 
     _price_prev = 0
 
@@ -128,9 +124,3 @@ class Bitcoin(IntervalModule):
             "full_text": self.format.format(**fdict),
             "color": color,
         }
-
-    def handle_leftclick(self):
-        user_open(self.leftclick)
-
-    def handle_rightclick(self):
-        user_open(self.rightclick)

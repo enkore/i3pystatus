@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import netifaces
 
 from i3pystatus import IntervalModule
@@ -198,6 +197,20 @@ class NetworkTraffic():
     def get_packets_received(self):
         return self.pnic.packets_recv - self.pnic_before.packets_recv
 
+    def get_rx_tot_Mbytes(self, interface):
+        try:
+            with open("/sys/class/net/{}/statistics/rx_bytes".format(interface)) as f:
+                return int(f.readline().split('\n')[0]) / (1024 * 1024)
+        except FileNotFoundError:
+            return False
+
+    def get_tx_tot_Mbytes(self, interface):
+        try:
+            with open("/sys/class/net/{}/statistics/tx_bytes".format(interface)) as f:
+                return int(f.readline().split('\n')[0]) / (1024 * 1024)
+        except FileNotFoundError:
+            return False
+
     def get_usage(self, interface):
         self.update_counters(interface)
         usage = dict(bytes_sent=0, bytes_recv=0, packets_sent=0, packets_recv=0)
@@ -209,6 +222,8 @@ class NetworkTraffic():
             usage["bytes_recv"] = self.get_bytes_received()
             usage["packets_sent"] = self.get_packets_sent()
             usage["packets_recv"] = self.get_packets_received()
+            usage["rx_tot_Mbytes"] = self.get_rx_tot_Mbytes(interface)
+            usage["tx_tot_Mbytes"] = self.get_tx_tot_Mbytes(interface)
             round_dict(usage, self.round_size)
         return usage
 
@@ -249,6 +264,8 @@ class Network(IntervalModule, ColorRangeModule):
     * `{bytes_recv}` — bytes received per second (divided by divisor)
     * `{packets_sent}` — bytes sent per second (divided by divisor)
     * `{packets_recv}` — bytes received per second (divided by divisor)
+    * `{rx_tot_Mbytes}` — total Mbytes received
+    * `{tx_tot_Mbytes}` — total Mbytes sent
     """
     settings = (
         ("format_up", "format string"),
@@ -313,7 +330,8 @@ class Network(IntervalModule, ColorRangeModule):
 
         # Don't require importing psutil unless using the functionality it offers.
         if any(s in self.format_up or s in self.format_down for s in
-               ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph', 'kbs']):
+               ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph',
+                'rx_tot_Mbytes', 'tx_tot_Mbytes', 'kbs']):
             self.network_traffic = NetworkTraffic(self.unknown_up, self.divisor, self.round_size)
         else:
             self.network_traffic = None
@@ -324,6 +342,7 @@ class Network(IntervalModule, ColorRangeModule):
         self.kbs_arr = [0.0] * self.graph_width
 
     def cycle_interface(self, increment=1):
+        """Cycle through available interfaces in `increment` steps. Sign indicates direction."""
         interfaces = [i for i in netifaces.interfaces() if i not in self.ignore_interfaces]
         if self.interface in interfaces:
             next_index = (interfaces.index(self.interface) + increment) % len(interfaces)
@@ -343,6 +362,7 @@ class Network(IntervalModule, ColorRangeModule):
 
     def run(self):
         format_values = dict(kbs="", network_graph="", bytes_sent="", bytes_recv="", packets_sent="", packets_recv="",
+                             rx_tot_Mbytes="", tx_tot_Mbytes="",
                              interface="", v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="", mac="",
                              essid="", freq="", quality="", quality_bar="")
         if self.network_traffic:

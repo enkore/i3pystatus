@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # i3pystatus documentation build configuration file, created by
 # sphinx-quickstart on Mon Oct 14 17:41:37 2013.
@@ -32,7 +31,8 @@ MOCK_MODULES = [
     "requests",
     "bs4",
     "dota2py",
-    "novaclient.v2"
+    "novaclient.v2",
+    "speedtest_cli"
 ]
 
 for mod_name in MOCK_MODULES:
