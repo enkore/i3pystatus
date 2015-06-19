@@ -33,7 +33,8 @@ class CommandEndpoint:
             target_module = self.modules.get(command["instance"])
             if target_module:
                 target_module.on_click(command["button"])
-
+                target_module.run()
+                os.kill(os.getpid(), signal.SIGUSR1)
 
 
 class Status:
