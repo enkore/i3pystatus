@@ -13,7 +13,7 @@ class Module(SettingsBase):
         ('on_rightclick', "Callback called on right click (see :ref:`callbacks`)"),
         ('on_upscroll', "Callback called on scrolling up (see :ref:`callbacks`)"),
         ('on_downscroll', "Callback called on scrolling down (see :ref:`callbacks`)"),
-        ('hints', "Additional output blocks for module output (dict)"),
+        ('hints', "Additional output blocks for module output (see :ref:`hints`)"),
     )
 
     on_leftclick = None
@@ -22,27 +22,6 @@ class Module(SettingsBase):
     on_downscroll = None
 
     hints = {"markup": "none"}
-    """
-    A dictionary containing additional output blocks used to customize output of
-    a module.
-
-    Blocks will be applied only if `self.output` does not contain a block with
-    the same name already.
-
-    All blocks are described in `i3bar protocol documentation
-    <http://i3wm.org/docs/i3bar-protocol.html#_blocks_in_detail>`_
-    but it is recommended to use only the following blocks:
-
-    * `min_width` and `align` blocks are used to set minimal width of output and
-      text aligment if text width is shorter than minimal width.
-    * `separator` and `separator_block_width` blocks are used to remove the
-      vertical bar that is separating modules.
-    * `markup` block can be set to `"none"` or `"pango"`.
-      `Pango markup
-      <https://developer.gnome.org/pango/stable/PangoMarkupFormat.html>`_
-      provides additional formatting options for advanced users.
-
-    """
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
