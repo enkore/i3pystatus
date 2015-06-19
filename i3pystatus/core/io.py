@@ -1,4 +1,5 @@
 import json
+import logging
 import signal
 import sys
 from contextlib import contextmanager
@@ -66,7 +67,7 @@ class StandaloneIO(IOHandler):
             try:
                 signal.sigtimedwait([signal.SIGUSR1], self.interval)
             except InterruptedError:
-                pass
+                logging.getLogger("i3pystatus").exception("Interrupted system call:")
             except KeyboardInterrupt:
                 return
 
