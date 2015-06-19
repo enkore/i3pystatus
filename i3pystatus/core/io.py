@@ -65,6 +65,8 @@ class StandaloneIO(IOHandler):
         while True:
             try:
                 signal.sigtimedwait([signal.SIGUSR1], self.interval)
+            except InterruptedError:
+                pass
             except KeyboardInterrupt:
                 return
 
