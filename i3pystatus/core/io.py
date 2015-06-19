@@ -1,5 +1,5 @@
-import time
 import json
+import signal
 import sys
 from contextlib import contextmanager
 
@@ -64,7 +64,7 @@ class StandaloneIO(IOHandler):
     def read(self):
         while True:
             try:
-                time.sleep(self.interval)
+                signal.sigtimedwait([signal.SIGUSR1], self.interval)
             except KeyboardInterrupt:
                 return
 
