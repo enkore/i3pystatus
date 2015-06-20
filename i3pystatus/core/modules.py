@@ -13,12 +13,15 @@ class Module(SettingsBase):
         ('on_rightclick', "Callback called on right click (see :ref:`callbacks`)"),
         ('on_upscroll', "Callback called on scrolling up (see :ref:`callbacks`)"),
         ('on_downscroll', "Callback called on scrolling down (see :ref:`callbacks`)"),
+        ('hints', "Additional output blocks for module output (see :ref:`hints`)"),
     )
 
     on_leftclick = None
     on_rightclick = None
     on_upscroll = None
     on_downscroll = None
+
+    hints = {"markup": "none"}
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
@@ -30,6 +33,13 @@ class Module(SettingsBase):
             self.output["instance"] = str(id(self))
             if (self.output.get("color", "") or "").lower() == "#ffffff":
                 del self.output["color"]
+            if self.hints:
+                for key, val in self.hints.items():
+                    if key not in self.output:
+                        self.output.update({key: val})
+            if self.output.get("markup") == "pango":
+                self.__text_to_pango()
+
             json.insert(convert_position(self.position, json), self.output)
 
     def run(self):
@@ -100,6 +110,18 @@ class Module(SettingsBase):
     def move(self, position):
         self.position = position
         return self
+
+    def __text_to_pango(self):
+        """
+        Replaces all ampersands in `"full_text"` and `"short_text"` blocks` in
+        `self.output` with `&amp;`.
+        """
+        if "full_text" in self.output.keys():
+            out = self.output["full_text"].replace("&", "&amp;")
+            self.output.update({"full_text": out})
+        if "short_text" in self.output.keys():
+            out = self.output["short_text"].replace("&", "&amp;")
+            self.output.update({"short_text": out})
 
 
 class IntervalModule(Module):
