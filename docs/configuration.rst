@@ -377,6 +377,7 @@ Refreshing the bar
 ------------------
 
 The whole bar can be refreshed by sending SIGUSR1 signal to i3pystatus process.
+This feature is available only in standalone :py:class:`.Status` operation.
 
 To find the PID of the i3pystatus process look for the ``status_command`` you
 use in your i3 config file.
