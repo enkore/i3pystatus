@@ -11,10 +11,22 @@ master branch
     - See :ref:`callbacks`
 * Added credentials storage
     - See :ref:`credentials`
-* Added deadbeef module
-* Added github module
-* Added whosonlocation module
-* Added openvpn module
+* Added :ref:`hints` to support special uses cases
+* Added support for Pango markup
+* Fixed issue where i3bar would interpret plain-text with
+  "HTML-look-alike" characters in them as HTML/Pango
+* New modules
+    - github: Check Github for pending notifications.
+    - whosonlocation: Change your whosonlocation.com status.
+    - openvpn: Monitor OpenVPN connections. Currently only supports systems that use Systemd.
+    - net_speed: Attempts to provide an estimation of internet speeds.
+    - makewatch: Watches for make jobs and notifies when they are completed.
+    - dota2wins: Displays the win/loss ratio of a given Dota account.
+    - dpms: Shows and toggles status of DPMS which prevents screen from blanking.
+    - cpu_freq: uses by default /proc/cpuinfo to determine the current cpu frequency
+    - updates: Generic update checker. Currently supports apt-get, pacman and cower
+    - openstack_vms: Displays the number of VMs in an openstack
+      cluster in ACTIVE and non-ACTIVE states.
 * backlight: add xbacklight support for changing brightness with mouse wheel
 * battery: added support for depleted batteries
 * battery: added support for multiple batteries
@@ -27,6 +39,7 @@ master branch
     - Removed ``network_graph``
     - Removed ``network_traffic``
     - Removed ``wireless``
+* network: added total traffic in Mbytes formatters
 * network: ``basiciw`` is only required if it is used (wireless)
 * network: ``psutil`` is only required if it is used (traffic)
 * network: scrolling changes displayed interface

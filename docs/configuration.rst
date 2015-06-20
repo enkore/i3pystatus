@@ -301,3 +301,72 @@ The settings can be of different types, namely
 
 .. note:: If you want to simply refresh the output of a module by clicking on
   it, set desired callback to ``"run"`` e.g. ``on_leftclick = "run"``.
+
+.. _hints:
+
+Hints
+-----
+
+Hints are additional parameters used to customize output of a module.
+They give you access to all attributes supported by `i3bar protocol
+<http://i3wm.org/docs/i3bar-protocol.html#_blocks_in_detail>`_.
+
+Hints are available as the ``hints`` setting in all modules and its
+value should be a dictionary or ``None``. An attribute defined in
+``hints`` will be applied only if the module output does not contain
+attribute with the same name already.
+
+Some possible uses for these attributes are:
+
+*   `min_width` and `align` can be used to set minimal width of output and
+    align the text if its width is shorter than `minimal_width`.
+*   `separator` and `separator_block_width` can be used to remove the
+    vertical bar that is separating modules.
+*   `markup` can be set to `"none"` or `"pango"`.
+    `Pango markup
+    <https://developer.gnome.org/pango/stable/PangoMarkupFormat.html>`_
+    provides additional formatting options for drawing rainbows and other
+    fancy stuff.
+
+Here is an example with the :py:class:`.Network` module.
+Pango markup is used to keep the ESSID green at all times while the
+recieved/sent part is changing color depending on the amount of traffic.
+
+  .. code:: python
+
+        status.register("network",
+            interface = "wlp2s0",
+            hints = {"markup": "pango"},
+            format_up = "<span color=\"#00FF00\">{essid}</span> {bytes_recv:6.1f}KiB {bytes_sent:5.1f}KiB",
+            format_down = "",
+            dynamic_color = True,
+            start_color = "#00FF00",
+            end_color = "#FF0000",
+            color_down = "#FF0000",
+            upper_limit = 800.0,
+            )
+
+Or you can use pango to customize the color of ``status`` setting in
+:py:class:`.NowPlaying` and :py:class:`.MPD` modules.
+
+    .. code:: python
+
+        ...
+        hints = {"markup": "pango"},
+        status = {
+            "play": "▶",
+            "pause": "<span color=\"orange\">▶</span>",
+            "stop": "<span color=\"red\">◾</span>",
+        },
+        ...
+
+Or make two modules look like one.
+
+    .. code:: python
+
+        status.register("text",
+            text = "shmentarianism is a pretty long word.")
+        status.register("text",
+            hints = {"separator": False, "separator_block_width": 0},
+            text = "Antidisestabli",
+            color="#FF0000")

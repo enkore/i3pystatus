@@ -56,3 +56,32 @@ or modules provided by i3pystatus) you import to the ``MOCK_MODULES``
 list in ``docs/conf.py``. This needs to be the actual name of the imported
 module, so for example if you have ``from somepkg.mod import AClass``,
 you need to add ``somepkg.mod`` to the list.
+
+Testing changes
+---------------
+
+i3pystatus uses continuous integration (CI) techniques, which means in
+our case that every patch and every pull request is tested
+automatically. While Travis is used for automatic building of GitHub
+pull requests it is not the authorative CI system (which is `Der Golem
+<http://golem.enkore.de/>`_) for the main repository.
+
+The ``ci-build.sh`` script needs to run successfully for a patch to be
+accepted. It can be run on your machine, too, so you don't need to
+wait for the often slow Travis build to complete. It does not require
+any special privileges, except write access to the ``ci-build``
+directory (a different build directory can be specified as the first
+parameter to ``ci-build.sh``).
+
+The script tests the following things:
+
+1. PEP8 compliance of the entire codebase, *excluding* errors of too
+   long lines (error code E501). Line lengths of about 120 characters
+   are acceptable.
+2. That ``setup.py`` installs i3pystatus and related binaries (into a
+   location below the build directory)
+3. Unit tests pass, they are tested against the installed version from
+   2.). A unit test log in JUnit format is generated in the build
+   directory (``testlog.xml``).
+4. Sphinx docs build without errors or warnings. The HTML docs are
+   generated in the ``docs`` directory in the build directory.
