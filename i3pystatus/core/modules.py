@@ -81,21 +81,23 @@ class Module(SettingsBase):
             cb = self.on_downscroll
         else:
             self.logger.info("Button '%d' not handled yet." % (button))
-            return
+            return False
 
         if not cb:
             self.logger.info("no cb attached")
-            return
+            return False
         else:
             cb, args = split_callback_and_args(cb)
             self.logger.debug("cb=%s args=%s" % (cb, args))
 
         if callable(cb):
-            return cb(self)
+            cb(self)
         elif hasattr(self, cb):
-            return getattr(self, cb)(*args)
+            if cb is not "run":
+                getattr(self, cb)(*args)
         else:
-            return run_through_shell(cb, *args)
+            run_through_shell(cb, *args)
+        return True
 
     def move(self, position):
         self.position = position

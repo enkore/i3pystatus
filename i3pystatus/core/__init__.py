@@ -31,8 +31,7 @@ class CommandEndpoint:
     def _command_endpoint(self):
         for command in self.io_handler_factory().read():
             target_module = self.modules.get(command["instance"])
-            if target_module:
-                target_module.on_click(command["button"])
+            if target_module and target_module.on_click(command["button"]):
                 target_module.run()
                 os.kill(os.getpid(), signal.SIGUSR2)
 
