@@ -58,7 +58,7 @@ class Updates(IntervalModule):
     color = "#00DD00"
     color_no_updates = "#FFFFFF"
 
-    on_leftclick = "run"
+    on_leftclick = "refresh"
 
     def init(self):
         if not isinstance(self.backends, list):
@@ -84,3 +84,7 @@ class Updates(IntervalModule):
             "full_text": formatp(self.format, **fdict).strip(),
             "color": self.color,
         }
+
+    def refresh(self):
+        # Dummy callback to enable click event.
+        return
