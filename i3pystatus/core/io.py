@@ -56,16 +56,22 @@ class StandaloneIO(IOHandler):
         {"version": 1, "click_events": True}, "[", "[]", ",[]",
     ]
 
-    def __init__(self, click_events, interval=1):
+    def __init__(self, click_events, modules, interval=1):
         super().__init__()
         self.interval = interval
         self.proto[0]['click_events'] = click_events
         self.proto[0] = json.dumps(self.proto[0])
+        self.modules = modules
 
     def read(self):
         while True:
             try:
-                signal.sigtimedwait([signal.SIGUSR1], self.interval)
+                info = signal.sigtimedwait([signal.SIGUSR1, signal.SIGUSR2],
+                                           self.interval)
+                # refresh the whole bar
+                if info and info.si_signo == signal.SIGUSR1:
+                    for module in self.modules:
+                        module.run()
             except InterruptedError:
                 logging.getLogger("i3pystatus").exception("Interrupted system call:")
             except KeyboardInterrupt:
