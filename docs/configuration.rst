@@ -298,3 +298,6 @@ The settings can be of different types, namely
   elements are passed as arguments to the callable
 - again a special case of the above: just a callable, no parameters
 - a string which is run in a shell
+
+.. note:: If you want to simply refresh the output of a module by clicking on
+  it, set desired callback to ``"run"`` e.g. ``on_leftclick = "run"``.
