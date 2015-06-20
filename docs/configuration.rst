@@ -308,10 +308,10 @@ Hints are additional parameters used to customize output of a module.
 They give you access to all attributes supported by `i3bar protocol
 <http://i3wm.org/docs/i3bar-protocol.html#_blocks_in_detail>`_.
 
-Hints are available as ``hints`` setting in all modules and its value should be
-a dictionary or ``None``.
-An attribute defined in ``hints`` will be applied only if module output does not
-contain attribute with the same name already.
+Hints are available as the ``hints`` setting in all modules and its
+value should be a dictionary or ``None``. An attribute defined in
+``hints`` will be applied only if the module output does not contain
+attribute with the same name already.
 
 Some possible uses for these attributes are:
 
