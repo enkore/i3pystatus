@@ -25,8 +25,7 @@ master branch
   - dpms: Shows and toggles status of DPMS which prevents screen from blanking.
   - cpu_freq: uses by default /proc/cpuinfo to determine the current cpu frequency
   - updates: Generic update checker. Currently supports apt-get, pacman and cower
-  - openstack_vms: Displays the number of VMs in an openstack cluster
-    in ACTIVE and non-ACTIVE states.
+  - openstack_vms: Displays the number of VMs in an openstack cluster in ACTIVE and non-ACTIVE states.
 * backlight: add xbacklight support for changing brightness with mouse wheel
 * battery: added support for depleted batteries
 * battery: added support for multiple batteries
