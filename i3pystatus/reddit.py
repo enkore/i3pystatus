@@ -138,7 +138,7 @@ class Reddit(IntervalModule):
         }
 
     def on_refresh(self):
-        self._background_refresh()
+        self.background_refresh()
 
     def open_mail(self):
         user_open('https://www.reddit.com/message/unread/')

@@ -41,7 +41,7 @@ class Module(SettingsBase):
                     if key not in self.output:
                         self.output.update({key: val})
             if self.output.get("markup") == "pango":
-                self._text_to_pango()
+                self.text_to_pango()
 
             json.insert(convert_position(self.position, json), self.output)
 
@@ -113,16 +113,37 @@ class Module(SettingsBase):
         return True
 
     def on_refresh(self):
+        """
+        This method is always called after a click event or refresh triggered by
+        SIGUSR1 signal.
+
+        If module relies on internet acces or it's `run` method takes longer to
+        execute this method shoul be overriden to refresh in background.
+        Generally the `backgound_refresh` method should be used to refresh
+        modules output without blocking other modules:
+
+            .. code :: python
+
+                def on_refresh(self):
+                    self.background_refresh()
+
+        For example :py:class:`.Network` module ignores refreshing completely
+        becaue some of its computations rely on the `interval` setting.
+        """
         self.run()
 
     def move(self, position):
         self.position = position
         return self
 
-    def _text_to_pango(self):
+    def text_to_pango(self):
         """
-        Replaces all ampersands in `"full_text"` and `"short_text"` blocks` in
+        Replaces all ampersands in `"full_text"` and `"short_text"` in
         `self.output` with `&amp;`.
+
+        Is called internally when pango markup is enabled.
+
+        Can be called multiple times (`&amp;` won't change to `&amp;amp;`).
         """
         def replace(s):
             s = s.split("&")
@@ -139,7 +160,11 @@ class Module(SettingsBase):
         if "short_text" in self.output.keys():
             self.output["short_text"] = replace(self.output["short_text"])
 
-    def _background_refresh(self):
+    def background_refresh(self):
+        """
+        Runs modules `run` method in separate thread once and sends SIGUSR1
+        signal afterwards to update the bar.
+        """
         if getattr(self, "_refresh_thread", None) is None:
             self._refresh_thread = None
 
@@ -150,7 +175,7 @@ class Module(SettingsBase):
         if not self._refresh_thread:
             def refresh_job(module):
                 module.run()
-                StandaloneIO.register_click_event()
+                StandaloneIO.refresh_statusline()
 
             self._refresh_thread = threading.Thread(target=refresh_job, args=(self,))
             self._refresh_thread.start()

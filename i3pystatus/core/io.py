@@ -52,7 +52,7 @@ class StandaloneIO(IOHandler):
     and the i3bar protocol header
     """
 
-    __is_click_event = False
+    refresh_modules = True
 
     n = -1
     proto = [
@@ -77,11 +77,15 @@ class StandaloneIO(IOHandler):
                 return
 
             if received_signal:
-                if StandaloneIO.__is_click_event:
-                    StandaloneIO.__is_click_event = False
-                else:
+                if StandaloneIO.refresh_modules:
+                    # refresh whole bar
                     for module in self.modules:
                         module.on_refresh()
+                else:
+                    # just send status line to i3bar immediately -> do nothing here
+
+                    # set next signal action back to default
+                    StandaloneIO.refresh_modules = True
 
             yield self.read_line()
 
@@ -91,8 +95,12 @@ class StandaloneIO(IOHandler):
         return self.proto[min(self.n, len(self.proto) - 1)]
 
     @classmethod
-    def register_click_event(cls):
-        cls.__is_click_event = True
+    def refresh_statusline(cls):
+        """
+        Changes behavior of the next SIGUSR1 signal to just flushing current
+        outputs of all modules and sends the signal.
+        """
+        cls.refresh_modules = False
         os.kill(os.getpid(), signal.SIGUSR1)
 
 

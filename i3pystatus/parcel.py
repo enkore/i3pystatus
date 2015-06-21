@@ -168,7 +168,7 @@ class ParcelTracker(IntervalModule):
         }
 
     def on_refresh(self):
-        self._background_refresh()
+        self.background_refresh()
 
     def open_browser(self):
         webbrowser.open_new_tab(self.instance.get_url())

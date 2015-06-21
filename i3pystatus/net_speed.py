@@ -115,4 +115,4 @@ class NetSpeed(IntervalModule):
         }
 
     def on_refresh(self):
-        self._background_refresh()
+        self.background_refresh()

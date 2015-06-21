@@ -87,7 +87,7 @@ class Mail(IntervalModule):
         }
 
     def on_refresh(self):
-        self._background_refresh()
+        self.background_refresh()
 
     def scroll_backend(self, step):
         self.current_backend = (self.current_backend + step) % len(self.backends)

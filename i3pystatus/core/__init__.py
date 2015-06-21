@@ -33,7 +33,7 @@ class CommandEndpoint:
             target_module = self.modules.get(command["instance"])
             if target_module and target_module.on_click(command["button"]):
                 target_module.on_refresh()
-                io.StandaloneIO.register_click_event()
+                io.StandaloneIO.refresh_statusline()
 
 
 class Status:
