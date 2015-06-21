@@ -124,12 +124,20 @@ class Module(SettingsBase):
         Replaces all ampersands in `"full_text"` and `"short_text"` blocks` in
         `self.output` with `&amp;`.
         """
+        def replace(s):
+            s = s.split("&")
+            out = s[0]
+            for i in range(len(s) - 1):
+                if s[i + 1].startswith("amp;"):
+                    out += "&" + s[i + 1]
+                else:
+                    out += "&amp;" + s[i + 1]
+            return out
+
         if "full_text" in self.output.keys():
-            out = self.output["full_text"].replace("&", "&amp;")
-            self.output.update({"full_text": out})
+            self.output["full_text"] = replace(self.output["full_text"])
         if "short_text" in self.output.keys():
-            out = self.output["short_text"].replace("&", "&amp;")
-            self.output.update({"short_text": out})
+            self.output["short_text"] = replace(self.output["short_text"])
 
     def _background_refresh(self):
         if getattr(self, "_refresh_thread", None) is None:
