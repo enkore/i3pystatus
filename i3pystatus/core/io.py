@@ -65,17 +65,19 @@ class StandaloneIO(IOHandler):
 
     def read(self):
         while True:
+            info = None
             try:
                 info = signal.sigtimedwait([signal.SIGUSR1, signal.SIGUSR2],
                                            self.interval)
-                # refresh the whole bar
-                if info and info.si_signo == signal.SIGUSR1:
-                    for module in self.modules:
-                        module.run()
             except InterruptedError:
                 logging.getLogger("i3pystatus").exception("Interrupted system call:")
             except KeyboardInterrupt:
                 return
+
+            # refresh the whole bar
+            if info and info.si_signo == signal.SIGUSR1:
+                for module in self.modules:
+                    module.on_refresh()
 
             yield self.read_line()
 

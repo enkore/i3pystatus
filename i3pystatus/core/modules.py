@@ -109,6 +109,9 @@ class Module(SettingsBase):
             run_through_shell(cb, *args)
         return True
 
+    def on_refresh(self):
+        self.run()
+
     def move(self, position):
         self.position = position
         return self
