@@ -111,3 +111,7 @@ class Weather(IntervalModule):
             ),
             "color": color
         }
+
+    def on_refresh(self):
+        self._background_refresh()
+

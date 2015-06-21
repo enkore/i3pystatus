@@ -1,5 +1,8 @@
-from i3pystatus import SettingsBase, IntervalModule, formatp
-from i3pystatus.core.util import internet, require
+from i3pystatus import formatp
+from i3pystatus import IntervalModule
+from i3pystatus import SettingsBase
+from i3pystatus.core.util import internet
+from i3pystatus.core.util import require
 
 
 class Backend(SettingsBase):
@@ -84,3 +87,6 @@ class Updates(IntervalModule):
             "full_text": formatp(self.format, **fdict).strip(),
             "color": self.color,
         }
+
+    def on_refresh(self):
+        self._background_refresh()

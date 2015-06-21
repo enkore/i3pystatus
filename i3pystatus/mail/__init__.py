@@ -86,6 +86,9 @@ class Mail(IntervalModule):
             "color": color,
         }
 
+    def on_refresh(self):
+        self._background_refresh()
+
     def scroll_backend(self, step):
         self.current_backend = (self.current_backend + step) % len(self.backends)
 
