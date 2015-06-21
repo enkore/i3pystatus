@@ -128,6 +128,22 @@ class Module(SettingsBase):
             out = self.output["short_text"].replace("&", "&amp;")
             self.output.update({"short_text": out})
 
+    def _background_refresh(self):
+        if getattr(self, "_refresh_thread", None) is None:
+            self._refresh_thread = None
+
+        # check if previous refresh is done
+        if self._refresh_thread and not self._refresh_thread.is_alive():
+            self._refresh_thread = None
+
+        if not self._refresh_thread:
+            def refresh_job(module):
+                module.run()
+                kill(getpid(), SIGUSR2)
+
+            self._refresh_thread = Thread(target=refresh_job, args=(self,))
+            self._refresh_thread.start()
+
 
 class IntervalModule(Module):
     settings = (
