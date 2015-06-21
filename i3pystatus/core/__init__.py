@@ -33,7 +33,7 @@ class CommandEndpoint:
             target_module = self.modules.get(command["instance"])
             if target_module and target_module.on_click(command["button"]):
                 target_module.on_refresh()
-                os.kill(os.getpid(), signal.SIGUSR2)
+                io.StandaloneIO.register_click_event()
 
 
 class Status:
@@ -54,7 +54,6 @@ class Status:
             def no_op(signum, stack):
                 return
             signal.signal(signal.SIGUSR1, no_op)
-            signal.signal(signal.SIGUSR2, no_op)
 
             self.io = io.StandaloneIO(self.click_events, self.modules, interval)
             if self.click_events:
@@ -63,7 +62,6 @@ class Status:
                     lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1))
         else:
             signal.signal(signal.SIGUSR1, signal.SIG_IGN)
-            signal.signal(signal.SIGUSR2, signal.SIG_IGN)
             self.io = io.IOHandler(input_stream)
 
     def register(self, module, *args, **kwargs):

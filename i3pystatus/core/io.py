@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import signal
 import sys
 from contextlib import contextmanager
@@ -51,6 +52,8 @@ class StandaloneIO(IOHandler):
     and the i3bar protocol header
     """
 
+    __is_click_event = False
+
     n = -1
     proto = [
         {"version": 1, "click_events": True}, "[", "[]", ",[]",
@@ -65,19 +68,20 @@ class StandaloneIO(IOHandler):
 
     def read(self):
         while True:
-            info = None
+            received_signal = None
             try:
-                info = signal.sigtimedwait([signal.SIGUSR1, signal.SIGUSR2],
-                                           self.interval)
+                received_signal = signal.sigtimedwait([signal.SIGUSR1], self.interval)
             except InterruptedError:
                 logging.getLogger("i3pystatus").exception("Interrupted system call:")
             except KeyboardInterrupt:
                 return
 
-            # refresh the whole bar
-            if info and info.si_signo == signal.SIGUSR1:
-                for module in self.modules:
-                    module.on_refresh()
+            if received_signal:
+                if StandaloneIO.__is_click_event:
+                    StandaloneIO.__is_click_event = False
+                else:
+                    for module in self.modules:
+                        module.on_refresh()
 
             yield self.read_line()
 
@@ -85,6 +89,12 @@ class StandaloneIO(IOHandler):
         self.n += 1
 
         return self.proto[min(self.n, len(self.proto) - 1)]
+
+    @classmethod
+    def register_click_event(cls):
+        cls.__is_click_event = True
+        os.kill(os.getpid(), signal.SIGUSR1)
+
 
 
 class JSONIO:

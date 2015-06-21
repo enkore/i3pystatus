@@ -1,3 +1,6 @@
+import threading
+
+from i3pystatus.core.io import StandaloneIO
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.threading import Manager
 from i3pystatus.core.util import convert_position
@@ -139,9 +142,9 @@ class Module(SettingsBase):
         if not self._refresh_thread:
             def refresh_job(module):
                 module.run()
-                kill(getpid(), SIGUSR2)
+                StandaloneIO.register_click_event()
 
-            self._refresh_thread = Thread(target=refresh_job, args=(self,))
+            self._refresh_thread = threading.Thread(target=refresh_job, args=(self,))
             self._refresh_thread.start()
 
 
