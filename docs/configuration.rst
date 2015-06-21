@@ -299,6 +299,9 @@ The settings can be of different types, namely
 - again a special case of the above: just a callable, no parameters
 - a string which is run in a shell
 
+.. note:: If you want to simply refresh the output of a module by clicking on
+  it, set desired callback to ``"run"`` e.g. ``on_leftclick = "run"``.
+
 .. _hints:
 
 Hints
@@ -367,3 +370,32 @@ Or make two modules look like one.
             hints = {"separator": False, "separator_block_width": 0},
             text = "Antidisestabli",
             color="#FF0000")
+
+.. _refresh:
+
+Refreshing the bar
+------------------
+
+The whole bar can be refreshed by sending SIGUSR1 signal to i3pystatus process.
+This feature is available only in standalone :py:class:`.Status` operation.
+
+To find the PID of the i3pystatus process look for the ``status_command`` you
+use in your i3 config file.
+If your `bar` section of i3 config looks like this
+
+    .. code::
+
+        bar {
+            status_command python ~/.config/i3/pystatus.py
+        }
+
+then you can refresh the bar by using the following command:
+
+    .. code:: bash
+
+        pkill -SIGUSR1 -f "python /home/user/.config/i3/pystatus.py"
+
+Note that the path must be expanded.
+
+.. note:: If you use slow modules in your bar (like :py:class:`.Updates`) which
+  take some time to update, the refresh of the whole bar may be delayed.

@@ -1,10 +1,12 @@
-import sys
 import os
+import signal
+import sys
 from threading import Thread
-from i3pystatus.core.exceptions import ConfigError
 
+from i3pystatus.core import io
+from i3pystatus.core import util
+from i3pystatus.core.exceptions import ConfigError
 from i3pystatus.core.imputil import ClassFinder
-from i3pystatus.core import io, util
 from i3pystatus.core.modules import Module
 
 
@@ -29,8 +31,9 @@ class CommandEndpoint:
     def _command_endpoint(self):
         for command in self.io_handler_factory().read():
             target_module = self.modules.get(command["instance"])
-            if target_module:
-                target_module.on_click(command["button"])
+            if target_module and target_module.on_click(command["button"]):
+                target_module.on_refresh()
+                io.StandaloneIO.refresh_statusline()
 
 
 class Status:
@@ -48,12 +51,17 @@ class Status:
         self.standalone = standalone
         self.click_events = click_events
         if standalone:
-            self.io = io.StandaloneIO(self.click_events, interval)
+            def no_op(signum, stack):
+                return
+            signal.signal(signal.SIGUSR1, no_op)
+
+            self.io = io.StandaloneIO(self.click_events, self.modules, interval)
             if self.click_events:
                 self.command_endpoint = CommandEndpoint(
                     self.modules,
                     lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1))
         else:
+            signal.signal(signal.SIGUSR1, signal.SIG_IGN)
             self.io = io.IOHandler(input_stream)
 
     def register(self, module, *args, **kwargs):

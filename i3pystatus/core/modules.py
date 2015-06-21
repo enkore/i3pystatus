@@ -1,3 +1,6 @@
+import threading
+
+from i3pystatus.core.io import StandaloneIO
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.threading import Manager
 from i3pystatus.core.util import convert_position
@@ -38,7 +41,7 @@ class Module(SettingsBase):
                     if key not in self.output:
                         self.output.update({key: val})
             if self.output.get("markup") == "pango":
-                self.__text_to_pango()
+                self.text_to_pango()
 
             json.insert(convert_position(self.position, json), self.output)
 
@@ -91,37 +94,91 @@ class Module(SettingsBase):
             cb = self.on_downscroll
         else:
             self.logger.info("Button '%d' not handled yet." % (button))
-            return
+            return False
 
         if not cb:
             self.logger.info("no cb attached")
-            return
+            return False
         else:
             cb, args = split_callback_and_args(cb)
             self.logger.debug("cb=%s args=%s" % (cb, args))
 
         if callable(cb):
-            return cb(self)
+            cb(self)
         elif hasattr(self, cb):
-            return getattr(self, cb)(*args)
+            if cb is not "run":
+                getattr(self, cb)(*args)
         else:
-            return run_through_shell(cb, *args)
+            run_through_shell(cb, *args)
+        return True
+
+    def on_refresh(self):
+        """
+        This method is always called after a click event or refresh triggered by
+        SIGUSR1 signal.
+
+        If module relies on internet acces or it's `run` method takes longer to
+        execute this method shoul be overriden to refresh in background.
+        Generally the `backgound_refresh` method should be used to refresh
+        modules output without blocking other modules:
+
+            .. code :: python
+
+                def on_refresh(self):
+                    self.background_refresh()
+
+        For example :py:class:`.Network` module ignores refreshing completely
+        becaue some of its computations rely on the `interval` setting.
+        """
+        self.run()
 
     def move(self, position):
         self.position = position
         return self
 
-    def __text_to_pango(self):
+    def text_to_pango(self):
         """
-        Replaces all ampersands in `"full_text"` and `"short_text"` blocks` in
+        Replaces all ampersands in `"full_text"` and `"short_text"` in
         `self.output` with `&amp;`.
+
+        Is called internally when pango markup is enabled.
+
+        Can be called multiple times (`&amp;` won't change to `&amp;amp;`).
         """
+        def replace(s):
+            s = s.split("&")
+            out = s[0]
+            for i in range(len(s) - 1):
+                if s[i + 1].startswith("amp;"):
+                    out += "&" + s[i + 1]
+                else:
+                    out += "&amp;" + s[i + 1]
+            return out
+
         if "full_text" in self.output.keys():
-            out = self.output["full_text"].replace("&", "&amp;")
-            self.output.update({"full_text": out})
+            self.output["full_text"] = replace(self.output["full_text"])
         if "short_text" in self.output.keys():
-            out = self.output["short_text"].replace("&", "&amp;")
-            self.output.update({"short_text": out})
+            self.output["short_text"] = replace(self.output["short_text"])
+
+    def background_refresh(self):
+        """
+        Runs modules `run` method in separate thread once and sends SIGUSR1
+        signal afterwards to update the bar.
+        """
+        if getattr(self, "_refresh_thread", None) is None:
+            self._refresh_thread = None
+
+        # check if previous refresh is done
+        if self._refresh_thread and not self._refresh_thread.is_alive():
+            self._refresh_thread = None
+
+        if not self._refresh_thread:
+            def refresh_job(module):
+                module.run()
+                StandaloneIO.refresh_statusline()
+
+            self._refresh_thread = threading.Thread(target=refresh_job, args=(self,))
+            self._refresh_thread.start()
 
 
 class IntervalModule(Module):

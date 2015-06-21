@@ -1,5 +1,7 @@
-import time
 import json
+import logging
+import os
+import signal
 import sys
 from contextlib import contextmanager
 
@@ -50,23 +52,40 @@ class StandaloneIO(IOHandler):
     and the i3bar protocol header
     """
 
+    refresh_modules = True
+
     n = -1
     proto = [
         {"version": 1, "click_events": True}, "[", "[]", ",[]",
     ]
 
-    def __init__(self, click_events, interval=1):
+    def __init__(self, click_events, modules, interval=1):
         super().__init__()
         self.interval = interval
         self.proto[0]['click_events'] = click_events
         self.proto[0] = json.dumps(self.proto[0])
+        self.modules = modules
 
     def read(self):
         while True:
+            received_signal = None
             try:
-                time.sleep(self.interval)
+                received_signal = signal.sigtimedwait([signal.SIGUSR1], self.interval)
+            except InterruptedError:
+                logging.getLogger("i3pystatus").exception("Interrupted system call:")
             except KeyboardInterrupt:
                 return
+
+            if received_signal:
+                if StandaloneIO.refresh_modules:
+                    # refresh whole bar
+                    for module in self.modules:
+                        module.on_refresh()
+                else:
+                    # just send status line to i3bar immediately -> do nothing here
+
+                    # set next signal action back to default
+                    StandaloneIO.refresh_modules = True
 
             yield self.read_line()
 
@@ -74,6 +93,15 @@ class StandaloneIO(IOHandler):
         self.n += 1
 
         return self.proto[min(self.n, len(self.proto) - 1)]
+
+    @classmethod
+    def refresh_statusline(cls):
+        """
+        Changes behavior of the next SIGUSR1 signal to just flushing current
+        outputs of all modules and sends the signal.
+        """
+        cls.refresh_modules = False
+        os.kill(os.getpid(), signal.SIGUSR1)
 
 
 class JSONIO:

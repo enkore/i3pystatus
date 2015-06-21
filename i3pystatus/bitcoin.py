@@ -124,3 +124,6 @@ class Bitcoin(IntervalModule):
             "full_text": self.format.format(**fdict),
             "color": color,
         }
+
+    def on_refresh(self):
+        self.background_refresh()

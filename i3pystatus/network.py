@@ -397,3 +397,6 @@ class Network(IntervalModule, ColorRangeModule):
             "full_text": format_str.format(**format_values),
             'color': color,
         }
+
+    def on_refresh(self):
+        return

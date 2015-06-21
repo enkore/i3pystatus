@@ -61,3 +61,6 @@ class Github(IntervalModule):
             'full_text': self.format.format(**format_values),
             'color': self.color
         }
+
+    def on_refresh(self):
+        self.background_refresh()

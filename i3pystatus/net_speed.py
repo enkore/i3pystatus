@@ -1,12 +1,15 @@
-from i3pystatus import IntervalModule
-import speedtest_cli
-import requests
-import time
-import os
-from urllib.parse import urlparse
 import contextlib
+import os
+import requests
+import speedtest_cli
 import sys
+import time
 from io import StringIO
+from urllib.parse import urlparse
+
+from i3pystatus import IntervalModule
+from i3pystatus.core.util import internet
+from i3pystatus.core.util import require
 
 
 class NetSpeed(IntervalModule):
@@ -27,6 +30,7 @@ class NetSpeed(IntervalModule):
     units = 'bits'
     format = "{speed} ({hosting_provider})"
 
+    @require(internet)
     def run(self):
 
         # since speedtest_cli likes to print crap, we need to squelch it
@@ -109,3 +113,6 @@ class NetSpeed(IntervalModule):
             "full_text": self.format.format(**cdict),
             "color": self.color
         }
+
+    def on_refresh(self):
+        self.background_refresh()
