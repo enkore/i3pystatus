@@ -96,7 +96,6 @@ class StandaloneIO(IOHandler):
         os.kill(os.getpid(), signal.SIGUSR1)
 
 
-
 class JSONIO:
     def __init__(self, io, skiplines=2):
         self.io = io

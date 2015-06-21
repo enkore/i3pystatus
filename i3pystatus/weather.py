@@ -114,4 +114,3 @@ class Weather(IntervalModule):
 
     def on_refresh(self):
         self._background_refresh()
-
