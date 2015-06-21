@@ -38,7 +38,7 @@ class Module(SettingsBase):
                     if key not in self.output:
                         self.output.update({key: val})
             if self.output.get("markup") == "pango":
-                self.__text_to_pango()
+                self._text_to_pango()
 
             json.insert(convert_position(self.position, json), self.output)
 
@@ -116,7 +116,7 @@ class Module(SettingsBase):
         self.position = position
         return self
 
-    def __text_to_pango(self):
+    def _text_to_pango(self):
         """
         Replaces all ampersands in `"full_text"` and `"short_text"` blocks` in
         `self.output` with `&amp;`.
