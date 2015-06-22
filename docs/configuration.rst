@@ -377,7 +377,8 @@ Refreshing the bar
 ------------------
 
 The whole bar can be refreshed by sending SIGUSR1 signal to i3pystatus process.
-This feature is available only in standalone :py:class:`.Status` operation.
+This feature is available only in standalone operation (:py:class:`.Status` was
+created with `standalone=True` parameter).
 
 To find the PID of the i3pystatus process look for the ``status_command`` you
 use in your i3 config file.
@@ -395,7 +396,4 @@ then you can refresh the bar by using the following command:
 
         pkill -SIGUSR1 -f "python /home/user/.config/i3/pystatus.py"
 
-Note that the path must be expanded.
-
-.. note:: If you use slow modules in your bar (like :py:class:`.Updates`) which
-  take some time to update, the refresh of the whole bar may be delayed.
+Note that the path must be expanded if using '~'.

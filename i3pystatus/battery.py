@@ -47,7 +47,9 @@ class Battery:
         return self._percentage("_DESIGN" if design else "") * 100
 
     def status(self):
-        if self.consumption() > 0.1 and self.percentage() < 99.9:
+        if self.consumption() is None:
+            return self.battery_info["STATUS"]
+        elif self.consumption() > 0.1 and self.percentage() < 99.9:
             return "Discharging" if self.battery_info["STATUS"] == "Discharging" else "Charging"
         elif self.consumption() == 0 and self.percentage() == 0.00:
             return "Depleted"
@@ -67,7 +69,7 @@ class BatteryCharge(Battery):
         if "VOLTAGE_NOW" in self.battery_info and "CURRENT_NOW" in self.battery_info:
             return super().consumption(self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"])  # V * A = W
         else:
-            return -1
+            return None
 
     def _percentage(self, design):
         return self.battery_info["CHARGE_NOW"] / self.battery_info["CHARGE_FULL" + design]
@@ -185,11 +187,17 @@ class BatteryChecker(IntervalModule):
         return total / len(batteries)
 
     def consumption(self, batteries):
-        return sum([bat.consumption() for bat in batteries])
+        consumption = 0
+        for battery in batteries:
+            if battery.consumption() is not None:
+                consumption += battery.consumption()
+        return consumption
 
     def abs_consumption(self, batteries):
         abs_consumption = 0
         for battery in batteries:
+            if battery.consumption() is None:
+                continue
             if battery.status() == 'Discharging':
                 abs_consumption -= battery.consumption()
             elif battery.status() == 'Charging':
@@ -203,7 +211,7 @@ class BatteryChecker(IntervalModule):
         elif abs_consumption < 0:
             return 'Discharging'
         else:
-            return batteries.pop().status()
+            return batteries[-1].status()
 
     def remaining(self, batteries):
         wh_depleted = 0

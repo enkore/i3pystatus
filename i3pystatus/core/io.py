@@ -1,8 +1,8 @@
 import json
-import logging
-import signal
 import sys
 from contextlib import contextmanager
+from threading import Condition
+from threading import Thread
 
 
 class IOHandler:
@@ -56,25 +56,28 @@ class StandaloneIO(IOHandler):
         {"version": 1, "click_events": True}, "[", "[]", ",[]",
     ]
 
-    def __init__(self, click_events, modules, interval=1):
+    def __init__(self, click_events, interval=1):
         super().__init__()
         self.interval = interval
+        self.modules = modules
+
         self.proto[0]['click_events'] = click_events
         self.proto[0] = json.dumps(self.proto[0])
         self.modules = modules
 
+        self.refresh_cond = Condition()
+        self.treshold_interval = 20.0
+        signal.signal(signal.SIGUSR1, self.refresh_signal_handler)
+
     def read(self):
+        self.compute_treshold_interval()
+        self.refresh_cond.acquire()
+
         while True:
             try:
-                info = signal.sigtimedwait([signal.SIGUSR1, signal.SIGUSR2],
-                                           self.interval)
-                # refresh the whole bar
-                if info and info.si_signo == signal.SIGUSR1:
-                    for module in self.modules:
-                        module.run()
-            except InterruptedError:
-                logging.getLogger("i3pystatus").exception("Interrupted system call:")
+                time.sleep(self.interval)
             except KeyboardInterrupt:
+                self.refresh_cond.release()
                 return
 
             yield self.read_line()
@@ -83,6 +86,56 @@ class StandaloneIO(IOHandler):
         self.n += 1
 
         return self.proto[min(self.n, len(self.proto) - 1)]
+
+    def compute_treshold_interval(self):
+        """
+        Current method is to compute average from all intervals.
+        """
+
+        intervals = [m.interval for m in self.modules if hasattr(m, "interval")]
+        if len(intervals) > 0:
+            self.treshold_interval = round(sum(intervals) / len(intervals))
+
+    def async_refresh(self):
+        """
+        Calling this method will send the status line to i3bar immediately
+        without waiting for timeout (1s by default).
+        """
+
+        self.refresh_cond.acquire()
+        self.refresh_cond.notify()
+        self.refresh_cond.release()
+
+    def refresh_signal_handler(self, signo, frame):
+        """
+        This callback is called when SIGUSR1 signal is received.
+
+        It updates outputs of all modules by calling their `run` method.
+
+        Interval modules are updated in separate threads if their interval is
+        above a certain treshold value.
+        This treshold is computed by :func:`compute_treshold_interval` class
+        method.
+        The reasoning is that modules with larger intervals also usually take
+        longer to refresh their output and that their output is not required in
+        'real time'.
+        This also prevents possible lag when updating all modules in a row.
+        """
+
+        if signo != signal.SIGUSR1:
+            return
+
+        for module in self.modules:
+            if hasattr(module, "interval"):
+                if module.interval > self.treshold_interval:
+                    thread = Thread(target=module.run)
+                    thread.start()
+                else:
+                    module.run()
+            else:
+                module.run()
+
+        self.async_refresh()
 
 
 class JSONIO:

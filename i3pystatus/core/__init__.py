@@ -18,9 +18,10 @@ class CommandEndpoint:
     :param io_handler_factory: function creating a file-like object returning a JSON generator on .read()
     """
 
-    def __init__(self, modules, io_handler_factory):
+    def __init__(self, modules, io_handler_factory, io):
         self.modules = modules
         self.io_handler_factory = io_handler_factory
+        self.io = io
         self.thread = Thread(target=self._command_endpoint)
         self.thread.daemon = True
 
@@ -31,9 +32,8 @@ class CommandEndpoint:
     def _command_endpoint(self):
         for command in self.io_handler_factory().read():
             target_module = self.modules.get(command["instance"])
-            if target_module and target_module.on_click(command["button"]):
-                target_module.run()
-                os.kill(os.getpid(), signal.SIGUSR2)
+            if target_module:
+                target_module.on_click(command["button"])
 
 
 class Status:
@@ -51,16 +51,12 @@ class Status:
         self.standalone = standalone
         self.click_events = click_events
         if standalone:
-            def no_op(signum, stack):
-                return
-            signal.signal(signal.SIGUSR1, no_op)
-            signal.signal(signal.SIGUSR2, no_op)
-
-            self.io = io.StandaloneIO(self.click_events, self.modules, interval)
+            self.io = io.StandaloneIO(self.click_events, interval)
             if self.click_events:
                 self.command_endpoint = CommandEndpoint(
                     self.modules,
-                    lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1))
+                    lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1),
+                    self.io)
         else:
             signal.signal(signal.SIGUSR1, signal.SIG_IGN)
             signal.signal(signal.SIGUSR2, signal.SIG_IGN)

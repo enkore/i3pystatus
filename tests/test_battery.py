@@ -22,6 +22,7 @@ def test_basic():
         ("test_battery_basic7", "DIS", "27.303", "1h:44m"),
         ("test_battery_132", "DIS", "8.370", "1h:17m"),
         ("test_battery_broken1", "FULL", "0.000", "0h:00m"),
+        ("test_battery_issue89_2", "DIS", "0.000", "0h:00m"),
     ]
     for path, status, consumption, remaining in cases:
         battery_test(path, "{status}", status)
