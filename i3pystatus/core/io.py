@@ -52,10 +52,6 @@ class StandaloneIO(IOHandler):
     and the i3bar protocol header
     """
 
-    refresh_cond = Condition()
-    modules = []
-    treshold_interval = 20.0
-
     n = -1
     proto = [
         {"version": 1, "click_events": True}, "[", "[]", ",[]",
@@ -69,21 +65,24 @@ class StandaloneIO(IOHandler):
 
         super().__init__()
         self.interval = interval
+        self.modules = modules
+
         self.proto[0]['click_events'] = click_events
         self.proto[0] = json.dumps(self.proto[0])
 
-        signal.signal(signal.SIGUSR1, StandaloneIO.refresh_signal_handler)
-        StandaloneIO.modules = modules
+        self.refresh_cond = Condition()
+        self.treshold_interval = 20.0
+        signal.signal(signal.SIGUSR1, self.refresh_signal_handler)
 
     def read(self):
-        StandaloneIO.compute_treshold_interval()
-        StandaloneIO.refresh_cond.acquire()
+        self.compute_treshold_interval()
+        self.refresh_cond.acquire()
 
         while True:
             try:
-                StandaloneIO.refresh_cond.wait(timeout=self.interval)
+                self.refresh_cond.wait(timeout=self.interval)
             except KeyboardInterrupt:
-                StandaloneIO.refresh_cond.release()
+                self.refresh_cond.release()
                 return
 
             yield self.read_line()
@@ -93,32 +92,26 @@ class StandaloneIO(IOHandler):
 
         return self.proto[min(self.n, len(self.proto) - 1)]
 
-    @classmethod
-    def compute_treshold_interval(cls):
+    def compute_treshold_interval(self):
         """
         Current method is to compute average from all intervals.
-
-        Make sure to call after all modules are registered.
         """
 
-        intervals = [m.interval for m in cls.modules if hasattr(m, "interval")]
-        cls.treshold_interval = round(sum(intervals) / len(intervals))
+        intervals = [m.interval for m in self.modules if hasattr(m, "interval")]
+        if len(intervals) > 0:
+            self.treshold_interval = round(sum(intervals) / len(intervals))
 
-    @classmethod
-    def async_refresh(cls):
+    def async_refresh(self):
         """
-        Calling this class method will send the status line to i3bar immediately
+        Calling this method will send the status line to i3bar immediately
         without waiting for timeout (1s by default).
-
-        Do not abuse!
         """
 
-        cls.refresh_cond.acquire()
-        cls.refresh_cond.notify()
-        cls.refresh_cond.release()
+        self.refresh_cond.acquire()
+        self.refresh_cond.notify()
+        self.refresh_cond.release()
 
-    @staticmethod
-    def refresh_signal_handler(signo, frame):
+    def refresh_signal_handler(self, signo, frame):
         """
         This callback is called when SIGUSR1 signal is received.
 
@@ -137,9 +130,9 @@ class StandaloneIO(IOHandler):
         if signo != signal.SIGUSR1:
             return
 
-        for module in StandaloneIO.modules:
+        for module in self.modules:
             if hasattr(module, "interval"):
-                if module.interval > StandaloneIO.treshold_interval:
+                if module.interval > self.treshold_interval:
                     thread = Thread(target=module.run)
                     thread.start()
                 else:
@@ -147,7 +140,7 @@ class StandaloneIO(IOHandler):
             else:
                 module.run()
 
-        StandaloneIO.async_refresh()
+        self.async_refresh()
 
 
 class JSONIO:

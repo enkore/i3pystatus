@@ -16,9 +16,10 @@ class CommandEndpoint:
     :param io_handler_factory: function creating a file-like object returning a JSON generator on .read()
     """
 
-    def __init__(self, modules, io_handler_factory):
+    def __init__(self, modules, io_handler_factory, io):
         self.modules = modules
         self.io_handler_factory = io_handler_factory
+        self.io = io
         self.thread = Thread(target=self._command_endpoint)
         self.thread.daemon = True
 
@@ -31,7 +32,7 @@ class CommandEndpoint:
             target_module = self.modules.get(command["instance"])
             if target_module and target_module.on_click(command["button"]):
                 target_module.run()
-                io.StandaloneIO.async_refresh()
+                self.io.async_refresh()
 
 
 class Status:
@@ -53,7 +54,8 @@ class Status:
             if self.click_events:
                 self.command_endpoint = CommandEndpoint(
                     self.modules,
-                    lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1))
+                    lambda: io.JSONIO(io=io.IOHandler(sys.stdin, open(os.devnull, "w")), skiplines=1),
+                    self.io)
         else:
             self.io = io.IOHandler(input_stream)
 
