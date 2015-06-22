@@ -54,6 +54,7 @@ class StandaloneIO(IOHandler):
 
     refresh_cond = Condition()
     modules = []
+    treshold_interval = 20.0
 
     n = -1
     proto = [
@@ -75,6 +76,7 @@ class StandaloneIO(IOHandler):
         StandaloneIO.modules = modules
 
     def read(self):
+        StandaloneIO.compute_treshold_interval()
         StandaloneIO.refresh_cond.acquire()
 
         while True:
@@ -92,6 +94,11 @@ class StandaloneIO(IOHandler):
         return self.proto[min(self.n, len(self.proto) - 1)]
 
     @classmethod
+    def compute_treshold_interval(cls):
+        intervals = [m.interval for m in cls.modules if hasattr(m, "interval")]
+        cls.treshold_interval = round(sum(intervals) / len(intervals))
+
+    @classmethod
     def async_refresh(cls):
         cls.refresh_cond.acquire()
         cls.refresh_cond.notify()
@@ -99,10 +106,21 @@ class StandaloneIO(IOHandler):
 
     @staticmethod
     def refresh_signal_handler(signo, frame):
-        if signo == signal.SIGUSR1:
-            for module in StandaloneIO.modules:
+        if signo != signal.SIGUSR1:
+            return
+
+        threads = []
+        for module in StandaloneIO.modules:
+            if hasattr(module, "interval"):
+                if module.interval > StandaloneIO.treshold_interval:
+                    thread = Thread(target=module.run)
+                    thread.start()
+                else:
+                    module.run()
+            else:
                 module.run()
-            StandaloneIO.async_refresh()
+
+        StandaloneIO.async_refresh()
 
 
 class JSONIO:
