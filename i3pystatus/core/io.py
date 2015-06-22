@@ -63,8 +63,8 @@ class StandaloneIO(IOHandler):
 
     def __init__(self, click_events, modules, interval=1):
         """
-        StandaloneIO instance must be created in main thread to set SIGUSR1
-        signal handler.
+        StandaloneIO instance must be created in main thread to be able to set
+        the SIGUSR1 signal handler.
         """
 
         super().__init__()
@@ -95,17 +95,45 @@ class StandaloneIO(IOHandler):
 
     @classmethod
     def compute_treshold_interval(cls):
+        """
+        Current method is to compute average from all intervals.
+
+        Make sure to call after all modules are registered.
+        """
+
         intervals = [m.interval for m in cls.modules if hasattr(m, "interval")]
         cls.treshold_interval = round(sum(intervals) / len(intervals))
 
     @classmethod
     def async_refresh(cls):
+        """
+        Calling this class method will send the status line to i3bar immediately
+        without waiting for timeout (1s by default).
+
+        Do not abuse!
+        """
+
         cls.refresh_cond.acquire()
         cls.refresh_cond.notify()
         cls.refresh_cond.release()
 
     @staticmethod
     def refresh_signal_handler(signo, frame):
+        """
+        This callback is called when SIGUSR1 signal is received.
+
+        It updates outputs of all modules by calling their `run` method.
+
+        Interval modules are updated in separate threads if their interval is
+        above a certain treshold value.
+        This treshold is computed by :func:`compute_treshold_interval` class
+        method.
+        The reasoning is that modules with larger intervals also usually take
+        longer to refresh their output and that their output is not required in
+        `real time`.
+        This also prevents possible lag when updating all modules in a row.
+        """
+
         if signo != signal.SIGUSR1:
             return
 
