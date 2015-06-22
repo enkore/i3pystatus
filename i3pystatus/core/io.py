@@ -130,14 +130,13 @@ class StandaloneIO(IOHandler):
         method.
         The reasoning is that modules with larger intervals also usually take
         longer to refresh their output and that their output is not required in
-        `real time`.
+        'real time'.
         This also prevents possible lag when updating all modules in a row.
         """
 
         if signo != signal.SIGUSR1:
             return
 
-        threads = []
         for module in StandaloneIO.modules:
             if hasattr(module, "interval"):
                 if module.interval > StandaloneIO.treshold_interval:
