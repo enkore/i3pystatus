@@ -14,6 +14,7 @@ master branch
 * Added :ref:`hints` to support special uses cases
 * Added support for Pango markup
 * Sending SIGUSR1 to i3pystatus refreshes the bar
+    - See :ref:`refresh`
 * Modules are refreshed instantly after a callback was handled
 * Fixed issue where i3bar would interpret plain-text with
   "HTML-look-alike" characters in them as HTML/Pango
