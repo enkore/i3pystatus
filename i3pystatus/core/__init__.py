@@ -48,7 +48,7 @@ class Status:
         self.standalone = standalone
         self.click_events = click_events
         if standalone:
-            self.io = io.StandaloneIO(self.click_events, interval)
+            self.io = io.StandaloneIO(self.click_events, self.modules, interval)
             if self.click_events:
                 self.command_endpoint = CommandEndpoint(
                     self.modules,

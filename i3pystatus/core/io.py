@@ -1,7 +1,9 @@
-import time
 import json
+import signal
 import sys
 from contextlib import contextmanager
+from threading import Condition
+from threading import Thread
 
 
 class IOHandler:
@@ -50,22 +52,36 @@ class StandaloneIO(IOHandler):
     and the i3bar protocol header
     """
 
+    refresh_cond = Condition()
+    modules = []
+
     n = -1
     proto = [
         {"version": 1, "click_events": True}, "[", "[]", ",[]",
     ]
 
-    def __init__(self, click_events, interval=1):
+    def __init__(self, click_events, modules, interval=1):
+        """
+        StandaloneIO instance must be created in main thread to set SIGUSR1
+        signal handler.
+        """
+
         super().__init__()
         self.interval = interval
         self.proto[0]['click_events'] = click_events
         self.proto[0] = json.dumps(self.proto[0])
 
+        signal.signal(signal.SIGUSR1, StandaloneIO.refresh_signal_handler)
+        StandaloneIO.modules = modules
+
     def read(self):
+        StandaloneIO.refresh_cond.acquire()
+
         while True:
             try:
-                time.sleep(self.interval)
+                StandaloneIO.refresh_cond.wait(timeout=self.interval)
             except KeyboardInterrupt:
+                StandaloneIO.refresh_cond.release()
                 return
 
             yield self.read_line()
@@ -74,6 +90,19 @@ class StandaloneIO(IOHandler):
         self.n += 1
 
         return self.proto[min(self.n, len(self.proto) - 1)]
+
+    @classmethod
+    def async_refresh(cls):
+        cls.refresh_cond.acquire()
+        cls.refresh_cond.notify()
+        cls.refresh_cond.release()
+
+    @staticmethod
+    def refresh_signal_handler(signo, frame):
+        if signo == signal.SIGUSR1:
+            for module in StandaloneIO.modules:
+                module.run()
+            StandaloneIO.async_refresh()
 
 
 class JSONIO:
