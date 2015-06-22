@@ -325,7 +325,7 @@ Some possible uses for these attributes are:
     provides additional formatting options for drawing rainbows and other
     fancy stuff.
 
-Here is an example with the :py:class:`.Network` module.
+Here is an example with the :py:mod:`.network` module.
 Pango markup is used to keep the ESSID green at all times while the
 recieved/sent part is changing color depending on the amount of traffic.
 
@@ -344,7 +344,7 @@ recieved/sent part is changing color depending on the amount of traffic.
             )
 
 Or you can use pango to customize the color of ``status`` setting in
-:py:class:`.NowPlaying` and :py:class:`.MPD` modules.
+:py:mod:`.now_playing` and :py:mod:`.mpd` modules.
 
     .. code:: python
 
