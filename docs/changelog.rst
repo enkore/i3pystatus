@@ -5,6 +5,9 @@ Changelog
 master branch
 +++++++++++++
 
+3.33 (2015-06-23)
++++++++++++++++++
+
 * Errors can now be logged to ``~/.i3pystatus-<pid>``
     - See :ref:`logging`
 * Added new callback system
