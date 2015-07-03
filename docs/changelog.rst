@@ -47,6 +47,7 @@ master branch
     - Removed ``network_graph``
     - Removed ``network_traffic``
     - Removed ``wireless``
+    - All the features of these three modules are now found in network
 * network: added total traffic in Mbytes formatters
 * network: ``basiciw`` is only required if it is used (wireless)
 * network: ``psutil`` is only required if it is used (traffic)
