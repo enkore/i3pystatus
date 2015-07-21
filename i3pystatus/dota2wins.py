@@ -38,7 +38,7 @@ class Dota2wins(IntervalModule):
     matches = 25
     interval = 1800
     screenname = 'retrieve'
-    format = "{screenname} {wins}W:{losses}L {win_percent}%"
+    format = "{screenname} {wins}W:{losses}L {win_percent:.2f}%"
 
     def run(self):
         api.set_api_key(self.steam_api_key)
@@ -96,7 +96,7 @@ class Dota2wins(IntervalModule):
             "screenname": screenname,
             "wins": wins,
             "losses": losses,
-            "win_percent": "%.2f" % win_percent,
+            "win_percent": win_percent,
         }
 
         self.output = {
