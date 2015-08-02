@@ -8,6 +8,9 @@ import logging
 class Shell(IntervalModule):
     """
     Shows output of shell command
+
+    .. rubric:: Available formatters
+    * `{output}` — just the striped command output without newlines
     """
 
     color = "#FFFFFF"
@@ -16,10 +19,12 @@ class Shell(IntervalModule):
     settings = (
         ("command", "command to be executed"),
         ("color", "standard color"),
-        ("error_color", "color to use when non zero exit code is returned")
+        ("error_color", "color to use when non zero exit code is returned"),
+        "format"
     )
 
     required = ("command",)
+    format = "{command}"
 
     def run(self):
         retvalue, out, stderr = run_through_shell(self.command, enable_shell=True)
@@ -31,6 +36,8 @@ class Shell(IntervalModule):
             out = out.replace("\n", " ").strip()
         elif stderr:
             out = stderr
+
+        out = self.format.format(command=out)
 
         self.output = {
             "full_text": out if out else "Command `%s` returned %d" % (self.command, retvalue),
