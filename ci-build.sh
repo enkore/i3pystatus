@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 python3 --version
-py.test --version
+py.test-3.4 --version
 python3 -mpep8 --version
 
 # Target directory for all build files
@@ -19,7 +19,7 @@ PYTHONPATH=${BUILD}/test-install python3 setup.py --quiet install --install-lib 
 test -f ${BUILD}/test-install-bin/i3pystatus
 test -f ${BUILD}/test-install-bin/i3pystatus-setting-util
 
-PYTHONPATH=${BUILD}/test-install py.test --junitxml ${BUILD}/testlog.xml tests
+PYTHONPATH=${BUILD}/test-install py.test-3.4 --junitxml ${BUILD}/testlog.xml tests
 
 # Check that the docs build w/o warnings (-W flag)
-sphinx-build -b html -W docs ${BUILD}/docs/
+sphinx-build-3.4 -b html -W docs ${BUILD}/docs/
