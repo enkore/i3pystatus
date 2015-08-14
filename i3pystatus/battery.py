@@ -140,7 +140,7 @@ class BatteryChecker(IntervalModule):
         ("not_present_text", "Text displayed if the battery is not present. No formatters are available"),
         ("alert", "Display a libnotify-notification on low battery"),
         ("critical_level_command", "Runs a shell command in the case of a critical power state"),
-        "critical_level_percentage"
+        "critical_level_percentage",
         "alert_percentage",
         ("alert_format_title", "The title of the notification, all formatters can be used"),
         ("alert_format_body", "The body text of the notification, all formatters can be used"),
