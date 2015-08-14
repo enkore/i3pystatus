@@ -139,7 +139,8 @@ class BatteryChecker(IntervalModule):
         "format",
         ("not_present_text", "Text displayed if the battery is not present. No formatters are available"),
         ("alert", "Display a libnotify-notification on low battery"),
-        ("alert_command", "Runs a shell command of low-battery emergency"),
+        ("critical_level_command", "Runs a shell command in the case of a critical power state"),
+        "critical_level_percentage"
         "alert_percentage",
         ("alert_format_title", "The title of the notification, all formatters can be used"),
         ("alert_format_body", "The body text of the notification, all formatters can be used"),
@@ -167,7 +168,8 @@ class BatteryChecker(IntervalModule):
     not_present_text = "Battery {battery_ident} not present"
 
     alert = False
-    alert_command = ""
+    critical_level_command = ""
+    critical_percentage = 1
     alert_percentage = 10
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
@@ -295,8 +297,8 @@ class BatteryChecker(IntervalModule):
         else:
             fdict["status"] = "FULL"
             color = self.full_color
-        if self.alert_command and fdict["status"] == "DIS" and fdict["percentage"] <= 1:
-            run_through_shell(self.alert_command, enable_shell=True)
+        if self.critical_level_command and fdict["status"] == "DIS" and fdict["percentage"] <= self.critical_percentage:
+            run_through_shell(self.critical_level_command, enable_shell=True)
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
             DesktopNotification(
