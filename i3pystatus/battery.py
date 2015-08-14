@@ -169,7 +169,7 @@ class BatteryChecker(IntervalModule):
 
     alert = False
     critical_level_command = ""
-    critical_percentage = 1
+    critical_level_percentage = 1
     alert_percentage = 10
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
@@ -297,7 +297,7 @@ class BatteryChecker(IntervalModule):
         else:
             fdict["status"] = "FULL"
             color = self.full_color
-        if self.critical_level_command and fdict["status"] == "DIS" and fdict["percentage"] <= self.critical_percentage:
+        if self.critical_level_command and fdict["status"] == "DIS" and fdict["percentage"] <= self.critical_level_percentage:
             run_through_shell(self.critical_level_command, enable_shell=True)
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
