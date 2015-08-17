@@ -42,6 +42,11 @@ class Dota2wins(IntervalModule):
 
     def run(self):
         api.set_api_key(self.steam_api_key)
+
+        if not isinstance(self.steamid, int):
+            # find by username
+            self.steamid = int(api.get_steam_id(self.steamid)['response']['steamid'])
+
         hist = api.get_match_history(account_id=self.steamid)['result']
         recent_matches = []
         while len(recent_matches) < self.matches:
