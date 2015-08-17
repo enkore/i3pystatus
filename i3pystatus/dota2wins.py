@@ -10,7 +10,7 @@ class Dota2wins(IntervalModule):
 
     settings = (
         ("matches", "Number of recent matches to calculate"),
-        ("steamid", "Steam user to track"),
+        ("steamid", "Steam ID or username to track"),
         ("steam_api_key", "Steam API key "
             "(http://steamcommunity.com/dev/apikey)"),
         ("good_threshold", "Win percentage (or higher) which you are happy "
