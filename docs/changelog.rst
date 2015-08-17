@@ -8,7 +8,7 @@ master branch
 .. _r3.33:
 
 * New modules
-    - :py:mod:`.xkblayou`: View and change keyboard layout
+    - :py:mod:`.xkblayout`: View and change keyboard layout
 * :py:mod:`.dota2wins`: Now accepts usernames in place of a Steam ID
 * dota2wins: Changed win percentage to be a float
 * :py:mod:`.uptime`: Added days, hours, minutes, secs formatters
