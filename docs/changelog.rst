@@ -7,6 +7,14 @@ master branch
 
 .. _r3.33:
 
+* New modules
+    - :py:mod:`.xkblayou`: View and change keyboard layout
+* :py:mod:`.dota2wins`: Now accepts usernames in place of a Steam ID
+* dota2wins: Changed win percentage to be a float
+* :py:mod:`.uptime`: Added days, hours, minutes, secs formatters
+* :py:mod:`.battery`: Added alert command feature (runs a shell
+  command when the battery is discharged below a preset threshold)
+
 3.33 (2015-06-23)
 +++++++++++++++++
 
