@@ -1,8 +1,8 @@
 import os
 
 from i3pystatus import IntervalModule, formatp
+from i3pystatus.core.command import run_through_shell
 from i3pystatus.core.util import TimeWrapper
-import subprocess
 
 
 def _extract_artist_title(input):
@@ -54,16 +54,14 @@ class Cmus(IntervalModule):
     on_downscroll = 'previous_song'
 
     def _cmus_command(self, command):
-        p = subprocess.Popen('cmus-remote --{command}'.format(command=command), shell=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT)
-        return p.communicate()
+        cmdline = 'cmus-remote --{command}'.format(command=command)
+        return run_through_shell(cmdline, enable_shell=True)
 
     def _query_cmus(self):
         status_dict = {}
-        status, error = self._cmus_command('query')
-        if status != b'cmus-remote: cmus is not running\n':
-            status = status.decode('utf-8').split('\n')
+        cmd = self._cmus_command('query')
+        if not cmd.rc:
+            status = cmd.out.split('\n')
             for item in status:
                 split_item = item.split(' ')
                 if split_item[0] in ['tag', 'set']:
