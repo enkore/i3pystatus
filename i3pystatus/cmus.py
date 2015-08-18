@@ -39,20 +39,20 @@ class Cmus(IntervalModule):
                    'stream, bitrate'),
         'color',
     )
-    color = "#909090"
-    format = "{status} {song_elapsed}/{song_length} {artist} - {title}"
+    color = '#909090'
+    format = '{status} {song_elapsed}/{song_length} {artist} - {title}'
     status_text = ''
     interval = 1
     status = {
-        "paused": "▷",
-        "playing": "▶",
-        "stopped": "◾",
+        'paused': '▷',
+        'playing': '▶',
+        'stopped': '◾',
     }
 
-    on_leftclick = "playpause"
-    on_rightclick = "next_song"
-    on_upscroll = "next_song"
-    on_downscroll = "previous_song"
+    on_leftclick = 'playpause'
+    on_rightclick = 'next_song'
+    on_upscroll = 'next_song'
+    on_downscroll = 'previous_song'
 
     def _cmus_command(self, command):
         p = subprocess.Popen('cmus-remote --{command}'.format(command=command), shell=True,
@@ -79,13 +79,13 @@ class Cmus(IntervalModule):
         status = self._query_cmus()
         if not status:
             self.output = {
-                "full_text": 'Not running',
-                "color": self.color
+                'full_text': 'Not running',
+                'color': self.color
             }
             return
         fdict = {
             'file': status.get('file', ''),
-            'status': self.status[status["status"]],
+            'status': self.status[status['status']],
             'title': status.get('tag_title', ''),
             'stream': status.get('stream', ''),
             'album': status.get('tag_album', ''),
@@ -93,7 +93,7 @@ class Cmus(IntervalModule):
             'tracknumber': status.get('tag_tracknumber', 0),
             'song_length': TimeWrapper(status.get('duration', 0)),
             'song_elapsed': TimeWrapper(status.get('position', 0)),
-            'bitrate': int(status.get("bitrate", 0)),
+            'bitrate': int(status.get('bitrate', 0)),
         }
 
         if fdict['stream']:
@@ -109,8 +109,8 @@ class Cmus(IntervalModule):
         fdict['artist'] = fdict['artist'].strip()
 
         self.output = {
-            "full_text": formatp(self.format, **fdict),
-            "color": self.color
+            'full_text': formatp(self.format, **fdict),
+            'color': self.color
         }
 
     def playpause(self):
@@ -123,7 +123,7 @@ class Cmus(IntervalModule):
             self._cmus_command('play')
 
     def next_song(self):
-        self._cmus_command("next")
+        self._cmus_command('next')
 
     def previous_song(self):
-        self._cmus_command("prev")
+        self._cmus_command('prev')
