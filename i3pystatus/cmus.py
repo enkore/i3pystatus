@@ -73,8 +73,7 @@ class Cmus(IntervalModule):
 
     def run(self):
         self.output = {
-            'full_text': self.format_not_running,
-            'color': self.color
+            'color': self.color,
         }
         response = self._query_cmus()
 
@@ -100,6 +99,8 @@ class Cmus(IntervalModule):
                 fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
 
             self.output['full_text'] = formatp(self.format, **fdict)
+        else:
+            self.output['full_text'] = self.format_not_running
 
     def playpause(self):
         status = self._query_cmus().get('status', '')
