@@ -31,12 +31,14 @@ class Cmus(IntervalModule):
 
     settings = (
         ('format', 'formatp string'),
+        ('format_not_running', 'Text to show if cmus is not running'),
         ('color', 'The color of the text'),
         ('status', 'Dictionary mapping status to output'),
     )
 
     color = '#909090'
     format = '{status} {song_elapsed}/{song_length} {artist} - {title}'
+    format_not_running = 'Not running'
     interval = 1
     status = {
         'paused': '▷',
@@ -71,7 +73,7 @@ class Cmus(IntervalModule):
 
     def run(self):
         self.output = {
-            'full_text': 'Not running',
+            'full_text': self.format_not_running,
             'color': self.color
         }
         response = self._query_cmus()
