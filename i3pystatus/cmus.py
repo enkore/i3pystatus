@@ -68,42 +68,34 @@ class Cmus(IntervalModule):
         return response
 
     def run(self):
-        status = self._query_cmus()
-        if not status:
-            self.output = {
-                'full_text': 'Not running',
-                'color': self.color
-            }
-            return
-        fdict = {
-            'file': status.get('file', ''),
-            'status': self.status[status['status']],
-            'title': status.get('tag_title', ''),
-            'stream': status.get('stream', ''),
-            'album': status.get('tag_album', ''),
-            'artist': status.get('tag_artist', ''),
-            'tracknumber': status.get('tag_tracknumber', 0),
-            'song_length': TimeWrapper(status.get('duration', 0)),
-            'song_elapsed': TimeWrapper(status.get('position', 0)),
-            'bitrate': int(status.get('bitrate', 0)),
-        }
-
-        if fdict['stream']:
-            fdict['artist'], fdict[
-                'title'] = _extract_artist_title(fdict['stream'])
-
-        elif not fdict['title']:
-            _, filename = os.path.split(fdict['file'])
-            filebase, _ = os.path.splitext(filename)
-            fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
-
-        fdict['title'] = fdict['title'].strip()
-        fdict['artist'] = fdict['artist'].strip()
-
         self.output = {
-            'full_text': formatp(self.format, **fdict),
+            'full_text': 'Not running',
             'color': self.color
         }
+        response = self._query_cmus()
+
+        if response:
+            fdict = {
+                'file': response.get('file', ''),
+                'status': self.status[response['status']],
+                'title': response.get('tag_title', ''),
+                'stream': response.get('stream', ''),
+                'album': response.get('tag_album', ''),
+                'artist': response.get('tag_artist', ''),
+                'tracknumber': response.get('tag_tracknumber', 0),
+                'song_length': TimeWrapper(response.get('duration', 0)),
+                'song_elapsed': TimeWrapper(response.get('position', 0)),
+                'bitrate': int(response.get('bitrate', 0)),
+            }
+
+            if fdict['stream']:
+                fdict['artist'], fdict['title'] = _extract_artist_title(fdict['stream'])
+            elif not fdict['title']:
+                filename = os.path.basename(fdict['file'])
+                filebase, _ = os.path.splitext(filename)
+                fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
+
+            self.output['full_text'] = formatp(self.format, **fdict)
 
     def playpause(self):
         status = self._query_cmus().get('status', '')
