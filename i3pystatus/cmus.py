@@ -32,6 +32,7 @@ class Cmus(IntervalModule):
     settings = (
         ('format', 'formatp string'),
         ('color', 'The color of the text'),
+        ('status', 'Dictionary mapping status to output'),
     )
 
     color = '#909090'
