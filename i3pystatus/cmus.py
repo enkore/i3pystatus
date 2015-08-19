@@ -32,9 +32,9 @@ class Cmus(IntervalModule):
         ('format', 'formatp string'),
         ('color', 'The color of the text'),
     )
+
     color = '#909090'
     format = '{status} {song_elapsed}/{song_length} {artist} - {title}'
-    status_text = ''
     interval = 1
     status = {
         'paused': '▷',
