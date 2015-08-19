@@ -6,14 +6,16 @@ Module reference
 
 .. rubric:: Module overview:
 
-:System: `clock`_ - `cpu_usage`_ - `disk`_ - `load`_ - `mem`_
+:System: `clock`_ - `cpu_freq`_ - `cpu_usage`_ - `disk`_ - `keyboard_locks`_ - `load`_ - `mem`_ -
+         `uname`_ - `uptime`_ - `xkblayout`_
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `backlight`_ - `battery`_ - `temp`_
-:Network: `network`_
-:Music: `mpd`_ - `now_playing`_
-:Websites: `bitcoin`_ - `parcel`_ - `reddit`_ - `weather`_
-:Other: `mail`_ - `pyload`_ - `text`_ - `updates`_
-:Advanced: `file`_ - `regex`_ - `runwatch`_ - `shell`_
+:Network: `net_speed`_ - `network`_ - `openstack_vms`_ - `openvpn`_
+:Music: `cmus`_ - `mpd`_ - `now_playing`_ - `pianobar`_ - `spotify`_
+:Websites: `bitcoin`_ - `dota2wins`_ - `github`_ - `modsde`_ - `parcel`_ - `reddit`_ - `weather`_ -
+           `whosonlocation`_
+:Other: `anybar`_ - `mail`_ - `pomodoro`_ - `pyload`_ - `text`_ - `updates`_
+:Advanced: `file`_ - `regex`_ - `makewatch`_ - `runwatch`_ - `shell`_
 
 .. autogen:: i3pystatus Module
 
