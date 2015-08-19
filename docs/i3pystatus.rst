@@ -6,12 +6,12 @@ Module reference
 
 .. rubric:: Module overview:
 
-:System: `clock`_ - `disk`_ - `load`_ - `mem`_  - `cpu_usage`_
+:System: `clock`_ - `cpu_usage`_ - `disk`_ - `load`_ - `mem`_
 :Audio: `alsa`_ - `pulseaudio`_
-:Hardware: `battery`_ - `backlight`_ - `temp`_
+:Hardware: `backlight`_ - `battery`_ - `temp`_
 :Network: `network`_
-:Music: `now_playing`_ - `mpd`_
-:Websites: `weather`_ - `bitcoin`_ - `reddit`_ - `parcel`_
+:Music: `mpd`_ - `now_playing`_
+:Websites: `bitcoin`_ - `parcel`_ - `reddit`_ - `weather`_
 :Other: `mail`_ - `pyload`_ - `text`_ - `updates`_
 :Advanced: `file`_ - `regex`_ - `runwatch`_ - `shell`_
 
