@@ -52,19 +52,20 @@ class Cmus(IntervalModule):
         return run_through_shell(cmdline, enable_shell=True)
 
     def _query_cmus(self):
-        status_dict = {}
+        response = {}
         cmd = self._cmus_command('query')
+
         if not cmd.rc:
-            status = cmd.out.split('\n')
-            for item in status:
-                split_item = item.split(' ')
-                if split_item[0] in ['tag', 'set']:
-                    key = '_'.join(split_item[:2])
-                    val = ' '.join([x for x in split_item[2:]])
-                    status_dict[key] = val
+            for line in cmd.out.splitlines():
+                category, _, category_value = line.partition(' ')
+                if category in ('set', 'tag'):
+                    key, _, value = category_value.partition(' ')
+                    key = '_'.join((category, key))
+                    response[key] = value
                 else:
-                    status_dict[split_item[0]] = ' '.join(split_item[1:])
-        return status_dict
+                    response[category] = category_value
+
+        return response
 
     def run(self):
         status = self._query_cmus()
