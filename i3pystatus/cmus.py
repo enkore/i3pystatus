@@ -37,8 +37,8 @@ class Cmus(IntervalModule):
         ('status', 'Dictionary mapping status to output'),
     )
 
-    color = '#909090'
-    color_not_running = '#909090'
+    color = '#ffffff'
+    color_not_running = '#ffffff'
     format = '{status} {song_elapsed}/{song_length} {artist} - {title}'
     format_not_running = 'Not running'
     interval = 1
