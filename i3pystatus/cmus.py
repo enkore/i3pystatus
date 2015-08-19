@@ -1,6 +1,7 @@
 import os
 
-from i3pystatus import IntervalModule, formatp
+from i3pystatus import formatp
+from i3pystatus import IntervalModule
 from i3pystatus.core.command import run_through_shell
 from i3pystatus.core.util import TimeWrapper
 
