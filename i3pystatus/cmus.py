@@ -33,10 +33,12 @@ class Cmus(IntervalModule):
         ('format', 'formatp string'),
         ('format_not_running', 'Text to show if cmus is not running'),
         ('color', 'The color of the text'),
+        ('color_not_running', 'The color of the text, when cmus is not running'),
         ('status', 'Dictionary mapping status to output'),
     )
 
     color = '#909090'
+    color_not_running = '#909090'
     format = '{status} {song_elapsed}/{song_length} {artist} - {title}'
     format_not_running = 'Not running'
     interval = 1
@@ -72,9 +74,7 @@ class Cmus(IntervalModule):
         return response
 
     def run(self):
-        self.output = {
-            'color': self.color,
-        }
+        self.output = {}
         response = self._query_cmus()
 
         if response:
@@ -99,8 +99,10 @@ class Cmus(IntervalModule):
                 fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
 
             self.output['full_text'] = formatp(self.format, **fdict)
+            self.output['color'] = self.color
         else:
             self.output['full_text'] = self.format_not_running
+            self.output['color'] = self.color_not_running
 
     def playpause(self):
         status = self._query_cmus().get('status', '')
