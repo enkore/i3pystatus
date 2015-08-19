@@ -6,12 +6,8 @@ from i3pystatus.core.util import TimeWrapper
 
 
 def _extract_artist_title(input):
-    for sep in ('-', ' - '):
-        split = input.split(sep)
-        if len(split) == 2:
-            return split[0], split[1]
-    # fallback
-    return (input.split('-') + [''] * 2)[:2]
+    artist, title = (input.split('-') + [''])[:2]
+    return artist.strip(), title.strip()
 
 
 class Cmus(IntervalModule):
