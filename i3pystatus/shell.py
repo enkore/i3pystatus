@@ -24,7 +24,7 @@ class Shell(IntervalModule):
     )
 
     required = ("command",)
-    format = "{command}"
+    format = "{output}"
 
     def run(self):
         retvalue, out, stderr = run_through_shell(self.command, enable_shell=True)
@@ -37,9 +37,7 @@ class Shell(IntervalModule):
         elif stderr:
             out = stderr
 
-        out = self.format.format(command=out)
-
         self.output = {
-            "full_text": out if out else "Command `%s` returned %d" % (self.command, retvalue),
+            "full_text": self.format.format(output=out) if out else "Command `%s` returned %d" % (self.command, retvalue),
             "color": self.color if retvalue == 0 else self.error_color
         }
