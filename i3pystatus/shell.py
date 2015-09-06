@@ -2,14 +2,13 @@ from i3pystatus import IntervalModule
 from i3pystatus.core.command import run_through_shell
 import logging
 
-# logger = logging.getLogger(__name__)
-
 
 class Shell(IntervalModule):
     """
     Shows output of shell command
 
     .. rubric:: Available formatters
+
     * `{output}` — just the striped command output without newlines
     """
 
