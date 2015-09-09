@@ -90,7 +90,6 @@ Contributors
 *  Mikael Knutsson
 *  Naglis Jonaitis
 *  Pandada8
-*  philipdexter
 *  Philip Dexter
 *  Sergei Turukin
 *  siikamiika
