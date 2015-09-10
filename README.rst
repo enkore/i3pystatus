@@ -7,7 +7,7 @@ i3pystatus
 .. image:: https://travis-ci.org/enkore/i3pystatus.svg?branch=master
     :target: https://travis-ci.org/enkore/i3pystatus
 
-i3pystatus is a growing collection of python scripts for 
+i3pystatus is a growing collection of python scripts for
 status output compatible to i3status / i3bar of the i3 window manager.
 
 Installation
@@ -47,63 +47,9 @@ Changelog
 Contributors
 ------------
 
-*  aaron-lebo
-*  Alastair Houghton
-*  Alexis Lahouze
-*  Alex Timmermann
-*  Andrés Martano
-*  Argish42
-*  Armin Fisslthaler
-*  Arvedui
-*  Baptiste Grenier
-*  bparmentier
-*  Cezary Biele
-*  cganas
-*  Christopher Ganas
-*  Chris Wood
-*  David Foucher
-*  David Garcia Quintas
-*  dubwoc
-*  eBrnd
-*  enkore (current maintainer)
-*  facetoe
-*  Frank Tackitt
-*  gacekjk
-*  Goran Mekić
-*  Gordon Schulz
-*  Hugo Osvaldo Barrera
-*  Iliyas Jorio
-*  Jan Oliver Oelerich (former maintainer)
-*  Jason Hite
-*  Joaquin Ignacio Barotto
-*  Jörg Thalheim
-*  Josef Gajdusek
-*  Júlio Rieger Lucchese
-*  Kenneth Lyons
-*  krypt-n
-*  Lukáš Mandák
-*  Łukasz Jędrzejewski
-*  Matthias Pronk
-*  Matthieu Coudron
-*  Matus Telgarsky
-*  Michael Schmidt
-*  Mikael Knutsson
-*  Naglis Jonaitis
-*  Pandada8
-*  philipdexter
-*  Philip Dexter
-*  Sergei Turukin
-*  siikamiika
-*  Simon
-*  Simon Legner
-*  Stéphane Brunner
-*  Talwrii
-*  theswitch
-*  tomasm
-*  Tom X. Tobin
-*  tyjak
-*  Tyjak
-*  Zack Gold
+A list of all contributors can be found in `CONTRIBUTORS <http://github.com/enkore/i3pystatus/CONTRIBUTORS>`_.
+Particular noteworthy contributors are former maintainer Jan Oliver Oelerich and
+current maintainer enkore.
 
 Contribute
 ----------
