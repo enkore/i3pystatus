@@ -28,12 +28,14 @@ class CpuUsage(IntervalModule):
     format_all = "{core}:{usage:02}%"
     exclude_average = False
     interval = 1
+    color = None
     settings = (
         ("format", "format string."),
         ("format_all", ("format string used for {usage_all} per core. "
                         "Available formaters are {core} and {usage}. ")),
         ("exclude_average", ("If True usage average of all cores will "
-                             "not be in format_all."))
+                             "not be in format_all.")),
+	("color", "HTML color code #RRGGBB")
     )
 
     def init(self):
@@ -117,5 +119,6 @@ class CpuUsage(IntervalModule):
         usage['usage'] = usage['usage_cpu']
 
         self.output = {
-            "full_text": self.format.format_map(usage)
+            "full_text": self.format.format_map(usage),
+            "color": self.color
         }
