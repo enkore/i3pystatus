@@ -114,6 +114,7 @@ class MPD(IntervalModule):
                     if len(fdict[key]) > self.max_field_len:
                         fdict[key] = fdict[key][:self.max_field_len - 1] + "…"
 
+            color_out = self.color
             full_text = formatp(self.format, **fdict).strip()
             full_text_len = len(full_text)
             if full_text_len > self.max_len and self.max_len > 0:
@@ -122,15 +123,15 @@ class MPD(IntervalModule):
 
                 for key in self.truncate_fields:
                     fdict[key] = fdict[key][:shrink] + "…"
-
+            
                 full_text = formatp(self.format, **fdict).strip()
         else:
             full_text = self.msg_error
-            self.color = self.color_error
+            color_out = self.color_error
 
         self.output = {
             "full_text": full_text,
-            "color": self.color,
+            "color": color_out,
         }
 
     def switch_playpause(self):
