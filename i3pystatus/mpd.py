@@ -33,6 +33,8 @@ class MPD(IntervalModule):
         ("host"),
         ("port", "MPD port"),
         ("format", "formatp string"),
+        ("msg_error", "Discrete 'no mpd' error message"),
+        ("color_error", "Color error message"),  
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
         ("max_field_len", "Defines max length for in truncate_fields defined fields, if truncated, ellipsis are appended as indicator. It's applied *before* max_len. Value of 0 disables this."),
@@ -53,17 +55,22 @@ class MPD(IntervalModule):
     color = "#FFFFFF"
     max_field_len = 25
     max_len = 100
+    msg_error = "No_mpd"
+    color_error = "#FFF000"
     truncate_fields = ("title", "album", "artist")
     on_leftclick = "switch_playpause"
     on_rightclick = "next_song"
     on_upscroll = on_rightclick
     on_downscroll = "previous_song"
-
+    
     def _mpd_command(self, sock, command):
         try:
             sock.send((command + "\n").encode("utf-8"))
         except Exception as e:
-            self.s = socket.create_connection((self.host, self.port))
+            try:
+                self.s = socket.create_connection((self.host, self.port))
+            except socket.error as e:
+                return None
             sock = self.s
             sock.recv(8192)
             sock.send((command + "\n").encode("utf-8"))
@@ -75,47 +82,51 @@ class MPD(IntervalModule):
                 (line.split(": ", 1)) for line in replylines
             )
         except Exception as e:
-            return None
+            return None 
 
     def run(self):
         status = self._mpd_command(self.s, "status")
-        currentsong = self._mpd_command(self.s, "currentsong")
-        fdict = {
-            "pos": int(status.get("song", 0)) + 1,
-            "len": int(status["playlistlength"]),
-            "status": self.status[status["state"]],
-            "volume": int(status["volume"]),
+        if status != None:
+            currentsong = self._mpd_command(self.s, "currentsong")
+            fdict = {
+                "pos": int(status.get("song", 0)) + 1,
+                "len": int(status["playlistlength"]),
+                "status": self.status[status["state"]],
+                "volume": int(status["volume"]),
 
-            "title": currentsong.get("Title", ""),
-            "album": currentsong.get("Album", ""),
-            "artist": currentsong.get("Artist", ""),
-            "song_length": TimeWrapper(currentsong.get("Time", 0)),
-            "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
-            "bitrate": int(status.get("bitrate", 0)),
+                "title": currentsong.get("Title", ""),
+                "album": currentsong.get("Album", ""),
+                "artist": currentsong.get("Artist", ""),
+                "song_length": TimeWrapper(currentsong.get("Time", 0)),
+                "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
+                "bitrate": int(status.get("bitrate", 0)),
 
-        }
+            } 
 
-        if not fdict["title"] and "filename" in fdict:
-            fdict["filename"] = '.'.join(
-                basename(currentsong["file"]).split('.')[:-1])
-        else:
-            fdict["filename"] = ""
+            if not fdict["title"] and "filename" in fdict:
+                fdict["filename"] = '.'.join(
+                    basename(currentsong["file"]).split('.')[:-1])
+            else:
+                fdict["filename"] = ""
 
-        if self.max_field_len > 0:
-            for key in self.truncate_fields:
-                if len(fdict[key]) > self.max_field_len:
-                    fdict[key] = fdict[key][:self.max_field_len - 1] + "…"
-
-        full_text = formatp(self.format, **fdict).strip()
-        full_text_len = len(full_text)
-        if full_text_len > self.max_len and self.max_len > 0:
-            shrink = floor((self.max_len - full_text_len) /
-                           len(self.truncate_fields)) - 1
-
-            for key in self.truncate_fields:
-                fdict[key] = fdict[key][:shrink] + "…"
+            if self.max_field_len > 0:
+                for key in self.truncate_fields:
+                    if len(fdict[key]) > self.max_field_len:
+                        fdict[key] = fdict[key][:self.max_field_len - 1] + "…"
 
             full_text = formatp(self.format, **fdict).strip()
+            full_text_len = len(full_text)
+            if full_text_len > self.max_len and self.max_len > 0:
+                shrink = floor((self.max_len - full_text_len) /
+                               len(self.truncate_fields)) - 1
+
+                for key in self.truncate_fields:
+                    fdict[key] = fdict[key][:shrink] + "…"
+
+                full_text = formatp(self.format, **fdict).strip()
+        else:
+            full_text = self.msg_error
+            self.color = self.color_error
 
         self.output = {
             "full_text": full_text,
