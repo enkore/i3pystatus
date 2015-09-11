@@ -16,7 +16,7 @@ class MoonPhase(IntervalModule):
     """
     Available Formatters
 
-    status: Allows for mapping of current moon phase to various
+    status: Allows for mapping of current moon phase
     - New Moon:
     - Waxing Crescent:
     - First Quarter:
