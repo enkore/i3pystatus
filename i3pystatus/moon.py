@@ -54,6 +54,8 @@ class MoonPhase(IntervalModule):
 
         }
 
+        color = "#ffffff"
+
         phase_color = {
             "New Moon": "#00BDE5",
             "Waxing Crescent": "#138DD8",
@@ -111,6 +113,8 @@ class MoonPhase(IntervalModule):
             return phase
 
         def run(self):
+
+            color = self.color
 
             fdict = {
                 "status": self.status[self.current_phase()],
