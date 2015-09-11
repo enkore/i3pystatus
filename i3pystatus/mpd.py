@@ -123,7 +123,7 @@ class MPD(IntervalModule):
 
                 for key in self.truncate_fields:
                     fdict[key] = fdict[key][:shrink] + "…"
-            
+
                 full_text = formatp(self.format, **fdict).strip()
         else:
             full_text = self.msg_error
