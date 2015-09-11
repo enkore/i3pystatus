@@ -34,7 +34,7 @@ class MPD(IntervalModule):
         ("port", "MPD port"),
         ("format", "formatp string"),
         ("msg_error", "Discrete 'no mpd' error message"),
-        ("color_error", "Color error message"),  
+        ("color_error", "Color error message"),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
         ("max_field_len", "Defines max length for in truncate_fields defined fields, if truncated, ellipsis are appended as indicator. It's applied *before* max_len. Value of 0 disables this."),
@@ -62,7 +62,7 @@ class MPD(IntervalModule):
     on_rightclick = "next_song"
     on_upscroll = on_rightclick
     on_downscroll = "previous_song"
-    
+
     def _mpd_command(self, sock, command):
         try:
             sock.send((command + "\n").encode("utf-8"))
@@ -82,11 +82,11 @@ class MPD(IntervalModule):
                 (line.split(": ", 1)) for line in replylines
             )
         except Exception as e:
-            return None 
+            return None
 
     def run(self):
         status = self._mpd_command(self.s, "status")
-        if status != None:
+        if status is not None:
             currentsong = self._mpd_command(self.s, "currentsong")
             fdict = {
                 "pos": int(status.get("song", 0)) + 1,
@@ -101,7 +101,7 @@ class MPD(IntervalModule):
                 "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
                 "bitrate": int(status.get("bitrate", 0)),
 
-            } 
+            }
 
             if not fdict["title"] and "filename" in fdict:
                 fdict["filename"] = '.'.join(
