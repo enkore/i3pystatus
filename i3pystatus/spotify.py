@@ -1,78 +1,105 @@
-import threading
 import math
+from i3pystatus import formatp
+from i3pystatus import IntervalModule
+from gi.repository import Playerctl
 
-from i3pystatus import Module
-from gi.repository import Playerctl, GLib
 
-
-class Spotify(Module):
+class Spotify(IntervalModule):
     """
-    This class shows information from Spotify.
+    Gets Spotify info using playerctl
 
-    Left click will toggle pause/play of the current song.
-    Right click will skip the song.
+    .. rubric:: Available formatters
 
-    Dependent on Playerctl ( https://github.com/acrisci/playerctl ) and GLib
+    * `{status}` — current status icon (paused/playing)
+    * `{length}` — total song duration (mm:ss format)
+    * `{artist}` — artist
+    * `{title}` — title
+    * `{album}` — album
     """
-
-    format = "{artist} - {title}"
-    color = "#ffffff"
 
     settings = (
-        ("format", "Format string. {artist}, {title}, {album}, {volume}, and {length} are available for output."),
-        ("color", "color of the output"),
+        ('format', 'formatp string'),
+        ('format_not_running', 'Text to show if cmus is not running'),
+        ('color', 'The color of the text'),
+        ('color_not_running', 'The color of the text, when cmus is not running'),
+        ('status', 'Dictionary mapping status to output'),
     )
 
-    on_leftclick = "switch_playpause"
-    on_rightclick = "next_song"
+    # default settings
+    color = '#ffffff'
+    color_not_running = '#ffffff'
+    format = '{status} {length} {artist} - {title}'
+    format_not_running = 'Not running'
+    interval = 1
+    status = {
+        'paused': '▷',
+        'playing': '▶',
+    }
 
-    def main_loop(self):
-        """ Mainloop blocks so we thread it."""
-        self.player = Playerctl.Player()
-        self.player.on('metadata', self.set_status)
+    on_leftclick = 'playpause'
+    on_rightclick = 'next_song'
+    on_upscroll = 'next_song'
 
-        if self.player.props.status != "":
-            self.set_status(self.player)
+    def get_info(self, player):
+        """gets spotify track info from playerctl"""
 
-        main = GLib.MainLoop()
-        main.run()
-
-    def init(self):
-        try:
-            t = threading.Thread(target=self.main_loop)
-            t.daemon = True
-            t.start()
-        except Exception as e:
-            self.output = {
-                "full_text": "Error creating new thread!",
-                "color": "#FF0000"
-            }
-
-    def set_status(self, player, e=None):
         artist = player.get_artist()
         title = player.get_title()
         album = player.get_album()
-        volume = player.props.volume
+        status = player.props.status
 
+        # gets the length of spotify through the metadata command
         length = ""
-        if e is not None:
-            time = e["mpris:length"] / 60.0e6
+
+        # stores the metadata and checks if it is valid
+        metadata = player.props.metadata
+        if metadata is not None:
+            # math to convert the number stored in mpris:length to a human readable format
+            time = dict(metadata)["mpris:length"] / 60.0e6
             minutes = math.floor(time)
             seconds = round(time % 1 * 60)
             if seconds < 10:
                 seconds = "0" + str(seconds)
             length = "{}:{}".format(minutes, seconds)
 
-        self.output = {
-            "full_text": self.format.format(
-                artist=artist, title=title,
-                album=album, length=length,
-                volume=volume),
-            "color": self.color
-        }
+        # sets length to an empty string if it does not exist for whatever reason. This should usually not happen
+        else:
+            length = ""
 
-    def switch_playpause(self):
+        # returns a dictionary of all spotify data
+        return {"artist": artist, "title": title, "album": album, "status": status, "length": length}
+
+    def run(self):
+        """Main statement, executes all code every interval"""
+
+        # tries to create player object and get data from player
+        try:
+            self.player = Playerctl.Player()
+
+            self.output = {}
+            response = self.get_info(self.player)
+
+            # creates a dictionary of the spotify data captured
+            fdict = {
+                'status': self.status[response['status'].lower()],
+                'title': response["title"],
+                'album': response.get('album', ''),
+                'artist': response.get('artist', ''),
+                'length': response.get('length', 0),
+            }
+            # outputs the dictionary in the default (or specified) color
+            self.output['full_text'] = formatp(self.format, **fdict)
+            self.output['color'] = self.color
+
+        # outputs the not running string if spotify is closed
+        except:
+            self.output['full_text'] = self.format_not_running
+            self.output['color'] = self.color_not_running
+
+    def playpause(self):
+        """Pauses and plays spotify"""
         self.player.play_pause()
 
     def next_song(self):
+        """skips to the next song"""
         self.player.next()
