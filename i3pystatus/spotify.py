@@ -76,7 +76,6 @@ class Spotify(IntervalModule):
         try:
             self.player = Playerctl.Player()
 
-            self.output = {}
             response = self.get_info(self.player)
 
             # creates a dictionary of the spotify data captured
@@ -87,14 +86,13 @@ class Spotify(IntervalModule):
                 'artist': response.get('artist', ''),
                 'length': response.get('length', 0),
             }
-            # outputs the dictionary in the default (or specified) color
-            self.output['full_text'] = formatp(self.format, **fdict)
-            self.output['color'] = self.color
+            self.output = {"full_text": formatp(self.format, **fdict),
+                           "color": self.color}
 
         # outputs the not running string if spotify is closed
         except:
-            self.output['full_text'] = self.format_not_running
-            self.output['color'] = self.color_not_running
+            self.output = {"full_text": self.format_not_running,
+                           "color": self.color_not_running}
 
     def playpause(self):
         """Pauses and plays spotify"""
