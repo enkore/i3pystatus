@@ -7,6 +7,7 @@ some packeges might be counted twice.
 from i3pystatus.core.command import run_through_shell
 from i3pystatus.updates import Backend
 
+
 class Yaourt(Backend):
 
     @property
