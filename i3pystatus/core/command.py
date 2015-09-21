@@ -30,22 +30,22 @@ def run_through_shell(command, enable_shell=False):
     except OSError as e:
         out = e.strerror
         stderr = e.strerror
-        logging.getLogger("i3pystatus.command").exception("")
+        logging.getLogger("i3pystatus.core.command").exception("")
     except subprocess.CalledProcessError as e:
         out = e.output
-        logging.getLogger("i3pystatus.command").exception("")
+        logging.getLogger("i3pystatus.core.command").exception("")
 
     return CommandResult(returncode, out, stderr)
 
 
-def run_in_background(command, detach=False):
+def execute(command, detach=False):
     """
     Runs a command in background.
     No output is retrieved.
     Useful for running GUI applications that would block click events.
 
     :param detach If set to `True` the application will be executed using the
-    `i3-msg` command.
+    `i3-msg` command (survives i3 in-place restart).
     """
 
     if not isinstance(command, list):
@@ -59,6 +59,6 @@ def run_in_background(command, detach=False):
         subprocess.Popen(command, stdin=subprocess.DEVNULL,
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except OSError:
-        logging.getLogger("i3pystatus.command").exception("")
+        logging.getLogger("i3pystatus.core.command").exception("")
     except subprocess.CalledProcessError:
-        logging.getLogger("i3pystatus.command").exception("")
+        logging.getLogger("i3pystatus.core.command").exception("")
