@@ -1,6 +1,7 @@
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.threading import Manager
 from i3pystatus.core.util import convert_position
+from i3pystatus.core.command import execute
 from i3pystatus.core.command import run_through_shell
 
 
@@ -106,7 +107,7 @@ class Module(SettingsBase):
             if cb is not "run":
                 getattr(self, cb)(*args)
         else:
-            run_through_shell(cb, *args)
+            execute(cb, *args)
         return True
 
     def move(self, position):
