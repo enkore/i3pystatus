@@ -1,7 +1,7 @@
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.threading import Manager
 from i3pystatus.core.util import convert_position
-from i3pystatus.core.command import run_through_shell
+from i3pystatus.core.command import run_through_shell, CommandResult
 
 
 class Module(SettingsBase):
@@ -53,6 +53,7 @@ class Module(SettingsBase):
         1. if null callback, do nothing
         2. if it's a python function ()
         3. if it's the name of a method of the current module (string)
+        4. if none of the above is true, then the first argument is considered as an external program
 
         To setup the callbacks, you can set the settings 'on_leftclick',
         'on_rightclick', 'on_upscroll', 'on_downscroll'.
@@ -68,6 +69,7 @@ class Module(SettingsBase):
                         ("%a %-d %b %X format 3", 'Europe/Paris'),
                     ],
                     on_leftclick= ["urxvtc"] , # launch urxvtc on left click
+                    on_leftclick= ["urxvtc", "-e", "ikhal"] , # launch ikhal in a terminal
                     on_rightclick= ["scroll_format", 2] , # update format by steps of 2
                     on_upscroll= [print, "hello world"] , # call python function print
                     log_level=logging.DEBUG,
@@ -98,15 +100,26 @@ class Module(SettingsBase):
             return False
         else:
             cb, args = split_callback_and_args(cb)
-            self.logger.debug("cb=%s args=%s" % (cb, args))
 
         if callable(cb):
+            self.logger.debug("Running python function %s" % (cb, ))
             cb(self)
         elif hasattr(self, cb):
+            self.logger.debug("Running member [%s] of module [%s] with args=%s" % (cb, self.__name__, args))
             if cb is not "run":
                 getattr(self, cb)(*args)
         else:
-            run_through_shell(cb, *args)
+            cmd = [cb] + args
+            res = run_through_shell(cmd)
+            if res.rc != 0:
+                self.logger.error("Module %s: Return code=%d with output [%s] and error msg [%s]",
+                                  self.__name__,
+                                  res.rc,
+                                  res.out,
+                                  res.err
+                                  )
+            else:
+                self.logger.debug("Command [%s] returned %d" % (' '.join(cmd), res.rc,))
         return True
 
     def move(self, position):

@@ -27,7 +27,9 @@ def run_through_shell(command, enable_shell=False):
     except OSError as e:
         out = e.strerror
         stderr = e.strerror
+        returncode = 1
     except subprocess.CalledProcessError as e:
         out = e.output
+        returncode = 1
 
     return CommandResult(returncode, out, stderr)
