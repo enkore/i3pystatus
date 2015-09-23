@@ -11,7 +11,6 @@ from i3pystatus.core.util import TimeWrapper
 dec = decimal.Decimal
 
 
-# Moon phase module
 class MoonPhase(IntervalModule):
     """
     Available Formatters
@@ -33,7 +32,6 @@ class MoonPhase(IntervalModule):
         ("status", "Current moon phase"),
         ("illum", "Percentage that is illuminated"),
         ("color", "Set color"),
-
     )
 
     format = "{illum} {status}"
@@ -41,7 +39,6 @@ class MoonPhase(IntervalModule):
     interval = 60 * 60 * 2  # every 2 hours
 
     status = {
-
         "New Moon": "NM",
         "Waxing Crescent": "WaxCres",
         "First Quarter": "FQ",
@@ -50,7 +47,6 @@ class MoonPhase(IntervalModule):
         "Waning Gibbous": "WanGib",
         "Last Quarter": "LQ",
         "Waning Cresent": "WanCres",
-
     }
 
     color = {
@@ -99,19 +95,16 @@ class MoonPhase(IntervalModule):
 
         if lunarCycle > 50:
             phase = 100 - lunarCycle
-
         else:
             phase = lunarCycle * 2
 
         return phase
 
     def run(self):
-
         fdict = {
             "status": self.status[self.current_phase()],
             "illum": self.illum(),
         }
-
         self.output = {
             "full_text": formatp(self.format, **fdict),
             "color": self.color[self.current_phase()],
