@@ -6,6 +6,8 @@ import string
 import random
 import types
 
+import pytest
+
 from i3pystatus.core.exceptions import ConfigAmbigiousClassesError, ConfigInvalidModuleError
 from i3pystatus.core import util, ClassFinder
 
@@ -22,61 +24,43 @@ def test_lchop_unmatched():
     assert util.lchop("12345", "345") == "12345"
 
 
-def partition(iterable, limit, assrt):
+@pytest.mark.parametrize("iterable, limit, assrt", [
+    ([1, 2, 3, 4], 3, [[1, 2], [3], [4]]),
+    ([2, 1, 3, 4], 3, [[1, 2], [3], [4]]),
+    ([0.33, 0.45, 0.89], 1, [[0.33, 0.45, 0.89]]),
+    ([], 10, []),
+])
+def test_partition(iterable, limit, assrt):
     partitions = util.partition(iterable, limit)
     partitions = [sorted(partition) for partition in partitions]
     for item in assrt:
         assert sorted(item) in partitions
 
 
-def test_partition():
-    cases = [
-        ([1, 2, 3, 4], 3, [[1, 2], [3], [4]]),
-        ([2, 1, 3, 4], 3, [[1, 2], [3], [4]]),
-        ([0.33, 0.45, 0.89], 1, [[0.33, 0.45, 0.89]]),
-        ([], 10, []),
-    ]
-
-    for iterable, limit, assrt in cases:
-        partition(iterable, limit, assrt)
-
-
-def popwhile(iterable, predicate, assrt):
+@pytest.mark.parametrize("iterable, predicate, assrt", [
+    ([1, 2, 3, 4], lambda x: x < 2, []),
+    ([1, 2, 3, 4], lambda x: x < 5 and x > 2, [4, 3]),
+    ([1, 2, 3, 4], lambda x: x == 4, [4]),
+    ([1, 2, 3, 4], lambda x: True, [4, 3, 2, 1]),
+    ([1, 2], lambda x: False, []),
+])
+def test_popwhile(iterable, predicate, assrt):
     assert list(util.popwhile(predicate, iterable)) == assrt
 
 
-def test_popwhile():
-    cases = [
-        ([1, 2, 3, 4], lambda x: x < 2, []),
-        ([1, 2, 3, 4], lambda x: x < 5 and x > 2, [4, 3]),
-        ([1, 2, 3, 4], lambda x: x == 4, [4]),
-        ([1, 2, 3, 4], lambda x: True, [4, 3, 2, 1]),
-        ([1, 2], lambda x: False, []),
-    ]
+@pytest.mark.parametrize("valid, required, feed, missing", [
+    # ( valid,              required, feed,      missing )
+    (("foo", "bar", "baz"), ("foo",), ("bar",), ("foo",)),
+    (("foo", "bar", "baz"), ("foo",), tuple(), ("foo",)),
+    (("foo", "bar", "baz"), ("bar", "baz"), ("bar", "baz"), tuple()),
+    (("foo", "bar", "baz"), ("bar", "baz"), ("bar", "foo", "baz"), tuple()),
 
-    for iterable, predicate, assrt in cases:
-        popwhile(iterable, predicate, assrt)
-
-
-def keyconstraintdict_missing(valid, required, feedkeys, assrt_missing):
+])
+def test_keyconstraintdict_missing(valid, required, feed, missing):
     kcd = util.KeyConstraintDict(valid_keys=valid, required_keys=required)
-    kcd.update(dict.fromkeys(feedkeys))
+    kcd.update(dict.fromkeys(feed))
 
-    assert kcd.missing() == set(assrt_missing)
-
-
-def test_keyconstraintdict_missing():
-    cases = [
-        # ( valid,              required, feed,      missing )
-        (("foo", "bar", "baz"), ("foo",), ("bar",), ("foo",)),
-        (("foo", "bar", "baz"), ("foo",), tuple(), ("foo",)),
-        (("foo", "bar", "baz"), ("bar", "baz"), ("bar", "baz"), tuple()),
-        (("foo", "bar", "baz"), ("bar", "baz"),
-         ("bar", "foo", "baz"), tuple()),
-    ]
-
-    for valid, required, feed, missing in cases:
-        keyconstraintdict_missing(valid, required, feed, missing)
+    assert kcd.missing() == set(missing)
 
 
 class ModuleListTests(unittest.TestCase):

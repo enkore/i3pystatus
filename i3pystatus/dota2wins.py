@@ -10,7 +10,7 @@ class Dota2wins(IntervalModule):
 
     settings = (
         ("matches", "Number of recent matches to calculate"),
-        ("steamid", "Steam user to track"),
+        ("steamid", "Steam ID or username to track"),
         ("steam_api_key", "Steam API key "
             "(http://steamcommunity.com/dev/apikey)"),
         ("good_threshold", "Win percentage (or higher) which you are happy "
@@ -38,10 +38,15 @@ class Dota2wins(IntervalModule):
     matches = 25
     interval = 1800
     screenname = 'retrieve'
-    format = "{screenname} {wins}W:{losses}L {win_percent}%"
+    format = "{screenname} {wins}W:{losses}L {win_percent:.2f}%"
 
     def run(self):
         api.set_api_key(self.steam_api_key)
+
+        if not isinstance(self.steamid, int):
+            # find by username
+            self.steamid = int(api.get_steam_id(self.steamid)['response']['steamid'])
+
         hist = api.get_match_history(account_id=self.steamid)['result']
         recent_matches = []
         while len(recent_matches) < self.matches:
@@ -96,7 +101,7 @@ class Dota2wins(IntervalModule):
             "screenname": screenname,
             "wins": wins,
             "losses": losses,
-            "win_percent": "%.2f" % win_percent,
+            "win_percent": win_percent,
         }
 
         self.output = {

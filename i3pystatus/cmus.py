@@ -1,21 +1,17 @@
 import os
 
-from i3pystatus import IntervalModule, formatp
+from i3pystatus import formatp
+from i3pystatus import IntervalModule
+from i3pystatus.core.command import run_through_shell
 from i3pystatus.core.util import TimeWrapper
-import subprocess
 
 
 def _extract_artist_title(input):
-    for sep in ('-', ' - '):
-        split = input.split(sep)
-        if len(split) == 2:
-            return split[0], split[1]
-    # fallback
-    return (input.split('-') + [''] * 2)[:2]
+    artist, title = (input.split('-') + [''])[:2]
+    return artist.strip(), title.strip()
 
 
 class Cmus(IntervalModule):
-
     """
     Gets the status and current song info using cmus-remote
 
@@ -34,84 +30,77 @@ class Cmus(IntervalModule):
     """
 
     settings = (
-        ('format', 'format string, available formatters: status, song_elapsed, '
-                   'song_length, artist, title, album, tracknumber, file, '
-                   'stream, bitrate'),
-        'color',
+        ('format', 'formatp string'),
+        ('format_not_running', 'Text to show if cmus is not running'),
+        ('color', 'The color of the text'),
+        ('color_not_running', 'The color of the text, when cmus is not running'),
+        ('status', 'Dictionary mapping status to output'),
     )
-    color = "#909090"
-    format = "{status} {song_elapsed}/{song_length} {artist} - {title}"
-    status_text = ''
+
+    color = '#ffffff'
+    color_not_running = '#ffffff'
+    format = '{status} {song_elapsed}/{song_length} {artist} - {title}'
+    format_not_running = 'Not running'
     interval = 1
     status = {
-        "paused": "▷",
-        "playing": "▶",
-        "stopped": "◾",
+        'paused': '▷',
+        'playing': '▶',
+        'stopped': '◾',
     }
 
-    on_leftclick = "playpause"
-    on_rightclick = "next_song"
-    on_upscroll = "next_song"
-    on_downscroll = "previous_song"
+    on_leftclick = 'playpause'
+    on_rightclick = 'next_song'
+    on_upscroll = 'next_song'
+    on_downscroll = 'previous_song'
 
     def _cmus_command(self, command):
-        p = subprocess.Popen('cmus-remote --{command}'.format(command=command), shell=True,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT)
-        return p.communicate()
+        cmdline = 'cmus-remote --{command}'.format(command=command)
+        return run_through_shell(cmdline, enable_shell=True)
 
     def _query_cmus(self):
-        status_dict = {}
-        status, error = self._cmus_command('query')
-        if status != b'cmus-remote: cmus is not running\n':
-            status = status.decode('utf-8').split('\n')
-            for item in status:
-                split_item = item.split(' ')
-                if split_item[0] in ['tag', 'set']:
-                    key = '_'.join(split_item[:2])
-                    val = ' '.join([x for x in split_item[2:]])
-                    status_dict[key] = val
+        response = {}
+        cmd = self._cmus_command('query')
+
+        if not cmd.rc:
+            for line in cmd.out.splitlines():
+                category, _, category_value = line.partition(' ')
+                if category in ('set', 'tag'):
+                    key, _, value = category_value.partition(' ')
+                    key = '_'.join((category, key))
+                    response[key] = value
                 else:
-                    status_dict[split_item[0]] = ' '.join(split_item[1:])
-        return status_dict
+                    response[category] = category_value
+
+        return response
 
     def run(self):
-        status = self._query_cmus()
-        if not status:
-            self.output = {
-                "full_text": 'Not running',
-                "color": self.color
+        response = self._query_cmus()
+        if response:
+            fdict = {
+                'file': response.get('file', ''),
+                'status': self.status[response['status']],
+                'title': response.get('tag_title', ''),
+                'stream': response.get('stream', ''),
+                'album': response.get('tag_album', ''),
+                'artist': response.get('tag_artist', ''),
+                'tracknumber': response.get('tag_tracknumber', 0),
+                'song_length': TimeWrapper(response.get('duration', 0)),
+                'song_elapsed': TimeWrapper(response.get('position', 0)),
+                'bitrate': int(response.get('bitrate', 0)),
             }
-            return
-        fdict = {
-            'file': status.get('file', ''),
-            'status': self.status[status["status"]],
-            'title': status.get('tag_title', ''),
-            'stream': status.get('stream', ''),
-            'album': status.get('tag_album', ''),
-            'artist': status.get('tag_artist', ''),
-            'tracknumber': status.get('tag_tracknumber', 0),
-            'song_length': TimeWrapper(status.get('duration', 0)),
-            'song_elapsed': TimeWrapper(status.get('position', 0)),
-            'bitrate': int(status.get("bitrate", 0)),
-        }
 
-        if fdict['stream']:
-            fdict['artist'], fdict[
-                'title'] = _extract_artist_title(fdict['stream'])
+            if fdict['stream']:
+                fdict['artist'], fdict['title'] = _extract_artist_title(fdict['stream'])
+            elif not fdict['title']:
+                filename = os.path.basename(fdict['file'])
+                filebase, _ = os.path.splitext(filename)
+                fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
+            self.output = {"full_text": formatp(self.format, **fdict),
+                           "color": self.color}
 
-        elif not fdict['title']:
-            _, filename = os.path.split(fdict['file'])
-            filebase, _ = os.path.splitext(filename)
-            fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
-
-        fdict['title'] = fdict['title'].strip()
-        fdict['artist'] = fdict['artist'].strip()
-
-        self.output = {
-            "full_text": formatp(self.format, **fdict),
-            "color": self.color
-        }
+        else:
+            self.output = {"full_text": self.format_not_running,
+                           "color": self.color_not_running}
 
     def playpause(self):
         status = self._query_cmus().get('status', '')
@@ -123,7 +112,7 @@ class Cmus(IntervalModule):
             self._cmus_command('play')
 
     def next_song(self):
-        self._cmus_command("next")
+        self._cmus_command('next')
 
     def previous_song(self):
-        self._cmus_command("prev")
+        self._cmus_command('prev')

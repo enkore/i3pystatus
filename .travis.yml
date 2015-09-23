@@ -1,9 +1,7 @@
 language: python
+sudo: false
 python:
   - "3.3"
-cache:
-  directories:
-    - $HOME/virtualenv/python3.3.5/lib/python3.3/site-packages
 install:
   - "pip install -r dev-requirements.txt"
 script: "./ci-build.sh"

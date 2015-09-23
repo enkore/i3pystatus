@@ -5,6 +5,7 @@ import configparser
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import lchop, TimeWrapper, make_bar
 from i3pystatus.core.desktop import DesktopNotification
+from i3pystatus.core.command import run_through_shell
 
 
 class UEventParser(configparser.ConfigParser):
@@ -138,6 +139,8 @@ class BatteryChecker(IntervalModule):
         "format",
         ("not_present_text", "Text displayed if the battery is not present. No formatters are available"),
         ("alert", "Display a libnotify-notification on low battery"),
+        ("critical_level_command", "Runs a shell command in the case of a critical power state"),
+        "critical_level_percentage",
         "alert_percentage",
         ("alert_format_title", "The title of the notification, all formatters can be used"),
         ("alert_format_body", "The body text of the notification, all formatters can be used"),
@@ -165,6 +168,8 @@ class BatteryChecker(IntervalModule):
     not_present_text = "Battery {battery_ident} not present"
 
     alert = False
+    critical_level_command = ""
+    critical_level_percentage = 1
     alert_percentage = 10
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
@@ -292,6 +297,8 @@ class BatteryChecker(IntervalModule):
         else:
             fdict["status"] = "FULL"
             color = self.full_color
+        if self.critical_level_command and fdict["status"] == "DIS" and fdict["percentage"] <= self.critical_level_percentage:
+            run_through_shell(self.critical_level_command, enable_shell=True)
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
             DesktopNotification(
