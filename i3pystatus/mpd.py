@@ -54,7 +54,7 @@ class MPD(IntervalModule):
     max_field_len = 25
     max_len = 100
     truncate_fields = ("title", "album", "artist")
-    hide_inactive = True
+    hide_inactive = False
     on_leftclick = "switch_playpause"
     on_rightclick = "next_song"
     on_upscroll = on_rightclick
