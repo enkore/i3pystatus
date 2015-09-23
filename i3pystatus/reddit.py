@@ -73,7 +73,7 @@ class Reddit(IntervalModule):
         r = praw.Reddit(user_agent='i3pystatus')
 
         if self.password:
-            r.login(self.username, self.password)
+            r.login(self.username, self.password, disable_warning=True)
             unread_messages = sum(1 for i in r.get_unread())
             if unread_messages:
                 d = vars(next(r.get_unread()))
