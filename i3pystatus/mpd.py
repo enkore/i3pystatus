@@ -38,7 +38,7 @@ class MPD(IntervalModule):
         ("max_field_len", "Defines max length for in truncate_fields defined fields, if truncated, ellipsis are appended as indicator. It's applied *before* max_len. Value of 0 disables this."),
         ("max_len", "Defines max length for the hole string, if exceeding fields specefied in truncate_fields are truncated equaly. If truncated, ellipsis are appended as indicator. It's applied *after* max_field_len. Value of 0 disables this."),
         ("truncate_fields", "fields that will be truncated if exceeding max_field_len or max_len."),
-
+        ("hide_inactive", "Hides status information when MPD is not running"),
     )
 
     host = "localhost"
@@ -54,6 +54,7 @@ class MPD(IntervalModule):
     max_field_len = 25
     max_len = 100
     truncate_fields = ("title", "album", "artist")
+    hide_inactive = True
     on_leftclick = "switch_playpause"
     on_rightclick = "next_song"
     on_upscroll = on_rightclick
@@ -78,8 +79,16 @@ class MPD(IntervalModule):
             return None
 
     def run(self):
-        status = self._mpd_command(self.s, "status")
-        currentsong = self._mpd_command(self.s, "currentsong")
+        try:
+            status = self._mpd_command(self.s, "status")
+            currentsong = self._mpd_command(self.s, "currentsong")
+        except Exception:
+            if self.hide_inactive:
+                self.output = {
+                    "full_text": ""
+                }
+                return
+
         fdict = {
             "pos": int(status.get("song", 0)) + 1,
             "len": int(status["playlistlength"]),
