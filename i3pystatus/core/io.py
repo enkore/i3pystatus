@@ -1,9 +1,12 @@
 import json
-import signal
 import sys
 from contextlib import contextmanager
 from threading import Condition
 from threading import Thread
+
+from sys import modules
+import signal
+import time
 
 
 class IOHandler:
@@ -57,18 +60,14 @@ class StandaloneIO(IOHandler):
         {"version": 1, "click_events": True}, "[", "[]", ",[]",
     ]
 
-    def __init__(self, click_events, modules, interval=1):
-        """
-        StandaloneIO instance must be created in main thread to be able to set
-        the SIGUSR1 signal handler.
-        """
-
+    def __init__(self, click_events, interval=1):
         super().__init__()
         self.interval = interval
         self.modules = modules
 
         self.proto[0]['click_events'] = click_events
         self.proto[0] = json.dumps(self.proto[0])
+        self.modules = modules
 
         self.refresh_cond = Condition()
         self.treshold_interval = 20.0
@@ -80,7 +79,7 @@ class StandaloneIO(IOHandler):
 
         while True:
             try:
-                self.refresh_cond.wait(timeout=self.interval)
+                time.sleep(self.interval)
             except KeyboardInterrupt:
                 self.refresh_cond.release()
                 return
