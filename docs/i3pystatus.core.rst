@@ -9,6 +9,21 @@ core Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`color` Module
+-------------------
+
+.. automodule:: i3pystatus.core.color
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`command` Module
+---------------------
+
+.. automodule:: i3pystatus.core.command
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 :mod:`desktop` Module
 ---------------------
@@ -74,11 +89,4 @@ core Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`color` Module
--------------------
-
-.. automodule:: i3pystatus.core.color
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
