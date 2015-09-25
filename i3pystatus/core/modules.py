@@ -75,6 +75,11 @@ class Module(SettingsBase):
                     )
         """
 
+        def log_event(name, button, cb, args, action):
+            msg = "{}: button={}, cb='{}', args={}, type='{}'".format(
+                  name, button, cb, args, action)
+            self.logger.debug(msg)
+
         def split_callback_and_args(cb):
             if isinstance(cb, list):
                 return cb[0], cb[1:]
@@ -91,23 +96,25 @@ class Module(SettingsBase):
         elif button == 5:  # mouse wheel down
             cb = self.on_downscroll
         else:
-            self.logger.info("Button '%d' not handled yet." % (button))
+            log_event(self.__name__, button, None, None, "Unhandled button")
             return False
 
         if not cb:
-            self.logger.info("no cb attached")
+            log_event(self.__name__, button, None, None, "No callback attached")
             return False
         else:
             cb, args = split_callback_and_args(cb)
-            self.logger.debug("cb=%s args=%s" % (cb, args))
 
         if callable(cb):
             cb(self, *args)
+            log_event(self.__name__, button, cb, args, "Python callback")
         elif hasattr(self, cb):
             if cb is not "run":
                 getattr(self, cb)(*args)
+                log_event(self.__name__, button, cb, args, "Member callback")
         else:
             execute(cb, detach=True)
+            log_event(self.__name__, button, cb, args, "External command")
         return True
 
     def move(self, position):
