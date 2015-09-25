@@ -10,16 +10,15 @@ from i3pystatus.updates import Backend
 
 
 class Yaourt(Backend):
-    def __init__(self, aur_only = True):
+    def __init__(self, aur_only=True):
         self.aur_only = aur_only
-    
+
     @property
-    
     def updates(self):
         command = ["yaourt", "-Qua"]
         checkupdates = run_through_shell(command)
         if(self.aur_only):
-            return len( re.findall("^aur/",  checkupdates.out, flags=re.M) )
+            return len(re.findall("^aur/", checkupdates.out, flags=re.M))
         return checkupdates.out.count("\n")
 
 Backend = Yaourt
