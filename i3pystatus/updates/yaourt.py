@@ -9,15 +9,13 @@ class Yaourt(Backend):
     By default it will only count aur packages. Thus it can be used with the pacman backend like this:
 
     from i3pystatus.updates import pacman, yaourt
-    status.register("updates",
-        backends = [pacman.Pacman(), yaourt.Yaourt()])
+    status.register("updates", backends = [pacman.Pacman(), yaourt.Yaourt()])
 
     If you want to count both pacman and aur packages with this module you can set the variable
     count_only_aur = False like this:
 
     from i3pystatus.updates import yaourt
-    status.register("updates",
-        backends = [yaourt.Yaourt(False)])
+    status.register("updates", backends = [yaourt.Yaourt(False)])
     """
 
     def __init__(self, aur_only=True):
