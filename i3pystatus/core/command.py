@@ -40,20 +40,24 @@ def run_through_shell(command, enable_shell=False):
 
 def execute(command, detach=False):
     """
-    Runs a command in background.
-    No output is retrieved.
-    Useful for running GUI applications that would block click events.
+    Runs a command in background. No output is retrieved. Useful for running GUI
+    applications that would block click events.
 
-    :param detach If set to `True` the application will be executed using the
-    `i3-msg` command (survives i3 in-place restart).
+    :param command: A string or a list of strings containing the name and
+     arguments of the program.
+    :param detach: If set to `True` the program will be executed using the
+     `i3-msg` command. As a result the program is executed independent of
+     i3pystatus as a child of i3 process. Because of how i3-msg parses its
+     arguments the type of `command` is limited to string in this mode.
     """
 
-    if not isinstance(command, list):
-        command = command.split()
-
     if detach:
-        command.insert(0, "exec")
-        command.insert(0, "i3-msg")
+        if not isinstance(command, str):
+            raise TypeError("Detached mode expects a string as command.")
+        command = ["i3-msg", "exec", command]
+    else:
+        if not isinstance(command, list):
+            command = command.split()
 
     try:
         subprocess.Popen(command, stdin=subprocess.DEVNULL,
