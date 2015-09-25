@@ -47,7 +47,7 @@ Changelog
 Contributors
 ------------
 
-A list of all contributors can be found in `CONTRIBUTORS <http://github.com/enkore/i3pystatus/CONTRIBUTORS>`_.
+A list of all contributors can be found in `CONTRIBUTORS <https://github.com/enkore/i3pystatus/blob/master/CONTRIBUTORS>`_.
 Particular noteworthy contributors are former maintainer Jan Oliver Oelerich and
 current maintainer enkore.
 
