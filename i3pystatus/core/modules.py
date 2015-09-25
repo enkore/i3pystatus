@@ -106,15 +106,15 @@ class Module(SettingsBase):
             cb, args = split_callback_and_args(cb)
 
         if callable(cb):
-            cb(self, *args)
             log_event(self.__name__, button, cb, args, "Python callback")
+            cb(self, *args)
         elif hasattr(self, cb):
             if cb is not "run":
-                getattr(self, cb)(*args)
                 log_event(self.__name__, button, cb, args, "Member callback")
+                getattr(self, cb)(*args)
         else:
-            execute(cb, detach=True)
             log_event(self.__name__, button, cb, args, "External command")
+            execute(cb, detach=True)
         return True
 
     def move(self, position):
