@@ -102,7 +102,7 @@ class Module(SettingsBase):
             self.logger.debug("cb=%s args=%s" % (cb, args))
 
         if callable(cb):
-            cb(self)
+            cb(self, *args)
         elif hasattr(self, cb):
             if cb is not "run":
                 getattr(self, cb)(*args)
