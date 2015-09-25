@@ -107,7 +107,7 @@ class Module(SettingsBase):
             if cb is not "run":
                 getattr(self, cb)(*args)
         else:
-            execute(cb, *args)
+            execute(cb, detach=True)
         return True
 
     def move(self, position):
