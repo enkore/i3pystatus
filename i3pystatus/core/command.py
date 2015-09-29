@@ -1,6 +1,7 @@
 import logging
-from collections import namedtuple
+import shlex
 import subprocess
+from collections import namedtuple
 
 CommandResult = namedtuple("Result", ['rc', 'out', 'err'])
 
@@ -25,7 +26,7 @@ def run_through_shell(command, enable_shell=False):
     """
 
     if not enable_shell and not isinstance(command, list):
-        command = command.split()
+        command = shlex.split(command)
 
     returncode = None
     stderr = None
@@ -67,7 +68,7 @@ def execute(command, detach=False):
         command = ["i3-msg", "exec", command]
     else:
         if not isinstance(command, list):
-            command = command.split()
+            command = shlex.split(command)
 
     try:
         subprocess.Popen(command, stdin=subprocess.DEVNULL,
