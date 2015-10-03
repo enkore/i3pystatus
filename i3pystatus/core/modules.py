@@ -48,31 +48,39 @@ class Module(SettingsBase):
 
     def on_click(self, button):
         """
-        Maps a click event (include mousewheel events) with its associated callback.
-        It then triggers the callback depending on the nature (ie type) of
-        the callback variable:
-        1. if null callback, do nothing
-        2. if it's a python function ()
-        3. if it's the name of a method of the current module (string)
+        Maps a click event with its associated callback.
 
-        To setup the callbacks, you can set the settings 'on_leftclick',
-        'on_rightclick', 'on_upscroll', 'on_downscroll'.
+        Currently implemented events are:
 
-        For instance, you can test with:
-        ::
+        ===========  ================  =========
+        Event        Callback setting  Button ID
+        ===========  ================  =========
+        Left click   on_leftclick      1
+        Right click  on_rightclick     3
+        Scroll up    on_upscroll       4
+        Scroll down  on_downscroll     5
+        ===========  ================  =========
 
-            status.register("clock",
-                    format=[
-                        ("Format 0",'Europe/London'),
-                        ("%a %-d Format 1",'Europe/Dublin'),
-                        "%a %-d %b %X format 2",
-                        ("%a %-d %b %X format 3", 'Europe/Paris'),
-                    ],
-                    on_leftclick= ["urxvtc"] , # launch urxvtc on left click
-                    on_rightclick= ["scroll_format", 2] , # update format by steps of 2
-                    on_upscroll= [print, "hello world"] , # call python function print
-                    log_level=logging.DEBUG,
-                    )
+        The action is determined by the nature (type and value) of the callback
+        setting in the following order:
+
+        1. If null callback (``None``), no action is taken.
+        2. If it's a `python function`, call it and pass any additional
+           arguments.
+        3. If it's name of a `member method` of current module (string), call it
+           and pass any additional arguments.
+        4. If the name does not match with `member method` name execute program
+           with such name.
+
+        .. seealso:: :ref:`callbacks` for more information about
+         callback settings and examples.
+
+        :param button: The ID of button event received from i3bar.
+        :type button: int
+        :return: Returns ``True`` if a valid callback action was executed.
+         ``False`` otherwise.
+        :rtype: bool
+
         """
 
         def log_event(name, button, cb, args, action):
