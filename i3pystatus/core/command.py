@@ -25,13 +25,14 @@ def run_through_shell(command, enable_shell=False):
      string since shell does all the parsing.
     """
 
-    if not enable_shell and not isinstance(command, list):
+    if not enable_shell and isinstance(command, str):
         command = shlex.split(command)
 
     returncode = None
     stderr = None
     try:
-        proc = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=enable_shell)
+        proc = subprocess.Popen(command, stderr=subprocess.PIPE,
+                                stdout=subprocess.PIPE, shell=enable_shell)
         out, stderr = proc.communicate()
         out = out.decode("UTF-8")
         stderr = stderr.decode("UTF-8")
@@ -64,10 +65,13 @@ def execute(command, detach=False):
 
     if detach:
         if not isinstance(command, str):
-            raise TypeError("Detached mode expects a string as command.")
+            msg = "Detached mode expects a string as command, not {}".format(
+                  command)
+            logging.getLogger("i3pystatus.core.command").error(msg)
+            raise AttributeError(msg)
         command = ["i3-msg", "exec", command]
     else:
-        if not isinstance(command, list):
+        if isinstance(command, str):
             command = shlex.split(command)
 
     try:
