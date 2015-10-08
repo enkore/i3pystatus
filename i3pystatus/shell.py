@@ -14,11 +14,13 @@ class Shell(IntervalModule):
 
     color = "#FFFFFF"
     error_color = "#FF0000"
+    markup = "none"
 
     settings = (
         ("command", "command to be executed"),
         ("color", "standard color"),
         ("error_color", "color to use when non zero exit code is returned"),
+        ("markup", "markup language used to parse returned text, e.g. pango"),
         "format"
     )
 
@@ -38,5 +40,6 @@ class Shell(IntervalModule):
 
         self.output = {
             "full_text": self.format.format(output=out) if out else "Command `%s` returned %d" % (self.command, retvalue),
-            "color": self.color if retvalue == 0 else self.error_color
+            "color": self.color if retvalue == 0 else self.error_color,
+            "markup": self.markup if out else "none"
         }
