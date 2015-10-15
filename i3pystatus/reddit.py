@@ -28,6 +28,8 @@ class Reddit(IntervalModule):
     * {message_author}
     * {message_subject}
     * {message_body}
+    * {link_karma}
+    * {comment_karma}
 
     """
 
@@ -130,6 +132,14 @@ class Reddit(IntervalModule):
         if len(fdict["submission_title"]) > self.title_maxlen:
             title = fdict["submission_title"][:(self.title_maxlen - 3)] + "..."
             fdict["submission_title"] = title
+
+        if self.username:
+            u = r.get_redditor(self.username)
+            fdict["link_karma"] = u.link_karma
+            fdict["comment_karma"] = u.comment_karma
+        else:
+            fdict["link_karma"] = ""
+            fdict["comment_karma"] = ""
 
         full_text = self.format.format(**fdict)
         self.output = {
