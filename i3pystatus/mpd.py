@@ -91,9 +91,9 @@ class MPD(IntervalModule):
 
         fdict = {
             "pos": int(status.get("song", 0)) + 1,
-            "len": int(status["playlistlength"]),
+            "len": int(status.get("playlistlength", 0)),
             "status": self.status[status["state"]],
-            "volume": int(status["volume"]),
+            "volume": int(status.get("volume", 0)),
 
             "title": currentsong.get("Title", ""),
             "album": currentsong.get("Album", ""),
@@ -101,7 +101,6 @@ class MPD(IntervalModule):
             "song_length": TimeWrapper(currentsong.get("Time", 0)),
             "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
             "bitrate": int(status.get("bitrate", 0)),
-
         }
 
         if not fdict["title"] and "filename" in fdict:
