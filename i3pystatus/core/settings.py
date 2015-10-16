@@ -99,7 +99,10 @@ class SettingsBase(metaclass=SettingsBaseMeta):
             raise ConfigMissingError(
                 type(self).__name__, missing=exc.keys) from exc
 
-        self.logger = logging.getLogger(self.__name__)
+        if self.__name__.startswith("i3pystatus"):
+            self.logger = logging.getLogger(self.__name__)
+        else:
+            self.logger = logging.getLogger("i3pystatus." + self.__name__)
         self.logger.setLevel(self.log_level)
         self.init()
 
