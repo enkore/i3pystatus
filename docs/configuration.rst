@@ -281,23 +281,94 @@ The global default action for all settings is ``None`` (do nothing),
 but many modules define other defaults, which are documented in the
 module reference.
 
-The settings can be of different types, namely
+The values you can assign to these four settings can be divided to following
+three categories:
 
-- a list referring to a method of the module, e.g.
+.. rubric:: Member callbacks
 
-  .. code:: python
+These callbacks are part of the module itself and usually do some simple module
+related tasks (like changing volume when scrolling, etc.). All available
+callbacks are (most likely not) documented in their respective module
+documentation.
 
-	    status.register("clock",
-	      on_leftclick=["scroll_format", 1])
+For example the module :py:class:`.ALSA` has callbacks named ``switch_mute``,
+``increase_volume`` and ``decrease volume``. They are already assigned by
+default but you can change them to your liking when registering the module.
 
-  ``scroll_format`` is a method of the ``clock`` module, the ``1`` is
-  passed as a parameter and indicates the direction in this case.
-- as a special case of the above: a string referring to a method, no
-  parameters are passed.
-- a list where the first element is a callable and the following
-  elements are passed as arguments to the callable
-- again a special case of the above: just a callable, no parameters
-- a string which is run in a shell
+.. code:: python
+
+    status.register("alsa",
+        on_leftclick = ["switch_mute"],
+        # or as a strings without the list
+        on_upscroll = "decrease_volume",
+        on_downscroll = "increase_volume",
+        # this will refresh any module by clicking on it
+        on_rightclick = "run",
+        )
+
+Some callbacks also have additional parameters. Both ``increase_volume`` and
+``decrease_volume`` have an optional parameter ``delta`` which determines the
+amount of percent to add/subtract from the current volume.
+
+.. code:: python
+
+    status.register("alsa",
+        # all additional items in the list are sent to the callback as arguments
+        on_upscroll = ["decrease_volume", 2],
+        on_downscroll = ["increase_volume", 2],
+        )
+
+
+.. rubric:: Python callbacks
+
+These refer to to any callable Python object (most likely a function).
+
+.. code:: python
+
+    # Note that the 'self' parameter is required and gives access to all
+    # variables of the module.
+    def change_text(self):
+        self.output["full_text"] = "Clicked"
+
+    status.register("text",
+        text = "Initial text",
+        on_leftclick = [change_text],
+        # or
+        on_rightclick = change_text,
+        )
+
+You can also create callbacks with parameters.
+
+.. code:: python
+
+    def change_text(self, text="Hello world!", color="#ffffff"):
+        self.output["full_text"] = text
+        self.output["color"] = color
+
+    status.register("text",
+        text = "Initial text",
+        color = "#00ff00",
+        on_leftclick = [change_text, "Clicked LMB", "#ff0000"],
+        on_rightclick = [change_text, "Clicked RMB"],
+        on_upscroll = change_text,
+        )
+
+.. rubric:: External program callbacks
+
+You can also use callbacks to execute external programs. Any string that does
+not match any `member callback` is treated as an external command. If you want
+to do anything more complex than executing a program with a few arguments,
+consider creating an `python callback` or execute a script instead.
+
+.. code:: python
+
+    status.register("text",
+        text = "Launcher?",
+        # open terminal window running htop
+        on_leftclick = "i3-sensible-terminal -e htop",
+        # open i3pystatus github page in firefox
+        on_rightclick = "firefox --new-window https://github.com/enkore/i3pystatus",
+        )
 
 .. _hints:
 
@@ -375,7 +446,7 @@ Refreshing the bar
 
 The whole bar can be refreshed by sending SIGUSR1 signal to i3pystatus process.
 This feature is available only in standalone operation (:py:class:`.Status` was
-created with `standalone=True` parameter).
+created with ``standalone=True`` parameter).
 
 To find the PID of the i3pystatus process look for the ``status_command`` you
 use in your i3 config file.
