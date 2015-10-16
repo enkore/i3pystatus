@@ -5,15 +5,27 @@ Changelog
 master branch
 +++++++++++++
 
-.. _r3.33:
+.. _r3.34:
 
 * New modules
+    - :py:mod:`.moon`: Display moon phase
+    - :py:mod:`.online`: Display internet connectivity
     - :py:mod:`.xkblayout`: View and change keyboard layout
+* Applications started from click events don't block other click events now
 * :py:mod:`.dota2wins`: Now accepts usernames in place of a Steam ID
 * dota2wins: Changed win percentage to be a float
 * :py:mod:`.uptime`: Added days, hours, minutes, secs formatters
 * :py:mod:`.battery`: Added alert command feature (runs a shell
   command when the battery is discharged below a preset threshold)
+* :py:mod:`.spotify`: Added status, format\_not\_running and color\_not\_running settings, rewrite
+* :py:mod:`.cmus`: Added status, format\_not\_running and color\_not\_running settings
+* :py:mod:`.cmus`: Fixed bug that sometimes lead to empty output
+* :py:mod:`.shell`: Added formatting capability
+* :py:mod:`.cpu_usage`: Added color setting
+* :py:mod:`.mpd`: Added hide\_inactive settings
+* mpd: Fixed a bug where an active playlist would be assumed, leading to no output
+* :py:mod:`.updates`: Added yaourt backend
+* :py:mod:`.reddit`: Added link\_karma and comment\_karma formatters
 
 3.33 (2015-06-23)
 +++++++++++++++++
