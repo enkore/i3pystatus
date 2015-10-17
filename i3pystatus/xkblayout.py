@@ -6,7 +6,9 @@ class Xkblayout(IntervalModule):
     """Displays and changes current keyboard layout.
 
     ``change_layout`` callback finds the current layout in the
-    ``layouts`` setting and sets the layout following it.
+    ``layouts`` setting and enables the layout following it. If the
+    current layout is not in the ``layouts`` setting the first layout
+    is enabled.
     """
 
     interval = 1
