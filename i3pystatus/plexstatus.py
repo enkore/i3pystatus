@@ -41,14 +41,14 @@ class Plexstatus(IntervalModule):
         for vid in tree.iter('Video'):
             try:
                 cdict['title'] = vid.attrib['title']
-            except:
+            except AttributeError:
                 pass
 
         for play in tree.iter('Player'):
             try:
                 cdict['platform'] = play.attrib['platform']
-            except:
-                player = ''
+            except AttributeError:
+                pass
 
         if not cdict['title'] or not cdict['platform']:
             self.output = {} if not self.format_no_streams else {
