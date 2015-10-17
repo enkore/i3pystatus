@@ -3,11 +3,18 @@ import subprocess
 
 
 class Xkblayout(IntervalModule):
+    """Displays and changes current keyboard layout.
+
+    ``change_layout`` callback finds the current layout in the
+    ``layouts`` setting and sets the layout following it.
+    """
+
     interval = 1
     format = u"\u2328 {name}"
     settings = (
-        ("layouts", "Layouts list"),
+        ("layouts", "List of layouts"),
     )
+    layouts = []
     on_leftclick = "change_layout"
 
     def run(self):
