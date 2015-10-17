@@ -102,6 +102,7 @@ class Dota2wins(IntervalModule):
             "wins": wins,
             "losses": losses,
             "win_percent": win_percent,
+            "win_percent": "%.2f" % win_percent,
         }
 
         self.output = {
