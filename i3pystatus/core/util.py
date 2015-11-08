@@ -4,6 +4,8 @@ import re
 import socket
 import string
 
+from threading import Timer, RLock
+
 
 def lchop(string, prefix):
     """Removes a prefix from string
@@ -489,3 +491,60 @@ def user_open(url_or_command):
     else:
         import subprocess
         subprocess.Popen(url_or_command, shell=True)
+
+
+class MultiClickHandler(object):
+    def __init__(self, callback_handler, timeout):
+        self.callback_handler = callback_handler
+        self.timeout = timeout
+
+        self.lock = RLock()
+
+        self._timer_id = 0
+        self.timer = None
+        self.button = None
+        self.cb = None
+
+    def set_timer(self, button, cb):
+        with self.lock:
+            self.clear_timer()
+
+            self.timer = Timer(self.timeout,
+                               self._timer_function,
+                               args=[self._timer_id])
+            self.button = button
+            self.cb = cb
+
+            self.timer.start()
+
+    def clear_timer(self):
+        with self.lock:
+            if self.timer is None:
+                return
+
+            self._timer_id += 1  # Invalidate existent timer
+
+            self.timer.cancel()  # Cancel the existent timer
+
+            self.timer = None
+            self.button = None
+            self.cb = None
+
+    def _timer_function(self, timer_id):
+        with self.lock:
+            if self._timer_id != timer_id:
+                return
+            self.callback_handler(self.button, self.cb)
+            self.clear_timer()
+
+    def check_double(self, button):
+        if self.timer is None:
+            return False
+
+        ret = True
+        if button != self.button:
+            self.callback_handler(self.button, self.cb)
+            ret = False
+
+        self.clear_timer()
+        return ret
