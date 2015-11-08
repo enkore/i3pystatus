@@ -1,6 +1,7 @@
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.threading import Manager
-from i3pystatus.core.util import convert_position
+from i3pystatus.core.util import (convert_position,
+                                  MultiClickHandler)
 from i3pystatus.core.command import execute
 from i3pystatus.core.command import run_through_shell
 
@@ -14,6 +15,11 @@ class Module(SettingsBase):
         ('on_rightclick', "Callback called on right click (see :ref:`callbacks`)"),
         ('on_upscroll', "Callback called on scrolling up (see :ref:`callbacks`)"),
         ('on_downscroll', "Callback called on scrolling down (see :ref:`callbacks`)"),
+        ('on_doubleleftclick', "Callback called on double left click (see :ref:`callbacks`)"),
+        ('on_doublerightclick', "Callback called on double right click (see :ref:`callbacks`)"),
+        ('on_doubleupscroll', "Callback called on double scroll up (see :ref:`callbacks`)"),
+        ('on_doubledownscroll', "Callback called on double scroll down (see :ref:`callbacks`)"),
+        ('multi_click_timeout', "Time (in seconds) before a single click is executed."),
         ('hints', "Additional output blocks for module output (see :ref:`hints`)"),
     )
 
@@ -21,11 +27,23 @@ class Module(SettingsBase):
     on_rightclick = None
     on_upscroll = None
     on_downscroll = None
+    on_doubleleftclick = None
+    on_doublerightclick = None
+    on_doubleupscroll = None
+    on_doubledownscroll = None
+
+    multi_click_timeout = 0.25
 
     hints = {"markup": "none"}
 
+    def __init__(self, *args, **kwargs):
+        super(Module, self).__init__(*args, **kwargs)
+        self.__multi_click = MultiClickHandler(self.__button_callback_handler,
+                                               self.multi_click_timeout)
+
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
+        self.__status_handler = status_handler
 
     def inject(self, json):
         if self.output:
@@ -45,6 +63,39 @@ class Module(SettingsBase):
 
     def run(self):
         pass
+
+    def __log_button_event(self, button, cb, args, action):
+        msg = "{}: button={}, cb='{}', args={}, type='{}'".format(
+            self.__name__, button, cb, args, action)
+        self.logger.debug(msg)
+
+    def __button_callback_handler(self, button, cb):
+        if not cb:
+            self.__log_button_event(button, None, None,
+                                    "No callback attached")
+            return False
+
+        if isinstance(cb, list):
+            cb, args = (cb[0], cb[1:])
+        else:
+            args = []
+
+        if callable(cb):
+            self.__log_button_event(button, cb, args, "Python callback")
+            cb(self, *args)
+        elif hasattr(self, cb):
+            if cb is not "run":
+                self.__log_button_event(button, cb, args, "Member callback")
+                getattr(self, cb)(*args)
+        else:
+            self.__log_event(button, cb, args, "External command")
+            execute(cb, detach=True)
+
+        # Notify status handler
+        try:
+            self.__status_handler.io.async_refresh()
+        except:
+            pass
 
     def on_click(self, button):
         """
@@ -83,46 +134,38 @@ class Module(SettingsBase):
 
         """
 
-        def log_event(name, button, cb, args, action):
-            msg = "{}: button={}, cb='{}', args={}, type='{}'".format(
-                  name, button, cb, args, action)
-            self.logger.debug(msg)
-
-        def split_callback_and_args(cb):
-            if isinstance(cb, list):
-                return cb[0], cb[1:]
-            else:
-                return cb, []
-
-        cb = None
         if button == 1:  # Left mouse button
-            cb = self.on_leftclick
+            action = 'leftclick'
         elif button == 3:  # Right mouse button
-            cb = self.on_rightclick
+            action = 'rightclick'
         elif button == 4:  # mouse wheel up
-            cb = self.on_upscroll
+            action = 'upscroll'
         elif button == 5:  # mouse wheel down
-            cb = self.on_downscroll
+            action = 'downscroll'
         else:
-            log_event(self.__name__, button, None, None, "Unhandled button")
+            self.__log_button_event(button, None, None, "Unhandled button")
             return False
 
-        if not cb:
-            log_event(self.__name__, button, None, None, "No callback attached")
-            return False
-        else:
-            cb, args = split_callback_and_args(cb)
+        m_click = self.__multi_click
 
-        if callable(cb):
-            log_event(self.__name__, button, cb, args, "Python callback")
-            cb(self, *args)
-        elif hasattr(self, cb):
-            if cb is not "run":
-                log_event(self.__name__, button, cb, args, "Member callback")
-                getattr(self, cb)(*args)
-        else:
-            log_event(self.__name__, button, cb, args, "External command")
-            execute(cb, detach=True)
+        with m_click.lock:
+            double = m_click.check_double(button)
+            double_action = 'double%s' % action
+
+            if double:
+                action = double_action
+
+            # Get callback function
+            cb = getattr(self, 'on_%s' % action, None)
+
+            has_double_handler = getattr(self, 'on_%s' % double_action, None) is not None
+            delay_execution = (not double and has_double_handler)
+
+            if delay_execution:
+                m_click.set_timer(button, cb)
+            else:
+                self.__button_callback_handler(button, cb)
+
         return True
 
     def move(self, position):
@@ -162,6 +205,7 @@ class IntervalModule(Module):
     managers = {}
 
     def registered(self, status_handler):
+        super(IntervalModule, self).registered(status_handler)
         if self.interval in IntervalModule.managers:
             IntervalModule.managers[self.interval].append(self)
         else:
