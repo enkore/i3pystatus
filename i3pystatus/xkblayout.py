@@ -12,7 +12,7 @@ class Xkblayout(IntervalModule):
     """
 
     interval = 1
-    format = u"\u2328 {name}"
+    format = u"\uF11C {name}"
     settings = (
         ("layouts", "List of layouts"),
     )
