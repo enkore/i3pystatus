@@ -31,10 +31,14 @@ class Disk(IntervalModule):
     round_size = 2
 
     def run(self):
-        stat = os.statvfs(self.path)
-        available = (stat.f_bsize * stat.f_bavail) / self.divisor
+        try:
+            stat = os.statvfs(self.path)
+            available = (stat.f_bsize * stat.f_bavail) / self.divisor
 
-        if available > self.display_limit:
+            if available > self.display_limit:
+                self.output = {}
+                return
+        except:
             self.output = {}
             return
 
