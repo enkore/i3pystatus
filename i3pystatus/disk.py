@@ -37,17 +37,25 @@ class Disk(IntervalModule):
     round_size = 2
     mounted_only = False
 
+    def not_mounted(self):
+        if self.mounted_only:
+            self.output = {}
+        else:
+            self.output = {} if not self.format_not_mounted else {
+                "full_text": self.format_not_mounted,
+                "color": self.color_not_mounted,
+            }
+
     def run(self):
+        if os.path.isdir(self.path) and not os.path.ismount(self.path):
+            if len(os.listdir(self.path)) == 0:
+                self.not_mounted()
+                return
+
         try:
             stat = os.statvfs(self.path)
         except Exception:
-            if self.mounted_only:
-                self.output = {}
-            else:
-                self.output = {} if not self.format_not_mounted else {
-                    "full_text": self.format_not_mounted,
-                    "color": self.color_not_mounted,
-                }
+            self.not_mounted()
             return
 
         available = (stat.f_bsize * stat.f_bavail) / self.divisor
