@@ -28,9 +28,9 @@ class Vk(IntervalModule):
         ("app_id", "Id of your VK API app"),
         ("access_token", "Your access token. You must have `messages` and `offline` access permissions"),
         ("token_error", "Message to be shown if there's some problem with your token"),
-        ("color",),
-        ("color_bad",),
-        ("color_unread",),
+        ("color", "General color of the output"),
+        ("color_bad", "Color of the output in case of access token error"),
+        ("color_unread", "Color of the output if there are unread messages"),
     )
 
     @require(internet)
