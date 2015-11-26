@@ -1,10 +1,11 @@
-import sys
+import logging
 import os
+import sys
 from threading import Thread
-from i3pystatus.core.exceptions import ConfigError
 
-from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core import io, util
+from i3pystatus.core.exceptions import ConfigError
+from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core.modules import Module
 
 
@@ -39,17 +40,31 @@ class Status:
     """
     The main class used for registering modules and managing I/O
 
-    :param standalone: Whether i3pystatus should read i3status-compatible input from `input_stream`
-    :param interval: Update interval in seconds
+    :param bool standalone: Whether i3pystatus should read i3status-compatible input from `input_stream`.
+    :param int interval: Update interval in seconds.
     :param input_stream: A file-like object that provides the input stream, if `standalone` is False.
-    :param click_events: Enable click events
+    :param bool click_events: Enable click events, if `standalone` is True.
+    :param str logfile: Path to log file that will be used by i3pystatus.
+    :param tuple internet_check: Address of server that will be used to check for internet connection by :py:class:`.internet`.
     """
 
-    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin, click_events=True):
-        self.modules = util.ModuleList(self, ClassFinder(Module))
+    def __init__(self, standalone=False, **kwargs):
         self.standalone = standalone
-        self.click_events = click_events
-        if standalone:
+        self.click_events = kwargs.get("click_events", True)
+        interval = kwargs.get("interval", 1)
+        input_stream = kwargs.get("input_stream", sys.stdin)
+        if "logfile" in kwargs:
+            logger = logging.getLogger("i3pystatus")
+            for handler in logger.handlers:
+                logger.removeHandler(handler)
+            handler = logging.FileHandler(kwargs["logfile"], delay=True)
+            logger.addHandler(handler)
+            logger.setLevel(logging.CRITICAL)
+        if "internet_check" in kwargs:
+            util.internet.address = kwargs["internet_check"]
+
+        self.modules = util.ModuleList(self, ClassFinder(Module))
+        if self.standalone:
             self.io = io.StandaloneIO(self.click_events, self.modules, interval)
             if self.click_events:
                 self.command_endpoint = CommandEndpoint(
