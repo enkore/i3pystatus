@@ -335,7 +335,7 @@ def require(predicate):
 
     .. seealso::
 
-        :py:func:`internet`
+        :py:class:`internet`
 
     """
 
@@ -351,18 +351,28 @@ def require(predicate):
     return decorator
 
 
-def internet():
+class internet:
     """
-    Checks for a internet connection by connecting to a Google DNS
-    server.
+    Checks for internet connection by connecting to a server.
 
-    :returns: True if internet connection is available
+    Used server is determined by the `address` class variable which consists of
+    server host name and port number.
+
+    :rtype: bool:
+
+    .. seealso::
+
+        :py:func:`require`
+
     """
-    try:
-        socket.create_connection(("google-public-dns-a.google.com", 53), 1).close()
-        return True
-    except OSError:
-        return False
+    address = ("google-public-dns-a.google.com", 53)
+
+    def __new__(cls):
+        try:
+            socket.create_connection(cls.address, 1).close()
+            return True
+        except OSError:
+            return False
 
 
 def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
