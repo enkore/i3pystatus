@@ -1,5 +1,5 @@
 from alsaaudio import Mixer, ALSAAudioError
-from math import exp, log, log10, ceil, floor 
+from math import exp, log, log10, ceil, floor
 
 from i3pystatus import IntervalModule
 
@@ -83,7 +83,7 @@ class ALSA(IntervalModule):
         if self.has_mute:
             muted = self.alsamixer.getmute()[self.channel] == 1
 
-        self.fdict["volume"] = self.get_cur_volume() 
+        self.fdict["volume"] = self.get_cur_volume()
         self.fdict["muted"] = self.muted if muted else self.unmuted
         self.fdict["db"] = self.get_db()
 
@@ -107,16 +107,16 @@ class ALSA(IntervalModule):
             dbCur = self.get_db() * 100.0
             dbMin = self.dbMin * 100.0
             dbMax = self.dbMax * 100.0
-    
+
             dbCur_norm = self.exp10((dbCur - dbMax) / 6000.0)
             dbMin_norm = self.exp10((dbMin - dbMax) / 6000.0)
 
             vol = (dbCur_norm - dbMin_norm) / (1 - dbMin_norm)
-            vol = int(round(vol * 100,0))
+            vol = int(round(vol * 100, 0))
 
             return vol
         else:
-            return self.alsamixer.getvolume()[self.channel] 
+            return self.alsamixer.getvolume()[self.channel]
 
     def get_new_volume(self, direction):
         if direction == "inc":
@@ -128,15 +128,15 @@ class ALSA(IntervalModule):
         dbMax = self.dbMax * 100
 
         dbMin_norm = self.exp10((dbMin - dbMax) / 6000.0)
-        
+
         vol = volume * (1 - dbMin_norm) + dbMin_norm
-        
+
         if direction == "inc":
             dbNew = min(self.dbMax, ceil(((6000.0 * log10(vol)) + dbMax) / 100))
         elif direction == "dec":
             dbNew = max(self.dbMin, floor(((6000.0 * log10(vol)) + dbMax) / 100))
 
-        volNew = int(round(self.map_db(dbNew, self.dbMin, self.dbMax, 0, 100),0))
+        volNew = int(round(self.map_db(dbNew, self.dbMin, self.dbMax, 0, 100), 0))
 
         return volNew
 
@@ -160,7 +160,7 @@ class ALSA(IntervalModule):
 
     def get_db(self):
         db = (((self.dbMax - self.dbMin) / 100) * self.alsamixer.getvolume()[self.channel]) + self.dbMin
-        db = int(round(db,0))
+        db = int(round(db, 0))
 
         return db
 
