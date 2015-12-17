@@ -55,7 +55,7 @@ class Zabbix(IntervalModule):
 
             cdict["default"] = "{0}:{a[5]}/{a[4]}/{a[3]}/{a[2]}/{a[1]}/{a[0]}".format(sum(alerts), a=alerts)
             cdict["total"] = sum(alerts)
-            color = alerts_color[max(alerts)]
+            color = alerts_color[max(map(int, alerts_list))]
             result = self.format.format(**cdict)
 
         except Exception as e:
