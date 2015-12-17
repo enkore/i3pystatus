@@ -34,29 +34,17 @@ class Zabbix(IntervalModule):
                                     )
         alerts_list = [t['priority'] for t in triggers]
         alerts = [0, 0, 0, 0, 0, 0]
-        colors = []
+        cdict = {}
         for i in range(0, 6):
-                alerts[i] = alerts_list.count(str(i))
-                if alerts[i] == 0:
-                    alerts_color[i] = "#FFFFFF"
+            alerts[i] = alerts_list.count(str(i))
+            cdict["a%s" % i]=alerts[i]
+            if alerts[i] == 0:
+                cdict["c%s" % i] = "#FFFFFF"
+            else:
+                cdict["c%s" % i] = alerts_color[i]
 
-
-        cdict = {
-            "default": "{0}:{a[5]}/{a[4]}/{a[3]}/{a[2]}/{a[1]}/{a[0]}".format(sum(alerts), a=alerts),
-            "a5": alerts[5],
-            "a4": alerts[4],
-            "a3": alerts[3],
-            "a2": alerts[2],
-            "a1": alerts[1],
-            "a0": alerts[0],
-            "c5": alerts_color[5],
-            "c4": alerts_color[4],
-            "c3": alerts_color[3],
-            "c2": alerts_color[2],
-            "c1": alerts_color[1],
-            "c0": alerts_color[0],
-            "total": sum(alerts)
-        }
+        cdict["default"] = "{0}:{a[5]}/{a[4]}/{a[3]}/{a[2]}/{a[1]}/{a[0]}".format(sum(alerts), a=alerts)
+        cdict["total"] = sum(alerts)
 
         self.output = {
             "full_text": self.format.format(**cdict)
