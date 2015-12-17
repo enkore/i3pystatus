@@ -44,12 +44,12 @@ class Zabbix(IntervalModule):
             cdict = {}
             for i in range(0, 6):
                 alerts[i] = alerts_list.count(str(i))
-                cdict["a%s_count" % i]=alerts[i]
+                cdict["a%s_count" % i] = alerts[i]
                 if alerts[i] == 0:
                     cdict["color%s" % i] = "#FFFFFF"
                 else:
                     cdict["color%s" % i] = alerts_color[i]
-    
+
             cdict["default"] = "{0}:{a[5]}/{a[4]}/{a[3]}/{a[2]}/{a[1]}/{a[0]}".format(sum(alerts), a=alerts)
             cdict["total"] = sum(alerts)
             color = alerts_color[max(alerts)]
