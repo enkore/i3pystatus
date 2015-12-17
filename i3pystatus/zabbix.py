@@ -6,14 +6,16 @@ class Zabbix(IntervalModule):
     """
     Zabbix alerts watcher
 
+    Requires: pyzabbix
+
     .. rubric:: Available formatters
+
     * {default} - Full output count alerts like total:a5/a4/a3/a2/a1/a0
     * {total} - Total count of alerts
     * {aX_count} - Count alerts of X severity
     * {colorX} - Predicted color for X severity. It can be used with Pango markup hint for different colours at each severity with
-
-    Requires pyzabbix
     """
+
     settings = (
         ("zabbix_server", "Zabbix Server URL"),
         ("zabbix_user", "Zabbix API User"),
@@ -21,6 +23,7 @@ class Zabbix(IntervalModule):
         ("interval", "Update interval"),
         "format"
     )
+
     required = ("zabbix_server", "zabbix_user", "zabbix_password")
     interval = 60
     format = "{default}"
