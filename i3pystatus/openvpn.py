@@ -20,7 +20,9 @@ class OpenVPN(IntervalModule):
 
     colour_up = "#00ff00"
     colour_down = "#FF0000"
-    format = "{label} {vpn_name} {status}"
+    status_up = '▲'
+    status_down = '▼'
+    format = "{vpn_name} {status}"
     status_command = "bash -c \"systemctl show openvpn@%(vpn_name)s | grep -oP 'ActiveState=\K(\w+)'\""
 
     label = ''
@@ -30,8 +32,9 @@ class OpenVPN(IntervalModule):
         ("format", "Format string"),
         ("colour_up", "VPN is up"),
         ("colour_down", "VPN is down"),
+        ("status_down", "Symbol to display when down"),
+        ("status_up", "Symbol to display when up"),
         ("vpn_name", "Name of VPN"),
-        ("label", "Set a label for this connection")
     )
 
     def init(self):
@@ -44,10 +47,10 @@ class OpenVPN(IntervalModule):
 
         if output == 'active':
             color = self.colour_up
-            status = '▲'
+            status = self.status_up
         else:
             color = self.colour_down
-            status = '▼'
+            status = self.status_down
 
         vpn_name = self.vpn_name
         label = self.label
