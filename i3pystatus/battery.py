@@ -131,7 +131,8 @@ class BatteryChecker(IntervalModule):
     * `{status}`
     * `{no_of_batteries}` — The number of batteries included
     * `{battery_ident}` — the same as the setting
-    * `{bar}` —bar displaying the percentage graphically
+    * `{bar}` —bar displaying the relative percentage graphically
+    * `{bar_design}` —bar displaying the absolute percentage graphically
     """
 
     settings = (
@@ -277,6 +278,7 @@ class BatteryChecker(IntervalModule):
             "consumption": self.consumption(batteries),
             "remaining": TimeWrapper(0, "%E%h:%M"),
             "bar": make_bar(self.percentage(batteries)),
+            "bar_design": make_bar(self.percentage(batteries, design=True)),
         }
 
         status = self.battery_status(batteries)
