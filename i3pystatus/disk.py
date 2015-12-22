@@ -6,7 +6,7 @@ from .core.util import round_dict
 
 class Disk(IntervalModule):
     """
-    Gets ``{used}``, ``{free}``, ``{available}`` and ``{total}`` amount of bytes on the given mounted filesystem.
+    Gets ``{used}``, ``{free}``, ``{avail}`` and ``{total}`` amount of bytes on the given mounted filesystem.
 
     These values can also be expressed as percentages with the ``{percentage_used}``, ``{percentage_free}``
     and ``{percentage_avail}`` formats.
