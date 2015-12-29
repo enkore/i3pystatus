@@ -4,7 +4,7 @@ from i3pystatus.core.command import run_through_shell
 
 class Solaar(IntervalModule):
     """
-    Shows output of shell command
+    Shows status and load percentage of bluetooth-device
 
     .. rubric:: Available formatters
 
