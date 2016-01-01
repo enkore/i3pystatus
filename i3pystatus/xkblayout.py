@@ -9,6 +9,8 @@ class Xkblayout(IntervalModule):
     ``layouts`` setting and enables the layout following it. If the
     current layout is not in the ``layouts`` setting the first layout
     is enabled.
+
+    ``layouts`` can be stated with or without variants, e.g.: status.register("xkblayout", layouts=["de neo", "de"])
     """
 
     interval = 1
