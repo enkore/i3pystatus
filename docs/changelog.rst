@@ -35,7 +35,7 @@ master branch
 * mpd: Fixed a bug where an active playlist would be assumed, leading to no output
 * :py:mod:`.updates`: Added yaourt backend
 * :py:mod:`.reddit`: Added link\_karma and comment\_karma formatters
-* :py:mod:`.vpn`: Configurable up/down symbols
+* :py:mod:`.openvpn`: Configurable up/down symbols
 * :py:mod:`.disk`: Improved handling of unmounted drives. Previously
   the free space of the underlying filesystem would be reported if the
   path provided was a directory but not a valid mountpoint. This adds
