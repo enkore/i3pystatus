@@ -11,7 +11,16 @@ master branch
     - :py:mod:`.moon`: Display moon phase
     - :py:mod:`.online`: Display internet connectivity
     - :py:mod:`.xkblayout`: View and change keyboard layout
+    - :py:mod:`.plexstatus`: View status of Plex Media Server
+    - :py:mod:`.iinet`: View iiNet internet usage
+    - :py:mod:`.gpu_mem`, :py:mod:`.gpu_temp`: View memory and temperature stats of nVidia cards
+    - :py:mod:`.solaar`: Show battery status of Solaar / Logitech Unifying devices
+    - :py:mod:`.zabbix`: Alerts watcher for the Zabbix enterprise network monitor
 * Applications started from click events don't block other click events now
+* Fixed crash with desktop notifications when python-gobject is installed, but no notification daemon is running
+* Log file name is now an option (``logfile`` of :py:class:`.Status`)
+* Server used for checking internet connectivity is now an option (``internet_check`` of :py:class:`.Status`)
+* Added double click support for click events
 * :py:mod:`.dota2wins`: Now accepts usernames in place of a Steam ID
 * dota2wins: Changed win percentage to be a float
 * :py:mod:`.uptime`: Added days, hours, minutes, secs formatters
@@ -26,7 +35,20 @@ master branch
 * mpd: Fixed a bug where an active playlist would be assumed, leading to no output
 * :py:mod:`.updates`: Added yaourt backend
 * :py:mod:`.reddit`: Added link\_karma and comment\_karma formatters
-
+* :py:mod:`.vpn`: Configurable up/down symbols
+* :py:mod:`.disk`: Improved handling of unmounted drives. Previously
+  the free space of the underlying filesystem would be reported if the
+  path provided was a directory but not a valid mountpoint. This adds
+  a check to first confirm whether a directory is a mountpoint using
+  os.path.ismount(), and if not, then runs an os.listdir() to count
+  the files; empty directories are considered not mounted. This
+  functionality allows for usage on setups with NFS and will not
+  report free space of underlying filesystem in cases with local
+  mountpoints as path.
+* :py:mod:`.battery`: Added ``bar_design`` formatter
+* :py:mod:`.alsa`: Implemented optional volume display/setting as in AlsaMixer
+* :py:mod:`.pulseaudio`: Fixed bug that created zombies on a click event
+  
 3.33 (2015-06-23)
 +++++++++++++++++
 
