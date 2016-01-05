@@ -81,8 +81,11 @@ def test_clicks(events, expected):
 
         _action = 'no action'
 
+    # Divide all times by 10 to make the test run faster
+    TestClicks.multi_click_timeout /= 10
+
     m = TestClicks()
     for sl, ev in events:
         m.on_click(ev)
-        time.sleep(sl)
+        time.sleep(sl / 10)
     assert m._action == expected
