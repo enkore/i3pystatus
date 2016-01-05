@@ -172,14 +172,14 @@ class PulseAudio(Module, ColorRangeModule):
                 command += 'unmute'
             else:
                 command += 'mute'
-            subprocess.Popen(command.split())
+            subprocess.run(command.split())
 
     def increase_volume(self):
         if self.has_amixer:
             command = "amixer -q -D pulse sset Master %s%%+" % self.step
-            subprocess.Popen(command.split())
+            subprocess.run(command.split())
 
     def decrease_volume(self):
         if self.has_amixer:
             command = "amixer -q -D pulse sset Master %s%%-" % self.step
-            subprocess.Popen(command.split())
+            subprocess.run(command.split())
