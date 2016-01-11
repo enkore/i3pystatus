@@ -48,6 +48,7 @@ master branch
 * :py:mod:`.battery`: Added ``bar_design`` formatter
 * :py:mod:`.alsa`: Implemented optional volume display/setting as in AlsaMixer
 * :py:mod:`.pulseaudio`: Fixed bug that created zombies on a click event
+* :py:mod:`.backlight`: Fixed bug preventing brightness increase
   
 3.33 (2015-06-23)
 +++++++++++++++++
