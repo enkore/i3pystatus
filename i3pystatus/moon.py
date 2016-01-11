@@ -46,7 +46,7 @@ class MoonPhase(IntervalModule):
         "Full Moon": "FM",
         "Waning Gibbous": "WanGib",
         "Last Quarter": "LQ",
-        "Waning Cresent": "WanCres",
+        "Waning Crescent": "WanCres",
     }
 
     color = {
