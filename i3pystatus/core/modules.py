@@ -88,7 +88,7 @@ class Module(SettingsBase):
                 self.__log_button_event(button, cb, args, "Member callback")
                 getattr(self, cb)(*args)
         else:
-            self.__log_event(button, cb, args, "External command")
+            self.__log_button_event(button, cb, args, "External command")
             execute(cb, detach=True)
 
         # Notify status handler
