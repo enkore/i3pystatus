@@ -1,6 +1,5 @@
 import urllib.request
 import json
-import time
 
 from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require, user_open
@@ -84,6 +83,7 @@ class Bitcoin(IntervalModule):
             "bid_price": price_data["bid"],
             "last_price": price_data["last"],
             "volume": price_data["volume_btc"],
+            "volume_percent": price_data["volume_percent"],
         }
 
         if self._price_prev and fdict["last_price"] > self._price_prev:
