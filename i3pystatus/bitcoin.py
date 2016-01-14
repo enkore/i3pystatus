@@ -58,7 +58,7 @@ class Bitcoin(IntervalModule):
     }
 
     on_leftclick = "electrum"
-    on_rightclick = [user_open, "https://bitcoinaverage.com/"]
+    on_rightclick = ["open_something", "https://bitcoinaverage.com/"]
 
     _price_prev = 0
 
@@ -124,3 +124,9 @@ class Bitcoin(IntervalModule):
             "full_text": self.format.format(**fdict),
             "color": color,
         }
+
+    def open_something(self, url_or_command):
+        """
+        Wrapper function, to pass the arguments to user_open
+        """
+        user_open(url_or_command)
