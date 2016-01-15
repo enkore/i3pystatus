@@ -36,6 +36,7 @@ class Bitcoin(IntervalModule):
         ("currency", "Base fiat currency used for pricing."),
         ("wallet_addresses", "List of wallet address(es) to monitor."),
         ("color", "Standard color"),
+        ("exchange", "Get ticker from a custom exchange instead"),
         ("colorize", "Enable color change on price increase/decrease"),
         ("color_up", "Color for price increases"),
         ("color_down", "Color for price decreases"),
@@ -45,6 +46,7 @@ class Bitcoin(IntervalModule):
     )
     format = "{symbol} {status}{last_price}"
     currency = "USD"
+    exchange = None
     symbol = "฿"
     wallet_addresses = ""
     color = "#FFFFFF"
@@ -62,6 +64,21 @@ class Bitcoin(IntervalModule):
 
     _price_prev = 0
 
+    def _fetch_price_data_specific_exchange(self):
+        api = "https://api.bitcoinaverage.com/exchanges/"
+        url = "{}{}".format(api, self.currency.upper())
+        try:
+            ret = json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
+            exchange = ret[self.exchange.lower()]
+            # Adapt values to global ticker format
+            exchange['ask'] = exchange['rates']['ask']
+            exchange['bid'] = exchange['rates']['bid']
+            exchange['last'] = exchange['rates']['last']
+            exchange['24h_avg'] = None
+            return exchange
+        except:
+            raise
+
     def _fetch_price_data(self):
         api = "https://api.bitcoinaverage.com/ticker/global/"
         url = "{}{}".format(api, self.currency.upper())
@@ -75,7 +92,10 @@ class Bitcoin(IntervalModule):
 
     @require(internet)
     def run(self):
-        price_data = self._fetch_price_data()
+        if self.exchange:
+            price_data = self._fetch_price_data_specific_exchange()
+        else:
+            price_data = self._fetch_price_data()
         fdict = {
             "symbol": self.symbol,
             "daily_average": price_data["24h_avg"],
