@@ -1,5 +1,6 @@
 import urllib.request
 import json
+from datetime import datetime
 
 from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require, user_open
@@ -64,6 +65,14 @@ class Bitcoin(IntervalModule):
 
     _price_prev = 0
 
+    def _get_age(self, bitcoinaverage_timestamp):
+        # Assume format is allwasy utc, to avoid import pytz
+        utc_tstamp = datetime.strptime(bitcoinaverage_timestamp.split(', ')[1],
+                                       u'%d %b %Y %H:%M:%S -0000')
+        diff = datetime.utcnow() - utc_tstamp
+        return  int(diff.total_seconds())
+
+
     def _fetch_price_data_specific_exchange(self):
         api = "https://api.bitcoinaverage.com/exchanges/"
         url = "{}{}".format(api, self.currency.upper())
@@ -75,20 +84,25 @@ class Bitcoin(IntervalModule):
             exchange['bid'] = exchange['rates']['bid']
             exchange['last'] = exchange['rates']['last']
             exchange['24h_avg'] = None
+            exchange['timestamp'] = ret['timestamp']
             return exchange
         except:
             raise
 
+
     def _fetch_price_data(self):
         api = "https://api.bitcoinaverage.com/ticker/global/"
         url = "{}{}".format(api, self.currency.upper())
-        return json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
+        data = json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
+        return data
+
 
     def _fetch_blockchain_data(self):
         api = "https://blockchain.info/multiaddr?active="
         addresses = "|".join(self.wallet_addresses)
         url = "{}{}".format(api, addresses)
         return json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
+
 
     @require(internet)
     def run(self):
@@ -104,6 +118,7 @@ class Bitcoin(IntervalModule):
             "last_price": price_data["last"],
             "volume": price_data["volume_btc"],
             "volume_percent": price_data["volume_percent"],
+            "age":  self._get_age(price_data['timestamp'])
         }
 
         if self._price_prev and fdict["last_price"] > self._price_prev:
