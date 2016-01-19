@@ -7,3 +7,4 @@ dist/*
 *~
 .i3pystatus-*
 ci-build
+.idea/
