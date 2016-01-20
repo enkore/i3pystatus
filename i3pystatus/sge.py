@@ -31,7 +31,7 @@ class SGETracker(IntervalModule):
                                       shell=True)
         root = etree.fromstring(xml)
         job_dict = {'qw': 0, 'Eqw': 0, 'r': 0}
-        
+
         for j in root.xpath('//job_info/job_info/job_list'):
             job_dict[j.find("state").text] += 1
 
