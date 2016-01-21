@@ -66,18 +66,25 @@ class Bitcoin(IntervalModule):
     _price_prev = 0
 
     def _get_age(self, bitcoinaverage_timestamp):
-        # Assume format is allwasy utc, to avoid import pytz
+        # Assume format is always utc, to avoid import pytz
         utc_tstamp = datetime.strptime(bitcoinaverage_timestamp.split(', ')[1],
                                        u'%d %b %Y %H:%M:%S -0000')
         diff = datetime.utcnow() - utc_tstamp
         return  int(diff.total_seconds())
 
+    def _query_api(self, api_url):
+        url = "{}{}".format(api_url, self.currency.upper())
+        response = urllib.request.urlopen(url).read().decode("utf-8")
+        return json.loads(response)
 
-    def _fetch_price_data_specific_exchange(self):
-        api = "https://api.bitcoinaverage.com/exchanges/"
-        url = "{}{}".format(api, self.currency.upper())
-        try:
-            ret = json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
+
+    def _fetch_price_data(self):
+        if self.exchange is None:
+            api_url = "https://api.bitcoinaverage.com/ticker/global/"
+            return self._query_api(api_url)
+        else:
+            api_url = "https://api.bitcoinaverage.com/exchanges/"
+            ret = self._query_api(api_url)
             exchange = ret[self.exchange.lower()]
             # Adapt values to global ticker format
             exchange['ask'] = exchange['rates']['ask']
@@ -86,15 +93,6 @@ class Bitcoin(IntervalModule):
             exchange['24h_avg'] = None
             exchange['timestamp'] = ret['timestamp']
             return exchange
-        except:
-            raise
-
-
-    def _fetch_price_data(self):
-        api = "https://api.bitcoinaverage.com/ticker/global/"
-        url = "{}{}".format(api, self.currency.upper())
-        data = json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
-        return data
 
 
     def _fetch_blockchain_data(self):
@@ -106,10 +104,8 @@ class Bitcoin(IntervalModule):
 
     @require(internet)
     def run(self):
-        if self.exchange:
-            price_data = self._fetch_price_data_specific_exchange()
-        else:
-            price_data = self._fetch_price_data()
+        price_data = self._fetch_price_data()
+
         fdict = {
             "symbol": self.symbol,
             "daily_average": price_data["24h_avg"],
