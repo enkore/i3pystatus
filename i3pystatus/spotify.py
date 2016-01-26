@@ -39,6 +39,7 @@ class Spotify(IntervalModule):
     on_leftclick = 'playpause'
     on_rightclick = 'next_song'
     on_upscroll = 'next_song'
+    on_downscroll = 'previous_song'
 
     def get_info(self, player):
         """gets spotify track info from playerctl"""
@@ -101,3 +102,7 @@ class Spotify(IntervalModule):
     def next_song(self):
         """skips to the next song"""
         self.player.next()
+
+    def previous_song(self):
+        """Plays the previous song"""
+        self.player.previous()
