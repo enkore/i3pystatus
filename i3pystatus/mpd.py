@@ -31,7 +31,7 @@ class MPD(IntervalModule):
 
     settings = (
         ("host"),
-        ("port", "MPD port"),
+        ("port", "MPD port. If set to 0, host will we interpreted as a Unix socket."),
         ("format", "formatp string"),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
@@ -64,7 +64,11 @@ class MPD(IntervalModule):
         try:
             sock.send((command + "\n").encode("utf-8"))
         except Exception as e:
-            self.s = socket.create_connection((self.host, self.port))
+            if self.port != 0:
+                self.s = socket.create_connection((self.host, self.port))
+            else:
+                self.s = socket.socket(family=socket.AF_UNIX)
+                self.s.connect(self.host)
             sock = self.s
             sock.recv(8192)
             sock.send((command + "\n").encode("utf-8"))
