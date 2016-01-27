@@ -127,7 +127,8 @@ class NowPlaying(IntervalModule):
                     "full_text": self.format_no_player,
                     "color": self.color_no_player,
                 }
-            if hasattr(self, "data"): del self.data
+            if hasattr(self, "data"): if hasattr(self, "data"):
+                del.data
             return
 
         except dbus.exceptions.DBusException as e:
@@ -138,7 +139,8 @@ class NowPlaying(IntervalModule):
                     "full_text": "DBus error: " + e.get_dbus_message(),
                     "color": "#ff0000",
                 }
-            if hasattr(self, "data"): del self.data
+            if hasattr(self, "data"):
+                del.data
             return
 
     def playpause(self):

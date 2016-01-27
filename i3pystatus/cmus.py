@@ -100,7 +100,8 @@ class Cmus(IntervalModule):
                            "color": self.color}
 
         else:
-            if hasattr(self, "data"): del self.data
+            if hasattr(self, "data"):
+                del.data
             self.output = {"full_text": self.format_not_running,
                            "color": self.color_not_running}
 

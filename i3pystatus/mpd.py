@@ -91,7 +91,8 @@ class MPD(IntervalModule):
                 self.output = {
                     "full_text": ""
                 }
-            if hasattr(self, "data"): del self.data
+            if hasattr(self, "data"):
+                del.data
             return
 
         fdict = {
