@@ -92,7 +92,7 @@ class MPD(IntervalModule):
                     "full_text": ""
                 }
             if hasattr(self, "data"):
-                del.data
+                del self.data
             return
 
         fdict = {

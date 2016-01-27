@@ -96,7 +96,7 @@ class Spotify(IntervalModule):
             self.output = {"full_text": self.format_not_running,
                            "color": self.color_not_running}
             if hasattr(self, "data"):
-                del.data
+                del self.data
 
     def playpause(self):
         """Pauses and plays spotify"""
