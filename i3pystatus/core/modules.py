@@ -102,7 +102,9 @@ class Module(SettingsBase):
                 getattr(self, cb)(*args)
         else:
             self.__log_button_event(button, cb, args, "External command")
-            execute(cb, detach=True)
+            if hasattr(self, "data"):
+                args = [arg.format(**self.data) for arg in args]
+            execute(cb + " " + " ".join(args), detach=True)
 
         # Notify status handler
         try:
