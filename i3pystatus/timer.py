@@ -1,4 +1,3 @@
-from enum import Enum
 import time
 
 from i3pystatus import IntervalModule
@@ -6,7 +5,7 @@ from i3pystatus.core.command import execute
 from i3pystatus.core.util import TimeWrapper
 
 
-class TimerState(Enum):
+class TimerState:
     stopped = 0
     running = 1
     overflow = 2
@@ -24,11 +23,6 @@ class Timer(IntervalModule):
       seconds.
     - Execute custom python function or external command when timer overflows
       (or reaches zero depending on how you look at it).
-
-    .. note::
-        This module requires `enum` module which was introduced in python 3.4.
-        If you have older version of python you can get the backported package
-        ``enum34`` from PyPI.
 
     .. rubric:: Available formatters
 
