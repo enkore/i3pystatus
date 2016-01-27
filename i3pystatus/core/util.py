@@ -3,7 +3,7 @@ import functools
 import re
 import socket
 import string
-
+import inspect
 from threading import Timer, RLock
 
 
@@ -558,3 +558,32 @@ class MultiClickHandler(object):
 
         self.clear_timer()
         return ret
+
+
+def get_module(function):
+    """Function decorator for retrieving the ``self`` argument from the stack.
+
+    Intended for use with callbacks that need access to a modules variables, for example:
+
+    .. code:: python
+
+        from i3pystatus import Status
+        from i3pystatus.core.util import get_module
+        from i3pystatus.core.command import execute
+        status = Status(...)
+        # other modules etc.
+        @get_module
+        def display_ip_verbose(module):
+            execute('sh -c "ip addr show dev {dev} | xmessage -file -"'.format(dev=module.interface))
+        status.register("network", interface="wlan1", on_leftclick=display_ip_verbose)
+    """
+    @functools.wraps(function)
+    def call_wrapper(*args, **kwargs):
+        stack = inspect.stack()
+        caller_frame_info = stack[1]
+        self = caller_frame_info[0].f_locals["self"]
+        # not completly sure whether this is necessary
+        # see note in Python docs about stack frames
+        del stack
+        function(self, *args, **kwargs)
+    return call_wrapper
