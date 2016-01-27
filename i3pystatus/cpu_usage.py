@@ -118,6 +118,7 @@ class CpuUsage(IntervalModule):
         # for backward compatibility
         usage['usage'] = usage['usage_cpu']
 
+        self.data = usage
         self.output = {
             "full_text": self.format.format_map(usage),
             "color": self.color

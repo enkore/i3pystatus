@@ -85,7 +85,7 @@ class Pomodoro(IntervalModule):
             'current_pomodoro': self.breaks,
             'total_pomodoro': self.short_break_count + 1,
         }
-
+        self.data = sdict
         self.output = {
             'full_text': self.format.format(**sdict),
             'color': color

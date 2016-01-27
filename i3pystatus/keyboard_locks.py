@@ -35,7 +35,7 @@ class Keyboard_locks(IntervalModule):
     scroll_on = "SCR"
     scroll_off = "___"
     color = "#FFFFFF"
-    fdict = {}
+    data = {}
 
     def get_status(self):
         xset = str(subprocess.check_output(["xset", "q"]))
@@ -46,13 +46,13 @@ class Keyboard_locks(IntervalModule):
 
     def run(self):
         (cap, num, scr) = self.get_status()
-        self.fdict["caps"] = self.caps_on if cap else self.caps_off
-        self.fdict["num"] = self.num_on if num else self.num_off
-        self.fdict["scroll"] = self.scroll_on if scr else self.scroll_off
+        self.data["caps"] = self.caps_on if cap else self.caps_off
+        self.data["num"] = self.num_on if num else self.num_off
+        self.data["scroll"] = self.scroll_on if scr else self.scroll_off
 
         output_format = self.format
 
         self.output = {
-            "full_text": output_format.format(**self.fdict),
+            "full_text": output_format.format(**self.data),
             "color": self.color,
         }

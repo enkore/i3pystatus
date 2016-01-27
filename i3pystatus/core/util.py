@@ -112,7 +112,7 @@ class KeyConstraintDict(collections.UserDict):
 
     def __delitem__(self, key):
         self.seen_keys.remove(key)
-        del self.data[key]
+        if hasattr(self, "data"): del self.data[key]
 
     def __iter__(self):
         """Iteration will raise a MissingKeys exception unless all required keys are set

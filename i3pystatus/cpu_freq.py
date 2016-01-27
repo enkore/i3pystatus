@@ -43,6 +43,7 @@ class CpuFreq(IntervalModule):
     def run(self):
         cdict = self.createvaluesdict()
 
+        self.data = cdict
         self.output = {
             "full_text": self.format.format(**cdict),
             "color": self.color,

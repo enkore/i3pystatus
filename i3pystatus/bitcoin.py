@@ -120,6 +120,7 @@ class Bitcoin(IntervalModule):
                 else:
                     fdict["last_tx_type"] = "sent"
 
+        self.data = fdict
         self.output = {
             "full_text": self.format.format(**fdict),
             "color": color,

@@ -77,6 +77,7 @@ class Disk(IntervalModule):
         }
         round_dict(cdict, self.round_size)
 
+        self.data = cdict
         self.output = {
             "full_text": self.format.format(**cdict),
             "color": self.critical_color if critical else self.color,

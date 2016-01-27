@@ -113,6 +113,7 @@ class NowPlaying(IntervalModule):
                 fdict["filename"] = '.'.join(
                     basename((currentsong.get("xesam:url") or "")).split('.')[:-1])
 
+            self.data = fdict
             self.output = {
                 "full_text": formatp(self.format, **fdict).strip(),
                 "color": self.color,
@@ -126,6 +127,7 @@ class NowPlaying(IntervalModule):
                     "full_text": self.format_no_player,
                     "color": self.color_no_player,
                 }
+            if hasattr(self, "data"): del self.data
             return
 
         except dbus.exceptions.DBusException as e:
@@ -136,6 +138,7 @@ class NowPlaying(IntervalModule):
                     "full_text": "DBus error: " + e.get_dbus_message(),
                     "color": "#ff0000",
                 }
+            if hasattr(self, "data"): del self.data
             return
 
     def playpause(self):

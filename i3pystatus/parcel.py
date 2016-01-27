@@ -162,6 +162,7 @@ class ParcelTracker(IntervalModule):
         }
         fdict.update(self.instance.status())
 
+        self.data = fdict
         self.output = {
             "full_text": self.format.format(**fdict).strip(),
             "instance": self.name,

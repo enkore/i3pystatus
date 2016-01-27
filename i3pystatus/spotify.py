@@ -87,6 +87,7 @@ class Spotify(IntervalModule):
                 'artist': response.get('artist', ''),
                 'length': response.get('length', 0),
             }
+            self.data = fdict
             self.output = {"full_text": formatp(self.format, **fdict),
                            "color": self.color}
 
@@ -94,6 +95,7 @@ class Spotify(IntervalModule):
         except:
             self.output = {"full_text": self.format_not_running,
                            "color": self.color_not_running}
+            if hasattr(self, "data"): del self.data
 
     def playpause(self):
         """Pauses and plays spotify"""

@@ -61,6 +61,7 @@ class Mem(IntervalModule):
         }
         round_dict(cdict, self.round_size)
 
+        self.data = cdict
         self.output = {
             "full_text": self.format.format(**cdict),
             "color": color

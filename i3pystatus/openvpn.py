@@ -55,6 +55,7 @@ class OpenVPN(IntervalModule):
         vpn_name = self.vpn_name
         label = self.label
 
+        self.data = locals()
         self.output = {
             "full_text": self.format.format(**locals()),
             'color': color,

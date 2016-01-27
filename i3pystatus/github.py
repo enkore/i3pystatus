@@ -57,6 +57,7 @@ class Github(IntervalModule):
             format_values['unread_count'] = unread
             format_values['unread'] = self.unread_marker
 
+        self.data = format_values
         self.output = {
             'full_text': self.format.format(**format_values),
             'color': self.color

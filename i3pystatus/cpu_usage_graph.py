@@ -50,6 +50,7 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
         format_options.update({'cpu_graph': graph})
 
         color = self.get_gradient(core_reading, self.colors)
+        self.data = format_options
         self.output = {
             "full_text": self.format.format_map(format_options),
             'color': color

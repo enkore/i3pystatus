@@ -313,6 +313,7 @@ class BatteryChecker(IntervalModule):
 
         fdict["status"] = self.status[fdict["status"]]
 
+        self.data = fdict
         self.output = {
             "full_text": formatp(self.format, **fdict),
             "instance": self.battery_ident,

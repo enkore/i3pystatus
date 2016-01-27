@@ -49,6 +49,7 @@ class SGETracker(IntervalModule):
             "running": jobs['r']
         }
 
+        self.data = fdict
         self.output = {
             "full_text": self.format.format(**fdict).strip(),
             "color": self.color

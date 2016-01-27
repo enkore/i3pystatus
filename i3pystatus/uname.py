@@ -30,6 +30,7 @@ class Uname(Module):
             "version": uname_result.version,
             "machine": uname_result.machine,
         }
+        self.data = fdict
         self.output = {
             "full_text": self.format.format(**fdict),
         }

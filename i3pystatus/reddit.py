@@ -97,6 +97,7 @@ class Reddit(IntervalModule):
         else:
             color = self.color
 
+        self.data = fdict
         full_text = self.format.format(**fdict)
         self.output = {
             "full_text": full_text,
