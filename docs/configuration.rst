@@ -370,6 +370,18 @@ consider creating an `python callback` or execute a script instead.
         on_rightclick = "firefox --new-window https://github.com/enkore/i3pystatus",
         )
 
+Most modules provide all the formatter data to program callbacks. The snippet below
+demonstrates how this could be used, in this case XMessage will display a dialog box
+showing verbose information about the network interface:
+
+.. code:: python
+
+    status.register("network",
+        interface="eth0",
+        on_leftclick="ip addr show dev {interface} | xmessage -file -"
+        )
+
+
 .. _hints:
 
 Hints
