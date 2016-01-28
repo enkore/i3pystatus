@@ -1,7 +1,9 @@
+import time
+from unittest.mock import MagicMock
+
 import pytest
 
 from i3pystatus import IntervalModule
-import time
 
 left_click = 1
 right_click = 3
@@ -89,3 +91,32 @@ def test_clicks(events, expected):
         m.on_click(ev)
         time.sleep(sl / 10)
     assert m._action == expected
+
+
+@pytest.mark.parametrize("button, stored_value", [
+    (left_click, "leftclick"),
+    (right_click, "rightclick")
+])
+def test_callback_handler_method(button, stored_value):
+    class TestClicks(IntervalModule):
+        def set_action(self, action):
+            self._action = action
+
+        on_leftclick = [set_action, "leftclick"]
+        on_rightclick = ["set_action", "rightclick"]
+
+    dut = TestClicks()
+
+    dut.on_click(button)
+    assert dut._action == stored_value
+
+
+def test_callback_handler_function():
+    callback_mock = MagicMock()
+
+    class TestClicks(IntervalModule):
+        on_upscroll = [callback_mock.callback, "upscroll"]
+
+    dut = TestClicks()
+    dut.on_click(scroll_up)
+    callback_mock.callback.assert_called_once_with("upscroll")
