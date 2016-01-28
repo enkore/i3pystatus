@@ -1,6 +1,5 @@
 import urllib.request
 import json
-import time
 
 from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require, user_open
@@ -59,7 +58,7 @@ class Bitcoin(IntervalModule):
     }
 
     on_leftclick = "electrum"
-    on_rightclick = [user_open, "https://bitcoinaverage.com/"]
+    on_rightclick = ["open_something", "https://bitcoinaverage.com/"]
 
     _price_prev = 0
 
@@ -84,6 +83,7 @@ class Bitcoin(IntervalModule):
             "bid_price": price_data["bid"],
             "last_price": price_data["last"],
             "volume": price_data["volume_btc"],
+            "volume_percent": price_data["volume_percent"],
         }
 
         if self._price_prev and fdict["last_price"] > self._price_prev:
@@ -125,3 +125,9 @@ class Bitcoin(IntervalModule):
             "full_text": self.format.format(**fdict),
             "color": color,
         }
+
+    def open_something(self, url_or_command):
+        """
+        Wrapper function, to pass the arguments to user_open
+        """
+        user_open(url_or_command)
