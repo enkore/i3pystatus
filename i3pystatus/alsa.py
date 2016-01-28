@@ -92,7 +92,7 @@ class ALSA(IntervalModule):
         else:
             output_format = self.format
 
-        self.data = fdict
+        self.data = self.fdict
         self.output = {
             "full_text": output_format.format(**self.fdict),
             "color": self.color_muted if muted else self.color,
