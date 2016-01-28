@@ -10,8 +10,12 @@ from i3pystatus.core.command import run_through_shell
 
 def is_method_of(method, object):
     """Decide whether ``method`` is contained within the MRO of ``object``."""
+    if not callable(method) or not hasattr(method, "__name__"):
+        return False
+    if inspect.ismethod(method):
+        return method.__self__ is object
     for cls in inspect.getmro(object.__class__):
-        if method in cls.__dict__.values():
+        if cls.__dict__.get(method.__name__, None) is method:
             return True
     return False
 
