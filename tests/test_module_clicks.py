@@ -69,17 +69,17 @@ def test_clicks(events, expected):
         def set_action(self, action):
             self._action = action
 
-        on_leftclick = [set_action, "leftclick"]
-        on_doubleleftclick = [set_action, "doubleleftclick"]
+        on_leftclick = ["set_action", "leftclick"]
+        on_doubleleftclick = ["set_action", "doubleleftclick"]
 
-        # on_rightclick = [set_action, "rightclick"]
-        on_doublerightclick = [set_action, "doublerightclick"]
+        # on_rightclick = ["set_action", "rightclick"]
+        on_doublerightclick = ["set_action", "doublerightclick"]
 
-        on_upscroll = [set_action, "upscroll"]
-        on_doubleupscroll = [set_action, "doubleupscroll"]
+        on_upscroll = ["set_action", "upscroll"]
+        on_doubleupscroll = ["set_action", "doubleupscroll"]
 
-        on_downscroll = [set_action, "downscroll"]
-        # on_doubledownscroll = [set_action, "doubledownscroll"]
+        on_downscroll = ["set_action", "downscroll"]
+        # on_doubledownscroll = ["set_action", "doubledownscroll"]
 
         _action = 'no action'
 

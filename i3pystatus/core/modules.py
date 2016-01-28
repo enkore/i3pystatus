@@ -8,14 +8,6 @@ from i3pystatus.core.command import execute
 from i3pystatus.core.command import run_through_shell
 
 
-def is_method_of(method, object):
-    """Decide whether ``method`` is contained within the MRO of ``object``."""
-    for cls in inspect.getmro(object.__class__):
-        if method in cls.__dict__.values():
-            return True
-    return False
-
-
 class Module(SettingsBase):
     output = None
     position = 0
@@ -90,12 +82,9 @@ class Module(SettingsBase):
         else:
             args = []
 
-        our_method = is_method_of(cb, self)
-        if callable(cb) and not our_method:
+        if callable(cb):
             self.__log_button_event(button, cb, args, "Python callback")
             cb(*args)
-        elif our_method:
-            cb(self, *args)
         elif hasattr(self, cb):
             if cb is not "run":
                 self.__log_button_event(button, cb, args, "Member callback")
