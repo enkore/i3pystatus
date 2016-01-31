@@ -97,24 +97,31 @@ class Syncthing(IntervalModule):
 
     # Callbacks
     def st_open(self):
+        """Callback: Open Syncthing web UI"""
         user_open(self.url)
 
     def st_restart(self):
+        """Callback: Restart Syncthing""""
         self.st_post('/rest/system/restart')
 
     def st_stop(self):
+        """Callback: Stop Syncthing"""
         self.st_post('/rest/system/shutdown')
 
     def st_start_systemd(self):
+        """Callback: systemctl --user start syncthing.service"""
         call(['systemctl', '--user', 'start', 'syncthing.service'])
 
     def st_restart_systemd(self):
+        """Callback: systemctl --user restart syncthing.service"""
         call(['systemctl', '--user', 'restart', 'syncthing.service'])
 
     def st_stop_systemd(self):
+        """Callback: systemctl --user stop syncthing.service"""
         call(['systemctl', '--user', 'stop', 'syncthing.service'])
 
     def st_toggle_systemd(self):
+        """Callback: start Syncthing service if offline, or stop it when online"""
         if self.online:
             self.st_stop_systemd()
         else:
