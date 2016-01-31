@@ -101,7 +101,7 @@ class Syncthing(IntervalModule):
         user_open(self.url)
 
     def st_restart(self):
-        """Callback: Restart Syncthing""""
+        """Callback: Restart Syncthing"""
         self.st_post('/rest/system/restart')
 
     def st_stop(self):
