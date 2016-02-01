@@ -1,4 +1,6 @@
-from i3pystatus import SettingsBase, IntervalModule, formatp
+import threading
+
+from i3pystatus import SettingsBase, Module, formatp
 from i3pystatus.core.util import internet, require
 
 
@@ -7,7 +9,7 @@ class Backend(SettingsBase):
     updates = 0
 
 
-class Updates(IntervalModule):
+class Updates(Module):
     """
     Generic update checker.
     To use select appropriate backend(s) for your system.
@@ -73,9 +75,19 @@ class Updates(IntervalModule):
         self.data = {
             "count": 0
         }
+        self.condition = threading.Condition()
+        self.thread = threading.Thread(target=self.update_thread, daemon=True)
+        self.thread.start()
+
+    def update_thread(self):
+        self.check_updates()
+        while True:
+            with self.condition:
+                self.condition.wait(self.interval)
+            self.check_updates()
 
     @require(internet)
-    def run(self):
+    def check_updates(self):
         self.output = {
             "full_text": formatp(self.format_working, **self.data).strip(),
             "color": self.color_working,
@@ -97,3 +109,7 @@ class Updates(IntervalModule):
             "full_text": formatp(self.format, **self.data).strip(),
             "color": self.color,
         }
+
+    def run(self):
+        with self.condition:
+            self.condition.notify()
