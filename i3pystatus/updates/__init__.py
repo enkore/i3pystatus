@@ -42,12 +42,14 @@ class Updates(IntervalModule):
 
     settings = (
         ("backends", "Required list of backends used to check for updates."),
-        ("format", "String shown when updates are available. "
+        ("format", "Format used when updates are available. "
          "May contain formatters."),
         ("format_no_updates", "String that is shown if no updates are available."
          " If not set the module will be hidden if no updates are available."),
+        ("format_working", "Format used while update queries are run. By default the same as ``format``."),
         "color",
         "color_no_updates",
+        "color_working",
         ("interval", "Default interval is set to one hour."),
     )
     required = ("backends",)
@@ -55,17 +57,30 @@ class Updates(IntervalModule):
     backends = None
     format = "Updates: {count}"
     format_no_updates = None
+    format_working = None
     color = "#00DD00"
     color_no_updates = "#FFFFFF"
+    color_working = None
 
     on_leftclick = "run"
 
     def init(self):
         if not isinstance(self.backends, list):
             self.backends = [self.backends]
+        if self.format_working is None:  # we want to allow an empty format
+            self.format_working = self.format
+        self.color_working = self.color_working or self.color
+        self.data = {
+            "count": 0
+        }
 
     @require(internet)
     def run(self):
+        self.output = {
+            "full_text": formatp(self.format_working, **self.data).strip(),
+            "color": self.color_working,
+        }
+
         updates_count = 0
         for backend in self.backends:
             updates_count += backend.updates
@@ -77,10 +92,8 @@ class Updates(IntervalModule):
             }
             return
 
-        fdict = {
-            "count": updates_count,
-        }
+        self.data["count"] = updates_count
         self.output = {
-            "full_text": formatp(self.format, **fdict).strip(),
+            "full_text": formatp(self.format, **self.data).strip(),
             "color": self.color,
         }
