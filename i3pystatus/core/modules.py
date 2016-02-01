@@ -101,8 +101,12 @@ class Module(SettingsBase):
         elif our_method:
             cb(self, *args)
         elif hasattr(self, cb):
-            self.__log_button_event(button, cb, args, "Member callback")
-            getattr(self, cb)(*args)
+            if cb is not "run":
+                # CommandEndpoint already calls run() after every
+                # callback to instantly update any changed state due
+                # to the callback's actions.
+                self.__log_button_event(button, cb, args, "Member callback")
+                getattr(self, cb)(*args)
         else:
             self.__log_button_event(button, cb, args, "External command")
             if hasattr(self, "data"):
