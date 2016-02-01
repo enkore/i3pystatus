@@ -21,6 +21,10 @@ class Updates(Module):
     .. rubric:: Available formatters
 
     * `{count}` — Sum of all available updates from all backends.
+    * For each backend registered there is one formatter named after the backend,
+      multiple identical backends do not accumulate, but overwrite each other.
+    * For example, `{Cower}` (note capitcal C) is the number of updates reported by
+      the cower backend, assuming it has been registered.
 
     .. rubric:: Usage example
 
@@ -95,7 +99,9 @@ class Updates(Module):
 
         updates_count = 0
         for backend in self.backends:
-            updates_count += backend.updates
+            updates = backend.updates
+            updates_count += updates
+            self.data[backend.__class__.__name__] = updates
 
         if updates_count == 0:
             self.output = {} if not self.format_no_updates else {
