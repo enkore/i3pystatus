@@ -33,7 +33,8 @@ MOCK_MODULES = [
     "dota2py",
     "novaclient.v2",
     "speedtest_cli",
-    "pyzabbix"
+    "pyzabbix",
+    "vk",
 ]
 
 for mod_name in MOCK_MODULES:
