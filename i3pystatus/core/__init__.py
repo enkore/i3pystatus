@@ -50,7 +50,7 @@ class Status:
 
     def __init__(self, standalone=False, **kwargs):
         self.standalone = standalone
-        self.click_events = kwargs.get("click_events", True)
+        self.click_events = kwargs.get("click_events", True if standalone else False)
         interval = kwargs.get("interval", 1)
         input_stream = kwargs.get("input_stream", sys.stdin)
         if "logfile" in kwargs:
