@@ -567,8 +567,7 @@ def get_module(function):
 
     .. code:: python
 
-        from i3pystatus import Status
-        from i3pystatus.core.util import get_module
+        from i3pystatus import Status, get_module
         from i3pystatus.core.command import execute
         status = Status(...)
         # other modules etc.

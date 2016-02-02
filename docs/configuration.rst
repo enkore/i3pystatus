@@ -321,12 +321,21 @@ amount of percent to add/subtract from the current volume.
 
 .. rubric:: Python callbacks
 
-These refer to to any callable Python object (most likely a function).
+These refer to to any callable Python object (most likely a
+function). To external Python callbacks that are not part of the
+module the ``self`` parameter is not passed by default. This allows to
+use many library functions with no additional wrapper.
+
+If ``self`` is needed to access the calling module, the
+:py:func:`.get_module` decorator can be used on the callback:
 
 .. code:: python
 
+    from i3pystatus import get_module
+
     # Note that the 'self' parameter is required and gives access to all
     # variables of the module.
+    @get_module
     def change_text(self):
         self.output["full_text"] = "Clicked"
 
@@ -341,6 +350,9 @@ You can also create callbacks with parameters.
 
 .. code:: python
 
+    from i3pystatus import get_module
+
+    @get_module
     def change_text(self, text="Hello world!", color="#ffffff"):
         self.output["full_text"] = text
         self.output["color"] = color
