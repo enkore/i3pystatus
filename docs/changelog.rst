@@ -19,6 +19,7 @@ master branch
     - :py:mod:`.sge`: Sun Grid Engine (SGE) monitor
     - :py:mod:`.timer`: Timer
     - :py:mod:`.syncthing`: Syncthing monitor and control
+    - :py:mpd:`.vk`: Displays number of messages in VKontakte
 * Applications started from click events don't block other click events now
 * Fixed crash with desktop notifications when python-gobject is installed, but no notification daemon is running
 * Log file name is now an option (``logfile`` of :py:class:`.Status`)
