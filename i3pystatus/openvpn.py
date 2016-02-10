@@ -18,8 +18,8 @@ class OpenVPN(IntervalModule):
 
     """
 
-    colour_up = "#00ff00"
-    colour_down = "#FF0000"
+    color_up = "#00ff00"
+    color_down = "#FF0000"
     status_up = '▲'
     status_down = '▼'
     format = "{vpn_name} {status}"
@@ -30,8 +30,8 @@ class OpenVPN(IntervalModule):
 
     settings = (
         ("format", "Format string"),
-        ("colour_up", "VPN is up"),
-        ("colour_down", "VPN is down"),
+        ("color_up", "VPN is up"),
+        ("color_down", "VPN is down"),
         ("status_down", "Symbol to display when down"),
         ("status_up", "Symbol to display when up"),
         ("vpn_name", "Name of VPN"),
@@ -46,10 +46,10 @@ class OpenVPN(IntervalModule):
         output = command_result.out.strip()
 
         if output == 'active':
-            color = self.colour_up
+            color = self.color_up
             status = self.status_up
         else:
-            color = self.colour_down
+            color = self.color_down
             status = self.status_down
 
         vpn_name = self.vpn_name
