@@ -31,6 +31,7 @@ example configuration for the MaildirMail backend:
 
 .. code:: python
 
+    from i3pystatus.mail import maildir
     status.register("mail",
                     backends=[maildir.MaildirMail(
                             directory="/home/name/Mail/inbox")
