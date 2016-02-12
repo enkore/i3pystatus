@@ -26,6 +26,7 @@ master branch
 * Server used for checking internet connectivity is now an option (``internet_check`` of :py:class:`.Status`)
 * Added double click support for click events
 * Formatter data is now available with most modules for program callbacks
+* Changed default mode to standalone mode
 * ``self`` is not passed anymore by default to external Python callbacks (see :py:func:`.get_module`)
 * :py:mod:`.dota2wins`: Now accepts usernames in place of a Steam ID
 * dota2wins: Changed win percentage to be a float

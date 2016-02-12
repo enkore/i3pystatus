@@ -13,7 +13,7 @@ example):
 
     from i3pystatus import Status
 
-    status = Status(standalone=True)
+    status = Status()
 
     # Displays clock like this:
     # Tue 30 Jul 11:59:46 PM KW31
@@ -470,9 +470,10 @@ Or make two modules look like one.
 Refreshing the bar
 ------------------
 
-The whole bar can be refreshed by sending SIGUSR1 signal to i3pystatus process.
-This feature is available only in standalone operation (:py:class:`.Status` was
-created with ``standalone=True`` parameter).
+The whole bar can be refreshed by sending SIGUSR1 signal to i3pystatus
+process.  This feature is not available in chained mode
+(:py:class:`.Status` was created with ``standalone=False`` parameter
+and gets it's input from ``i3status`` or a similar program).
 
 To find the PID of the i3pystatus process look for the ``status_command`` you
 use in your i3 config file.

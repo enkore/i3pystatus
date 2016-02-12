@@ -33,7 +33,7 @@ class Updates(Module):
         from i3pystatus import Status
         from i3pystatus.updates import pacman, cower
 
-        status = Status(standalone=True)
+        status = Status()
 
         status.register("updates",
                         format = "Updates: {count}",

@@ -28,6 +28,6 @@ logger.setLevel(logging.CRITICAL)
 def main():
     from i3pystatus.clock import Clock
 
-    status = Status(standalone=True)
+    status = Status()
     status.register(Clock())
     status.run()
