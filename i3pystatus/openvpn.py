@@ -23,7 +23,7 @@ class OpenVPN(IntervalModule):
     status_up = '▲'
     status_down = '▼'
     format = "{vpn_name} {status}"
-    status_command = "bash -c \"systemctl show openvpn@%(vpn_name)s | grep -oP 'ActiveState=\K(\w+)'\""
+    status_command = "bash -c \"systemctl show openvpn@%(vpn_name)s | grep 'ActiveState=active'"
 
     label = ''
     vpn_name = ''
@@ -35,6 +35,7 @@ class OpenVPN(IntervalModule):
         ("status_down", "Symbol to display when down"),
         ("status_up", "Symbol to display when up"),
         ("vpn_name", "Name of VPN"),
+        ("status_command", "command to find out if the VPN is active"),
     )
 
     def init(self):
@@ -45,7 +46,7 @@ class OpenVPN(IntervalModule):
         command_result = run_through_shell(self.status_command % {'vpn_name': self.vpn_name}, enable_shell=True)
         output = command_result.out.strip()
 
-        if output == 'active':
+        if output:
             color = self.color_up
             status = self.status_up
         else:
