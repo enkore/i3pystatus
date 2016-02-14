@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name="i3pystatus",
-      version="3.33",
+      version="3.34",
       description="A complete replacement for i3status",
       url="http://github.com/enkore/i3pystatus",
       license="MIT",

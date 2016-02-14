@@ -5,7 +5,10 @@ Changelog
 master branch
 +++++++++++++
 
-.. _r3.34:
+.. _r3.35:
+
+3.34 (2016-02-14)
++++++++++++++++++
 
 * New modules
     - :py:mod:`.moon`: Display moon phase
@@ -46,6 +49,8 @@ master branch
 * updates: Additional formatters for every backend (to distinguish pacman vs. AUR updates, for example)
 * :py:mod:`.reddit`: Added link\_karma and comment\_karma formatters
 * :py:mod:`.openvpn`: Configurable up/down symbols
+* openvpn: Rename colour_up/colour_down to color_up/color_down
+* openvpn: NetworkManager compatibility
 * :py:mod:`.disk`: Improved handling of unmounted drives. Previously
   the free space of the underlying filesystem would be reported if the
   path provided was a directory but not a valid mountpoint. This adds
