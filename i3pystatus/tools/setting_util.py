@@ -13,6 +13,7 @@ import keyring
 import i3pystatus
 from i3pystatus import Module, SettingsBase
 from i3pystatus.core import ClassFinder
+from i3pystatus.core.exceptions import ConfigInvalidModuleError
 
 
 def signal_handler(signal, frame):
@@ -58,11 +59,12 @@ def get_credential_modules():
     for module_name in get_modules():
         try:
             module = class_finder.get_module(module_name)
-        except ImportError:
+            clazz = class_finder.get_class(module)
+        except (ImportError, ConfigInvalidModuleError):
             if verbose:
                 print("ImportError while importing", module_name)
             continue
-        clazz = class_finder.get_class(module)
+
         members = [m[0] for m in inspect.getmembers(clazz) if not m[0].startswith('_')]
         if any([hasattr(clazz, setting) for setting in protected_settings]):
             credential_modules[clazz.__name__]['credentials'] = list(set(protected_settings) & set(members))
@@ -97,11 +99,11 @@ Options:
     if "-l" in sys.argv:
         for name, module in credential_modules.items():
             print(name)
-            for credential in enumerate_choices(module["credentials"]):
-                if keyring.get_password("%s.%s" % (module["key"], credential), getpass.getuser()):
+            for credential in module['credentials']:
+                if keyring.get_password("%s.%s" % (module['key'], credential), getpass.getuser()):
                     print(" - %s: set" % credential)
-            else:
-                print(" (none stored)")
+                else:
+                    print(" - %s: unset" % credential)
         return
 
     choices = list(credential_modules.keys())
