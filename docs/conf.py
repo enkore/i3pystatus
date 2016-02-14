@@ -35,6 +35,12 @@ MOCK_MODULES = [
     "speedtest_cli",
     "pyzabbix",
     "vk",
+    "google-api-python-client",
+    "dateutil",
+    "httplib2",
+    "oauth2client",
+    "apiclient"
+
 ]
 
 for mod_name in MOCK_MODULES:
