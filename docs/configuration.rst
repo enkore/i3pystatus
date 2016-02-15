@@ -146,7 +146,8 @@ If you don't want to use the default you can set a specific keyring like so:
 
 .. code:: python
 
-    from keyring.backends.file import PlaintextKeyring
+    # Requires the keyrings.alt package
+    from keyrings.alt.file import PlaintextKeyring
     status.register('github', keyring_backend=PlaintextKeyring())
 
 i3pystatus will locate and set the credentials during the module
