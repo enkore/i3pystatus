@@ -75,12 +75,16 @@ class ExceptionWrapper(Wrapper):
             if hasattr(self.workload, "logger"):
                 self.workload.logger.error(message, exc_info=True)
             self.workload.output = {
-                "full_text": "{}: {}".format(self.workload.__class__.__name__,
-                                             self.format_error(str(sys.exc_info()[1]))),
+                "full_text": self.format_exception(),
                 "color": "#FF0000",
             }
 
-    def format_error(self, exception_message):
+    def format_exception(self):
+        type, value, _ = sys.exc_info()
+        exception = self.truncate_error("%s: %s" % (type.__name__, value))
+        return "%s: %s" % (self.workload.__class__.__name__, exception)
+
+    def truncate_error(self, exception_message):
         if hasattr(self.workload, 'max_error_len'):
             error_len = self.workload.max_error_len
             if len(exception_message) > error_len:
