@@ -26,6 +26,8 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
     * `{kind}` — type of event
     * `{status}` — eg, confirmed
     * `{summary}` — essentially the title
+    * `{remaining_time}` - how long remaining until the event
+    * `{start_time}` - when this event starts
     * `{htmlLink}` — link to the calendar event
 
 
@@ -61,7 +63,7 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
 
         display_event = self.get_next_event()
         if display_event:
-            start_time = parser.parse(display_event['start']['dateTime'])
+            start_time = display_event['start_time']
             now = datetime.datetime.now(tz=pytz.UTC)
 
             alert_time = now + datetime.timedelta(seconds=self.urgent_seconds)
@@ -85,12 +87,21 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
 
     def get_next_event(self):
         for event in self.get_events():
-            start_time = parser.parse(event['start']['dateTime'])
+            # If we don't have a dateTime just make do with a date.
+            if 'dateTime' not in event['start']:
+                event['start_time'] = pytz.utc.localize(parser.parse(event['start']['date']))
+            else:
+                event['start_time'] = parser.parse(event['start']['dateTime'])
+
             now = datetime.datetime.now(tz=pytz.UTC)
             if 'recurringEventId' in event and self.skip_recurring:
                 continue
-            elif start_time < now:
+            elif event['start_time'] < now:
                 continue
+
+            # It is possible for there to be no title...
+            if 'summary' not in event:
+                event['summary'] = '(no title)'
             return event
 
     def get_events(self):
