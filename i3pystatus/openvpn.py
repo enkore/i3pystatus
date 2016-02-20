@@ -23,7 +23,7 @@ class OpenVPN(IntervalModule):
     status_up = '▲'
     status_down = '▼'
     format = "{vpn_name} {status}"
-    status_command = "bash -c \"systemctl show openvpn@%(vpn_name)s | grep 'ActiveState=active'"
+    status_command = "bash -c 'systemctl show openvpn@%(vpn_name)s | grep ActiveState=active'"
 
     label = ''
     vpn_name = ''
