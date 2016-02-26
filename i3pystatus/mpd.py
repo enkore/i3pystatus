@@ -74,7 +74,7 @@ class MPD(IntervalModule):
             sock = self.s
             sock.recv(8192)
             if self.password is not None:
-                sock.send('password "{}"\n'.format(self.password).encode())
+                sock.send('password "{}"\n'.format(self.password).encode("utf-8"))
                 sock.recv(8192)
             sock.send((command + "\n").encode("utf-8"))
         try:
