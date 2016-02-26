@@ -39,10 +39,12 @@ class MPD(IntervalModule):
         ("max_len", "Defines max length for the hole string, if exceeding fields specefied in truncate_fields are truncated equaly. If truncated, ellipsis are appended as indicator. It's applied *after* max_field_len. Value of 0 disables this."),
         ("truncate_fields", "fields that will be truncated if exceeding max_field_len or max_len."),
         ("hide_inactive", "Hides status information when MPD is not running"),
+        ("password", "A password for access to MPD. (This is sent in cleartext to the server.)"),
     )
 
     host = "localhost"
     port = 6600
+    password = None
     s = None
     format = "{title} {status}"
     status = {
@@ -71,6 +73,9 @@ class MPD(IntervalModule):
                 self.s.connect(self.host)
             sock = self.s
             sock.recv(8192)
+            if self.password is not None:
+                sock.send('password "{}"\n'.format(self.password).encode())
+                sock.recv(8192)
             sock.send((command + "\n").encode("utf-8"))
         try:
             reply = sock.recv(16384).decode("utf-8")
