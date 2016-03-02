@@ -94,25 +94,28 @@ class Module(SettingsBase):
         else:
             args = []
 
-        our_method = is_method_of(cb, self)
-        if callable(cb) and not our_method:
-            self.__log_button_event(button, cb, args, "Python callback")
-            cb(*args)
-        elif our_method:
-            cb(self, *args)
-        elif hasattr(self, cb):
-            if cb is not "run":
-                # CommandEndpoint already calls run() after every
-                # callback to instantly update any changed state due
-                # to the callback's actions.
-                self.__log_button_event(button, cb, args, "Member callback")
-                getattr(self, cb)(*args)
-        else:
-            self.__log_button_event(button, cb, args, "External command")
-            if hasattr(self, "data"):
-                args = [arg.format(**self.data) for arg in args]
-                cb = cb.format(**self.data)
-            execute(cb + " " + " ".join(args), detach=True)
+        try:
+            our_method = is_method_of(cb, self)
+            if callable(cb) and not our_method:
+                self.__log_button_event(button, cb, args, "Python callback")
+                cb(*args)
+            elif our_method:
+                cb(self, *args)
+            elif hasattr(self, cb):
+                if cb is not "run":
+                    # CommandEndpoint already calls run() after every
+                    # callback to instantly update any changed state due
+                    # to the callback's actions.
+                    self.__log_button_event(button, cb, args, "Member callback")
+                    getattr(self, cb)(*args)
+            else:
+                self.__log_button_event(button, cb, args, "External command")
+                if hasattr(self, "data"):
+                    args = [arg.format(**self.data) for arg in args]
+                    cb = cb.format(**self.data)
+                execute(cb + " " + " ".join(args), detach=True)
+        except Exception as e:
+            self.logger.critical("Exception while processing button callback: {!r}".format(e))
 
         # Notify status handler
         try:
