@@ -4,8 +4,8 @@ from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import make_vertical_bar, make_bar
 from .pulse import *
 
+from i3pystatus.core.command import execute
 from i3pystatus import Module
-import subprocess
 
 
 class PulseAudio(Module, ColorRangeModule):
@@ -80,7 +80,7 @@ class PulseAudio(Module, ColorRangeModule):
         self.colors = self.get_hex_color_range(self.color_muted, self.color_unmuted, 100)
 
         # Check that we have amixer for toggling mute/unmute and incrementing/decrementing volume
-        self.has_amixer = shutil.which('alsamixer') is not None
+        self.has_amixer = shutil.which('amixer') is not None
 
     def request_update(self, context):
         """Requests a sink info update (sink_info_cb is called)"""
@@ -172,14 +172,14 @@ class PulseAudio(Module, ColorRangeModule):
                 command += 'unmute'
             else:
                 command += 'mute'
-            subprocess.run(command.split())
+            execute(command)
 
     def increase_volume(self):
         if self.has_amixer:
             command = "amixer -q -D pulse sset Master %s%%+" % self.step
-            subprocess.run(command.split())
+            execute(command)
 
     def decrease_volume(self):
         if self.has_amixer:
             command = "amixer -q -D pulse sset Master %s%%-" % self.step
-            subprocess.run(command.split())
+            execute(command)
