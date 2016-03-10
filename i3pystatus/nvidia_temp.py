@@ -24,11 +24,10 @@ class NvidiaTemperature(IntervalModule):
 
     def run(self):
         # call nvidia-smi and strip newlines
-        ret = subprocess.run(
+        ret = subprocess.getoutput(
             ['nvidia-smi',
              '--query-gpu=temperature.gpu',
-             '--format=csv,noheader'],
-            stdout=subprocess.PIPE).stdout.strip()
+             '--format=csv,noheader']).strip()
         # convirt string to int
         temp = int(ret)
 
