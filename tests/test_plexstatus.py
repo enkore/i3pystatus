@@ -29,6 +29,7 @@ STREAM = b'''<?xml version="1.0" encoding="UTF-8"?>
   </Video>
 </MediaContainer>'''
 
+
 class PlexstatusTest(unittest.TestCase):
 
     @patch('i3pystatus.plexstatus.urlopen', autospec=True)
