@@ -28,6 +28,9 @@ class Weather(IntervalModule):
     settings = (
         ("location_code", "Location code from www.weather.com"),
         ("colorize", "Enable color with temperature and UTF-8 icons."),
+        ("color_icons", "Dictionary mapping weather conditions to tuples "
+                        "containing a UTF-8 code for the icon, and the color "
+                        "to be used."),
         ("units", "Celsius (metric) or Fahrenheit (imperial)"),
         "format",
     )
