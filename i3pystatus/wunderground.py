@@ -31,9 +31,11 @@ class Wunderground(IntervalModule):
         * **Latitude/Longitude** - 41.8301943,-87.6342619
         * **Personal Weather Station (PWS)** - pws:KILCHICA30
 
-        When not using a PWS, the location will be queried, and the closest
-        station will be used. When possible, it is recommended to use a PWS
-        location, as this will result in fewer API calls.
+        When not using a ``pws`` or ``icao`` station ID, the location will be
+        queried, and the closest station will be used. For a list of PWS
+        station IDs, visit the following URL:
+
+        http://www.wunderground.com/weatherstation/ListStations.asp
 
     .. rubric:: Available formatters
 
