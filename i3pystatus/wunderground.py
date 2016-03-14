@@ -158,7 +158,7 @@ class Wunderground(IntervalModule):
         query_url = STATION_LOOKUP_URL % (self.api_key, self.station_id)
         try:
             response = self.api_request(query_url)['current_observation']
-            self.forecast_url = response.pop('forecast_url', None)
+            self.forecast_url = response.pop('ob_url', None)
         except KeyError:
             raise Exception('No weather data found for %s' % self.station_id)
 
@@ -181,7 +181,6 @@ class Wunderground(IntervalModule):
             observation_time = 0
 
         return dict(
-            forecast_url=_find('forecast_url'),
             city=_find('city', response['observation_location']),
             condition=_find('weather'),
             observation_time=datetime.fromtimestamp(observation_time),
