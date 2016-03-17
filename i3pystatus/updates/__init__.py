@@ -92,6 +92,11 @@ class Updates(Module):
 
     @require(internet)
     def check_updates(self):
+        for backend in self.backends:
+            key = backend.__class__.__name__
+            if key not in self.data:
+                self.data[key] = '?'
+
         self.output = {
             "full_text": formatp(self.format_working, **self.data).strip(),
             "color": self.color_working,
