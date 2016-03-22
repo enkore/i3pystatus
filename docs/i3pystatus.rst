@@ -52,3 +52,12 @@ Update Backends
 .. autogen:: i3pystatus.updates SettingsBase
 
     .. nothin'
+
+.. _weatherbackends:
+
+Weather Backends
+----------------
+
+.. autogen:: i3pystatus.weather SettingsBase
+
+    .. nothin'
