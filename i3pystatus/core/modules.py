@@ -90,9 +90,14 @@ class Module(SettingsBase):
             wrapped_cb = getattr(cb, "__wrapped__", None)
             if wrapped_cb:
                 locals()["self"] = self  # Add self to the local stack frame
-                args_spec = inspect.getargspec(wrapped_cb)
+                tmp_cb = wrapped_cb
             else:
-                args_spec = inspect.getargspec(cb)
+                tmp_cb = cb
+
+            try:
+                args_spec = inspect.getargspec(tmp_cb)
+            except Exception:
+                args_spec = inspect.ArgSpec([], None, None, None)
 
             # Remove all variables present in kwargs that are not used in the
             # callback, except if there is a keyword argument.
