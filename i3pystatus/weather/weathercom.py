@@ -1,57 +1,75 @@
 from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require
+from i3pystatus.weather import Backend
 
+from datetime import datetime
 from urllib.request import urlopen
 import re
 import xml.etree.ElementTree as ElementTree
 
 WEATHER_COM_URL = 'http://wxdata.weather.com/wxdata/weather/local/%s?unit=%s&dayf=1&cc=*'
+ON_LEFTCLICK_URL = 'https://weather.com/weather/today/l/%s'
 
 
-class Weather(IntervalModule):
-    """
-    This module gets the weather from weather.com.
-    First, you need to get the code for the location from www.weather.com
+class Weathercom(Backend):
+    '''
+    This module gets the weather from weather.com. The ``location_code``
+    parameter should be set to the location code from weather.com. To obtain
+    this code, search for the location on weather.com, and the location code
+    will be everything after the last slash (e.g. ``94107:4:US``).
 
-    .. rubric:: Available formatters
+    .. _weather-usage-weathercom:
 
-    * `{current_temp}` — current temperature including unit (and symbol if colorize is true)
-    * `{min_temp}` — today's minimum temperature including unit
-    * `{max_temp}` — today's maximum temperature including unit
-    * `{current_wind}` — current wind direction, speed including unit
-    * `{humidity}` — current humidity excluding percentage symbol
+    .. rubric:: Usage example
 
-    """
+    ::
+        from i3pystatus import Status
+        from i3pystatus.weather import weathercom
 
-    interval = 20
+        status = Status()
 
+        status.register(
+            'weather',
+            format='{condition} {current_temp}{temp_unit}{icon}[ Hi: {high_temp}] Lo: {low_temp}',
+            colorize=True,
+            backend=weathercom.Weathercom(
+                location_code='94107:4:US',
+                units='imperial',
+            ),
+        )
+
+        status.run()
+
+    See :ref:`here <weather-formatters>` for a list of formatters which can be
+    used.
+    '''
     settings = (
-        ("location_code", "Location code from www.weather.com"),
-        ("colorize", "Enable color with temperature and UTF-8 icons."),
-        ("color_icons", "Dictionary mapping weather conditions to tuples "
-                        "containing a UTF-8 code for the icon, and the color "
-                        "to be used."),
-        ("units", "Celsius (metric) or Fahrenheit (imperial)"),
-        "format",
+        ('location_code', 'Location code from www.weather.com'),
+        ('units', '\'metric\' or \'imperial\''),
     )
-    required = ("location_code",)
+    required = ('location_code',)
 
     location_code = None
-    units = "metric"
-    format = "{current_temp}"
-    colorize = False
-    color_icons = {
-        "Fair": (u"\u2600", "#FFCC00"),
-        "Cloudy": (u"\u2601", "#F8F8FF"),
-        "Partly Cloudy": (u"\u2601", "#F8F8FF"),  # \u26c5 is not in many fonts
-        "Rainy": (u"\u2614", "#CBD2C0"),
-        "Sunny": (u"\u263C", "#FFFF00"),
-        "Snow": (u"\u2603", "#FFFFFF"),
-        "default": ("", None),
-    }
 
-    def fetch_weather(self):
-        '''Fetches the current weather from wxdata.weather.com service.'''
+    units = 'metric'
+
+    # This will be set once weather data has been checked
+    forecast_url = None
+
+    @require(internet)
+    def weather_data(self):
+        '''
+        Fetches the current weather from wxdata.weather.com service.
+        '''
+        if self.forecast_url is None and ':' in self.location_code:
+            # Set the URL so that clicking the weather will launch the
+            # weather.com forecast page. Only set it though if there is a colon
+            # in the location_code. Technically, the weather.com API will
+            # successfully return weather data if a U.S. ZIP code is used as
+            # the location_code (e.g. 94107), but if substituted in
+            # ON_LEFTCLICK_URL it may or may not result in a valid URL.
+            self.forecast_url = ON_LEFTCLICK_URL % self.location_code
+
         unit = '' if self.units == 'imperial' or self.units == '' else 'm'
         url = WEATHER_COM_URL % (self.location_code, unit)
         with urlopen(url) as handler:
@@ -62,55 +80,57 @@ class Weather(IntervalModule):
                 charset = 'utf-8'
             xml = handler.read().decode(charset)
         doc = ElementTree.XML(xml)
+
+        # Cut off the timezone from the end of the string (it's after the last
+        # space, hence the use of rpartition). International timezones (or ones
+        # outside the system locale) don't seem to be handled well by
+        # datetime.datetime.strptime().
+        observation_time_str = doc.findtext('cc/lsup').rpartition(' ')[0]
+        try:
+            observation_time = datetime.strptime(observation_time_str,
+                                                 '%m/%d/%y %I:%M %p')
+        except ValueError:
+            observation_time = datetime.fromtimestamp(0)
+
+        pressure_trend_str = doc.findtext('cc/bar/d').lower()
+        if pressure_trend_str == 'rising':
+            pressure_trend = '+'
+        elif pressure_trend_str == 'falling':
+            pressure_trend = '-'
+        else:
+            pressure_trend = ''
+
+        if not doc.findtext('dayf/day[@d="0"]/part[@p="d"]/icon').strip():
+            # If the "d" (day) part of today's forecast's keys are empty, there
+            # is no high temp anymore (this happens in the afternoon), but
+            # instead of handling things in a sane way and setting the high
+            # temp to an empty string or something like that, the API returns
+            # the current temp as the high temp, which is incorrect. This if
+            # statement catches it so that we can correctly report that there
+            # is no high temp at this point of the day.
+            high_temp = ''
+        else:
+            high_temp = doc.findtext('dayf/day[@d="0"]/hi')
+
         return dict(
-            current_conditions=dict(
-                text=doc.findtext('cc/t'),
-                temperature=doc.findtext('cc/tmp'),
-                humidity=doc.findtext('cc/hmid'),
-                wind=dict(
-                    text=doc.findtext('cc/wind/t'),
-                    speed=doc.findtext('cc/wind/s'),
-                ),
-            ),
-            today=dict(
-                min_temperature=doc.findtext('dayf/day[@d="0"]/low'),
-                max_temperature=doc.findtext('dayf/day[@d="0"]/hi'),
-            ),
-            units=dict(
-                temperature=doc.findtext('head/ut'),
-                speed=doc.findtext('head/us'),
-            ),
+            city=doc.findtext('loc/dnam'),
+            condition=doc.findtext('cc/t'),
+            observation_time=observation_time,
+            current_temp=doc.findtext('cc/tmp'),
+            low_temp=doc.findtext('dayf/day[@d="0"]/low'),
+            high_temp=high_temp,
+            temp_unit='°' + doc.findtext('head/ut').upper(),
+            feelslike=doc.findtext('cc/flik'),
+            dewpoint=doc.findtext('cc/dewp'),
+            wind_speed=doc.findtext('cc/wind/s'),
+            wind_unit=doc.findtext('head/us'),
+            wind_direction=doc.findtext('cc/wind/t'),
+            wind_gust=doc.findtext('cc/wind/gust'),
+            pressure=doc.findtext('cc/bar/r'),
+            pressure_unit=doc.findtext('head/up'),
+            pressure_trend=pressure_trend,
+            visibility=doc.findtext('cc/vis'),
+            visibility_unit=doc.findtext('head/ud'),
+            humidity=doc.findtext('cc/hmid'),
+            uv_index=doc.findtext('cc/uv/i'),
         )
-
-    @require(internet)
-    def run(self):
-        result = self.fetch_weather()
-        conditions = result["current_conditions"]
-        temperature = conditions["temperature"]
-        humidity = conditions["humidity"]
-        wind = conditions["wind"]
-        units = result["units"]
-        color = None
-        current_temp = "{t}°{d}".format(t=temperature, d=units["temperature"])
-        min_temp = "{t}°{d}".format(t=result["today"]["min_temperature"], d=units["temperature"])
-        max_temp = "{t}°{d}".format(t=result["today"]["max_temperature"], d=units["temperature"])
-        current_wind = "{t} {s}{d}".format(t=wind["text"], s=wind["speed"], d=units["speed"])
-
-        if self.colorize:
-            icon, color = self.color_icons.get(conditions["text"],
-                                               self.color_icons["default"])
-            current_temp = "{t}°{d} {i}".format(t=temperature,
-                                                d=units["temperature"],
-                                                i=icon)
-            color = color
-
-        self.output = {
-            "full_text": self.format.format(
-                current_temp=current_temp,
-                current_wind=current_wind,
-                humidity=humidity,
-                min_temp=min_temp,
-                max_temp=max_temp,
-            ),
-            "color": color
-        }
