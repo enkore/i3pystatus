@@ -29,9 +29,16 @@ class CommandEndpoint:
         self.thread.start()
 
     def _command_endpoint(self):
-        for command in self.io_handler_factory().read():
-            target_module = self.modules.get(command["instance"])
-            if target_module and target_module.on_click(command["button"]):
+        for cmd in self.io_handler_factory().read():
+            target_module = self.modules.get(cmd["instance"])
+
+            try:
+                pos = {"pos_x": int(cmd["x"]),
+                       "pos_y": int(cmd["y"])}
+            except Exception:
+                pos = {}
+
+            if target_module and target_module.on_click(cmd["button"], **pos):
                 target_module.run()
                 self.io.async_refresh()
 

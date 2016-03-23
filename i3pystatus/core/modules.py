@@ -1,11 +1,11 @@
 import inspect
+import traceback
 
 from i3pystatus.core.settings import SettingsBase
 from i3pystatus.core.threading import Manager
 from i3pystatus.core.util import (convert_position,
                                   MultiClickHandler)
 from i3pystatus.core.command import execute
-from i3pystatus.core.command import run_through_shell
 
 
 def is_method_of(method, object):
@@ -78,15 +78,32 @@ class Module(SettingsBase):
     def run(self):
         pass
 
-    def __log_button_event(self, button, cb, args, action):
-        msg = "{}: button={}, cb='{}', args={}, type='{}'".format(
-            self.__name__, button, cb, args, action)
+    def __log_button_event(self, button, cb, args, action, **kwargs):
+        msg = "{}: button={}, cb='{}', args={}, kwargs={}, type='{}'".format(
+            self.__name__, button, cb, args, kwargs, action)
         self.logger.debug(msg)
 
-    def __button_callback_handler(self, button, cb):
+    def __button_callback_handler(self, button, cb, **kwargs):
+
+        def call_callback(cb, *args, **kwargs):
+            # Recover the function if wrapped (with get_module for example)
+            wrapped_cb = getattr(cb, "__wrapped__", None)
+            if wrapped_cb:
+                locals()["self"] = self  # Add self to the local stack frame
+                args_spec = inspect.getargspec(wrapped_cb)
+            else:
+                args_spec = inspect.getargspec(cb)
+
+            # Remove all variables present in kwargs that are not used in the
+            # callback, except if there is a keyword argument.
+            if not args_spec.keywords:
+                kwargs = {k: v for k, v in kwargs.items()
+                          if k in args_spec.args}
+            cb(*args, **kwargs)
+
         if not cb:
             self.__log_button_event(button, None, None,
-                                    "No callback attached")
+                                    "No callback attached", **kwargs)
             return False
 
         if isinstance(cb, list):
@@ -97,25 +114,35 @@ class Module(SettingsBase):
         try:
             our_method = is_method_of(cb, self)
             if callable(cb) and not our_method:
-                self.__log_button_event(button, cb, args, "Python callback")
-                cb(*args)
+                self.__log_button_event(button, cb, args,
+                                        "Python callback", **kwargs)
+                call_callback(cb, *args, **kwargs)
             elif our_method:
-                cb(self, *args)
+                self.__log_button_event(button, cb, args,
+                                        "Method callback", **kwargs)
+                call_callback(cb, self, *args, **kwargs)
             elif hasattr(self, cb):
                 if cb is not "run":
                     # CommandEndpoint already calls run() after every
                     # callback to instantly update any changed state due
                     # to the callback's actions.
-                    self.__log_button_event(button, cb, args, "Member callback")
-                    getattr(self, cb)(*args)
+                    self.__log_button_event(button, cb, args,
+                                            "Member callback", **kwargs)
+                    call_callback(getattr(self, cb), *args, **kwargs)
             else:
-                self.__log_button_event(button, cb, args, "External command")
+                self.__log_button_event(button, cb, args,
+                                        "External command", **kwargs)
+
                 if hasattr(self, "data"):
-                    args = [arg.format(**self.data) for arg in args]
-                    cb = cb.format(**self.data)
+                    kwargs.update(self.data)
+
+                args = [str(arg).format(**kwargs) for arg in args]
+                cb = cb.format(**kwargs)
                 execute(cb + " " + " ".join(args), detach=True)
         except Exception as e:
-            self.logger.critical("Exception while processing button callback: {!r}".format(e))
+            self.logger.critical("Exception while processing button "
+                                 "callback: {!r}".format(e))
+            self.logger.critical(traceback.format_exc())
 
         # Notify status handler
         try:
@@ -123,7 +150,7 @@ class Module(SettingsBase):
         except:
             pass
 
-    def on_click(self, button):
+    def on_click(self, button, **kwargs):
         """
         Maps a click event with its associated callback.
 
@@ -144,8 +171,8 @@ class Module(SettingsBase):
         1. If null callback (``None``), no action is taken.
         2. If it's a `python function`, call it and pass any additional
            arguments.
-        3. If it's name of a `member method` of current module (string), call it
-           and pass any additional arguments.
+        3. If it's name of a `member method` of current module (string), call
+           it and pass any additional arguments.
         4. If the name does not match with `member method` name execute program
            with such name.
 
@@ -153,7 +180,8 @@ class Module(SettingsBase):
          callback settings and examples.
 
         :param button: The ID of button event received from i3bar.
-        :type button: int
+        :param kwargs: Further information received from i3bar like the
+         positions of the mouse where the click occured.
         :return: Returns ``True`` if a valid callback action was executed.
          ``False`` otherwise.
         :rtype: bool
@@ -184,13 +212,13 @@ class Module(SettingsBase):
             # Get callback function
             cb = getattr(self, 'on_%s' % action, None)
 
-            has_double_handler = getattr(self, 'on_%s' % double_action, None) is not None
-            delay_execution = (not double and has_double_handler)
+            double_handler = getattr(self, 'on_%s' % double_action, None)
+            delay_execution = (not double and double_handler)
 
             if delay_execution:
-                m_click.set_timer(button, cb)
+                m_click.set_timer(button, cb, **kwargs)
             else:
-                self.__button_callback_handler(button, cb)
+                self.__button_callback_handler(button, cb, **kwargs)
 
         return True
 
