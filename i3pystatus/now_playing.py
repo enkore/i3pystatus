@@ -70,8 +70,14 @@ class NowPlaying(IntervalModule):
 
     def find_player(self):
         obj = dbus.SessionBus().get_object("org.freedesktop.DBus", "/org/freedesktop/DBus")
-        method = obj.get_dbus_method('ListNames', 'org.freedesktop.DBus')
-        players = [a for a in method() if a.startswith("org.mpris.MediaPlayer2.")]
+
+        def get_players(methodname):
+            method = obj.get_dbus_method(methodname, 'org.freedesktop.DBus')
+            return [a for a in method() if a.startswith("org.mpris.MediaPlayer2.")]
+
+        players = get_players('ListNames')
+        if not players:
+            players = get_players('ListActivatableNames')
         if self.old_player in players:
             return self.old_player
         if not players:
