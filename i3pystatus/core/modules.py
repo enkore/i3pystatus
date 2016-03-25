@@ -26,25 +26,35 @@ class Module(SettingsBase):
 
     settings = (
         ('on_leftclick', "Callback called on left click (see :ref:`callbacks`)"),
+        ('on_middleclick', "Callback called on middle click (see :ref:`callbacks`)"),
         ('on_rightclick', "Callback called on right click (see :ref:`callbacks`)"),
         ('on_upscroll', "Callback called on scrolling up (see :ref:`callbacks`)"),
         ('on_downscroll', "Callback called on scrolling down (see :ref:`callbacks`)"),
         ('on_doubleleftclick', "Callback called on double left click (see :ref:`callbacks`)"),
+        ('on_doubleleftclick', "Callback called on double left click (see :ref:`callbacks`)"),
+        ('on_doublemiddleclick', "Callback called on double middle click (see :ref:`callbacks`)"),
         ('on_doublerightclick', "Callback called on double right click (see :ref:`callbacks`)"),
         ('on_doubleupscroll', "Callback called on double scroll up (see :ref:`callbacks`)"),
         ('on_doubledownscroll', "Callback called on double scroll down (see :ref:`callbacks`)"),
+        ('on_unhandledclick', "Callback called on unhandled click (see :ref:`callbacks`)"),
+        ('on_doubleunhandledclick', "Callback called on double unhandled click (see :ref:`callbacks`)"),
         ('multi_click_timeout', "Time (in seconds) before a single click is executed."),
         ('hints', "Additional output blocks for module output (see :ref:`hints`)"),
     )
 
     on_leftclick = None
+    on_middleclick = None
     on_rightclick = None
     on_upscroll = None
     on_downscroll = None
     on_doubleleftclick = None
+    on_doublemiddleclick = None
     on_doublerightclick = None
     on_doubleupscroll = None
     on_doubledownscroll = None
+
+    on_unhandledclick = None
+    on_doubleunhandledclick = None
 
     multi_click_timeout = 0.25
 
@@ -189,21 +199,15 @@ class Module(SettingsBase):
          positions of the mouse where the click occured.
         :return: Returns ``True`` if a valid callback action was executed.
          ``False`` otherwise.
-        :rtype: bool
-
         """
 
-        if button == 1:  # Left mouse button
-            action = 'leftclick'
-        elif button == 3:  # Right mouse button
-            action = 'rightclick'
-        elif button == 4:  # mouse wheel up
-            action = 'upscroll'
-        elif button == 5:  # mouse wheel down
-            action = 'downscroll'
-        else:
+        actions = ['leftclick', 'middleclick', 'rightclick',
+                   'upscroll', 'downscroll']
+        try:
+            action = actions[button - 1]
+        except (TypeError, IndexError):
             self.__log_button_event(button, None, None, "Unhandled button")
-            return False
+            action = "unhandled"
 
         m_click = self.__multi_click
 
@@ -224,8 +228,6 @@ class Module(SettingsBase):
                 m_click.set_timer(button, cb, **kwargs)
             else:
                 self.__button_callback_handler(button, cb, **kwargs)
-
-        return True
 
     def move(self, position):
         self.position = position

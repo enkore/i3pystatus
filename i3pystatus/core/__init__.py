@@ -38,7 +38,8 @@ class CommandEndpoint:
             except Exception:
                 pos = {}
 
-            if target_module and target_module.on_click(cmd["button"], **pos):
+            if target_module:
+                target_module.on_click(cmd["button"], **pos)
                 target_module.run()
                 self.io.async_refresh()
 
