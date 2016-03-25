@@ -36,8 +36,8 @@ class Module(SettingsBase):
         ('on_doublerightclick', "Callback called on double right click (see :ref:`callbacks`)"),
         ('on_doubleupscroll', "Callback called on double scroll up (see :ref:`callbacks`)"),
         ('on_doubledownscroll', "Callback called on double scroll down (see :ref:`callbacks`)"),
-        ('on_unhandledclick', "Callback called on unhandled click (see :ref:`callbacks`)"),
-        ('on_doubleunhandledclick', "Callback called on double unhandled click (see :ref:`callbacks`)"),
+        ('on_otherclick', "Callback called on other click (see :ref:`callbacks`)"),
+        ('on_doubleotherclick', "Callback called on double other click (see :ref:`callbacks`)"),
         ('multi_click_timeout', "Time (in seconds) before a single click is executed."),
         ('hints', "Additional output blocks for module output (see :ref:`hints`)"),
     )
@@ -53,8 +53,8 @@ class Module(SettingsBase):
     on_doubleupscroll = None
     on_doubledownscroll = None
 
-    on_unhandledclick = None
-    on_doubleunhandledclick = None
+    on_otherclick = None
+    on_doubleotherclick = None
 
     multi_click_timeout = 0.25
 
@@ -171,14 +171,16 @@ class Module(SettingsBase):
 
         Currently implemented events are:
 
-        ===========  ================  =========
-        Event        Callback setting  Button ID
-        ===========  ================  =========
-        Left click   on_leftclick      1
-        Right click  on_rightclick     3
-        Scroll up    on_upscroll       4
-        Scroll down  on_downscroll     5
-        ===========  ================  =========
+        ============  ================  =========
+        Event         Callback setting  Button ID
+        ============  ================  =========
+        Left click    on_leftclick      1
+        Middle click  on_middleclick    2
+        Right click   on_rightclick     3
+        Scroll up     on_upscroll       4
+        Scroll down   on_downscroll     5
+        Others        on_otherclick     > 5
+        ============  ================  =========
 
         The action is determined by the nature (type and value) of the callback
         setting in the following order:
@@ -206,8 +208,8 @@ class Module(SettingsBase):
         try:
             action = actions[button - 1]
         except (TypeError, IndexError):
-            self.__log_button_event(button, None, None, "Unhandled button")
-            action = "unhandled"
+            self.__log_button_event(button, None, None, "Other button")
+            action = "otherclick"
 
         m_click = self.__multi_click
 
