@@ -1,5 +1,6 @@
 from i3pystatus import IntervalModule
 import requests
+import keyring
 import json
 from i3pystatus.core import ConfigError
 from i3pystatus.core.util import user_open, internet, require
@@ -8,7 +9,7 @@ from i3pystatus.core.util import user_open, internet, require
 class Github(IntervalModule):
     """
     Check Github for pending notifications.
-    Requires `requests`
+    Requires `requests`, `keyring`
 
     Formatters:
 
@@ -22,9 +23,10 @@ class Github(IntervalModule):
     color = '#78EAF2'
     username = ''
     password = ''
+    goto = 'profile'
     format = '{unread}'
     interval = 600
-    keyring_backend = None
+    keyring_backend = keyring.get_keyring()
 
     on_leftclick = 'open_github'
 
@@ -34,17 +36,28 @@ class Github(IntervalModule):
         ('unread_marker', 'sets the string that the "unread" formatter shows when there are pending notifications'),
         ("username", ""),
         ("password", ""),
-        ("color", "")
+        ("color", ""),
+        ("goto", "choose which github page to open on leftclick")
     )
 
     def open_github(self):
-        user_open('https://github.com/' + self.username)
+        user_open('https://github.com/' +
+                  (self.username if self.goto == 'profile' else 'notifications'))
 
     @require(internet)
     def run(self):
         format_values = dict(unread_count='', unread='')
 
-        response = requests.get('https://api.github.com/notifications', auth=(self.username, self.password))
+        if self.goto not in ('profile', 'notifications'):
+            raise Exception(
+                "goto must be either 'profile' or 'notifications'!")
+
+        if not self.password:
+            self.password = self.keyring_backend.get_password(
+                "github", self.username)
+
+        response = requests.get(
+            'https://api.github.com/notifications', auth=(self.username, self.password))
         data = json.loads(response.text)
 
         # Bad credentials
