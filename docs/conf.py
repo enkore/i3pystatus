@@ -39,8 +39,8 @@ MOCK_MODULES = [
     "dateutil",
     "httplib2",
     "oauth2client",
-    "apiclient"
-
+    "apiclient",
+    "keyring"
 ]
 
 for mod_name in MOCK_MODULES:
