@@ -65,7 +65,7 @@ class Updates(Module):
     format_no_updates = None
     format_working = None
     color = "#00DD00"
-    color_no_updates = "#FFFFFF"
+    color_no_updates = None
     color_working = None
 
     on_leftclick = "run"
