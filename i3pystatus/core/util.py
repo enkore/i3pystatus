@@ -514,8 +514,9 @@ class MultiClickHandler(object):
         self.timer = None
         self.button = None
         self.cb = None
+        self.kwargs = None
 
-    def set_timer(self, button, cb):
+    def set_timer(self, button, cb, **kwargs):
         with self.lock:
             self.clear_timer()
 
@@ -524,6 +525,7 @@ class MultiClickHandler(object):
                                args=[self._timer_id])
             self.button = button
             self.cb = cb
+            self.kwargs = kwargs
 
             self.timer.start()
 
@@ -544,7 +546,7 @@ class MultiClickHandler(object):
         with self.lock:
             if self._timer_id != timer_id:
                 return
-            self.callback_handler(self.button, self.cb)
+            self.callback_handler(self.button, self.cb, **self.kwargs)
             self.clear_timer()
 
     def check_double(self, button):
@@ -553,7 +555,7 @@ class MultiClickHandler(object):
 
         ret = True
         if button != self.button:
-            self.callback_handler(self.button, self.cb)
+            self.callback_handler(self.button, self.cb, **self.kwargs)
             ret = False
 
         self.clear_timer()
