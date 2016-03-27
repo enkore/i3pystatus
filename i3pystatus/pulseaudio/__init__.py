@@ -95,10 +95,11 @@ class PulseAudio(Module, ColorRangeModule):
         state = b'DEFAULT'
         for sink in sinks.splitlines():
             attribs = sink.split()
-            if attribs[-1] == b'RUNNING':
+            sink_state = attribs[-1]
+            if sink_state == b'RUNNING':
                 bestsink = attribs[1]
                 state = 'RUNNING'
-            elif attribs[-1] == b'IDLE' and state == b'DEFAULT':
+            elif (sink_state == b'IDLE' or sink_state == b'SUSPENDED') and state == b'DEFAULT':
                 bestsink = attribs[1]
                 state = b'IDLE'
         return bestsink
