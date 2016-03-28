@@ -84,7 +84,26 @@ class Clock(IntervalModule):
         elif isinstance(self.format, str) or isinstance(self.format, tuple):
             self.format = [self.format]
 
+        self._local_tzname = self._get_local_tz()
+        self._non_daylight_zone = time.tzname[0]
         self.format = self.expand_formats(self.format)
+
+    def _get_local_tz(self):
+        '''
+        Returns a string representing localtime, suitable for setting localtime
+        using time.tzset().
+
+        https://docs.python.org/3/library/time.html#time.tzset
+        '''
+        hours_offset = time.altzone / 3600.0
+        if time.localtime().tm_isdst == 1:
+            # We're currently in DST, add 1 to the offset
+            hours_offset += 1
+        plus_minus = '+' if hours_offset >= 0 else '-'
+        hh = int(hours_offset)
+        mm = 60 * (hours_offset % 1)
+        return '%s%s%02d:%02d%s' % (time.tzname[0], plus_minus,
+                                    hh, mm, time.tzname[1])
 
     @staticmethod
     def expand_formats(formats):
@@ -94,15 +113,18 @@ class Clock(IntervalModule):
                 if len(format_) > 1 and os.path.isfile('/usr/share/zoneinfo/' + format_[1]):
                     return (format_[0], format_[1])
                 else:
-                    return (format_[0], time.tzname[0])
-            return (format_, time.tzname[0])
+                    return (format_[0], None)
+            return (format_, None)
 
         return [expand_format(format_) for format_ in formats]
 
     def run(self):
         # set timezone
-        if time.tzname[0] is not self.format[self.current_format_id][1]:
-            os.environ.putenv('TZ', self.format[self.current_format_id][1])
+        target_tz = self.format[self.current_format_id][1]
+        if target_tz is None and time.tzname[0] != self._non_daylight_zone \
+                or target_tz is not None and time.tzname[0] != target_tz:
+            new_tz = self._local_tzname if target_tz is None else target_tz
+            os.environ.putenv('TZ', new_tz)
             time.tzset()
 
         self.output = {
