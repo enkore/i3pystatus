@@ -95,10 +95,7 @@ class Clock(IntervalModule):
 
         https://docs.python.org/3/library/time.html#time.tzset
         '''
-        hours_offset = time.altzone / 3600.0
-        if time.localtime().tm_isdst == 1:
-            # We're currently in DST, add 1 to the offset
-            hours_offset += 1
+        hours_offset = time.timezone / 3600.0
         plus_minus = '+' if hours_offset >= 0 else '-'
         hh = int(hours_offset)
         mm = 60 * (hours_offset % 1)
