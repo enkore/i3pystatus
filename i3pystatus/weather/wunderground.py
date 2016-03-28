@@ -1,5 +1,5 @@
 from i3pystatus import IntervalModule
-from i3pystatus.core.util import user_open, internet, require
+from i3pystatus.core.util import internet, require
 
 from datetime import datetime
 from urllib.request import urlopen
@@ -7,19 +7,21 @@ import json
 import re
 
 GEOLOOKUP_URL = 'http://api.wunderground.com/api/%s/geolookup%s/q/%s.json'
-STATION_LOOKUP_URL = 'http://api.wunderground.com/api/%s/conditions/q/%s.json'
+STATION_QUERY_URL = 'http://api.wunderground.com/api/%s/%s/q/%s.json'
 
 
 class Wunderground(IntervalModule):
     '''
-    This module retrieves weather from the Weather Underground API.
+    This module retrieves weather data using the Weather Underground API.
 
     .. note::
         A Weather Underground API key is required to use this module, you can
-        sign up for one for a developer API key free at
+        sign up for a developer API key free at
         https://www.wunderground.com/weather/api/
 
-        A developer API key is allowed 500 queries per day.
+        A developer API key is allowed 500 queries per day, and no more than 10
+        in a given minute. Therefore, it is recommended to be conservative when
+        setting the update interval.
 
         Valid values for ``location_code`` include:
 
@@ -37,58 +39,60 @@ class Wunderground(IntervalModule):
 
         http://www.wunderground.com/weatherstation/ListStations.asp
 
-    .. rubric:: Available formatters
+    .. _weather-usage-wunderground:
 
-    * `{city}` — Location of weather observation
-    * `{conditon}` — Current condition (Rain, Snow, Overcast, etc.)
-    * `{observation_time}` — Time of weather observation (supports strftime format flags)
-    * `{current_temp}` — Current temperature, excluding unit
-    * `{degrees}` — ``°C`` if ``units`` is set to ``metric``, otherwise ``°F``
-    * `{feelslike}` — Wunderground "Feels Like" temperature, excluding unit
-    * `{current_wind}` — Wind speed in mph/kph, excluding unit
-    * `{current_wind_direction}` — Wind direction
-    * `{current_wind_gust}` — Speed of wind gusts in mph/kph, excluding unit
-    * `{pressure_in}` — Barometric pressure (in inches), excluding unit
-    * `{pressure_mb}` — Barometric pressure (in millibars), excluding unit
-    * `{pressure_trend}` — ``+`` (rising) or ``-`` (falling)
-    * `{visibility}` — Visibility in mi/km, excluding unit
-    * `{humidity}` — Current humidity, excluding percentage symbol
-    * `{dewpoint}` — Dewpoint temperature, excluding unit
-    * `{uv_index}` — UV Index
+    .. rubric:: Usage example
 
+    .. code-block:: python
+
+        from i3pystatus import Status
+        from i3pystatus.weather import wunderground
+
+        status = Status()
+
+        status.register(
+            'weather',
+            format='{condition} {current_temp}{temp_unit}{icon}[ Hi: {high_temp}] Lo: {low_temp}',
+            colorize=True,
+            backend=wunderground.Wunderground(
+                api_key='dbafe887d56ba4ad',
+                location_code='pws:MAT645',
+                units='imperial',
+            ),
+        )
+
+        status.run()
+
+    See :ref:`here <weather-formatters>` for a list of formatters which can be
+    used.
     '''
 
     interval = 300
 
     settings = (
         ('api_key', 'Weather Underground API key'),
-        ('location_code', 'Location code from www.weather.com'),
-        ('units', 'Celsius (metric) or Fahrenheit (imperial)'),
+        ('location_code', 'Location code from wunderground.com'),
+        ('units', '\'metric\' or \'imperial\''),
         ('use_pws', 'Set to False to use only airport stations'),
-        ('error_log', 'If set, tracebacks will be logged to this file'),
-        'format',
+        ('forecast', 'Set to ``True`` to check forecast (generates one '
+                     'additional API request per weather update). If set to '
+                     '``False``, then the ``low_temp`` and ``high_temp`` '
+                     'formatters will be set to empty strings.'),
     )
+
     required = ('api_key', 'location_code')
 
     api_key = None
     location_code = None
-    units = "metric"
-    format = "{current_temp}{degrees}"
+    units = 'metric'
     use_pws = True
-    error_log = None
+    forecast = False
 
+    # These will be set once weather data has been checked
     station_id = None
     forecast_url = None
 
-    on_leftclick = 'open_wunderground'
-
-    def open_wunderground(self):
-        '''
-        Open the forecast URL, if one was retrieved
-        '''
-        if self.forecast_url and self.forecast_url != 'N/A':
-            user_open(self.forecast_url)
-
+    @require(internet)
     def api_request(self, url):
         '''
         Execute an HTTP POST to the specified URL and return the content
@@ -106,6 +110,7 @@ class Wunderground(IntervalModule):
                 pass
             return response
 
+    @require(internet)
     def geolookup(self):
         '''
         Use the location_code to perform a geolookup and find the closest
@@ -148,32 +153,63 @@ class Wunderground(IntervalModule):
                     raise Exception('No icao entry for station')
                 self.station_id = 'icao:%s' % nearest_airport
 
-    def query_station(self):
+    @require(internet)
+    def get_forecast(self):
         '''
-        Query a specific station
+        If configured to do so, make an API request to retrieve the forecast
+        data for the configured/queried weather station, and return the low and
+        high temperatures. Otherwise, return two empty strings.
+        '''
+        if self.forecast:
+            query_url = STATION_QUERY_URL % (self.api_key,
+                                             'forecast',
+                                             self.station_id)
+            try:
+                response = self.api_request(query_url)['forecast']
+                response = response['simpleforecast']['forecastday'][0]
+            except (KeyError, IndexError, TypeError):
+                raise Exception('No forecast data found for %s' % self.station_id)
+
+            unit = 'celsius' if self.units == 'metric' else 'fahrenheit'
+            low_temp = response.get('low', {}).get(unit, '')
+            high_temp = response.get('high', {}).get(unit, '')
+            return low_temp, high_temp
+        else:
+            return '', ''
+
+    @require(internet)
+    def weather_data(self):
+        '''
+        Query the configured/queried station and return the weather data
         '''
         # If necessary, do a geolookup to set the station_id
         self.geolookup()
 
-        query_url = STATION_LOOKUP_URL % (self.api_key, self.station_id)
+        query_url = STATION_QUERY_URL % (self.api_key,
+                                         'conditions',
+                                         self.station_id)
         try:
             response = self.api_request(query_url)['current_observation']
             self.forecast_url = response.pop('ob_url', None)
         except KeyError:
             raise Exception('No weather data found for %s' % self.station_id)
 
-        def _find(key, data=None):
-            data = data or response
-            return data.get(key, 'N/A')
+        low_temp, high_temp = self.get_forecast()
 
         if self.units == 'metric':
             temp_unit = 'c'
             speed_unit = 'kph'
             distance_unit = 'km'
+            pressure_unit = 'mb'
         else:
             temp_unit = 'f'
             speed_unit = 'mph'
             distance_unit = 'mi'
+            pressure_unit = 'in'
+
+        def _find(key, data=None):
+            data = data or response
+            return data.get(key, 'N/A')
 
         try:
             observation_time = int(_find('observation_epoch'))
@@ -185,36 +221,20 @@ class Wunderground(IntervalModule):
             condition=_find('weather'),
             observation_time=datetime.fromtimestamp(observation_time),
             current_temp=_find('temp_' + temp_unit),
+            low_temp=low_temp,
+            high_temp=high_temp,
+            temp_unit='°' + temp_unit.upper(),
             feelslike=_find('feelslike_' + temp_unit),
-            current_wind=_find('wind_' + speed_unit),
-            current_wind_direction=_find('wind_dir'),
-            current_wind_gust=_find('wind_gust_' + speed_unit),
-            pressure_in=_find('pressure_in'),
-            pressure_mb=_find('pressure_mb'),
+            dewpoint=_find('dewpoint_' + temp_unit),
+            wind_speed=_find('wind_' + speed_unit),
+            wind_unit=speed_unit,
+            wind_direction=_find('wind_dir'),
+            wind_gust=_find('wind_gust_' + speed_unit),
+            pressure=_find('pressure_' + pressure_unit),
+            pressure_unit=pressure_unit,
             pressure_trend=_find('pressure_trend'),
             visibility=_find('visibility_' + distance_unit),
+            visibility_unit=distance_unit,
             humidity=_find('relative_humidity').rstrip('%'),
-            dewpoint=_find('dewpoint_' + temp_unit),
             uv_index=_find('uv'),
         )
-
-    @require(internet)
-    def run(self):
-        try:
-            result = self.query_station()
-        except Exception as exc:
-            if self.error_log:
-                import traceback
-                with open(self.error_log, 'a') as f:
-                    f.write('%s : An exception was raised:\n' %
-                            datetime.isoformat(datetime.now()))
-                    f.write(''.join(traceback.format_exc()))
-                    f.write(80 * '-' + '\n')
-            raise
-
-        result['degrees'] = '°%s' % ('C' if self.units == 'metric' else 'F')
-
-        self.output = {
-            "full_text": self.format.format(**result),
-            # "color": self.color  # TODO: add some sort of color effect
-        }
