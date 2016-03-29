@@ -175,9 +175,9 @@ decimal dot
 formatp
 ~~~~~~~
 
-Some modules use an extended format string syntax (the :py:mod:`.mpd`
-module, for example).  Given the format string below the output adapts
-itself to the available data.
+Some modules use an extended format string syntax (the :py:mod:`.mpd` and
+:py:mod:`.weather` modules, for example). Given the format string below the
+output adapts itself to the available data.
 
 ::
 
