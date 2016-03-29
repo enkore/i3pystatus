@@ -22,7 +22,8 @@ class Weathercom(Backend):
 
     .. rubric:: Usage example
 
-    ::
+    .. code-block:: python
+
         from i3pystatus import Status
         from i3pystatus.weather import weathercom
 
