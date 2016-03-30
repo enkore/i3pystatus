@@ -114,10 +114,10 @@ class Weather(IntervalModule):
         and color that match.
         '''
         condition_lc = condition.lower()
-        if condition_lc == 'mostly cloudy':
-            condition = 'Cloudy'
-        elif condition_lc == 'clear':
+        if condition_lc == 'clear':
             condition = 'Fair'
+        if 'cloudy' in condition_lc:
+            condition = 'Cloudy'
         elif 'rain' in condition_lc:
             condition = 'Rainy'
         elif 'thunder' in condition_lc:
