@@ -51,7 +51,7 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
     skip_recurring = True
     days = 1
     urgent_seconds = 300
-    color = '#FFFFFF'
+    color = None
 
     service = None
     credentials = None
