@@ -88,7 +88,8 @@ class Clock(IntervalModule):
         self._non_daylight_zone = time.tzname[0]
         self.format = self.expand_formats(self.format)
 
-    def _get_local_tz(self):
+    @staticmethod
+    def _get_local_tz():
         '''
         Returns a string representing localtime, suitable for setting localtime
         using time.tzset().
