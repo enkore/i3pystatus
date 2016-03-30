@@ -118,7 +118,7 @@ class Weather(IntervalModule):
             condition = 'Cloudy'
         elif condition_lc == 'clear':
             condition = 'Fair'
-        elif condition_lc == 'rain':
+        elif 'rain' in condition_lc:
             condition = 'Rainy'
         elif 'thunder' in condition_lc:
             condition = 'Thunderstorm'
