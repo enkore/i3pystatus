@@ -13,7 +13,7 @@ example):
 
     from i3pystatus import Status
 
-    status = Status(standalone=True)
+    status = Status()
 
     # Displays clock like this:
     # Tue 30 Jul 11:59:46 PM KW31
@@ -146,7 +146,8 @@ If you don't want to use the default you can set a specific keyring like so:
 
 .. code:: python
 
-    from keyring.backends.file import PlaintextKeyring
+    # Requires the keyrings.alt package
+    from keyrings.alt.file import PlaintextKeyring
     status.register('github', keyring_backend=PlaintextKeyring())
 
 i3pystatus will locate and set the credentials during the module
@@ -174,9 +175,9 @@ decimal dot
 formatp
 ~~~~~~~
 
-Some modules use an extended format string syntax (the :py:mod:`.mpd`
-module, for example).  Given the format string below the output adapts
-itself to the available data.
+Some modules use an extended format string syntax (the :py:mod:`.mpd` and
+:py:mod:`.weather` modules, for example). Given the format string below the
+output adapts itself to the available data.
 
 ::
 
@@ -321,12 +322,21 @@ amount of percent to add/subtract from the current volume.
 
 .. rubric:: Python callbacks
 
-These refer to to any callable Python object (most likely a function).
+These refer to to any callable Python object (most likely a
+function). To external Python callbacks that are not part of the
+module the ``self`` parameter is not passed by default. This allows to
+use many library functions with no additional wrapper.
+
+If ``self`` is needed to access the calling module, the
+:py:func:`.get_module` decorator can be used on the callback:
 
 .. code:: python
 
+    from i3pystatus import get_module
+
     # Note that the 'self' parameter is required and gives access to all
     # variables of the module.
+    @get_module
     def change_text(self):
         self.output["full_text"] = "Clicked"
 
@@ -341,6 +351,9 @@ You can also create callbacks with parameters.
 
 .. code:: python
 
+    from i3pystatus import get_module
+
+    @get_module
     def change_text(self, text="Hello world!", color="#ffffff"):
         self.output["full_text"] = text
         self.output["color"] = color
@@ -369,6 +382,18 @@ consider creating an `python callback` or execute a script instead.
         # open i3pystatus github page in firefox
         on_rightclick = "firefox --new-window https://github.com/enkore/i3pystatus",
         )
+
+Most modules provide all the formatter data to program callbacks. The snippet below
+demonstrates how this could be used, in this case XMessage will display a dialog box
+showing verbose information about the network interface:
+
+.. code:: python
+
+    status.register("network",
+        interface="eth0",
+        on_leftclick="ip addr show dev {interface} | xmessage -file -"
+        )
+
 
 .. _hints:
 
@@ -446,9 +471,10 @@ Or make two modules look like one.
 Refreshing the bar
 ------------------
 
-The whole bar can be refreshed by sending SIGUSR1 signal to i3pystatus process.
-This feature is available only in standalone operation (:py:class:`.Status` was
-created with ``standalone=True`` parameter).
+The whole bar can be refreshed by sending SIGUSR1 signal to i3pystatus
+process.  This feature is not available in chained mode
+(:py:class:`.Status` was created with ``standalone=False`` parameter
+and gets it's input from ``i3status`` or a similar program).
 
 To find the PID of the i3pystatus process look for the ``status_command`` you
 use in your i3 config file.

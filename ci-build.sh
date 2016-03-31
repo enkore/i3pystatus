@@ -19,7 +19,7 @@ PYTHONPATH=${BUILD}/test-install python3 setup.py --quiet install --install-lib 
 test -f ${BUILD}/test-install-bin/i3pystatus
 test -f ${BUILD}/test-install-bin/i3pystatus-setting-util
 
-PYTHONPATH=${BUILD}/test-install py.test --junitxml ${BUILD}/testlog.xml tests
+PYTHONPATH=${BUILD}/test-install py.test -q --junitxml ${BUILD}/testlog.xml tests
 
 # Check that the docs build w/o warnings (-W flag)
-sphinx-build -b html -W docs ${BUILD}/docs/
+sphinx-build -Nq -b html -W docs ${BUILD}/docs/

@@ -118,9 +118,11 @@ class BatteryEnergy(Battery):
 class BatteryChecker(IntervalModule):
     """
     This class uses the /sys/class/power_supply/…/uevent interface to check for the
-    battery status
-    It provides the "ALL" battery_ident which will summarise all available batteries
-    for the moment and aggregate the % as well as the time remaining on the charge.
+    battery status.
+
+    Setting ``battery_ident`` to ``ALL`` will summarise all available batteries
+    and aggregate the % as well as the time remaining on the charge. This is
+    helpful when the machine has more than one battery available.
 
     .. rubric:: Available formatters
 
@@ -133,6 +135,35 @@ class BatteryChecker(IntervalModule):
     * `{battery_ident}` — the same as the setting
     * `{bar}` —bar displaying the relative percentage graphically
     * `{bar_design}` —bar displaying the absolute percentage graphically
+
+    This module supports the :ref:`formatp <formatp>` extended string format
+    syntax. By setting the ``FULL`` status to an empty string, and including
+    brackets around the ``{status}`` formatter, the text within the brackets
+    will be hidden when the battery is full, as can be seen in the below
+    example:
+
+    .. code-block:: python
+
+        from i3pystatus import Status
+
+        status = Status()
+
+        status.register(
+            'battery',
+            interval=5,
+            format='{battery_ident}: [{status} ]{percentage_design:.2f}%',
+            alert=True,
+            alert_percentage=15,
+            status = {
+                'DPL': 'DPL',
+                'CHR': 'CHR',
+                'DIS': 'DIS',
+                'FULL': '',
+            }
+        )
+
+        status.run()
+
     """
 
     settings = (
@@ -313,6 +344,7 @@ class BatteryChecker(IntervalModule):
 
         fdict["status"] = self.status[fdict["status"]]
 
+        self.data = fdict
         self.output = {
             "full_text": formatp(self.format, **fdict),
             "instance": self.battery_ident,

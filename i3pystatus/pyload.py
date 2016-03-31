@@ -81,6 +81,7 @@ class pyLoad(IntervalModule):
             "free_space": self._rpc_call("freeSpace") / (1024 ** 3),
         }
 
+        self.data = fdict
         self.output = {
             "full_text": self.format.format(**fdict).strip(),
             "instance": self.address,

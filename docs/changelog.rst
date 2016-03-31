@@ -5,7 +5,10 @@ Changelog
 master branch
 +++++++++++++
 
-.. _r3.34:
+.. _r3.35:
+
+3.34 (2016-02-14)
++++++++++++++++++
 
 * New modules
     - :py:mod:`.moon`: Display moon phase
@@ -16,11 +19,18 @@ master branch
     - :py:mod:`.gpu_mem`, :py:mod:`.gpu_temp`: View memory and temperature stats of nVidia cards
     - :py:mod:`.solaar`: Show battery status of Solaar / Logitech Unifying devices
     - :py:mod:`.zabbix`: Alerts watcher for the Zabbix enterprise network monitor
+    - :py:mod:`.sge`: Sun Grid Engine (SGE) monitor
+    - :py:mod:`.timer`: Timer
+    - :py:mod:`.syncthing`: Syncthing monitor and control
+    - :py:mod:`.vk`: Displays number of messages in VKontakte
 * Applications started from click events don't block other click events now
 * Fixed crash with desktop notifications when python-gobject is installed, but no notification daemon is running
 * Log file name is now an option (``logfile`` of :py:class:`.Status`)
 * Server used for checking internet connectivity is now an option (``internet_check`` of :py:class:`.Status`)
 * Added double click support for click events
+* Formatter data is now available with most modules for program callbacks
+* Changed default mode to standalone mode
+* ``self`` is not passed anymore by default to external Python callbacks (see :py:func:`.get_module`)
 * :py:mod:`.dota2wins`: Now accepts usernames in place of a Steam ID
 * dota2wins: Changed win percentage to be a float
 * :py:mod:`.uptime`: Added days, hours, minutes, secs formatters
@@ -33,9 +43,14 @@ master branch
 * :py:mod:`.cpu_usage`: Added color setting
 * :py:mod:`.mpd`: Added hide\_inactive settings
 * mpd: Fixed a bug where an active playlist would be assumed, leading to no output
+* mpd: Added support for UNIX sockets
 * :py:mod:`.updates`: Added yaourt backend
+* updates: Can display a working/busy message now
+* updates: Additional formatters for every backend (to distinguish pacman vs. AUR updates, for example)
 * :py:mod:`.reddit`: Added link\_karma and comment\_karma formatters
 * :py:mod:`.openvpn`: Configurable up/down symbols
+* openvpn: Rename colour_up/colour_down to color_up/color_down
+* openvpn: NetworkManager compatibility
 * :py:mod:`.disk`: Improved handling of unmounted drives. Previously
   the free space of the underlying filesystem would be reported if the
   path provided was a directory but not a valid mountpoint. This adds

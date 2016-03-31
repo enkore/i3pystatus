@@ -3,7 +3,7 @@ import functools
 import re
 import socket
 import string
-
+import inspect
 from threading import Timer, RLock
 
 
@@ -514,8 +514,9 @@ class MultiClickHandler(object):
         self.timer = None
         self.button = None
         self.cb = None
+        self.kwargs = None
 
-    def set_timer(self, button, cb):
+    def set_timer(self, button, cb, **kwargs):
         with self.lock:
             self.clear_timer()
 
@@ -524,6 +525,7 @@ class MultiClickHandler(object):
                                args=[self._timer_id])
             self.button = button
             self.cb = cb
+            self.kwargs = kwargs
 
             self.timer.start()
 
@@ -544,7 +546,7 @@ class MultiClickHandler(object):
         with self.lock:
             if self._timer_id != timer_id:
                 return
-            self.callback_handler(self.button, self.cb)
+            self.callback_handler(self.button, self.cb, **self.kwargs)
             self.clear_timer()
 
     def check_double(self, button):
@@ -553,8 +555,36 @@ class MultiClickHandler(object):
 
         ret = True
         if button != self.button:
-            self.callback_handler(self.button, self.cb)
+            self.callback_handler(self.button, self.cb, **self.kwargs)
             ret = False
 
         self.clear_timer()
         return ret
+
+
+def get_module(function):
+    """Function decorator for retrieving the ``self`` argument from the stack.
+
+    Intended for use with callbacks that need access to a modules variables, for example:
+
+    .. code:: python
+
+        from i3pystatus import Status, get_module
+        from i3pystatus.core.command import execute
+        status = Status(...)
+        # other modules etc.
+        @get_module
+        def display_ip_verbose(module):
+            execute('sh -c "ip addr show dev {dev} | xmessage -file -"'.format(dev=module.interface))
+        status.register("network", interface="wlan1", on_leftclick=display_ip_verbose)
+    """
+    @functools.wraps(function)
+    def call_wrapper(*args, **kwargs):
+        stack = inspect.stack()
+        caller_frame_info = stack[1]
+        self = caller_frame_info[0].f_locals["self"]
+        # not completly sure whether this is necessary
+        # see note in Python docs about stack frames
+        del stack
+        function(self, *args, **kwargs)
+    return call_wrapper

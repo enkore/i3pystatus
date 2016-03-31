@@ -55,6 +55,7 @@ class CpuUsageBar(CpuUsage, ColorRangeModule):
         # for backward compatibility
         cpu_usage['usage_bar'] = cpu_usage['usage_bar_cpu']
 
+        self.data = cpu_usage
         self.output = {
             "full_text": self.format.format_map(cpu_usage),
             'color': self.get_gradient(cpu_usage[self.cpu], self.colors, 100)

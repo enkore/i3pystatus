@@ -95,10 +95,13 @@ class Cmus(IntervalModule):
                 filename = os.path.basename(fdict['file'])
                 filebase, _ = os.path.splitext(filename)
                 fdict['artist'], fdict['title'] = _extract_artist_title(filebase)
+            self.data = fdict
             self.output = {"full_text": formatp(self.format, **fdict),
                            "color": self.color}
 
         else:
+            if hasattr(self, "data"):
+                del self.data
             self.output = {"full_text": self.format_not_running,
                            "color": self.color_not_running}
 

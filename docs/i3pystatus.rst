@@ -26,6 +26,20 @@ Module reference
 Mail Backends
 -------------
 
+The generic mail module can be configured to use multiple mail backends. Here is an
+example configuration for the MaildirMail backend:
+
+.. code:: python
+
+    from i3pystatus.mail import maildir
+    status.register("mail",
+                    backends=[maildir.MaildirMail(
+                            directory="/home/name/Mail/inbox")
+                    ],
+                    format="P {unread}",
+                    log_level=20,
+                    hide_if_null=False, )
+
 .. autogen:: i3pystatus.mail SettingsBase
 
    .. nothin'
@@ -36,5 +50,14 @@ Update Backends
 ---------------
 
 .. autogen:: i3pystatus.updates SettingsBase
+
+    .. nothin'
+
+.. _weatherbackends:
+
+Weather Backends
+----------------
+
+.. autogen:: i3pystatus.weather SettingsBase
 
     .. nothin'

@@ -29,9 +29,19 @@ class CommandEndpoint:
         self.thread.start()
 
     def _command_endpoint(self):
-        for command in self.io_handler_factory().read():
-            target_module = self.modules.get(command["instance"])
-            if target_module and target_module.on_click(command["button"]):
+        for cmd in self.io_handler_factory().read():
+            target_module = self.modules.get(cmd["instance"])
+
+            button = cmd["button"]
+            kwargs = {"button_id": button}
+            try:
+                kwargs.update({"pos_x": cmd["x"],
+                               "pos_y": cmd["y"]})
+            except Exception:
+                continue
+
+            if target_module:
+                target_module.on_click(button, **kwargs)
                 target_module.run()
                 self.io.async_refresh()
 
@@ -48,20 +58,20 @@ class Status:
     :param tuple internet_check: Address of server that will be used to check for internet connection by :py:class:`.internet`.
     """
 
-    def __init__(self, standalone=False, **kwargs):
+    def __init__(self, standalone=True, click_events=True, interval=1,
+                 input_stream=None, logfile=None, internet_check=None):
         self.standalone = standalone
-        self.click_events = kwargs.get("click_events", True)
-        interval = kwargs.get("interval", 1)
-        input_stream = kwargs.get("input_stream", sys.stdin)
-        if "logfile" in kwargs:
+        self.click_events = standalone and click_events
+        input_stream = input_stream or sys.stdin
+        if logfile:
             logger = logging.getLogger("i3pystatus")
             for handler in logger.handlers:
                 logger.removeHandler(handler)
-            handler = logging.FileHandler(kwargs["logfile"], delay=True)
+            handler = logging.FileHandler(logfile, delay=True)
             logger.addHandler(handler)
             logger.setLevel(logging.CRITICAL)
-        if "internet_check" in kwargs:
-            util.internet.address = kwargs["internet_check"]
+        if internet_check:
+            util.internet.address = internet_check
 
         self.modules = util.ModuleList(self, ClassFinder(Module))
         if self.standalone:

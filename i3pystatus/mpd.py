@@ -31,7 +31,7 @@ class MPD(IntervalModule):
 
     settings = (
         ("host"),
-        ("port", "MPD port"),
+        ("port", "MPD port. If set to 0, host will we interpreted as a Unix socket."),
         ("format", "formatp string"),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
@@ -39,10 +39,12 @@ class MPD(IntervalModule):
         ("max_len", "Defines max length for the hole string, if exceeding fields specefied in truncate_fields are truncated equaly. If truncated, ellipsis are appended as indicator. It's applied *after* max_field_len. Value of 0 disables this."),
         ("truncate_fields", "fields that will be truncated if exceeding max_field_len or max_len."),
         ("hide_inactive", "Hides status information when MPD is not running"),
+        ("password", "A password for access to MPD. (This is sent in cleartext to the server.)"),
     )
 
     host = "localhost"
     port = 6600
+    password = None
     s = None
     format = "{title} {status}"
     status = {
@@ -64,9 +66,16 @@ class MPD(IntervalModule):
         try:
             sock.send((command + "\n").encode("utf-8"))
         except Exception as e:
-            self.s = socket.create_connection((self.host, self.port))
+            if self.port != 0:
+                self.s = socket.create_connection((self.host, self.port))
+            else:
+                self.s = socket.socket(family=socket.AF_UNIX)
+                self.s.connect(self.host)
             sock = self.s
             sock.recv(8192)
+            if self.password is not None:
+                sock.send('password "{}"\n'.format(self.password).encode("utf-8"))
+                sock.recv(8192)
             sock.send((command + "\n").encode("utf-8"))
         try:
             reply = sock.recv(16384).decode("utf-8")
@@ -87,7 +96,9 @@ class MPD(IntervalModule):
                 self.output = {
                     "full_text": ""
                 }
-                return
+            if hasattr(self, "data"):
+                del self.data
+            return
 
         fdict = {
             "pos": int(status.get("song", 0)) + 1,
@@ -114,6 +125,7 @@ class MPD(IntervalModule):
                 if len(fdict[key]) > self.max_field_len:
                     fdict[key] = fdict[key][:self.max_field_len - 1] + "…"
 
+        self.data = fdict
         full_text = formatp(self.format, **fdict).strip()
         full_text_len = len(full_text)
         if full_text_len > self.max_len and self.max_len > 0:
@@ -124,7 +136,6 @@ class MPD(IntervalModule):
                 fdict[key] = fdict[key][:shrink] + "…"
 
             full_text = formatp(self.format, **fdict).strip()
-
         self.output = {
             "full_text": full_text,
             "color": self.color,

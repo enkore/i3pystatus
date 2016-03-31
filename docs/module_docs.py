@@ -97,16 +97,16 @@ def process_signature(app, what, name, obj, options, signature, return_annotatio
         return ("", return_annotation)
 
 
-def get_modules(path, name):
+def get_modules(path, package):
     modules = []
     for finder, modname, is_package in pkgutil.iter_modules(path):
         if modname not in IGNORE_MODULES:
-            modules.append(get_module(finder, modname))
+            modules.append(get_module(finder, modname, package))
     return modules
 
 
-def get_module(finder, modname):
-    fullname = "i3pystatus.{modname}".format(modname=modname)
+def get_module(finder, modname, package):
+    fullname = "{package}.{modname}".format(package=package, modname=modname)
     return (modname, finder.find_loader(fullname)[0].load_module(fullname))
 
 

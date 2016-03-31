@@ -60,6 +60,7 @@ class Openstack_vms(IntervalModule):
             "nonactive_servers": nonactive_servers,
         }
 
+        self.data = cdict
         self.output = {
             "full_text": self.format.format(**cdict),
             "color": display_color

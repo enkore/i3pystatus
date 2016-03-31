@@ -97,6 +97,7 @@ class Reddit(IntervalModule):
         else:
             color = self.color
 
+        self.data = fdict
         full_text = self.format.format(**fdict)
         self.output = {
             "full_text": full_text,
@@ -105,7 +106,7 @@ class Reddit(IntervalModule):
 
     def connect(self):
         if not self.reddit_session:
-            self.reddit_session = praw.Reddit(user_agent='i3pystatus')
+            self.reddit_session = praw.Reddit(user_agent='i3pystatus', disable_update_check=True)
         return self.reddit_session
 
     def get_redditor(self, reddit):

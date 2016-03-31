@@ -102,8 +102,10 @@ class Dota2wins(IntervalModule):
             "wins": wins,
             "losses": losses,
             "win_percent": win_percent,
+            "win_percent": "%.2f" % win_percent,
         }
 
+        self.data = cdict
         self.output = {
             "full_text": self.format.format(**cdict),
             "color": color

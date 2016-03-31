@@ -33,7 +33,14 @@ MOCK_MODULES = [
     "dota2py",
     "novaclient.v2",
     "speedtest_cli",
-    "pyzabbix"
+    "pyzabbix",
+    "vk",
+    "google-api-python-client",
+    "dateutil",
+    "httplib2",
+    "oauth2client",
+    "apiclient"
+
 ]
 
 for mod_name in MOCK_MODULES:
@@ -66,7 +73,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'i3pystatus'
-copyright = '2012-2015 i3pystatus developers. Free and open software under the MIT license'
+copyright = '2012-2016 i3pystatus developers. Free and open software under the MIT license'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

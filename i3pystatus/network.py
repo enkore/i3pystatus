@@ -393,6 +393,7 @@ class Network(IntervalModule, ColorRangeModule):
         format_values.update(network_info)
         format_values['interface'] = self.interface
 
+        self.data = format_values
         self.output = {
             "full_text": format_str.format(**format_values),
             'color': color,

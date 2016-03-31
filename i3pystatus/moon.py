@@ -105,6 +105,7 @@ class MoonPhase(IntervalModule):
             "status": self.status[self.current_phase()],
             "illum": self.illum(),
         }
+        self.data = fdict
         self.output = {
             "full_text": formatp(self.format, **fdict),
             "color": self.color[self.current_phase()],

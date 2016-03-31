@@ -3,7 +3,7 @@ from pkgutil import extend_path
 from i3pystatus.core import Status
 from i3pystatus.core.modules import Module, IntervalModule
 from i3pystatus.core.settings import SettingsBase
-from i3pystatus.core.util import formatp
+from i3pystatus.core.util import formatp, get_module
 
 import logging
 import os
@@ -15,6 +15,7 @@ __all__ = [
     "Module", "IntervalModule",
     "SettingsBase",
     "formatp",
+    "get_module",
 ]
 
 logpath = os.path.join(os.path.expanduser("~"), ".i3pystatus-%s" % os.getpid())
@@ -27,6 +28,6 @@ logger.setLevel(logging.CRITICAL)
 def main():
     from i3pystatus.clock import Clock
 
-    status = Status(standalone=True)
+    status = Status()
     status.register(Clock())
     status.run()

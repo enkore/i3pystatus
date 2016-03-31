@@ -50,6 +50,7 @@ class Plexstatus(IntervalModule):
             except AttributeError:
                 pass
 
+        self.data = cdict
         if not cdict['title'] or not cdict['platform']:
             self.output = {} if not self.format_no_streams else {
                 "full_text": self.format_no_stream,
