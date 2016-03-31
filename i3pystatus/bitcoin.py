@@ -11,6 +11,7 @@ from contextlib import contextmanager
 
 LOCALE_LOCK = threading.Lock()
 
+
 @contextmanager
 def setlocale(name):
     # To deal with locales only in this module and keep it thread save
@@ -20,6 +21,7 @@ def setlocale(name):
             yield locale.setlocale(locale.LC_ALL, name)
         finally:
             locale.setlocale(locale.LC_ALL, saved)
+
 
 class Bitcoin(IntervalModule):
 
@@ -81,12 +83,13 @@ class Bitcoin(IntervalModule):
     _price_prev = 0
 
     def _get_age(self, bitcoinaverage_timestamp):
-        with setlocale('C'): # Deal with locales (months name differ)
+        with setlocale('C'):  # Deal with locales (months name differ)
             # Assume format is always utc, to avoid import pytz
-            utc_tstamp = datetime.strptime(bitcoinaverage_timestamp.split(', ')[1],
-                                       u'%d %b %Y %H:%M:%S -0000')
+            utc_tstamp = datetime.strptime(
+                bitcoinaverage_timestamp.split(', ')[1],
+                u'%d %b %Y %H:%M:%S -0000')
         diff = datetime.utcnow() - utc_tstamp
-        return  int(diff.total_seconds())
+        return int(diff.total_seconds())
 
     def _query_api(self, api_url):
         url = "{}{}".format(api_url, self.currency.upper())
@@ -109,13 +112,11 @@ class Bitcoin(IntervalModule):
             exchange['timestamp'] = ret['timestamp']
             return exchange
 
-
     def _fetch_blockchain_data(self):
         api = "https://blockchain.info/multiaddr?active="
         addresses = "|".join(self.wallet_addresses)
         url = "{}{}".format(api, addresses)
         return json.loads(urllib.request.urlopen(url).read().decode("utf-8"))
-
 
     @require(internet)
     def run(self):
@@ -128,9 +129,9 @@ class Bitcoin(IntervalModule):
             "bid_price": price_data["bid"],
             "last_price": price_data["last"],
             "volume": price_data["volume_btc"],
-            "volume_thousend": price_data["volume_btc"]/1000,
+            "volume_thousend": price_data["volume_btc"] / 1000,
             "volume_percent": price_data["volume_percent"],
-            "age":  self._get_age(price_data['timestamp'])
+            "age": self._get_age(price_data['timestamp'])
         }
 
         if self._price_prev and fdict["last_price"] > self._price_prev:
