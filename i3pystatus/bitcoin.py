@@ -5,6 +5,21 @@ from datetime import datetime
 from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require, user_open
 
+import locale
+import threading
+from contextlib import contextmanager
+
+LOCALE_LOCK = threading.Lock()
+
+@contextmanager
+def setlocale(name):
+    # To deal with locales only in this module and keep it thread save
+    with LOCALE_LOCK:
+        saved = locale.setlocale(locale.LC_ALL)
+        try:
+            yield locale.setlocale(locale.LC_ALL, name)
+        finally:
+            locale.setlocale(locale.LC_ALL, saved)
 
 class Bitcoin(IntervalModule):
 
@@ -66,8 +81,9 @@ class Bitcoin(IntervalModule):
     _price_prev = 0
 
     def _get_age(self, bitcoinaverage_timestamp):
-        # Assume format is always utc, to avoid import pytz
-        utc_tstamp = datetime.strptime(bitcoinaverage_timestamp.split(', ')[1],
+        with setlocale('C'): # Deal with locales (months name differ)
+            # Assume format is always utc, to avoid import pytz
+            utc_tstamp = datetime.strptime(bitcoinaverage_timestamp.split(', ')[1],
                                        u'%d %b %Y %H:%M:%S -0000')
         diff = datetime.utcnow() - utc_tstamp
         return  int(diff.total_seconds())
@@ -76,7 +92,6 @@ class Bitcoin(IntervalModule):
         url = "{}{}".format(api_url, self.currency.upper())
         response = urllib.request.urlopen(url).read().decode("utf-8")
         return json.loads(response)
-
 
     def _fetch_price_data(self):
         if self.exchange is None:
