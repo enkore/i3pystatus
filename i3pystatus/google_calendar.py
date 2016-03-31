@@ -36,6 +36,7 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
         ('format', 'format string'),
         ("credential_path", "Path to credentials"),
         ("skip_recurring", "Skip recurring events."),
+        ("days", "Only show events between now and this many days in the future"),
         ("urgent_seconds", "Add urgent hint when this many seconds until event startTime"),
         ("start_color", "Hex or English name for start of color range, eg '#00FF00' or 'green'"),
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
@@ -43,12 +44,14 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
 
     required = ('credential_path',)
 
-    format = "{summary} ({remaining_time})"
-    urgent_seconds = 300
     interval = 30
-    color = '#FFFFFF'
-    skip_recurring = True
+
+    format = "{summary} ({remaining_time})"
     credential_path = None
+    skip_recurring = True
+    days = 1
+    urgent_seconds = 300
+    color = None
 
     service = None
     credentials = None
@@ -119,7 +122,7 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
 
     def get_timerange(self):
         now = datetime.datetime.utcnow()
-        later = now + datetime.timedelta(days=1)
+        later = now + datetime.timedelta(days=self.days)
         now = now.isoformat() + 'Z'
         later = later.isoformat() + 'Z'
         return now, later
