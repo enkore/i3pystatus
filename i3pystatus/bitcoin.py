@@ -29,8 +29,10 @@ class Bitcoin(IntervalModule):
     This module fetches and displays current Bitcoin market prices and
     optionally monitors transactions to and from a list of user-specified
     wallet addresses. Market data is pulled from the BitcoinAverage Price
-    Index API <https://bitcoinaverage.com> while transaction data is pulled
-    from blockchain.info <https://blockchain.info/api/blockchain_api>.
+    Index API <https://bitcoinaverage.com> and it is possible to specify
+    the exchange to be monitored.
+    Transaction data is pulled from blockchain.info
+    <https://blockchain.info/api/blockchain_api>.
 
     .. rubric:: Available formatters
 
@@ -39,6 +41,9 @@ class Bitcoin(IntervalModule):
     * {bid_price}
     * {daily_average}
     * {volume}
+    * {volume_thousend}
+    * {volume_percent}
+    * {age}
     * {status}
     * {last_tx_type}
     * {last_tx_addr}
