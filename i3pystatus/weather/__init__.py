@@ -124,6 +124,8 @@ class Weather(IntervalModule):
             condition = 'Thunderstorm'
         elif 'snow' in condition_lc:
             condition = 'Snow'
+        elif 'showers' in condition_lc:
+            condition = 'Rainy'
 
         return self.color_icons['default'] \
             if condition not in self.color_icons \
