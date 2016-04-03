@@ -55,11 +55,13 @@ class Taskwarrior(IntervalModule):
 
     def run(self):
         try:
-            urgent_tasks_json = subprocess.check_output(['task', self.urgent_filter, 'export'])
+            urgent_params = ['task'] + self.urgent_filter.split(' ') + ['export']
+            urgent_tasks_json = subprocess.check_output(urgent_params)
             self.urgent_tasks = loads(urgent_tasks_json.decode("utf-8"))
             self.urgent_tasks = sorted(self.urgent_tasks, key=lambda x: x['urgency'], reverse=True)
 
-            ready_tasks = subprocess.check_output(['task', self.ready_filter, 'export'])
+            ready_params = ['task'] + self.ready_filter.split(' ') + ['export']
+            ready_tasks = subprocess.check_output(ready_params)
             self.ready_tasks = loads(ready_tasks.decode("utf-8"))
             self.ready_tasks = sorted(self.ready_tasks, key=lambda x: x['urgency'], reverse=True)
 
