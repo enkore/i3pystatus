@@ -113,19 +113,24 @@ class Weather(IntervalModule):
         Disambiguate similarly-named weather conditions, and return the icon
         and color that match.
         '''
-        condition_lc = condition.lower()
-        if condition_lc.startswith('clear'):
-            condition = 'Fair'
-        if 'cloudy' in condition_lc:
-            condition = 'Cloudy'
-        elif 'rain' in condition_lc:
-            condition = 'Rainy'
-        elif 'thunder' in condition_lc:
-            condition = 'Thunderstorm'
-        elif 'snow' in condition_lc:
-            condition = 'Snow'
-        elif 'showers' in condition_lc:
-            condition = 'Rainy'
+        if condition not in self.color_icons:
+            # Check for similarly-named conditions if no exact match found
+            condition_lc = condition.lower()
+            if 'cloudy' in condition_lc:
+                if 'partly' in condition_lc:
+                    condition = 'Partly Cloudy'
+                else:
+                    condition = 'Cloudy'
+            elif 'thunder' in condition_lc:
+                condition = 'Thunderstorm'
+            elif 'snow' in condition_lc:
+                condition = 'Snow'
+            elif 'rain' in condition_lc or 'showers' in condition_lc:
+                condition = 'Rainy'
+            elif 'sunny' in condition_lc:
+                condition = 'Sunny'
+            elif 'clear' in condition_lc:
+                condition = 'Fair'
 
         return self.color_icons['default'] \
             if condition not in self.color_icons \
