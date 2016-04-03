@@ -129,7 +129,7 @@ class Weather(IntervalModule):
                 condition = 'Rainy'
             elif 'sunny' in condition_lc:
                 condition = 'Sunny'
-            elif 'clear' in condition_lc:
+            elif 'clear' in condition_lc or 'fair' in condition_lc:
                 condition = 'Fair'
 
         return self.color_icons['default'] \
