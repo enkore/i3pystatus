@@ -44,6 +44,15 @@ example configuration for the MaildirMail backend:
 
    .. nothin'
 
+.. _scorebackends:
+
+Score Backends
+--------------
+
+.. autogen:: i3pystatus.scores SettingsBase
+
+    .. nothin'
+
 .. _updatebackends:
 
 Update Backends
