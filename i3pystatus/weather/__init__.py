@@ -84,12 +84,12 @@ class Weather(IntervalModule):
 
     colorize = False
     color_icons = {
-        'Fair': (u'\u2600', '#ffcc00'),
+        'Fair': (u'\u263c', '#ffcc00'),
         'Cloudy': (u'\u2601', '#f8f8ff'),
         'Partly Cloudy': (u'\u2601', '#f8f8ff'),  # \u26c5 is not in many fonts
         'Rainy': (u'\u26c8', '#cbd2c0'),
         'Thunderstorm': (u'\u03de', '#cbd2c0'),
-        'Sunny': (u'\u263c', '#ffff00'),
+        'Sunny': (u'\u2600', '#ffff00'),
         'Snow': (u'\u2603', '#ffffff'),
         'default': ('', None),
     }
@@ -113,17 +113,24 @@ class Weather(IntervalModule):
         Disambiguate similarly-named weather conditions, and return the icon
         and color that match.
         '''
-        condition_lc = condition.lower()
-        if condition_lc == 'clear':
-            condition = 'Fair'
-        if 'cloudy' in condition_lc:
-            condition = 'Cloudy'
-        elif 'rain' in condition_lc:
-            condition = 'Rainy'
-        elif 'thunder' in condition_lc:
-            condition = 'Thunderstorm'
-        elif 'snow' in condition_lc:
-            condition = 'Snow'
+        if condition not in self.color_icons:
+            # Check for similarly-named conditions if no exact match found
+            condition_lc = condition.lower()
+            if 'cloudy' in condition_lc:
+                if 'partly' in condition_lc:
+                    condition = 'Partly Cloudy'
+                else:
+                    condition = 'Cloudy'
+            elif 'thunder' in condition_lc:
+                condition = 'Thunderstorm'
+            elif 'snow' in condition_lc:
+                condition = 'Snow'
+            elif 'rain' in condition_lc or 'showers' in condition_lc:
+                condition = 'Rainy'
+            elif 'sunny' in condition_lc:
+                condition = 'Sunny'
+            elif 'clear' in condition_lc or 'fair' in condition_lc:
+                condition = 'Fair'
 
         return self.color_icons['default'] \
             if condition not in self.color_icons \
