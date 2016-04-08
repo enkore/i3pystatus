@@ -233,7 +233,23 @@ to files in your home directory named
 ``.i3pystatus-<pid-of-thread>``. Some modules might log additional
 information.
 
-.. rubric:: Log level
+Setting a specific logfile
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When instantiating your ``Status`` object, the path to a log file can be
+specified. If this is done, then log messages will be sent to that file and not
+to an ``.i3pystatus-<pid-of-thread>`` file in your home directory.  This is
+useful in that it helps keep your home directory from becoming cluttered with
+files containing errors.
+
+.. code-block:: python
+
+    from i3pystatus import Status
+
+    status = Status(logfile='/home/username/var/i3pystatus.log')
+
+Log level
+~~~~~~~~~
 
 Every module has a ``log_level`` option which sets the *minimum*
 severity required for an event to be logged.
