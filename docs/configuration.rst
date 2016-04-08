@@ -248,6 +248,26 @@ files containing errors.
 
     status = Status(logfile='/home/username/var/i3pystatus.log')
 
+Changing log format
+~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.35
+
+The ``logformat`` option can be useed to change the format of the log files,
+using `LogRecord attributes`__.
+
+.. code-block:: python
+
+    from i3pystatus import Status
+
+    status = Status(
+        logfile='/home/username/var/i3pystatus.log',
+        logformat='%(asctime)s %(levelname)s:',
+    )
+
+.. __: https://docs.python.org/3/library/logging.html#logrecord-attributes
+
+
 Log level
 ~~~~~~~~~
 
