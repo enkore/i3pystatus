@@ -2,6 +2,7 @@ import threading
 
 from i3pystatus import SettingsBase, Module, formatp
 from i3pystatus.core.util import internet, require
+from i3pystatus.core.desktop import DesktopNotification
 
 
 class Backend(SettingsBase):
@@ -21,10 +22,11 @@ class Updates(Module):
     .. rubric:: Available formatters
 
     * `{count}` — Sum of all available updates from all backends.
-    * For each backend registered there is one formatter named after the backend,
-      multiple identical backends do not accumulate, but overwrite each other.
-    * For example, `{Cower}` (note capitcal C) is the number of updates reported by
-      the cower backend, assuming it has been registered.
+    * For each backend registered there is one formatter named after the
+      backend, multiple identical backends do not accumulate, but overwrite
+      each other.
+    * For example, `{Cower}` (note capital C) is the number of updates
+      reported by the cower backend, assuming it has been registered.
 
     .. rubric:: Usage example
 
@@ -50,9 +52,11 @@ class Updates(Module):
         ("backends", "Required list of backends used to check for updates."),
         ("format", "Format used when updates are available. "
          "May contain formatters."),
-        ("format_no_updates", "String that is shown if no updates are available."
-         " If not set the module will be hidden if no updates are available."),
-        ("format_working", "Format used while update queries are run. By default the same as ``format``."),
+        ("format_no_updates", "String that is shown if no updates are "
+            "available. If not set the module will be hidden if no updates "
+            "are available."),
+        ("format_working", "Format used while update queries are run. By "
+            "default the same as ``format``."),
         "color",
         "color_no_updates",
         "color_working",
@@ -69,6 +73,7 @@ class Updates(Module):
     color_working = None
 
     on_leftclick = "run"
+    on_rightclick = "report"
 
     def init(self):
         if not isinstance(self.backends, list):
@@ -79,6 +84,7 @@ class Updates(Module):
         self.data = {
             "count": 0
         }
+        self.notif_body = {}
         self.condition = threading.Condition()
         self.thread = threading.Thread(target=self.update_thread, daemon=True)
         self.thread.start()
@@ -96,6 +102,8 @@ class Updates(Module):
             key = backend.__class__.__name__
             if key not in self.data:
                 self.data[key] = '?'
+            if key not in self.notif_body:
+                self.notif_body[key] = '?'
 
         self.output = {
             "full_text": formatp(self.format_working, **self.data).strip(),
@@ -104,9 +112,11 @@ class Updates(Module):
 
         updates_count = 0
         for backend in self.backends:
-            updates = backend.updates
+            name = backend.__class__.__name__
+            updates, notif_body = backend.updates
             updates_count += updates
-            self.data[backend.__class__.__name__] = updates
+            self.data[name] = updates
+            self.notif_body[name] = notif_body or ""
 
         if updates_count == 0:
             self.output = {} if not self.format_no_updates else {
@@ -124,3 +134,12 @@ class Updates(Module):
     def run(self):
         with self.condition:
             self.condition.notify()
+
+    def report(self):
+        DesktopNotification(
+            title=formatp(self.format, **self.data).strip(),
+            body="\n".join(self.notif_body.values()),
+            icon="software-update-available",
+            urgency=1,
+            timeout=0,
+        ).display()
