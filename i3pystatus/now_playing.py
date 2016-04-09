@@ -100,14 +100,20 @@ class NowPlaying(IntervalModule):
         try:
             player = self.get_player()
             properties = dbus.Interface(player, "org.freedesktop.DBus.Properties")
-            get_prop = functools.partial(properties.Get, "org.mpris.MediaPlayer2.Player")
+
+            def get_prop(name, default=None):
+                try:
+                    return properties.Get("org.mpris.MediaPlayer2.Player", name)
+                except dbus.exceptions.DBusException:
+                    return default
+
             currentsong = get_prop("Metadata")
 
             fdict = {
                 "status": self.status[self.statusmap[get_prop("PlaybackStatus")]],
                 "len": 0,  # TODO: Use optional(!) TrackList interface for this to gain 100 % mpd<->now_playing compat
                 "pos": 0,
-                "volume": int(get_prop("Volume") * 100),
+                "volume": int(get_prop("Volume", 0) * 100),
 
                 "title": currentsong.get("xesam:title", ""),
                 "album": currentsong.get("xesam:album", ""),
