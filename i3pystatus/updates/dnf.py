@@ -1,5 +1,6 @@
 from i3pystatus.core.command import run_through_shell
 from i3pystatus.updates import Backend
+from re import split
 
 
 class Dnf(Backend):
@@ -16,7 +17,9 @@ class Dnf(Backend):
 
         update_count = 0
         if dnf.rc == 100:
-            update_count = len(dnf.out.split("\n")[2:-1])
+            lines = dnf.out.splitlines()[2:]
+            lines = [l for l in lines if len(split("\s{2,}", l.rstrip())) == 3]
+            update_count = len(lines)
         return update_count
 
 Backend = Dnf
