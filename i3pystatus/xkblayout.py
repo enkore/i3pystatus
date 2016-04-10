@@ -10,7 +10,8 @@ class Xkblayout(IntervalModule):
     current layout is not in the ``layouts`` setting the first layout
     is enabled.
 
-    ``layouts`` can be stated with or without variants, e.g.: status.register("xkblayout", layouts=["de neo", "de"])
+    ``layouts`` can be stated with or without variants,
+    e.g.: status.register("xkblayout", layouts=["de neo", "de"])
     """
 
     interval = 1
@@ -22,7 +23,7 @@ class Xkblayout(IntervalModule):
     on_leftclick = "change_layout"
 
     def run(self):
-        kblayout = subprocess.check_output("setxkbmap -query | awk '/layout/,/variant/{print $2}'", shell=True).decode('utf-8').replace("\n", " ").strip()
+        kblayout = self.kblayout()
 
         self.output = {
             "full_text": self.format.format(name=kblayout).upper(),
@@ -31,12 +32,21 @@ class Xkblayout(IntervalModule):
 
     def change_layout(self):
         layouts = self.layouts
-        kblayout = subprocess.check_output("setxkbmap -query | awk '/layout/,/variant/{print $2}'", shell=True).decode('utf-8').replace("\n", " ").strip()
+        kblayout = self.kblayout()
         if kblayout in layouts:
             position = layouts.index(kblayout)
             try:
-                subprocess.check_call(["setxkbmap"] + layouts[position + 1].split())
+                subprocess.check_call(["setxkbmap"] +
+                                      layouts[position + 1].split())
             except IndexError:
                 subprocess.check_call(["setxkbmap"] + layouts[0].split())
         else:
             subprocess.check_call(["setxkbmap"] + layouts[0].split())
+
+    def kblayout(self):
+        kblayout = subprocess.check_output("setxkbmap -query", shell=True)\
+            .decode("utf-8").splitlines()
+        kblayout = [l.split() for l in kblayout]
+        kblayout = [l[1].strip() for l in kblayout
+                    if l[0].startswith(("layout", "variant"))]
+        return (" ").join(kblayout)
