@@ -19,6 +19,9 @@ class Updates(Module):
     Left clicking on the module will refresh the count of upgradeable packages.
     This may be used to dismiss the notification after updating your system.
 
+    Right clicking shows a desktop notification with a summary count and a list
+    of available updates.
+
     .. rubric:: Available formatters
 
     * `{count}` — Sum of all available updates from all backends.
@@ -57,6 +60,8 @@ class Updates(Module):
             "are available."),
         ("format_working", "Format used while update queries are run. By "
             "default the same as ``format``."),
+        ("format_summary", "Format for the summary line of notifications. By "
+            "default the same as ``format``."),
         "color",
         "color_no_updates",
         "color_working",
@@ -68,6 +73,7 @@ class Updates(Module):
     format = "Updates: {count}"
     format_no_updates = None
     format_working = None
+    format_summary = None
     color = "#00DD00"
     color_no_updates = None
     color_working = None
@@ -80,6 +86,8 @@ class Updates(Module):
             self.backends = [self.backends]
         if self.format_working is None:  # we want to allow an empty format
             self.format_working = self.format
+        if self.format_summary is None:  # we want to allow an empty format
+            self.format_summary = self.format
         self.color_working = self.color_working or self.color
         self.data = {
             "count": 0
@@ -137,7 +145,7 @@ class Updates(Module):
 
     def report(self):
         DesktopNotification(
-            title=formatp(self.format, **self.data).strip(),
+            title=formatp(self.format_summary, **self.data).strip(),
             body="\n".join(self.notif_body.values()),
             icon="software-update-available",
             urgency=1,
