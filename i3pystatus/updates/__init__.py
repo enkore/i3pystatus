@@ -113,9 +113,9 @@ class Updates(Module):
         for backend in self.backends:
             key = backend.__class__.__name__
             if key not in self.data:
-                self.data[key] = '?'
+                self.data[key] = "?"
             if key not in self.notif_body:
-                self.notif_body[key] = '?'
+                self.notif_body[key] = ""
 
         self.output = {
             "full_text": formatp(self.format_working, **self.data).strip(),
