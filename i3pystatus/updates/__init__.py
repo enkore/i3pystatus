@@ -62,6 +62,9 @@ class Updates(Module):
             "default the same as ``format``."),
         ("format_summary", "Format for the summary line of notifications. By "
             "default the same as ``format``."),
+        ("notification_icon", "Icon shown when reporting the list of updates. "
+            "Default is ``software-update-available``, and can be "
+            "None for no icon."),
         "color",
         "color_no_updates",
         "color_working",
@@ -74,6 +77,7 @@ class Updates(Module):
     format_no_updates = None
     format_working = None
     format_summary = None
+    notification_icon = "software-update-available"
     color = "#00DD00"
     color_no_updates = None
     color_working = None
@@ -147,7 +151,7 @@ class Updates(Module):
         DesktopNotification(
             title=formatp(self.format_summary, **self.data).strip(),
             body="\n".join(self.notif_body.values()),
-            icon="software-update-available",
+            icon=self.notification_icon,
             urgency=1,
             timeout=0,
         ).display()
