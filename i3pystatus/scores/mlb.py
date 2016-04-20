@@ -258,6 +258,9 @@ class MLB(ScoresBackend):
         if ret['status'] == 'delayed_start':
             ret['status'] = 'pregame'
             ret['delay'] = game.get('reason', 'Unknown')
+        elif ret['status'] == 'delayed':
+            ret['status'] = 'in_progress'
+            ret['delay'] = game.get('reason', 'Unknown')
         elif ret['status'] == 'postponed':
             ret['postponed'] = game.get('reason', 'Unknown Reason')
         elif ret['status'] == 'game_over':
