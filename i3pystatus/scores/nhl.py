@@ -271,7 +271,7 @@ class NHL(ScoresBackend):
         elif ret['status'] == 'final':
             _update('overtime',
                     'linescore:currentPeriodOrdinal',
-                    lambda x: x if x in ('OT', 'SO') else '')
+                    lambda x: x if 'OT' in x or x == 'SO' else '')
         elif ret['status'] != 'in_progress':
             ret['status'] = 'pregame'
 
