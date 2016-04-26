@@ -11,6 +11,7 @@ class Online(IntervalModule):
         ('color_offline', 'Text color when offline'),
         ('format_online', 'Status text when online'),
         ('format_offline', 'Status text when offline'),
+        ("interval", "Update interval"),
     )
 
     color = '#ffffff'
