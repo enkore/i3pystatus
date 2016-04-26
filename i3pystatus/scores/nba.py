@@ -25,6 +25,8 @@ class NBA(ScoresBackend):
     * `{home_score}` — Home team's current score
     * `{home_wins}` — Home team's number of wins
     * `{home_losses}` — Home team's number of losses
+    * `{home_seed}` — During the playoffs, shows the home team's playoff seed.
+      When not in the playoffs, this formatter will be blank.
     * `{home_favorite}` — Displays the value for the :py:mod:`.scores` module's
       ``favorite`` attribute, if the home team is one of the teams being
       followed. Otherwise, this formatter will be blank.
@@ -34,6 +36,8 @@ class NBA(ScoresBackend):
     * `{away_score}` — Away team's current score
     * `{away_wins}` — Away team's number of wins
     * `{away_losses}` — Away team's number of losses
+    * `{away_seed}` — During the playoffs, shows the away team's playoff seed.
+      When not in the playoffs, this formatter will be blank.
     * `{away_favorite}` — Displays the value for the :py:mod:`.scores` module's
       ``favorite`` attribute, if the away team is one of the teams being
       followed. Otherwise, this formatter will be blank.
@@ -162,7 +166,7 @@ class NBA(ScoresBackend):
 
     display_order = _valid_display_order
     format_no_games = 'NBA: No games'
-    format_pregame = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) {start_time:%H:%M %Z}'
+    format_pregame = '[{scroll} ]NBA: [{away_favorite} ][{away_seed} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ][{home_seed} ]{home_abbrev} ({home_wins}-{home_losses}) {start_time:%H:%M %Z}'
     format_in_progress = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score}[ ({away_power_play})], [{home_favorite} ]{home_abbrev} {home_score}[ ({home_power_play})] ({time_remaining} {quarter})'
     format_final = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Final[/{overtime}])'
     team_colors = _default_colors
@@ -280,12 +284,26 @@ class NBA(ScoresBackend):
         _update('venue', 'arena')
 
         for ret_key, game_key in (('home', 'home'), ('away', 'visitor')):
-            _update('%s_score' % ret_key, '%s:score' % game_key)
-            _update('%s_wins' % ret_key, '%s:wins' % game_key)
-            _update('%s_losses' % ret_key, '%s:losses' % game_key)
+            _update('%s_score' % ret_key, '%s:score' % game_key,
+                    callback=self.force_int, default=0)
             _update('%s_city' % ret_key, '%s:city' % game_key)
             _update('%s_name' % ret_key, '%s:nickname' % game_key)
             _update('%s_abbrev' % ret_key, '%s:abbreviation' % game_key)
+            if 'playoffs' in game:
+                _update('%s_wins' % ret_key, 'playoffs:%s_wins' % game_key,
+                        callback=self.force_int, default=0)
+                _update('%s_seed' % ret_key, 'playoffs:%s_seed' % game_key,
+                        callback=self.force_int, default=0)
+            else:
+                _update('%s_wins' % ret_key, '%s:wins' % game_key,
+                        callback=self.force_int, default=0)
+                _update('%s_losses' % ret_key, '%s:losses' % game_key,
+                        callback=self.force_int, default=0)
+                ret['%s_seed' % ret_key] = ''
+
+        if 'playoffs' in game:
+            ret['home_losses'] = ret['away_wins']
+            ret['away_losses'] = ret['home_wins']
 
         # From API data, date is YYYYMMDD, time is HHMM
         game_time_str = '%s%s' % (game.get('date', ''), game.get('time', ''))
