@@ -114,7 +114,7 @@ class MPD(IntervalModule):
             "bitrate": int(status.get("bitrate", 0)),
         }
 
-        if not fdict["title"]:
+        if not fdict["title"] and "file" in currentsong:
             fdict["filename"] = '.'.join(
                 basename(currentsong["file"]).split('.')[:-1])
         else:
