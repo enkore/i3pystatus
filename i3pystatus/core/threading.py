@@ -67,7 +67,7 @@ class ExceptionWrapper(Wrapper):
         try:
             self.workload()
         except:
-            message = "\n> Exception in {thread} at {time}, module {name}".format(
+            message = "Exception in {thread} at {time}, module {name}".format(
                 thread=threading.current_thread().name,
                 time=time.strftime("%c"),
                 name=self.workload.__class__.__name__

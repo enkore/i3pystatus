@@ -8,6 +8,8 @@ from i3pystatus.core.exceptions import ConfigError
 from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core.modules import Module
 
+DEFAULT_LOG_FORMAT = '%(asctime)s [%(levelname)-8s][%(name)s %(lineno)d] %(message)s'
+
 
 class CommandEndpoint:
     """
@@ -59,17 +61,21 @@ class Status:
     """
 
     def __init__(self, standalone=True, click_events=True, interval=1,
-                 input_stream=None, logfile=None, internet_check=None):
+                 input_stream=None, logfile=None, internet_check=None,
+                 logformat=DEFAULT_LOG_FORMAT):
         self.standalone = standalone
         self.click_events = standalone and click_events
         input_stream = input_stream or sys.stdin
+        logger = logging.getLogger("i3pystatus")
         if logfile:
-            logger = logging.getLogger("i3pystatus")
             for handler in logger.handlers:
                 logger.removeHandler(handler)
             handler = logging.FileHandler(logfile, delay=True)
             logger.addHandler(handler)
             logger.setLevel(logging.CRITICAL)
+        if logformat:
+            for index in range(len(logger.handlers)):
+                logger.handlers[index].setFormatter(logging.Formatter(logformat))
         if internet_check:
             util.internet.address = internet_check
 
