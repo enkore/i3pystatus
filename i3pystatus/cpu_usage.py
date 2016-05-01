@@ -50,7 +50,7 @@ class CpuUsage(IntervalModule, ColorRangeModule):
         self.prev_busy = defaultdict(int)
         self.formatter = Formatter()
 
-        self.key = re.findall('usage_cpu\d+',self.format)
+        self.key = re.findall('usage_cpu\d+', self.format)
         if len(self.key) == 1:
             self.key = self.key[0]
         else:
@@ -62,7 +62,7 @@ class CpuUsage(IntervalModule, ColorRangeModule):
         if not self.dynamic_color:
             self.start_color = self.color
             self.end_color = self.color
-        self.colors = self.get_hex_color_range(self.start_color,self.end_color,int(self.upper_limit))
+        self.colors = self.get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
 
     def get_cpu_timings(self):
         """
@@ -139,7 +139,7 @@ class CpuUsage(IntervalModule, ColorRangeModule):
         # for backward compatibility
         usage['usage'] = usage['usage_cpu']
 
-        color = self.get_gradient(usage[self.key],self.colors,int(self.upper_limit))
+        color = self.get_gradient(usage[self.key], self.colors, int(self.upper_limit))
 
         self.data = usage
         self.output = {
