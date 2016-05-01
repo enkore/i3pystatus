@@ -17,6 +17,7 @@ class CpuUsage(IntervalModule, ColorRangeModule):
     The first output will be inacurate.
 
     Linux only
+    Requires the PyPI package 'colour'.
 
     .. rubric:: Available formatters
 
