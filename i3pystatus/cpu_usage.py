@@ -1,7 +1,9 @@
 from collections import defaultdict
 from string import Formatter
+import re
 
 from i3pystatus import IntervalModule
+from i3pystatus.core.color import ColorRangeModule
 
 try:
     from natsort import natsorted as sorted
@@ -9,7 +11,7 @@ except ImportError:
     pass
 
 
-class CpuUsage(IntervalModule):
+class CpuUsage(IntervalModule, ColorRangeModule):
     """
     Shows CPU usage.
     The first output will be inacurate.
@@ -29,19 +31,38 @@ class CpuUsage(IntervalModule):
     exclude_average = False
     interval = 1
     color = None
+    dynamic_color = False
+    upper_limit = 100
     settings = (
         ("format", "format string."),
         ("format_all", ("format string used for {usage_all} per core. "
                         "Available formaters are {core} and {usage}. ")),
         ("exclude_average", ("If True usage average of all cores will "
                              "not be in format_all.")),
-        ("color", "HTML color code #RRGGBB")
+        ("color", "HTML color code #RRGGBB"),
+        ("dynamic_color", "Set color dynamically based on CPU usage. Note: this overrides color_up"),
+        ("start_color", "Hex or English name for start of color range, eg '#00FF00' or 'green'"),
+        ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'")
     )
 
     def init(self):
         self.prev_total = defaultdict(int)
         self.prev_busy = defaultdict(int)
         self.formatter = Formatter()
+
+        self.key = re.findall('usage_cpu\d+',self.format)
+        if len(self.key) == 1:
+            self.key = self.key[0]
+        else:
+            self.key = 'usage_cpu'
+
+        if not self.color:
+            self.color = '#FFFFFF'
+
+        if not self.dynamic_color:
+            self.start_color = self.color
+            self.end_color = self.color
+        self.colors = self.get_hex_color_range(self.start_color,self.end_color,int(self.upper_limit))
 
     def get_cpu_timings(self):
         """
@@ -118,8 +139,10 @@ class CpuUsage(IntervalModule):
         # for backward compatibility
         usage['usage'] = usage['usage_cpu']
 
+        color = self.get_gradient(usage[self.key],self.colors,int(self.upper_limit))
+
         self.data = usage
         self.output = {
             "full_text": self.format.format_map(usage),
-            "color": self.color
+            "color": color
         }
