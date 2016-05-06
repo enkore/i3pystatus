@@ -18,8 +18,9 @@ class Openfiles(IntervalModule):
 
     def run(self):
 
-        cur_filenr = open(self.filenr_path, 'r').readlines()
-        openfiles, unused, maxfiles = cur_filenr[0].split()
+        cur_filenr = open(self.filenr_path, 'r')
+        openfiles, unused, maxfiles = cur_filenr.readlines()[0].split()
+        cur_filenr.close()
 
         cdict = {'openfiles': openfiles,
                  'maxfiles': maxfiles}
