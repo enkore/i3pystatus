@@ -1,14 +1,12 @@
-import os
 import subprocess
-import locale
-
 from datetime import datetime, timedelta
-
 from i3pystatus import IntervalModule
+
 
 STOPPED = 0
 RUNNING = 1
 BREAK = 2
+
 
 class Pomodoro(IntervalModule):
 
@@ -77,17 +75,16 @@ class Pomodoro(IntervalModule):
             text = '{:02}:{:02}'.format(int(min), int(sec))
             sdict = {
                'time': text,
-                'current_pomodoro': self.breaks + 1,
-                'total_pomodoro': self.short_break_count + 1,
+               'current_pomodoro': self.breaks + 1,
+               'total_pomodoro': self.short_break_count + 1,
             }
-            
+
             color = self.color_running if self.state == RUNNING else self.color_break
-            text = self.format.format(**sdict)          
+            text = self.format.format(**sdict)
         else:
             text = 'Start pomodoro',
             color = self.color_stopped
 
-        
         self.output = {
             'full_text': text,
             'color': color
@@ -108,4 +105,5 @@ class Pomodoro(IntervalModule):
                          text])
         subprocess.Popen(['aplay',
                           self.sound,
-                          '-q'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                          '-q'],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
