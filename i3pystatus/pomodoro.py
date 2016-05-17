@@ -6,6 +6,10 @@ from datetime import datetime, timedelta
 
 from i3pystatus import IntervalModule
 
+STOPPED = 0
+RUNNING = 1
+BREAK = 2
+
 class Pomodoro(IntervalModule):
 
     """
@@ -44,14 +48,14 @@ class Pomodoro(IntervalModule):
 
     def init(self):
         # state could be either running/break or stopped
-        self.state = 'stopped'
+        self.state = STOPPED
         self.breaks = 0
         self.time = None
 
     def run(self):
         if self.time and datetime.utcnow() >= self.time:
-            if self.state == 'running':
-                self.state = 'break'
+            if self.state == RUNNING:
+                self.state = BREAK
                 if self.breaks == self.short_break_count:
                     self.time = datetime.utcnow() + \
                         timedelta(seconds=self.long_break_duration)
@@ -62,19 +66,19 @@ class Pomodoro(IntervalModule):
                     self.breaks += 1
                 text = 'Go for a break!'
             else:
-                self.state = 'running'
+                self.state = RUNNING
                 self.time = datetime.utcnow() + \
                     timedelta(seconds=self.pomodoro_duration)
                 text = 'Back to work!'
             self._alarm(text)
 
-        if self.state == 'running' or self.state == 'break':
+        if self.state == RUNNING or self.state == BREAK:
             min, sec = divmod((self.time - datetime.utcnow()).total_seconds(), 60)
             text = '{:02}:{:02}'.format(int(min), int(sec))
-            color = self.color_running if self.state == 'running' else self.color_break
+            color = self.color_running if self.state == RUNNING else self.color_break
         else:
             self.output = {
-                'full_text': 'Stopped',
+                'full_text': 'Start pomodoro',
                 'color': self.color_stopped
             }
             return
@@ -91,12 +95,12 @@ class Pomodoro(IntervalModule):
         }
 
     def start(self):
-        self.state = 'running'
+        self.state = RUNNING
         self.time = datetime.utcnow() + timedelta(seconds=self.pomodoro_duration)
         self.breaks = 0
 
     def stop(self):
-        self.state = 'stopped'
+        self.state = STOPPED
         self.time = None
 
     def _alarm(self, text):
