@@ -53,6 +53,33 @@ class NHL(ScoresBackend):
       formatter will show ``OT`` kor ``SO``. If the game ended in regulation,
       or has not yet completed, this formatter will be blank.
 
+    .. rubric:: Playoffs
+
+    In the playoffs, losses are not important (as the losses will be equal to
+    the other team's wins). Therefore, it is a good idea during the playoffs to
+    manually set format strings to exclude information on team losses. For
+    example:
+
+    .. code-block:: python
+
+        from i3pystatus import Status
+        from i3pystatus.scores import nhl
+
+        status = Status()
+        status.register(
+            'scores',
+            hints={'markup': 'pango'},
+            colorize_teams=True,
+            favorite_icon='<span size="small" color="#F5FF00">★</span>',
+            backends=[
+                nhl.NHL(
+                    favorite_teams=['CHI'],
+                    format_pregame = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} ({away_wins}) at [{home_favorite} ]{home_abbrev} ({home_wins}) {start_time:%H:%M %Z}',
+                    format_final = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}) (Final[/{overtime}])',
+                ),
+            ],
+        )
+
     .. rubric:: Team abbreviations
 
     * **ANA** — Anaheim Ducks
@@ -261,6 +288,14 @@ class NHL(ScoresBackend):
             _update('%s_empty_net' % team,
                     'linescore:teams:%s:goaliePulled' % team,
                     lambda x: self.empty_net if x else '')
+
+        if game.get('gameType') == 'P':
+            for team in ('home', 'away'):
+                # Series wins are the remainder of dividing wins by 4
+                ret['_'.join((team, 'wins'))] %= 4
+            # Series losses are the other team's wins
+            ret['home_losses'] = ret['away_wins']
+            ret['away_losses'] = ret['home_wins']
 
         _update('status',
                 'status:abstractGameState',
