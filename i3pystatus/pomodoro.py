@@ -75,22 +75,21 @@ class Pomodoro(IntervalModule):
         if self.state == RUNNING or self.state == BREAK:
             min, sec = divmod((self.time - datetime.utcnow()).total_seconds(), 60)
             text = '{:02}:{:02}'.format(int(min), int(sec))
-            color = self.color_running if self.state == RUNNING else self.color_break
-        else:
-            self.output = {
-                'full_text': 'Start pomodoro',
-                'color': self.color_stopped
+            sdict = {
+               'time': text,
+                'current_pomodoro': self.breaks + 1,
+                'total_pomodoro': self.short_break_count + 1,
             }
-            return
+            
+            color = self.color_running if self.state == RUNNING else self.color_break
+            text = self.format.format(**sdict)          
+        else:
+            text = 'Start pomodoro',
+            color = self.color_stopped
 
-        sdict = {
-            'time': text,
-            'current_pomodoro': self.breaks + 1,
-            'total_pomodoro': self.short_break_count + 1,
-        }
-        self.data = sdict
+        
         self.output = {
-            'full_text': self.format.format(**sdict),
+            'full_text': text,
             'color': color
         }
 
