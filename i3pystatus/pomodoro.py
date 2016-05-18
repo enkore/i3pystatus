@@ -55,7 +55,7 @@ class Pomodoro(IntervalModule):
         if self.time and datetime.utcnow() >= self.time:
             if self.state == RUNNING:
                 self.state = BREAK
-                if self.breaks == self.short_break_count:
+                if self.current_pomodoro == self.short_break_count:
                     self.time = datetime.utcnow() + \
                         timedelta(seconds=self.long_break_duration)
                 else:
