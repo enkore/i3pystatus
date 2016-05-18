@@ -74,9 +74,9 @@ class Pomodoro(IntervalModule):
             min, sec = divmod((self.time - datetime.utcnow()).total_seconds(), 60)
             text = '{:02}:{:02}'.format(int(min), int(sec))
             sdict = {
-               'time': text,
-               'current_pomodoro': self.current_pomodoro + 1,
-               'total_pomodoro': self.total_pomodoro,
+                'time': text,
+                'current_pomodoro': self.current_pomodoro + 1,
+                'total_pomodoro': self.total_pomodoro
             }
 
             color = self.color_running if self.state == RUNNING else self.color_break
