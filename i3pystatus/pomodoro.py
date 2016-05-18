@@ -47,7 +47,8 @@ class Pomodoro(IntervalModule):
     def init(self):
         # state could be either running/break or stopped
         self.state = STOPPED
-        self.breaks = 0
+        self.current_pomodoro = 0
+        self.total_pomodoro = self.short_break_count + 1  # and 1 long break
         self.time = None
 
     def run(self):
@@ -57,17 +58,16 @@ class Pomodoro(IntervalModule):
                 if self.breaks == self.short_break_count:
                     self.time = datetime.utcnow() + \
                         timedelta(seconds=self.long_break_duration)
-                    self.breaks = 0
                 else:
                     self.time = datetime.utcnow() + \
                         timedelta(seconds=self.break_duration)
-                    self.breaks += 1
                 text = 'Go for a break!'
             else:
                 self.state = RUNNING
                 self.time = datetime.utcnow() + \
                     timedelta(seconds=self.pomodoro_duration)
                 text = 'Back to work!'
+                self.current_pomodoro = (self.current_pomodoro + 1) % self.total_pomodoro
             self._alarm(text)
 
         if self.state == RUNNING or self.state == BREAK:
@@ -75,8 +75,8 @@ class Pomodoro(IntervalModule):
             text = '{:02}:{:02}'.format(int(min), int(sec))
             sdict = {
                'time': text,
-               'current_pomodoro': self.breaks + 1,
-               'total_pomodoro': self.short_break_count + 1,
+               'current_pomodoro': self.current_pomodoro + 1,
+               'total_pomodoro': self.total_pomodoro,
             }
 
             color = self.color_running if self.state == RUNNING else self.color_break
@@ -93,7 +93,7 @@ class Pomodoro(IntervalModule):
     def start(self):
         self.state = RUNNING
         self.time = datetime.utcnow() + timedelta(seconds=self.pomodoro_duration)
-        self.breaks = 0
+        self.current_pomodoro = 0
 
     def stop(self):
         self.state = STOPPED
