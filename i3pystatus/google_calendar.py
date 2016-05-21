@@ -9,7 +9,7 @@ from googleapiclient.errors import HttpError
 
 from i3pystatus import IntervalModule, logger
 from i3pystatus.core.color import ColorRangeModule
-from i3pystatus.core.util import internet, require
+from i3pystatus.core.util import internet, require, user_open
 
 
 class GoogleCalendar(IntervalModule, ColorRangeModule):
@@ -57,6 +57,11 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
     service = None
     credentials = None
 
+    display_event = None
+
+    def on_click(self, button, **kwargs):
+        self.open_calendar()
+
     def init(self):
         self.colors = self.get_hex_color_range(self.end_color, self.start_color, self.urgent_seconds * 2)
 
@@ -65,22 +70,23 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
         if not self.service:
             self.connect_service()
 
-        display_event = self.get_next_event()
-        if display_event:
-            start_time = display_event['start_time']
+        self.display_event = self.get_next_event()
+        if self.display_event:
+            start_time = self.display_event['start_time']
             now = datetime.datetime.now(tz=pytz.UTC)
 
             alert_time = now + datetime.timedelta(seconds=self.urgent_seconds)
-            display_event['remaining_time'] = str((start_time - now)).partition('.')[0]
+            self.display_event['remaining_time'] = str((start_time - now)).partition('.')[0]
             urgent = alert_time > start_time
             color = self.get_color(now, start_time)
 
             self.output = {
-                'full_text': self.format.format(**display_event),
+                'full_text': self.format.format(**self.display_event),
                 'color': color,
                 'urgent': urgent
             }
         else:
+            self.display_event = None
             self.output = {
                 'full_text': "",
             }
@@ -141,3 +147,9 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
         v = self.percentage(seconds_to_event, self.urgent_seconds)
         color = self.get_gradient(v, self.colors)
         return color
+
+    def open_calendar(self):
+        if self.display_event:
+            calendar_url = self.display_event.get('htmlLink', None)
+            if calendar_url:
+                user_open(calendar_url)
