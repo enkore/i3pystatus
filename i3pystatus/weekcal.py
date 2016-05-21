@@ -24,7 +24,7 @@ class WeekCal(IntervalModule):
     interval = 30
     prefixformat = "%a"
     suffixformat = "%b %Y"
-    todayhighlight = "[]"
+    todayhighlight = ("[", "]")
 
     def __init__(self, *args, **kwargs):
         IntervalModule.__init__(self, *args, **kwargs)
