@@ -75,7 +75,7 @@ class Spotify(IntervalModule):
 
         # tries to create player object and get data from player
         try:
-            self.player = Playerctl.Player()
+            self.player = Playerctl.Player(player_name="spotify")
 
             response = self.get_info(self.player)
 
