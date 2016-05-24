@@ -40,11 +40,16 @@ class Syncthing(IntervalModule):
     )
 
     def st_get(self, endpoint):
-        response = requests.get(
-            urljoin(self.url, endpoint),
-            verify=self.verify_ssl,
-        )
-        return json.loads(response.text)
+        # TODO: Maybe we can share a session across multiple GETs.
+        with requests.Session() as s:
+            r = s.get(self.url)
+            csrf_name, csfr_value = r.headers['Set-Cookie'].split('=')
+            s.headers.update({'X-' + csrf_name: csfr_value})
+            r = s.get(
+                urljoin(self.url, endpoint),
+                verify=self.verify_ssl,
+            )
+        return json.loads(r.text)
 
     def st_post(self, endpoint, data=None):
         headers = {'X-API-KEY': self.apikey}
