@@ -22,7 +22,7 @@ class GPUMemory(IntervalModule):
         ("warn_percentage", "minimal percentage for warn state"),
         ("alert_percentage", "minimal percentage for alert state"),
         ("color", "standard color"),
-        ("warn_color", "defines the color used wann warn percentage ist exceeded"),
+        ("warn_color", "defines the color used when warn percentage is exceeded"),
         ("alert_color", "defines the color used when alert percentage is exceeded"),
         ("round_size", "defines number of digits in round"),
 
