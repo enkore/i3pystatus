@@ -32,7 +32,7 @@ class MemBar(IntervalModule, ColorRangeModule):
         ("alert_percentage", "minimal percentage for alert state"),
         ("color", "standard color"),
         ("warn_color",
-         "defines the color used wann warn percentage ist exceeded"),
+         "defines the color used when warn percentage is exceeded"),
         ("alert_color",
          "defines the color used when alert percentage is exceeded"),
         ("multi_colors", "whether to use range of colors from 'color' to 'alert_color' based on memory usage."),
