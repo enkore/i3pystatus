@@ -121,7 +121,7 @@ class Weather(IntervalModule):
                     condition = 'Partly Cloudy'
                 else:
                     condition = 'Cloudy'
-            elif 'thunder' in condition_lc:
+            elif 'thunder' in condition_lc or 't-storm' in condition_lc:
                 condition = 'Thunderstorm'
             elif 'snow' in condition_lc:
                 condition = 'Snow'
