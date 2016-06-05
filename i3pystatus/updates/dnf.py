@@ -28,3 +28,10 @@ class Dnf(Backend):
         return update_count, notif_body
 
 Backend = Dnf
+
+if __name__ == "__main__":
+    """
+    Call this module directly; Print the update count and notification body.
+    """
+    dnf = Dnf()
+    print("Updates: {}\n\n{}".format(*dnf.updates))
