@@ -24,7 +24,7 @@ class Dnf(Backend):
         update_count = 0
         if dnf.rc == 100:
             lines = raw.splitlines()[2:]
-            lines = [l for l in lines if len(split("\s{2,}", l.rstrip())) == 3]
+            lines = [l for l in lines if len(split("\s+", l.rstrip())) == 3]
             update_count = len(lines)
         notif_body = sub(r"(\S+)\s+(\S+)\s+\S+\s*\n", r"\1: \2\n", raw)
         return update_count, notif_body
