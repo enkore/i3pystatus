@@ -17,8 +17,10 @@ class Dnf(Backend):
     def updates(self):
         command = ["dnf", "check-update"]
         dnf = run_through_shell(command)
-        raw = dnf.out
+        if dnf.err:
+            return "?", dnf.err
 
+        raw = dnf.out
         update_count = 0
         if dnf.rc == 100:
             lines = raw.splitlines()[2:]
