@@ -1,12 +1,10 @@
-import os
-import shutil
+import re
+import subprocess
+
+from i3pystatus import Module
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import make_vertical_bar, make_bar
 from .pulse import *
-
-from i3pystatus.core.command import execute
-from i3pystatus import Module
-import subprocess
 
 
 class PulseAudio(Module, ColorRangeModule):
@@ -52,6 +50,7 @@ class PulseAudio(Module, ColorRangeModule):
     vertical_bar_width = 2
 
     on_rightclick = "switch_mute"
+    on_doubleleftclick = "change_sink"
     on_leftclick = "pavucontrol"
     on_upscroll = "increase_volume"
     on_downscroll = "decrease_volume"
@@ -79,27 +78,30 @@ class PulseAudio(Module, ColorRangeModule):
         pa_threaded_mainloop_start(_mainloop)
 
         self.colors = self.get_hex_color_range(self.color_muted, self.color_unmuted, 100)
+        self.sinks = []
 
     def request_update(self, context):
         """Requests a sink info update (sink_info_cb is called)"""
         pa_operation_unref(pa_context_get_sink_info_by_name(
-            context, self.sink, self._sink_info_cb, None))
+            context, self.sink.encode(), self._sink_info_cb, None))
 
     def success_cb(self, context, success, userdata):
         pass
 
     @property
     def sink(self):
-        sinks = subprocess.Popen(['pactl', 'list', 'short', 'sinks'], stdout=subprocess.PIPE).stdout.read()
+        self.sinks = subprocess.Popen(['pactl', 'list', 'short', 'sinks'],
+                                      stdout=subprocess.PIPE,
+                                      universal_newlines=True).stdout.read().splitlines()
         bestsink = None
-        state = b'DEFAULT'
-        for sink in sinks.splitlines():
+        state = 'DEFAULT'
+        for sink in self.sinks:
             attribs = sink.split()
             sink_state = attribs[-1]
-            if sink_state == b'RUNNING':
+            if sink_state == 'RUNNING':
                 bestsink = attribs[1]
                 state = 'RUNNING'
-            elif sink_state in (b'IDLE', b'SUSPENDED') and state == b'DEFAULT':
+            elif sink_state in ('IDLE', 'SUSPENDED') and state == 'DEFAULT':
                 bestsink = attribs[1]
         return bestsink
 
@@ -174,6 +176,18 @@ class PulseAudio(Module, ColorRangeModule):
                     db=volume_db,
                     volume_bar=volume_bar),
             }
+
+    def change_sink(self):
+        sink_inputs = subprocess.Popen("pacmd list-sink-inputs".split(),
+                                       stdout=subprocess.PIPE,
+                                       universal_newlines=True).stdout.read()
+        curr_sink = self.sink
+        sinks = list(s.split()[1] for s in self.sinks)
+        next_sink = (sinks.index(curr_sink) + 1) % len(sinks)
+        subprocess.Popen("pacmd set-default-sink {}".format(next_sink).split())
+        for input_index in re.findall('index:\s+(\d+)', sink_inputs):
+            subprocess.Popen("pacmd move-sink-input {} {}".format(input_index, next_sink).split(),
+                             stdout=subprocess.PIPE)
 
     def switch_mute(self):
         subprocess.Popen(['pactl', 'set-sink-mute', self.sink, "toggle"])
