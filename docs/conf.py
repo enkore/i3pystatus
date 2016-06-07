@@ -39,7 +39,8 @@ MOCK_MODULES = [
     "dateutil",
     "httplib2",
     "oauth2client",
-    "apiclient"
+    "apiclient",
+    "googleapiclient.errors"
 
 ]
 
