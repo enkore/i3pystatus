@@ -178,16 +178,18 @@ class PulseAudio(Module, ColorRangeModule):
             }
 
     def change_sink(self):
-        sink_inputs = subprocess.Popen("pacmd list-sink-inputs".split(),
-                                       stdout=subprocess.PIPE,
-                                       universal_newlines=True).stdout.read()
         curr_sink = self.sink
         sinks = list(s.split()[1] for s in self.sinks)
         next_sink = (sinks.index(curr_sink) + 1) % len(sinks)
-        subprocess.Popen("pacmd set-default-sink {}".format(next_sink).split())
+
+        sink_inputs = subprocess.Popen("pacmd list-sink-inputs".split(),
+                                       stdout=subprocess.PIPE,
+                                       universal_newlines=True).stdout.read()
         for input_index in re.findall('index:\s+(\d+)', sink_inputs):
-            subprocess.Popen("pacmd move-sink-input {} {}".format(input_index, next_sink).split(),
+            command = "pacmd move-sink-input {} {}".format(input_index, sinks[next_sink])
+            subprocess.Popen(command.split(),
                              stdout=subprocess.PIPE)
+        subprocess.Popen("pacmd set-default-sink {}".format(sinks[next_sink]).split())
 
     def switch_mute(self):
         subprocess.Popen(['pactl', 'set-sink-mute', self.sink, "toggle"])
