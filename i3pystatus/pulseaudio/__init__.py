@@ -4,6 +4,7 @@ from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import make_vertical_bar, make_bar
 from .pulse import *
 
+from i3pystatus.core.command import execute
 from i3pystatus import Module
 import subprocess
 
@@ -79,9 +80,6 @@ class PulseAudio(Module, ColorRangeModule):
 
         self.colors = self.get_hex_color_range(self.color_muted, self.color_unmuted, 100)
 
-        # Check that we have amixer for toggling mute/unmute and incrementing/decrementing volume
-        self.has_amixer = shutil.which('alsamixer') is not None
-
     def request_update(self, context):
         """Requests a sink info update (sink_info_cb is called)"""
         pa_operation_unref(pa_context_get_sink_info_by_name(
@@ -90,12 +88,24 @@ class PulseAudio(Module, ColorRangeModule):
     def success_cb(self, context, success, userdata):
         pass
 
+    @property
+    def sink(self):
+        sinks = subprocess.Popen(['pactl', 'list', 'short', 'sinks'], stdout=subprocess.PIPE).stdout.read()
+        bestsink = None
+        state = b'DEFAULT'
+        for sink in sinks.splitlines():
+            attribs = sink.split()
+            sink_state = attribs[-1]
+            if sink_state == b'RUNNING':
+                bestsink = attribs[1]
+                state = 'RUNNING'
+            elif sink_state in (b'IDLE', b'SUSPENDED') and state == b'DEFAULT':
+                bestsink = attribs[1]
+        return bestsink
+
     def server_info_cb(self, context, server_info_p, userdata):
         """Retrieves the default sink and calls request_update"""
         server_info = server_info_p.contents
-
-        self.sink = server_info.default_sink_name
-
         self.request_update(context)
 
     def context_notify_cb(self, context, _):
@@ -166,20 +176,10 @@ class PulseAudio(Module, ColorRangeModule):
             }
 
     def switch_mute(self):
-        if self.has_amixer:
-            command = "amixer -q -D pulse sset Master "
-            if self.currently_muted:
-                command += 'unmute'
-            else:
-                command += 'mute'
-            subprocess.Popen(command.split())
+        subprocess.Popen(['pactl', 'set-sink-mute', self.sink, "toggle"])
 
     def increase_volume(self):
-        if self.has_amixer:
-            command = "amixer -q -D pulse sset Master %s%%+" % self.step
-            subprocess.Popen(command.split())
+        subprocess.Popen(['pactl', 'set-sink-volume', self.sink, "+%s%%" % self.step])
 
     def decrease_volume(self):
-        if self.has_amixer:
-            command = "amixer -q -D pulse sset Master %s%%-" % self.step
-            subprocess.Popen(command.split())
+        subprocess.Popen(['pactl', 'set-sink-volume', self.sink, "-%s%%" % self.step])

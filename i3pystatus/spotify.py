@@ -39,6 +39,7 @@ class Spotify(IntervalModule):
     on_leftclick = 'playpause'
     on_rightclick = 'next_song'
     on_upscroll = 'next_song'
+    on_downscroll = 'previous_song'
 
     def get_info(self, player):
         """gets spotify track info from playerctl"""
@@ -74,7 +75,7 @@ class Spotify(IntervalModule):
 
         # tries to create player object and get data from player
         try:
-            self.player = Playerctl.Player()
+            self.player = Playerctl.Player(player_name="spotify")
 
             response = self.get_info(self.player)
 
@@ -86,6 +87,7 @@ class Spotify(IntervalModule):
                 'artist': response.get('artist', ''),
                 'length': response.get('length', 0),
             }
+            self.data = fdict
             self.output = {"full_text": formatp(self.format, **fdict),
                            "color": self.color}
 
@@ -93,6 +95,8 @@ class Spotify(IntervalModule):
         except:
             self.output = {"full_text": self.format_not_running,
                            "color": self.color_not_running}
+            if hasattr(self, "data"):
+                del self.data
 
     def playpause(self):
         """Pauses and plays spotify"""
@@ -101,3 +105,7 @@ class Spotify(IntervalModule):
     def next_song(self):
         """skips to the next song"""
         self.player.next()
+
+    def previous_song(self):
+        """Plays the previous song"""
+        self.player.previous()

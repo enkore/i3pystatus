@@ -1,11 +1,14 @@
-import sys
+import logging
 import os
+import sys
 from threading import Thread
-from i3pystatus.core.exceptions import ConfigError
 
-from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core import io, util
+from i3pystatus.core.exceptions import ConfigError
+from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core.modules import Module
+
+DEFAULT_LOG_FORMAT = '%(asctime)s [%(levelname)-8s][%(name)s %(lineno)d] %(message)s'
 
 
 class CommandEndpoint:
@@ -28,9 +31,19 @@ class CommandEndpoint:
         self.thread.start()
 
     def _command_endpoint(self):
-        for command in self.io_handler_factory().read():
-            target_module = self.modules.get(command["instance"])
-            if target_module and target_module.on_click(command["button"]):
+        for cmd in self.io_handler_factory().read():
+            target_module = self.modules.get(cmd["instance"])
+
+            button = cmd["button"]
+            kwargs = {"button_id": button}
+            try:
+                kwargs.update({"pos_x": cmd["x"],
+                               "pos_y": cmd["y"]})
+            except Exception:
+                continue
+
+            if target_module:
+                target_module.on_click(button, **kwargs)
                 target_module.run()
                 self.io.async_refresh()
 
@@ -39,17 +52,35 @@ class Status:
     """
     The main class used for registering modules and managing I/O
 
-    :param standalone: Whether i3pystatus should read i3status-compatible input from `input_stream`
-    :param interval: Update interval in seconds
+    :param bool standalone: Whether i3pystatus should read i3status-compatible input from `input_stream`.
+    :param int interval: Update interval in seconds.
     :param input_stream: A file-like object that provides the input stream, if `standalone` is False.
-    :param click_events: Enable click events
+    :param bool click_events: Enable click events, if `standalone` is True.
+    :param str logfile: Path to log file that will be used by i3pystatus.
+    :param tuple internet_check: Address of server that will be used to check for internet connection by :py:class:`.internet`.
     """
 
-    def __init__(self, standalone=False, interval=1, input_stream=sys.stdin, click_events=True):
-        self.modules = util.ModuleList(self, ClassFinder(Module))
+    def __init__(self, standalone=True, click_events=True, interval=1,
+                 input_stream=None, logfile=None, internet_check=None,
+                 logformat=DEFAULT_LOG_FORMAT):
         self.standalone = standalone
-        self.click_events = click_events
-        if standalone:
+        self.click_events = standalone and click_events
+        input_stream = input_stream or sys.stdin
+        logger = logging.getLogger("i3pystatus")
+        if logfile:
+            for handler in logger.handlers:
+                logger.removeHandler(handler)
+            handler = logging.FileHandler(logfile, delay=True)
+            logger.addHandler(handler)
+            logger.setLevel(logging.CRITICAL)
+        if logformat:
+            for index in range(len(logger.handlers)):
+                logger.handlers[index].setFormatter(logging.Formatter(logformat))
+        if internet_check:
+            util.internet.address = internet_check
+
+        self.modules = util.ModuleList(self, ClassFinder(Module))
+        if self.standalone:
             self.io = io.StandaloneIO(self.click_events, self.modules, interval)
             if self.click_events:
                 self.command_endpoint = CommandEndpoint(

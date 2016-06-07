@@ -45,6 +45,7 @@ class File(IntervalModule):
         for key, transform in self.transforms.items():
             cdict[key] = transform(cdict)
 
+        self.data = cdict
         self.output = {
             "full_text": self.format.format(**cdict),
             "color": self.color

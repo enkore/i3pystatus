@@ -54,7 +54,7 @@ class Uptime(IntervalModule):
             "secs": seconds,
             "uptime": "{}:{}".format(hours, minutes),
         }
-
+        self.data = fdict
         if self.alert:
             if seconds > self.seconds_alert:
                 self.color = self.color_alert

@@ -3,6 +3,8 @@ import functools
 import re
 import socket
 import string
+import inspect
+from threading import Timer, RLock
 
 
 def lchop(string, prefix):
@@ -335,7 +337,7 @@ def require(predicate):
 
     .. seealso::
 
-        :py:func:`internet`
+        :py:class:`internet`
 
     """
 
@@ -351,18 +353,28 @@ def require(predicate):
     return decorator
 
 
-def internet():
+class internet:
     """
-    Checks for a internet connection by connecting to a Google DNS
-    server.
+    Checks for internet connection by connecting to a server.
 
-    :returns: True if internet connection is available
+    Used server is determined by the `address` class variable which consists of
+    server host name and port number.
+
+    :rtype: bool
+
+    .. seealso::
+
+        :py:func:`require`
+
     """
-    try:
-        socket.create_connection(("google-public-dns-a.google.com", 53), 1).close()
-        return True
-    except OSError:
-        return False
+    address = ("google-public-dns-a.google.com", 53)
+
+    def __new__(cls):
+        try:
+            socket.create_connection(cls.address, 1).close()
+            return True
+        except OSError:
+            return False
 
 
 def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
@@ -489,3 +501,90 @@ def user_open(url_or_command):
     else:
         import subprocess
         subprocess.Popen(url_or_command, shell=True)
+
+
+class MultiClickHandler(object):
+    def __init__(self, callback_handler, timeout):
+        self.callback_handler = callback_handler
+        self.timeout = timeout
+
+        self.lock = RLock()
+
+        self._timer_id = 0
+        self.timer = None
+        self.button = None
+        self.cb = None
+        self.kwargs = None
+
+    def set_timer(self, button, cb, **kwargs):
+        with self.lock:
+            self.clear_timer()
+
+            self.timer = Timer(self.timeout,
+                               self._timer_function,
+                               args=[self._timer_id])
+            self.button = button
+            self.cb = cb
+            self.kwargs = kwargs
+
+            self.timer.start()
+
+    def clear_timer(self):
+        with self.lock:
+            if self.timer is None:
+                return
+
+            self._timer_id += 1  # Invalidate existent timer
+
+            self.timer.cancel()  # Cancel the existent timer
+
+            self.timer = None
+            self.button = None
+            self.cb = None
+
+    def _timer_function(self, timer_id):
+        with self.lock:
+            if self._timer_id != timer_id:
+                return
+            self.callback_handler(self.button, self.cb, **self.kwargs)
+            self.clear_timer()
+
+    def check_double(self, button):
+        if self.timer is None:
+            return False
+
+        ret = True
+        if button != self.button:
+            self.callback_handler(self.button, self.cb, **self.kwargs)
+            ret = False
+
+        self.clear_timer()
+        return ret
+
+
+def get_module(function):
+    """Function decorator for retrieving the ``self`` argument from the stack.
+
+    Intended for use with callbacks that need access to a modules variables, for example:
+
+    .. code:: python
+
+        from i3pystatus import Status, get_module
+        from i3pystatus.core.command import execute
+        status = Status(...)
+        # other modules etc.
+        @get_module
+        def display_ip_verbose(module):
+            execute('sh -c "ip addr show dev {dev} | xmessage -file -"'.format(dev=module.interface))
+        status.register("network", interface="wlan1", on_leftclick=display_ip_verbose)
+    """
+    @functools.wraps(function)
+    def call_wrapper(*args, **kwargs):
+        stack = inspect.stack()
+        caller_frame_info = stack[1]
+        self = caller_frame_info[0].f_locals["self"]
+        # not completly sure whether this is necessary
+        # see note in Python docs about stack frames
+        del stack
+        function(self, *args, **kwargs)
+    return call_wrapper

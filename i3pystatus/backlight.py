@@ -41,12 +41,24 @@ class Backlight(File):
     def init(self):
         self.base_path = self.base_path.format(backlight=self.backlight)
         self.has_xbacklight = shutil.which("xbacklight") is not None
+
+        # xbacklight expects a percentage as parameter. Calculate the percentage
+        # for one step (if smaller xbacklight doesn't increases the brightness)
+        if self.has_xbacklight:
+            parsefunc = self.components['max_brightness'][0]
+            maxbfile = self.components['max_brightness'][1]
+            with open(self.base_path + maxbfile, "r") as f:
+                max_steps = parsefunc(f.read().strip())
+                if max_steps:
+                    self.step_size = 100 // max_steps + 1
+                else:
+                    self.step_size = 5  # default?
         super().init()
 
     def lighter(self):
         if self.has_xbacklight:
-            run_through_shell(["xbacklight", "+5"])
+            run_through_shell(["xbacklight", "-inc", str(self.step_size)])
 
     def darker(self):
         if self.has_xbacklight:
-            run_through_shell(["xbacklight", "-5"])
+            run_through_shell(["xbacklight", "-dec", str(self.step_size)])

@@ -69,7 +69,15 @@ class NowPlaying(IntervalModule):
     old_player = None
 
     def find_player(self):
-        players = [a for a in dbus.SessionBus().get_object("org.freedesktop.DBus", "/org/freedesktop/DBus").ListNames() if a.startswith("org.mpris.MediaPlayer2.")]
+        obj = dbus.SessionBus().get_object("org.freedesktop.DBus", "/org/freedesktop/DBus")
+
+        def get_players(methodname):
+            method = obj.get_dbus_method(methodname, 'org.freedesktop.DBus')
+            return [a for a in method() if a.startswith("org.mpris.MediaPlayer2.")]
+
+        players = get_players('ListNames')
+        if not players:
+            players = get_players('ListActivatableNames')
         if self.old_player in players:
             return self.old_player
         if not players:
@@ -92,14 +100,20 @@ class NowPlaying(IntervalModule):
         try:
             player = self.get_player()
             properties = dbus.Interface(player, "org.freedesktop.DBus.Properties")
-            get_prop = functools.partial(properties.Get, "org.mpris.MediaPlayer2.Player")
+
+            def get_prop(name, default=None):
+                try:
+                    return properties.Get("org.mpris.MediaPlayer2.Player", name)
+                except dbus.exceptions.DBusException:
+                    return default
+
             currentsong = get_prop("Metadata")
 
             fdict = {
                 "status": self.status[self.statusmap[get_prop("PlaybackStatus")]],
                 "len": 0,  # TODO: Use optional(!) TrackList interface for this to gain 100 % mpd<->now_playing compat
                 "pos": 0,
-                "volume": int(get_prop("Volume") * 100),
+                "volume": int(get_prop("Volume", 0) * 100),
 
                 "title": currentsong.get("xesam:title", ""),
                 "album": currentsong.get("xesam:album", ""),
@@ -113,6 +127,7 @@ class NowPlaying(IntervalModule):
                 fdict["filename"] = '.'.join(
                     basename((currentsong.get("xesam:url") or "")).split('.')[:-1])
 
+            self.data = fdict
             self.output = {
                 "full_text": formatp(self.format, **fdict).strip(),
                 "color": self.color,
@@ -126,6 +141,8 @@ class NowPlaying(IntervalModule):
                     "full_text": self.format_no_player,
                     "color": self.color_no_player,
                 }
+            if hasattr(self, "data"):
+                del self.data
             return
 
         except dbus.exceptions.DBusException as e:
@@ -136,6 +153,8 @@ class NowPlaying(IntervalModule):
                     "full_text": "DBus error: " + e.get_dbus_message(),
                     "color": "#ff0000",
                 }
+            if hasattr(self, "data"):
+                del self.data
             return
 
     def playpause(self):

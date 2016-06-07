@@ -34,7 +34,7 @@ class Mem(IntervalModule):
         ("alert_percentage", "minimal percentage for alert state"),
         ("color", "standard color"),
         ("warn_color",
-         "defines the color used wann warn percentage ist exceeded"),
+         "defines the color used when warn percentage is exceeded"),
         ("alert_color",
          "defines the color used when alert percentage is exceeded"),
         ("round_size", "defines number of digits in round"),
@@ -61,6 +61,7 @@ class Mem(IntervalModule):
         }
         round_dict(cdict, self.round_size)
 
+        self.data = cdict
         self.output = {
             "full_text": self.format.format(**cdict),
             "color": color
