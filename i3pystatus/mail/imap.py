@@ -54,9 +54,14 @@ class IMAP(Backend):
 
     @property
     def unread(self):
-        conn = self.get_connection()
-        self.last = len(conn.search(None, "UnSeen")[1][0].split())
-        return self.last
+        try:
+            conn = self.get_connection()
+        except socket.gaierror:
+            pass
+        else:
+            self.last = len(conn.search(None, "UnSeen")[1][0].split())
+        finally:
+            return self.last
 
 
 Backend = IMAP
