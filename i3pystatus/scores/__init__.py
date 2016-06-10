@@ -45,11 +45,29 @@ class ScoresBackend(SettingsBase):
         try:
             with urlopen(url) as content:
                 try:
+                    if content.url != url:
+                        self.logger.debug('Request to %s was redirected to %s',
+                                          url, content.url)
                     content_type = dict(content.getheaders())['Content-Type']
+                    mime_type = content_type.split(';')[0].lower()
+                    if 'json' not in mime_type:
+                        self.logger.debug('Response from %s is not JSON',
+                                          content.url)
+                        return {}
                     charset = re.search(r'charset=(.*)', content_type).group(1)
                 except AttributeError:
                     charset = 'utf-8'
-                response = json.loads(content.read().decode(charset))
+                response_json = content.read().decode(charset).strip()
+                if not response_json:
+                    self.logger.debug('JSON response from %s was blank', url)
+                    return {}
+                try:
+                    response = json.loads(response_json)
+                except json.decoder.JSONDecodeError as exc:
+                    self.logger.error('Error loading JSON: %s', exc)
+                    self.logger.debug('JSON text that failed to load: %s',
+                                      response_json)
+                    return {}
                 self.logger.log(5, 'API response: %s', response)
                 return response
         except HTTPError as exc:
