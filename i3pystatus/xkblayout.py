@@ -16,9 +16,11 @@ class Xkblayout(IntervalModule):
 
     interval = 1
     format = u"\u2328 {name}"
+    uppercase = True
     settings = (
         ("format", "Format string"),
         ("layouts", "List of layouts"),
+        ("uppercase", "Flag for uppercase output"),
     )
     layouts = []
     on_leftclick = "change_layout"
@@ -26,8 +28,12 @@ class Xkblayout(IntervalModule):
     def run(self):
         kblayout = self.kblayout()
 
+        full_text = self.format.format(name=kblayout);
+        if self.uppercase:
+            full_text = full_text.upper()
+
         self.output = {
-            "full_text": self.format.format(name=kblayout).upper(),
+            "full_text": full_text,
             "color": "#ffffff"
         }
 
