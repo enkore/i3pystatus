@@ -17,6 +17,7 @@ class Xkblayout(IntervalModule):
     interval = 1
     format = u"\u2328 {name}"
     settings = (
+        ("format", "Format string"),
         ("layouts", "List of layouts"),
     )
     layouts = []
