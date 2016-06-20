@@ -28,7 +28,7 @@ class Xkblayout(IntervalModule):
     def run(self):
         kblayout = self.kblayout()
 
-        full_text = self.format.format(name=kblayout);
+        full_text = self.format.format(name=kblayout)
         if self.uppercase:
             full_text = full_text.upper()
 
