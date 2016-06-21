@@ -13,6 +13,12 @@ class Cower(Backend):
     def updates(self):
         command = ["cower", "-u"]
         cower = run_through_shell(command)
-        return cower.out.count('\n')
+        return cower.out.count('\n'), cower.out
 
 Backend = Cower
+
+if __name__ == "__main__":
+    """
+    Call this module directly; Print the update count and notification body.
+    """
+    print("Updates: {}\n\n{}".format(*Backend().updates))

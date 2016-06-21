@@ -25,8 +25,15 @@ class Yaourt(Backend):
     def updates(self):
         command = ["yaourt", "-Qua"]
         checkupdates = run_through_shell(command)
+        out = checkupdates.out
         if(self.aur_only):
-            return len(re.findall("^aur/", checkupdates.out, flags=re.M))
-        return checkupdates.out.count("\n")
+            out = [line for line in out if line.startswith("aur")]
+        return out.count("\n"), out
 
 Backend = Yaourt
+
+if __name__ == "__main__":
+    """
+    Call this module directly; Print the update count and notification body.
+    """
+    print("Updates: {}\n\n{}".format(*Backend().updates))

@@ -35,5 +35,4 @@ if __name__ == "__main__":
     """
     Call this module directly; Print the update count and notification body.
     """
-    dnf = Dnf()
-    print("Updates: {}\n\n{}".format(*dnf.updates))
+    print("Updates: {}\n\n{}".format(*Backend().updates))
