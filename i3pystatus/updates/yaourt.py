@@ -1,4 +1,3 @@
-import re
 from i3pystatus.core.command import run_through_shell
 from i3pystatus.updates import Backend
 
@@ -6,16 +5,22 @@ from i3pystatus.updates import Backend
 class Yaourt(Backend):
     """
     This module counts the available updates using yaourt.
-    By default it will only count aur packages. Thus it can be used with the pacman backend like this:
+    By default it will only count aur packages. Thus it can be used with the
+    pacman backend like this:
 
-    from i3pystatus.updates import pacman, yaourt
-    status.register("updates", backends = [pacman.Pacman(), yaourt.Yaourt()])
+    .. code-block:: python
 
-    If you want to count both pacman and aur packages with this module you can set the variable
-    count_only_aur = False like this:
+        from i3pystatus.updates import pacman, yaourt
+        status.register("updates", backends = \
+[pacman.Pacman(), yaourt.Yaourt()])
 
-    from i3pystatus.updates import yaourt
-    status.register("updates", backends = [yaourt.Yaourt(False)])
+    If you want to count both pacman and aur packages with this module you can
+    set the variable count_only_aur = False like this:
+
+    .. code-block:: python
+
+        from i3pystatus.updates import yaourt
+        status.register("updates", backends = [yaourt.Yaourt(False)])
     """
 
     def __init__(self, aur_only=True):
