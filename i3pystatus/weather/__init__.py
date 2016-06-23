@@ -89,7 +89,7 @@ class Weather(IntervalModule):
         'Cloudy': (u'\u2601', '#f8f8ff'),
         'Partly Cloudy': (u'\u2601', '#f8f8ff'),  # \u26c5 is not in many fonts
         'Rainy': (u'\u26c8', '#cbd2c0'),
-        'Thunderstorm': (u'\u26c8', '#cbd2c0'),
+        'Thunderstorm': (u'\u26a1', '#cbd2c0'),
         'Sunny': (u'\u2600', '#ffff00'),
         'Snow': (u'\u2603', '#ffffff'),
         'default': ('', None),
