@@ -23,10 +23,14 @@ class AptGet(Backend):
         command = "apt-get upgrade -s -o Dir::State::Lists=" + cache_dir
         apt = run_through_shell(command.split())
 
-        update_count = 0
-        for line in apt.out.split("\n"):
-            if line.startswith("Inst"):
-                update_count += 1
-        return update_count
+        out = apt.out.splitlines()
+        out = [line[5:] for line in apt.out if line.startswith("Inst ")]
+        return out.count("\n"), out
 
 Backend = AptGet
+
+if __name__ == "__main__":
+    """
+    Call this module directly; Print the update count and notification body.
+    """
+    print("Updates: {}\n\n{}".format(*Backend().updates))
