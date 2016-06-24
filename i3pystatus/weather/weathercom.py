@@ -1,4 +1,3 @@
-from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require
 from i3pystatus.weather import Backend
 
@@ -7,7 +6,8 @@ from urllib.request import urlopen
 import re
 import xml.etree.ElementTree as ElementTree
 
-WEATHER_COM_URL = 'http://wxdata.weather.com/wxdata/weather/local/%s?unit=%s&dayf=1&cc=*'
+WEATHER_COM_URL = \
+    'http://wxdata.weather.com/wxdata/weather/local/%s?unit=%s&dayf=1&cc=*'
 ON_LEFTCLICK_URL = 'https://weather.com/weather/today/l/%s'
 
 
@@ -31,7 +31,8 @@ class Weathercom(Backend):
 
         status.register(
             'weather',
-            format='{condition} {current_temp}{temp_unit}{icon}[ Hi: {high_temp}] Lo: {low_temp}',
+            format='{condition} {current_temp}{temp_unit}{icon}\
+[ Hi: {high_temp}] Lo: {low_temp}',
             colorize=True,
             backend=weathercom.Weathercom(
                 location_code='94107:4:US',
