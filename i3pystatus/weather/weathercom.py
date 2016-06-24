@@ -86,11 +86,11 @@ class Weathercom(Backend):
         # space, hence the use of rpartition). International timezones (or ones
         # outside the system locale) don't seem to be handled well by
         # datetime.datetime.strptime().
-        observation_time_str = doc.findtext('cc/lsup').rpartition(' ')[0]
         try:
+            observation_time_str = doc.findtext('cc/lsup').rpartition(' ')[0]
             observation_time = datetime.strptime(observation_time_str,
                                                  '%m/%d/%y %I:%M %p')
-        except ValueError:
+        except (ValueError, AttributeError):
             observation_time = datetime.fromtimestamp(0)
 
         pressure_trend_str = doc.findtext('cc/bar/d').lower()
