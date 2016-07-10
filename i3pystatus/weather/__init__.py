@@ -85,10 +85,11 @@ class Weather(IntervalModule):
     colorize = False
     color_icons = {
         'Fair': (u'\u263c', '#ffcc00'),
+        'Fog': (u'', '#949494'),
         'Cloudy': (u'\u2601', '#f8f8ff'),
         'Partly Cloudy': (u'\u2601', '#f8f8ff'),  # \u26c5 is not in many fonts
         'Rainy': (u'\u26c8', '#cbd2c0'),
-        'Thunderstorm': (u'\u03de', '#cbd2c0'),
+        'Thunderstorm': (u'\u26a1', '#cbd2c0'),
         'Sunny': (u'\u2600', '#ffff00'),
         'Snow': (u'\u2603', '#ffffff'),
         'default': ('', None),
@@ -131,6 +132,8 @@ class Weather(IntervalModule):
                 condition = 'Sunny'
             elif 'clear' in condition_lc or 'fair' in condition_lc:
                 condition = 'Fair'
+            elif 'fog' in condition_lc:
+                condition = 'Fog'
 
         return self.color_icons['default'] \
             if condition not in self.color_icons \
