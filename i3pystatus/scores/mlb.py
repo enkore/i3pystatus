@@ -191,6 +191,12 @@ class MLB(ScoresBackend):
         game_list = self.get_nested(self.api_request(url),
                                     'data:games:game',
                                     default=[])
+        if not isinstance(game_list, list):
+            # When only one game is taking place during a given day, the game
+            # data is just a single dict containing that game's data, rather
+            # than a list of dicts. Encapsulate the single game dict in a list
+            # to make it process correctly in the loop below.
+            game_list = [game_list]
 
         # Convert list of games to dictionary for easy reference later on
         data = {}
@@ -198,7 +204,7 @@ class MLB(ScoresBackend):
         for game in game_list:
             try:
                 id_ = game['id']
-            except KeyError:
+            except (KeyError, TypeError):
                 continue
 
             try:
