@@ -123,6 +123,16 @@ Also change your i3wm config to the following:
 .. note:: Don't name your config file ``i3pystatus.py``, as it would
     make ``i3pystatus`` un-importable and lead to errors.
 
+Another way to launch your configuration file is to use ``i3pystatus`` script
+from installation:
+
+.. code:: bash
+
+    i3pystatus -c ~/.path/to/your/config/file.py
+
+If no arguments were provided, ``i3pystatus`` script works as an example of
+``Clock`` module.
+
 .. _credentials:
 
 Credentials
