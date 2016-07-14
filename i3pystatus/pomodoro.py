@@ -1,10 +1,11 @@
-import os
 import subprocess
-import locale
-
 from datetime import datetime, timedelta
-
 from i3pystatus import IntervalModule
+
+
+STOPPED = 0
+RUNNING = 1
+BREAK = 2
 
 
 class Pomodoro(IntervalModule):
@@ -45,59 +46,57 @@ class Pomodoro(IntervalModule):
 
     def init(self):
         # state could be either running/break or stopped
-        self.state = 'stopped'
-        self.breaks = 0
+        self.state = STOPPED
+        self.current_pomodoro = 0
+        self.total_pomodoro = self.short_break_count + 1  # and 1 long break
         self.time = None
 
     def run(self):
-        if self.time and datetime.now() >= self.time:
-            if self.state == 'running':
-                self.state = 'break'
-                if self.breaks == self.short_break_count:
-                    self.time = datetime.now() + \
+        if self.time and datetime.utcnow() >= self.time:
+            if self.state == RUNNING:
+                self.state = BREAK
+                if self.current_pomodoro == self.short_break_count:
+                    self.time = datetime.utcnow() + \
                         timedelta(seconds=self.long_break_duration)
-                    self.breaks = 0
                 else:
-                    self.time = datetime.now() + \
+                    self.time = datetime.utcnow() + \
                         timedelta(seconds=self.break_duration)
-                    self.breaks += 1
                 text = 'Go for a break!'
             else:
-                self.state = 'running'
-                self.time = datetime.now() + \
+                self.state = RUNNING
+                self.time = datetime.utcnow() + \
                     timedelta(seconds=self.pomodoro_duration)
                 text = 'Back to work!'
+                self.current_pomodoro = (self.current_pomodoro + 1) % self.total_pomodoro
             self._alarm(text)
 
-        if self.state == 'running' or self.state == 'break':
-            min, sec = divmod((self.time - datetime.now()).total_seconds(), 60)
+        if self.state == RUNNING or self.state == BREAK:
+            min, sec = divmod((self.time - datetime.utcnow()).total_seconds(), 60)
             text = '{:02}:{:02}'.format(int(min), int(sec))
-            color = self.color_running if self.state == 'running' else self.color_break
-        else:
-            self.output = {
-                'full_text': 'Stopped',
-                'color': self.color_stopped
+            sdict = {
+                'time': text,
+                'current_pomodoro': self.current_pomodoro + 1,
+                'total_pomodoro': self.total_pomodoro
             }
-            return
 
-        sdict = {
-            'time': text,
-            'current_pomodoro': self.breaks,
-            'total_pomodoro': self.short_break_count + 1,
-        }
-        self.data = sdict
+            color = self.color_running if self.state == RUNNING else self.color_break
+            text = self.format.format(**sdict)
+        else:
+            text = 'Start pomodoro',
+            color = self.color_stopped
+
         self.output = {
-            'full_text': self.format.format(**sdict),
+            'full_text': text,
             'color': color
         }
 
     def start(self):
-        self.state = 'running'
-        self.time = datetime.now() + timedelta(seconds=self.pomodoro_duration)
-        self.breaks = 0
+        self.state = RUNNING
+        self.time = datetime.utcnow() + timedelta(seconds=self.pomodoro_duration)
+        self.current_pomodoro = 0
 
     def stop(self):
-        self.state = 'stopped'
+        self.state = STOPPED
         self.time = None
 
     def _alarm(self, text):
@@ -106,4 +105,5 @@ class Pomodoro(IntervalModule):
                          text])
         subprocess.Popen(['aplay',
                           self.sound,
-                          '-q'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                          '-q'],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
