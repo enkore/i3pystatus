@@ -76,7 +76,7 @@ class ScoresBackend(SettingsBase):
                 exc.code, exc.reason, exc.url,
             )
             return {}
-        except URLError as exc:
+        except (ConnectionResetError, URLError) as exc:
             self.logger.critical('Error making request to %s: %s', url, exc)
             return {}
 
