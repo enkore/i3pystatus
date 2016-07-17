@@ -177,6 +177,8 @@ class PulseAudio(Module, ColorRangeModule):
                     volume_bar=volume_bar),
             }
 
+            self.send_output()
+
     def change_sink(self):
         curr_sink = self.sink
         sinks = list(s.split()[1] for s in self.sinks)
