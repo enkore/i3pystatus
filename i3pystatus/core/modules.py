@@ -88,6 +88,10 @@ class Module(SettingsBase):
     def run(self):
         pass
 
+    def send_output(self):
+        """Send a status update with the current module output"""
+        self.__status_handler.io.async_refresh()
+
     def __log_button_event(self, button, cb, args, action, **kwargs):
         msg = "{}: button={}, cb='{}', args={}, kwargs={}, type='{}'".format(
             self.__name__, button, cb, args, kwargs, action)
