@@ -269,7 +269,7 @@ class MLB(ScoresBackend):
             ret['delay'] = game.get('reason', 'Unknown')
         elif ret['status'] == 'postponed':
             ret['postponed'] = game.get('reason', 'Unknown Reason')
-        elif ret['status'] == 'game_over':
+        elif ret['status'] in ('game_over', 'completed_early'):
             ret['status'] = 'final'
         elif ret['status'] not in ('in_progress', 'final'):
             ret['status'] = 'pregame'
@@ -277,7 +277,7 @@ class MLB(ScoresBackend):
         try:
             inning = game.get('inning', '0')
             ret['extra_innings'] = inning \
-                if ret['status'] == 'final' and int(inning) > 9 \
+                if ret['status'] == 'final' and int(inning) != 9 \
                 else ''
         except ValueError:
             ret['extra_innings'] = ''
