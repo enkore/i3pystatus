@@ -7,8 +7,15 @@ from i3pystatus.core.util import user_open, internet, require
 
 class Github(IntervalModule):
     """
-    Check Github for pending notifications.
+    Check GitHub for pending notifications.
     Requires `requests`
+
+    Availables authentication methods:
+
+    * username + password
+    * access_token (manually generate a new token at https://github.com/settings/tokens)
+
+    See https://developer.github.com/v3/#authentication for more informations.
 
     Formatters:
 
@@ -22,6 +29,7 @@ class Github(IntervalModule):
     color = '#78EAF2'
     username = ''
     password = ''
+    access_token = ''
     format = '{unread}'
     interval = 600
     keyring_backend = None
@@ -34,6 +42,7 @@ class Github(IntervalModule):
         ('unread_marker', 'sets the string that the "unread" formatter shows when there are pending notifications'),
         ("username", ""),
         ("password", ""),
+        ("access_token", "see https://developer.github.com/v3/#authentication"),
         ("color", "")
     )
 
@@ -44,7 +53,10 @@ class Github(IntervalModule):
     def run(self):
         format_values = dict(unread_count='', unread='')
 
-        response = requests.get('https://api.github.com/notifications', auth=(self.username, self.password))
+        if self.access_token:
+            response = requests.get('https://api.github.com/notifications?access_token=' + self.access_token)
+        else:
+            response = requests.get('https://api.github.com/notifications', auth=(self.username, self.password))
         data = json.loads(response.text)
 
         # Bad credentials
