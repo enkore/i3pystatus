@@ -22,6 +22,7 @@ class Github(IntervalModule):
     color = '#78EAF2'
     username = ''
     password = ''
+    access_token = ''
     format = '{unread}'
     interval = 600
     keyring_backend = None
@@ -34,6 +35,7 @@ class Github(IntervalModule):
         ('unread_marker', 'sets the string that the "unread" formatter shows when there are pending notifications'),
         ("username", ""),
         ("password", ""),
+        ("access_token", ""),
         ("color", "")
     )
 
@@ -44,7 +46,10 @@ class Github(IntervalModule):
     def run(self):
         format_values = dict(unread_count='', unread='')
 
-        response = requests.get('https://api.github.com/notifications', auth=(self.username, self.password))
+        if self.access_token:
+            response = requests.get('https://api.github.com/notifications?access_token=' + self.access_token)
+        else:
+            response = requests.get('https://api.github.com/notifications', auth=(self.username, self.password))
         data = json.loads(response.text)
 
         # Bad credentials
