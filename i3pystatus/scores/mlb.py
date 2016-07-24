@@ -177,7 +177,7 @@ class MLB(ScoresBackend):
     format_in_progress = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score}, [{home_favorite} ]{home_abbrev} {home_score} ({top_bottom} {inning}, {outs} Out)[ ({delay} Delay)]'
     format_final = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Final[/{extra_innings}])'
     format_postponed = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) (PPD: {postponed})'
-    format_suspended = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) (Suspended: {suspended})'
+    format_suspended = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Suspended: {suspended})'
     inning_top = 'Top'
     inning_bottom = 'Bot'
     team_colors = _default_colors
