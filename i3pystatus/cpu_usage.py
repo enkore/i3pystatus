@@ -109,14 +109,14 @@ class CpuUsage(IntervalModule):
 
             usage['usage_' + cpu] = cpu_usage
 
+        # for backward compatibility
+        usage['usage'] = usage['usage_cpu']
+
         return usage
 
     def run(self):
         usage = self.get_usage()
         usage['usage_all'] = self.gen_format_all(usage)
-
-        # for backward compatibility
-        usage['usage'] = usage['usage_cpu']
 
         self.data = usage
         self.output = {
