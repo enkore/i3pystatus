@@ -27,7 +27,15 @@ title is empty)
     * `{bitrate}` — (Current bitrate in kilobit/s)
     * `{volume}` — (Volume set in MPD)
 
-    Left click on the module play/pauses, right click (un)mutes.
+    .. rubric:: Available callbacks
+
+    * ``switch_playpause`` — Plays if paused or stopped, otherwise pauses. \
+Emulates ``mpc toggle``.
+    * ``stop`` — Stops playback. Emulates ``mpc stop``.
+    * ``next_song`` — Goes to next track in the playlist. Emulates ``mpc \
+next``.
+    * ``previous_song`` — Goes to previous track in the playlist. Emulates \
+``mpc prev``.
     """
 
     interval = 1
