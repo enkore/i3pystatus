@@ -539,3 +539,30 @@ then you can refresh the bar by using the following command:
         pkill -SIGUSR1 -f "python /home/user/.config/i3/pystatus.py"
 
 Note that the path must be expanded if using '~'.
+
+.. _internet:
+
+Internet Connectivity
+---------------------
+
+Module methods that ``@require(internet)`` won't be run unless a test TCP
+connection is successful. By default, this is made to Google's DNS server, but
+you can customize the host and port. See :py:class:`.internet`.
+
+If you are behind a gateway that redirects web traffic to an authorization page
+and blocks other traffic, the DNS check will return a false positive. This is
+often encountered in open WiFi networks. In these cases it is helpful to try a
+service that is not traditionally required for web browsing:
+
+.. code:: python
+
+  from i3pystatus import Status
+
+  status = Status(check_internet=("whois.arin.net", 43))
+
+.. code:: python
+
+  from i3pystatus import Status
+
+  status = Status(check_internet=("github.com", 22))
+
