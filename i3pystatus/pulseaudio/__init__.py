@@ -90,9 +90,8 @@ class PulseAudio(Module, ColorRangeModule):
 
     @property
     def sink(self):
-        self.sinks = subprocess.Popen(['pactl', 'list', 'short', 'sinks'],
-                                      stdout=subprocess.PIPE,
-                                      universal_newlines=True).stdout.read().splitlines()
+        self.sinks = subprocess.check_output(['pactl', 'list', 'short', 'sinks'],
+                                             universal_newlines=True).splitlines()
         bestsink = None
         state = 'DEFAULT'
         for sink in self.sinks:
@@ -184,20 +183,18 @@ class PulseAudio(Module, ColorRangeModule):
         sinks = list(s.split()[1] for s in self.sinks)
         next_sink = (sinks.index(curr_sink) + 1) % len(sinks)
 
-        sink_inputs = subprocess.Popen("pacmd list-sink-inputs".split(),
-                                       stdout=subprocess.PIPE,
-                                       universal_newlines=True).stdout.read()
+        sink_inputs = subprocess.check_output("pacmd list-sink-inputs".split(),
+                                              universal_newlines=True)
         for input_index in re.findall('index:\s+(\d+)', sink_inputs):
             command = "pacmd move-sink-input {} {}".format(input_index, sinks[next_sink])
-            subprocess.Popen(command.split(),
-                             stdout=subprocess.PIPE)
-        subprocess.Popen("pacmd set-default-sink {}".format(sinks[next_sink]).split())
+            subprocess.call(command.split())
+        subprocess.call("pacmd set-default-sink {}".format(sinks[next_sink]).split())
 
     def switch_mute(self):
-        subprocess.Popen(['pactl', 'set-sink-mute', self.sink, "toggle"])
+        subprocess.call(['pactl', 'set-sink-mute', self.sink, "toggle"])
 
     def increase_volume(self):
-        subprocess.Popen(['pactl', 'set-sink-volume', self.sink, "+%s%%" % self.step])
+        subprocess.call(['pactl', 'set-sink-volume', self.sink, "+%s%%" % self.step])
 
     def decrease_volume(self):
-        subprocess.Popen(['pactl', 'set-sink-volume', self.sink, "-%s%%" % self.step])
+        subprocess.call(['pactl', 'set-sink-volume', self.sink, "-%s%%" % self.step])
