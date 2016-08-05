@@ -42,7 +42,7 @@ class WindowTitle(Module):
         self.output = {
             "full_text": self.title,
             "color": self.color,
-            }
+        }
 
         # we are listening to i3 events in a separate thread
         t = Thread(target=self._loop)
@@ -57,8 +57,7 @@ class WindowTitle(Module):
         # don't show window title when the window already has means
         # to display it
         if not self.always_show and (
-            w.border == "normal" or
-            w.type == "workspace"
+                            w.border == "normal" or w.type == "workspace" 
                 or (p.layout in ("stacked", "tabbed") and len(p.nodes) > 1)):
             return self.empty_title
         else:
