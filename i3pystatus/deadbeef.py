@@ -53,7 +53,7 @@ class DeaDBeeF(IntervalModule):
     format_stopped = "STOPPED"
     interval = 1
     status = {
-        'paused': "⠿",
+        'paused': '▷',
         'playing': '▶',
         'stopped': '◾',
     }
@@ -94,8 +94,7 @@ class DeaDBeeF(IntervalModule):
     def run(self):
         try:
             parts = self.get_info()
-            artist, title, album, length, elapsed,\
-             bitrate, codec, isplaying, ispaused = parts
+            artist, title, album, length, elapsed, bitrate, codec, isplaying, ispaused = parts
 
             db_status = 'stopped'
             if isplaying == '1' and ispaused == '':
