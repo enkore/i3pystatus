@@ -90,6 +90,7 @@ class MPD(IntervalModule):
     def run(self):
         try:
             status = self._mpd_command(self.s, "status")
+            playback_state = status["state"]
             currentsong = self._mpd_command(self.s, "currentsong")
         except Exception:
             if self.hide_inactive:
@@ -103,7 +104,7 @@ class MPD(IntervalModule):
         fdict = {
             "pos": int(status.get("song", 0)) + 1,
             "len": int(status.get("playlistlength", 0)),
-            "status": self.status[status["state"]],
+            "status": self.status[playback_state],
             "volume": int(status.get("volume", 0)),
 
             "title": currentsong.get("Title", ""),
