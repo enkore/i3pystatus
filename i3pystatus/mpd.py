@@ -149,6 +149,12 @@ class MPD(IntervalModule):
         except Exception as e:
             pass
 
+    def stop(self):
+        try:
+            self._mpd_command(self.s, "stop")
+        except Exception as e:
+            pass
+
     def next_song(self):
         try:
             self._mpd_command(self.s, "next")
