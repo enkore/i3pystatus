@@ -231,15 +231,8 @@ class NetworkTraffic:
 class Network(IntervalModule, ColorRangeModule):
     """
     Displays network information for an interface.
-
     formatp support
-
     if u wanna display recv/send speed separate in dynamic color mode, please enable pango hint.
-
-    status.register(
-        "network",
-        hints={"markup": "pango"},
-    )
 
     Requires the PyPI packages `colour`, `netifaces`, `psutil` (optional, see below)
     and `basiciw` (optional, see below).
@@ -276,6 +269,7 @@ class Network(IntervalModule, ColorRangeModule):
     * `{rx_tot_Mbytes}` — total Mbytes received
     * `{tx_tot_Mbytes}` — total Mbytes sent
     """
+
     settings = (
         ("format_up", "format string"),
         ("format_down", "format string"),

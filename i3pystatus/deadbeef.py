@@ -22,6 +22,7 @@ class DeaDBeeF(IntervalModule):
     Requires the `DeaDBeeF` player.
 
     .. rubric:: Available formatters
+
     * `{status}` —  player status
     * `{album}` —  album
     * `{artist}` —  artist
