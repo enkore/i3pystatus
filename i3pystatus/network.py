@@ -396,7 +396,7 @@ class Network(IntervalModule, ColorRangeModule):
                 c_recv = self.get_gradient(int(per_recv * 100), self.colors, 100)
                 c_sent = self.get_gradient(int(per_sent * 100), self.colors, 100)
                 format_values["bytes_recv"] = color_template.format(c_recv, network_usage["bytes_recv"])
-                format_values["bytes_recv"] = color_template.format(c_sent, network_usage["bytes_sent"])
+                format_values["bytes_sent"] = color_template.format(c_sent, network_usage["bytes_sent"])
                 if self.graph_type == 'output':
                     c_kbs = c_sent
                 else:
