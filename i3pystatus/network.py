@@ -1,13 +1,13 @@
 import netifaces
 
-from i3pystatus import IntervalModule
+from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import make_graph, round_dict, make_bar
 
 
 def count_bits(integer):
     bits = 0
-    while (integer):
+    while integer:
         integer &= integer - 1
         bits += 1
     return bits
@@ -67,7 +67,7 @@ def sysfs_interface_up(interface, unknown_up=False):
     return status == "up" or unknown_up and status == "unknown"
 
 
-class NetworkInfo():
+class NetworkInfo:
     """
     Retrieve network information.
     """
@@ -161,7 +161,7 @@ class NetworkInfo():
         return info
 
 
-class NetworkTraffic():
+class NetworkTraffic:
     """
     Retrieve network traffic information
     """
@@ -231,6 +231,8 @@ class NetworkTraffic():
 class Network(IntervalModule, ColorRangeModule):
     """
     Displays network information for an interface.
+    formatp support
+    if u wanna display recv/send speed separate in dynamic color mode, please enable pango hint.
 
     Requires the PyPI packages `colour`, `netifaces`, `psutil` (optional, see below)
     and `basiciw` (optional, see below).
@@ -255,10 +257,10 @@ class Network(IntervalModule, ColorRangeModule):
     * `{quality}` — Link quality in percent
     * `{quality_bar}` —Bar graphically representing link quality
 
-    Network Traffic Formatters (requires PyPI pacakge `psutil`):
+    Network Traffic Formatters (requires PyPI package `psutil`):
 
     * `{interface}` — the configured network interface
-    * `{kbs}` – Float representing kb\s
+    * `{kbs}` – Float representing KiB\s corresponds to graph type
     * `{network_graph}` – Unicode graph representing network usage
     * `{bytes_sent}` — bytes sent per second (divided by divisor)
     * `{bytes_recv}` — bytes received per second (divided by divisor)
@@ -267,6 +269,7 @@ class Network(IntervalModule, ColorRangeModule):
     * `{rx_tot_Mbytes}` — total Mbytes received
     * `{tx_tot_Mbytes}` — total Mbytes sent
     """
+
     settings = (
         ("format_up", "format string"),
         ("format_down", "format string"),
@@ -278,8 +281,10 @@ class Network(IntervalModule, ColorRangeModule):
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
         ("graph_width", "Width of the network traffic graph"),
         ("graph_style", "Graph style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake')"),
-        ("upper_limit",
-         "Expected max kb/s. This value controls how the network traffic graph is drawn and in what color"),
+        ("recv_limit", "Expected max KiB/s. This value controls the drawing color of receive speed"),
+        ("sent_limit", "Expected max KiB/s. similar with receive_limit"),
+        ("separate_color", "display recv/send color separate in dynamic color mode."
+                           "Note: only network speed formatters will display with range color "),
         ("graph_type", "Whether to draw the network traffic graph for input or output. "
                        "Allowed values 'input' or 'output'"),
         ("divisor", "divide all byte values by this value"),
@@ -301,7 +306,9 @@ class Network(IntervalModule, ColorRangeModule):
     graph_type = 'input'
     graph_width = 15
     graph_style = 'blocks'
-    upper_limit = 150.0
+    recv_limit = 2048
+    sent_limit = 1024
+    separate_color = False
 
     # Network traffic settings
     divisor = 1024
@@ -319,7 +326,7 @@ class Network(IntervalModule, ColorRangeModule):
 
     def init(self):
         # Don't require importing basiciw unless using the functionality it offers.
-        if any(s in self.format_up or s in self.format_up for s in
+        if any(s in self.format_down or s in self.format_up for s in
                ['essid', 'freq', 'quality', 'quality_bar']):
             get_wifi_info = True
         else:
@@ -337,9 +344,10 @@ class Network(IntervalModule, ColorRangeModule):
             self.network_traffic = None
 
         if not self.dynamic_color:
-            self.end_color = self.start_color
-        self.colors = self.get_hex_color_range(self.start_color, self.end_color, int(self.upper_limit))
+            self.end_color = self.start_color = self.color_up
+        self.colors = self.get_hex_color_range(self.start_color, self.end_color, 100)
         self.kbs_arr = [0.0] * self.graph_width
+        self.pango_enabled = self.hints.get("markup", False) and self.hints["markup"] == "pango"
 
     def cycle_interface(self, increment=1):
         """Cycle through available interfaces in `increment` steps. Sign indicates direction."""
@@ -354,11 +362,11 @@ class Network(IntervalModule, ColorRangeModule):
             self.network_traffic.clear_counters()
             self.kbs_arr = [0.0] * self.graph_width
 
-    def get_network_graph(self, kbs):
+    def get_network_graph(self, kbs, limit):
         # Cycle array by inserting at the start and chopping off the last element
         self.kbs_arr.insert(0, kbs)
         self.kbs_arr = self.kbs_arr[:self.graph_width]
-        return make_graph(self.kbs_arr, 0.0, self.upper_limit, self.graph_style)
+        return make_graph(self.kbs_arr, 0.0, limit, self.graph_style)
 
     def run(self):
         format_values = dict(kbs="", network_graph="", bytes_sent="", bytes_recv="", packets_sent="", packets_recv="",
@@ -369,15 +377,35 @@ class Network(IntervalModule, ColorRangeModule):
             network_usage = self.network_traffic.get_usage(self.interface)
             format_values.update(network_usage)
             if self.graph_type == 'input':
-                kbs = network_usage['bytes_recv']
+                limit = self.recv_limit
+                kbs = network_usage['bytes_recv'] * self.divisor / 1024
             elif self.graph_type == 'output':
-                kbs = network_usage['bytes_sent']
+                limit = self.sent_limit
+                kbs = network_usage['bytes_sent'] * self.divisor / 1024
             else:
                 raise Exception("graph_type must be either 'input' or 'output'!")
 
-            format_values['network_graph'] = self.get_network_graph(kbs)
-            format_values['kbs'] = "{0:.1f}".format(round(kbs, 2)).rjust(6)
-            color = self.get_gradient(kbs, self.colors, self.upper_limit)
+            format_values['network_graph'] = self.get_network_graph(kbs, limit)
+            format_values['kbs'] = "{0:.1f}".format(round(kbs, 2))
+
+            if self.separate_color and self.pango_enabled:
+                color = self.color_up
+                color_template = "<span color=\"{}\">{}</span>"
+                per_recv = network_usage["bytes_recv"] * self.divisor / (self.recv_limit * 1024)
+                per_sent = network_usage["bytes_sent"] * self.divisor / (self.sent_limit * 1024)
+                c_recv = self.get_gradient(int(per_recv * 100), self.colors, 100)
+                c_sent = self.get_gradient(int(per_sent * 100), self.colors, 100)
+                format_values["bytes_recv"] = color_template.format(c_recv, network_usage["bytes_recv"])
+                format_values["bytes_sent"] = color_template.format(c_sent, network_usage["bytes_sent"])
+                if self.graph_type == 'output':
+                    c_kbs = c_sent
+                else:
+                    c_kbs = c_recv
+                format_values['network_graph'] = color_template.format(c_kbs, format_values["network_graph"])
+                format_values['kbs'] = color_template.format(c_kbs, format_values["kbs"])
+            else:
+                percent = int(kbs * 100 / limit)
+                color = self.get_gradient(percent, self.colors, 100)
         else:
             color = None
 
@@ -395,6 +423,6 @@ class Network(IntervalModule, ColorRangeModule):
 
         self.data = format_values
         self.output = {
-            "full_text": format_str.format(**format_values),
+            "full_text": formatp(format_str, **format_values).strip(),
             'color': color,
         }
