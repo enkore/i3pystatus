@@ -41,7 +41,7 @@ class Scratchpad(Module):
         t.daemon = True
         t.start()
 
-    def update_scratchpad_counter(self, conn, e=None):
+    def update_scratchpad_counter(self, conn, *args):
         cons = conn.get_tree().scratchpad().leaves()
         self.urgent = any(con for con in cons if con.urgent)
         self.count = len(cons)

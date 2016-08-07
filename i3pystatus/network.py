@@ -390,22 +390,19 @@ class Network(IntervalModule, ColorRangeModule):
 
             if self.separate_color and self.pango_enabled:
                 color = self.color_up
+                color_template = "<span color=\"{}\">{}</span>"
                 per_recv = network_usage["bytes_recv"] * self.divisor / (self.recv_limit * 1024)
                 per_sent = network_usage["bytes_sent"] * self.divisor / (self.sent_limit * 1024)
                 c_recv = self.get_gradient(int(per_recv * 100), self.colors, 100)
                 c_sent = self.get_gradient(int(per_sent * 100), self.colors, 100)
-                format_values["bytes_recv"] = "<span color=\"" + c_recv + "\">" + \
-                                              str(network_usage["bytes_recv"]) + "</span>"
-                format_values["bytes_sent"] = "<span color=\"" + c_sent + "\">" + \
-                                              str(network_usage["bytes_sent"]) + "</span>"
+                format_values["bytes_recv"] = color_template.format(c_recv, network_usage["bytes_recv"])
+                format_values["bytes_recv"] = color_template.format(c_sent, network_usage["bytes_sent"])
                 if self.graph_type == 'output':
                     c_kbs = c_sent
                 else:
                     c_kbs = c_recv
-                format_values['network_graph'] = "<span color=\"" + c_kbs + "\">" + \
-                                                 str(format_values["network_graph"]) + "</span>"
-                format_values['kbs'] = "<span color=\"" + c_kbs + "\">" + \
-                                       str(format_values["kbs"]) + "</span>"
+                format_values['network_graph'] = color_template.format(c_kbs, format_values["network_graph"])
+                format_values['kbs'] = color_template.format(c_kbs, format_values["kbs"])
             else:
                 percent = int(kbs * 100 / limit)
                 color = self.get_gradient(percent, self.colors, 100)
