@@ -89,7 +89,7 @@ class Disk(IntervalModule):
         if self.critical_metric not in cdict:
             raise Exception("{} is not a valid critical_metric. Available metrics: {}"
                             .format(self.critical_metric, list(cdict.keys())))
-        critical = cdict[self.critical_metric] < self.critical_limit
+        critical = (cdict[self.critical_metric] > self.critical_limit) and self.critical_limit > 0
 
         round_dict(cdict, self.round_size)
 
