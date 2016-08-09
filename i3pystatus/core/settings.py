@@ -33,8 +33,10 @@ class SettingsBaseMeta(type):
         # required anymore.
         for base in inspect.getmro(cls):
             for r in list(required):
-                if hasattr(base, r) and getattr(base, r) != getattr(cls, r):
+                if hasattr(base, r) and getattr(base, r) != getattr(cls, r) \
+                        or hasattr(cls, r) and getattr(cls, r) is not None:
                     required.remove(r)
+
         return unique(settings), required
 
 
