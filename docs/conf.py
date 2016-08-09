@@ -42,8 +42,8 @@ MOCK_MODULES = [
     "apiclient",
     "googleapiclient.errors",
     "vlc",
-    "dateutil.tz"
-
+    "dateutil.tz",
+    "i3ipc",
 ]
 
 for mod_name in MOCK_MODULES:
