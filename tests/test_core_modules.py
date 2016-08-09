@@ -2,9 +2,9 @@ import time
 from unittest.mock import MagicMock
 
 import pytest
-
 from i3pystatus import IntervalModule
-from i3pystatus.core.modules import is_method_of
+from i3pystatus.core.exceptions import ConfigMissingError
+from i3pystatus.core.modules import is_method_of, Module
 
 left_click = 1
 right_click = 3
@@ -145,3 +145,49 @@ def test_is_method_of():
         assert not is_method_of(source_object.assigned_function, object)
         assert not is_method_of(source_object.member, object)
         assert not is_method_of(source_object.string_member, object)
+
+
+def test_required_raises():
+    """ Ensure undefined required settings raise a ConfigMissingError """
+
+    class TestRequired(Module):
+        settings = (
+            ("some_setting",),
+        )
+        required = ('some_setting',)
+
+    with pytest.raises(ConfigMissingError):
+        TestRequired()
+
+    TestRequired(some_setting='foo')
+
+
+def test_required_defined_raises():
+    """ Ensure defined but unmodified required settings raise a ConfigMissingError """
+
+    class TestRequiredDefined(Module):
+        settings = (
+            ("some_setting",),
+        )
+        required = ('some_setting',)
+        some_setting = None
+
+    with pytest.raises(ConfigMissingError):
+        TestRequiredDefined()
+
+    TestRequiredDefined(some_setting='foo')
+
+
+def test_required_subclass_overide():
+    """ Ensure required settings defined in subclasses do not raise a ConfigMissingError """
+
+    class TestRequiredDefined(Module):
+        settings = (
+            ("some_setting",),
+        )
+        required = ('some_setting',)
+
+    class TestSubClass(TestRequiredDefined):
+        some_setting = 'foo'
+
+    TestSubClass()
