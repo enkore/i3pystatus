@@ -178,6 +178,23 @@ def test_required_defined_raises():
     TestRequiredDefined(some_setting='foo')
 
 
+def test_required_subclass_none_raises():
+    """ Ensure required settings defined in subclasses raise a ConfigMissingError if they are set to None"""
+
+    class TestRequiredDefined(Module):
+        settings = (
+            ("some_setting",),
+        )
+        required = ('some_setting',)
+
+    class TestSubClass(TestRequiredDefined):
+        some_setting = None
+
+    with pytest.raises(ConfigMissingError):
+        TestRequiredDefined()
+    TestSubClass(some_setting='foo')
+
+
 def test_required_subclass_overide():
     """ Ensure required settings defined in subclasses do not raise a ConfigMissingError """
 
