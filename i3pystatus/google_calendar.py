@@ -6,7 +6,6 @@ import pytz
 from apiclient import discovery
 from dateutil import parser
 from googleapiclient.errors import HttpError
-
 from i3pystatus import IntervalModule, logger
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.util import internet, require, user_open
@@ -70,7 +69,11 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
         if not self.service:
             self.connect_service()
 
-        self.display_event = self.get_next_event()
+        try:
+            self.display_event = self.get_next_event()
+        except ConnectionResetError as e:
+            logger.warn(e)
+
         if self.display_event:
             start_time = self.display_event['start_time']
             now = datetime.datetime.now(tz=pytz.UTC)
