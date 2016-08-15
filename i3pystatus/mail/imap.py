@@ -56,6 +56,7 @@ class Idler(object):
         self.stop()
         self.start()
 
+
 class IMAP(Backend):
     """
     Checks for mail on a IMAP server
