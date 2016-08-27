@@ -13,16 +13,8 @@ def count_bits(integer):
     return bits
 
 
-def v6_to_int(v6):
-    return int(v6.replace(":", ""), 16)
-
-
-def prefix6(mask):
-    return count_bits(v6_to_int(mask))
-
-
-def cidr6(addr, mask):
-    return "{addr}/{bits}".format(addr=addr, bits=prefix6(mask))
+def cidr6(addr, bits):
+    return "{addr}/{bits}".format(addr=addr, bits=bits)
 
 
 def v4_to_int(v4):
@@ -126,8 +118,9 @@ class NetworkInfo:
         if netifaces.AF_INET6 in network_info:
             for v6 in network_info[netifaces.AF_INET6]:
                 info["v6"] = v6["addr"]
-                info["v6mask"] = v6["netmask"]
-                info["v6cidr"] = cidr6(v6["addr"], v6["netmask"])
+                mask, bits = v6["netmask"].split("/")
+                info["v6mask"] = mask
+                info["v6cidr"] = cidr6(v6["addr"], bits)
                 if not v6["addr"].startswith("fe80::"):  # prefer non link-local addresses
                     break
         return info
