@@ -14,7 +14,7 @@ def count_bits(integer):
 
 
 def v6_to_int(v6):
-    return int(v6.replace(":", ""), 16)
+    return int(v6.replace(":", "").split('/')[0], 16)
 
 
 def prefix6(mask):
