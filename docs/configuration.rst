@@ -212,7 +212,7 @@ Setting a specific logfile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When instantiating your ``Status`` object, the path to a log file can be
-specified. If this is done, then log messages will be sent to that file and not
+specified (it accepts environment variables). If this is done, then log messages will be sent to that file and not
 to an ``.i3pystatus-<pid-of-thread>`` file in your home directory.  This is
 useful in that it helps keep your home directory from becoming cluttered with
 files containing errors.
@@ -221,7 +221,7 @@ files containing errors.
 
     from i3pystatus import Status
 
-    status = Status(logfile='/home/username/var/i3pystatus.log')
+    status = Status(logfile='$HOME/var/i3pystatus.log')
 
 Changing log format
 ~~~~~~~~~~~~~~~~~~~
