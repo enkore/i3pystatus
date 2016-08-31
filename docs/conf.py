@@ -31,7 +31,7 @@ MOCK_MODULES = [
     "requests",
     "bs4",
     "dota2py",
-    "novaclient.v2",
+    "novaclient",
     "speedtest_cli",
     "pyzabbix",
     "vk",
