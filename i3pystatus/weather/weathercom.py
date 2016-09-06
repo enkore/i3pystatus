@@ -83,18 +83,26 @@ class Weathercom(Backend):
             xml = handler.read().decode(charset)
         doc = ElementTree.XML(xml)
 
+        def _findtext(xmlpath):
+            '''
+            return the contents of the key at the specified path, or an empty
+            string if the key is not present
+            '''
+            value = doc.findtext(xmlpath)
+            return value if value is not None else ''
+
         # Cut off the timezone from the end of the string (it's after the last
         # space, hence the use of rpartition). International timezones (or ones
         # outside the system locale) don't seem to be handled well by
         # datetime.datetime.strptime().
         try:
-            observation_time_str = doc.findtext('cc/lsup').rpartition(' ')[0]
+            observation_time_str = _findtext('cc/lsup').rpartition(' ')[0]
             observation_time = datetime.strptime(observation_time_str,
                                                  '%m/%d/%y %I:%M %p')
         except (ValueError, AttributeError):
             observation_time = datetime.fromtimestamp(0)
 
-        pressure_trend_str = doc.findtext('cc/bar/d').lower()
+        pressure_trend_str = _findtext('cc/bar/d').lower()
         if pressure_trend_str == 'rising':
             pressure_trend = '+'
         elif pressure_trend_str == 'falling':
@@ -102,7 +110,7 @@ class Weathercom(Backend):
         else:
             pressure_trend = ''
 
-        if not doc.findtext('dayf/day[@d="0"]/part[@p="d"]/icon').strip():
+        if not _findtext('dayf/day[@d="0"]/part[@p="d"]/icon'):
             # If the "d" (day) part of today's forecast's keys are empty, there
             # is no high temp anymore (this happens in the afternoon), but
             # instead of handling things in a sane way and setting the high
@@ -112,27 +120,27 @@ class Weathercom(Backend):
             # is no high temp at this point of the day.
             high_temp = ''
         else:
-            high_temp = doc.findtext('dayf/day[@d="0"]/hi')
+            high_temp = _findtext('dayf/day[@d="0"]/hi')
 
         return dict(
-            city=doc.findtext('loc/dnam'),
-            condition=doc.findtext('cc/t'),
+            city=_findtext('loc/dnam'),
+            condition=_findtext('cc/t'),
             observation_time=observation_time,
-            current_temp=doc.findtext('cc/tmp'),
-            low_temp=doc.findtext('dayf/day[@d="0"]/low'),
+            current_temp=_findtext('cc/tmp'),
+            low_temp=_findtext('dayf/day[@d="0"]/low'),
             high_temp=high_temp,
-            temp_unit='°' + doc.findtext('head/ut').upper(),
-            feelslike=doc.findtext('cc/flik'),
-            dewpoint=doc.findtext('cc/dewp'),
-            wind_speed=doc.findtext('cc/wind/s'),
-            wind_unit=doc.findtext('head/us'),
-            wind_direction=doc.findtext('cc/wind/t'),
-            wind_gust=doc.findtext('cc/wind/gust'),
-            pressure=doc.findtext('cc/bar/r'),
-            pressure_unit=doc.findtext('head/up'),
+            temp_unit='°' + _findtext('head/ut').upper(),
+            feelslike=_findtext('cc/flik'),
+            dewpoint=_findtext('cc/dewp'),
+            wind_speed=_findtext('cc/wind/s'),
+            wind_unit=_findtext('head/us'),
+            wind_direction=_findtext('cc/wind/t'),
+            wind_gust=_findtext('cc/wind/gust'),
+            pressure=_findtext('cc/bar/r'),
+            pressure_unit=_findtext('head/up'),
             pressure_trend=pressure_trend,
-            visibility=doc.findtext('cc/vis'),
-            visibility_unit=doc.findtext('head/ud'),
-            humidity=doc.findtext('cc/hmid'),
-            uv_index=doc.findtext('cc/uv/i'),
+            visibility=_findtext('cc/vis'),
+            visibility_unit=_findtext('head/ud'),
+            humidity=_findtext('cc/hmid'),
+            uv_index=_findtext('cc/uv/i'),
         )
