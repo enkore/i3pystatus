@@ -213,6 +213,12 @@ class EPL(ScoresBackend):
 
     def get_context(self):
         response = self.api_request(self.context_url)
+        if not response:
+            # There is no context data, but we still need a date to use in
+            # __init__.py to log that there are no games for the given date.
+            # Fall back to the parent class' function to set a date.
+            super(EPL, self).get_api_date()
+            return False
         context_tuple = namedtuple(
             'Context',
             ('competition', 'date', 'game_week', 'match_day', 'season')
@@ -224,6 +230,7 @@ class EPL(ScoresBackend):
                           'matchDayId', 'seasonId')
             ]
         )
+        return True
 
     def get_team_stats(self):
         ret = {}
@@ -259,48 +266,51 @@ class EPL(ScoresBackend):
             return '?\''
 
     def check_scores(self):
-        self.get_context()
-        self.get_api_date()
-
-        url = self.api_url % (self.context.competition,
-                              self.context.season,
-                              self.context.game_week)
-
-        for item in self.api_request(url).get('Data', []):
-            if item.get('Key', '') == self.date.strftime('%Y%m%d'):
-                game_list = item.get('Scores', [])
-                break
+        if not self.get_context():
+            data = team_game_map = {}
         else:
-            game_list = []
-        self.logger.debug('game_list = %s', game_list)
+            self.get_api_date()
 
-        team_stats = self.get_team_stats()
+            url = self.api_url % (self.context.competition,
+                                  self.context.season,
+                                  self.context.game_week)
 
-        # Convert list of games to dictionary for easy reference later on
-        data = {}
-        team_game_map = {}
-        for game in game_list:
-            try:
-                id_ = game['Id']
-            except KeyError:
-                continue
+            for item in self.api_request(url).get('Data', []):
+                if item.get('Key', '') == self.date.strftime('%Y%m%d'):
+                    game_list = item.get('Scores', [])
+                    break
+            else:
+                game_list = []
 
-            try:
+            self.logger.debug('game_list = %s', game_list)
+
+            team_stats = self.get_team_stats()
+
+            # Convert list of games to dictionary for easy reference later on
+            data = {}
+            team_game_map = {}
+            for game in game_list:
+                try:
+                    id_ = game['Id']
+                except KeyError:
+                    continue
+
+                try:
+                    for key in ('HomeTeam', 'AwayTeam'):
+                        team = game[key]['Code'].upper()
+                        if team in self.favorite_teams:
+                            team_game_map.setdefault(team, []).append(id_)
+                except KeyError:
+                    continue
+
+                data[id_] = game
+                # Merge in the team stats, because they are not returned in the
+                # initial API request.
                 for key in ('HomeTeam', 'AwayTeam'):
                     team = game[key]['Code'].upper()
-                    if team in self.favorite_teams:
-                        team_game_map.setdefault(team, []).append(id_)
-            except KeyError:
-                continue
-
-            data[id_] = game
-            # Merge in the team stats, because they are not returned in the
-            # initial API request.
-            for key in ('HomeTeam', 'AwayTeam'):
-                team = game[key]['Code'].upper()
-                data[id_][key]['Stats'] = team_stats.get(team, {})
-            # Add the minute, if applicable
-            data[id_]['Minute'] = self.get_minute(data, id_)
+                    data[id_][key]['Stats'] = team_stats.get(team, {})
+                # Add the minute, if applicable
+                data[id_]['Minute'] = self.get_minute(data, id_)
 
         self.interpret_api_return(data, team_game_map)
 

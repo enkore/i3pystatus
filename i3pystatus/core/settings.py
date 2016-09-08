@@ -30,11 +30,13 @@ class SettingsBaseMeta(type):
             settings += tuple(getattr(base, "settings", []))
             required |= set(getattr(base, "required", []))
         # if a derived class defines a default for a setting it is not
-        # required anymore.
+        # required anymore, provided that default is not set to None.
         for base in inspect.getmro(cls):
             for r in list(required):
-                if hasattr(base, r):
+                if hasattr(base, r) and getattr(base, r) != getattr(cls, r) \
+                        or hasattr(cls, r) and getattr(cls, r) is not None:
                     required.remove(r)
+
         return unique(settings), required
 
 

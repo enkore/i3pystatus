@@ -1,4 +1,3 @@
-from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require
 from i3pystatus.weather import Backend
 
@@ -7,7 +6,8 @@ from urllib.request import urlopen
 import re
 import xml.etree.ElementTree as ElementTree
 
-WEATHER_COM_URL = 'http://wxdata.weather.com/wxdata/weather/local/%s?unit=%s&dayf=1&cc=*'
+WEATHER_COM_URL = \
+    'http://wxdata.weather.com/wxdata/weather/local/%s?unit=%s&dayf=1&cc=*'
 ON_LEFTCLICK_URL = 'https://weather.com/weather/today/l/%s'
 
 
@@ -31,7 +31,8 @@ class Weathercom(Backend):
 
         status.register(
             'weather',
-            format='{condition} {current_temp}{temp_unit}{icon}[ Hi: {high_temp}] Lo: {low_temp}',
+            format='{condition} {current_temp}{temp_unit}{icon}\
+[ Hi: {high_temp}] Lo: {low_temp}',
             colorize=True,
             backend=weathercom.Weathercom(
                 location_code='94107:4:US',
@@ -86,11 +87,11 @@ class Weathercom(Backend):
         # space, hence the use of rpartition). International timezones (or ones
         # outside the system locale) don't seem to be handled well by
         # datetime.datetime.strptime().
-        observation_time_str = doc.findtext('cc/lsup').rpartition(' ')[0]
         try:
+            observation_time_str = doc.findtext('cc/lsup').rpartition(' ')[0]
             observation_time = datetime.strptime(observation_time_str,
                                                  '%m/%d/%y %I:%M %p')
-        except ValueError:
+        except (ValueError, AttributeError):
             observation_time = datetime.fromtimestamp(0)
 
         pressure_trend_str = doc.findtext('cc/bar/d').lower()

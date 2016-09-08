@@ -123,40 +123,15 @@ Also change your i3wm config to the following:
 .. note:: Don't name your config file ``i3pystatus.py``, as it would
     make ``i3pystatus`` un-importable and lead to errors.
 
-.. _credentials:
+Another way to launch your configuration file is to use ``i3pystatus`` script
+from installation:
 
-Credentials
------------
+.. code:: bash
 
-Settings that require credentials can utilize the keyring module to
-keep sensitive information out of config files.  To take advantage of
-this feature, simply use the ``i3pystatus-setting-util`` script
-installed along i3pystatus to set the credentials for a module. Once
-this is done you can add the module to your config without specifying
-the credentials, e.g.:
+    i3pystatus -c ~/.path/to/your/config/file.py
 
-.. code:: python
-
-    # Use the default keyring to retrieve credentials.
-    # To determine which backend is the default on your system, run
-    # python -c 'import keyring; print(keyring.get_keyring())'
-    status.register('github')
-
-If you don't want to use the default you can set a specific keyring like so:
-
-.. code:: python
-
-    # Requires the keyrings.alt package
-    from keyrings.alt.file import PlaintextKeyring
-    status.register('github', keyring_backend=PlaintextKeyring())
-
-i3pystatus will locate and set the credentials during the module
-loading process. Currently supported credentials are "password",
-"email" and "username".
-
-.. note:: Credential handling requires the PyPI package
-   ``keyring``. Many distributions have it pre-packaged available as
-   ``python-keyring``.
+If no arguments were provided, ``i3pystatus`` script works as an example of
+``Clock`` module.
 
 Formatting
 ----------
@@ -237,7 +212,7 @@ Setting a specific logfile
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When instantiating your ``Status`` object, the path to a log file can be
-specified. If this is done, then log messages will be sent to that file and not
+specified (it accepts environment variables). If this is done, then log messages will be sent to that file and not
 to an ``.i3pystatus-<pid-of-thread>`` file in your home directory.  This is
 useful in that it helps keep your home directory from becoming cluttered with
 files containing errors.
@@ -246,7 +221,7 @@ files containing errors.
 
     from i3pystatus import Status
 
-    status = Status(logfile='/home/username/var/i3pystatus.log')
+    status = Status(logfile='$HOME/var/i3pystatus.log')
 
 Changing log format
 ~~~~~~~~~~~~~~~~~~~
@@ -529,3 +504,65 @@ then you can refresh the bar by using the following command:
         pkill -SIGUSR1 -f "python /home/user/.config/i3/pystatus.py"
 
 Note that the path must be expanded if using '~'.
+
+.. _internet:
+
+Internet Connectivity
+---------------------
+
+Module methods that ``@require(internet)`` won't be run unless a test TCP
+connection is successful. By default, this is made to Google's DNS server, but
+you can customize the host and port. See :py:class:`.internet`.
+
+If you are behind a gateway that redirects web traffic to an authorization page
+and blocks other traffic, the DNS check will return a false positive. This is
+often encountered in open WiFi networks. In these cases it is helpful to try a
+service that is not traditionally required for web browsing:
+
+.. code:: python
+
+  from i3pystatus import Status
+
+  status = Status(check_internet=("whois.arin.net", 43))
+
+.. code:: python
+
+  from i3pystatus import Status
+
+  status = Status(check_internet=("github.com", 22))
+
+.. _credentials:
+
+Credentials
+-----------
+
+Settings that require credentials can utilize the keyring module to
+keep sensitive information out of config files.  To take advantage of
+this feature, simply use the ``i3pystatus-setting-util`` script
+installed along i3pystatus to set the credentials for a module. Once
+this is done you can add the module to your config without specifying
+the credentials, e.g.:
+
+.. code:: python
+
+    # Use the default keyring to retrieve credentials.
+    # To determine which backend is the default on your system, run
+    # python -c 'import keyring; print(keyring.get_keyring())'
+    status.register('github')
+
+If you don't want to use the default you can set a specific keyring like so:
+
+.. code:: python
+
+    # Requires the keyrings.alt package
+    from keyrings.alt.file import PlaintextKeyring
+    status.register('github', keyring_backend=PlaintextKeyring())
+
+i3pystatus will locate and set the credentials during the module
+loading process. Currently supported credentials are "password",
+"email" and "username".
+
+.. note:: Credential handling requires the PyPI package
+   ``keyring``. Many distributions have it pre-packaged available as
+   ``python-keyring``.
+

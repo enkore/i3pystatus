@@ -131,14 +131,14 @@ class CpuUsage(IntervalModule, ColorRangeModule):
 
             usage['usage_' + cpu] = cpu_usage
 
+        # for backward compatibility
+        usage['usage'] = usage['usage_cpu']
+
         return usage
 
     def run(self):
         usage = self.get_usage()
-        usage['format_all'] = self.gen_format_all(usage)
-
-        # for backward compatibility
-        usage['usage'] = usage['usage_cpu']
+        usage['usage_all'] = self.gen_format_all(usage)
 
         color = self.get_gradient(usage[self.key], self.colors, int(self.upper_limit))
 

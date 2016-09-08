@@ -1,6 +1,6 @@
 from i3pystatus import IntervalModule
 # requires python-novaclient
-from novaclient.v2 import client
+from novaclient import client
 import webbrowser
 
 
@@ -35,6 +35,7 @@ class Openstack_vms(IntervalModule):
 
     def run(self):
         nclient = client.Client(
+            '2.0',
             self.username,
             self.password,
             self.tenant_name,

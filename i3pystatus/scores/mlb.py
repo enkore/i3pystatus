@@ -109,6 +109,7 @@ class MLB(ScoresBackend):
         ('format_in_progress', 'Format used when the game is in progress'),
         ('format_final', 'Format used when the game is complete'),
         ('format_postponed', 'Format used when the game has been postponed'),
+        ('format_suspended', 'Format used when the game has been suspended'),
         ('inning_top', 'Value for the ``{top_bottom}`` formatter when game '
                        'is in the top half of an inning'),
         ('inning_bottom', 'Value for the ``{top_bottom}`` formatter when game '
@@ -168,7 +169,7 @@ class MLB(ScoresBackend):
     }
 
     _valid_teams = [x for x in _default_colors]
-    _valid_display_order = ['in_progress', 'final', 'postponed', 'pregame']
+    _valid_display_order = ['in_progress', 'suspended', 'final', 'postponed', 'pregame']
 
     display_order = _valid_display_order
     format_no_games = 'MLB: No games'
@@ -176,6 +177,7 @@ class MLB(ScoresBackend):
     format_in_progress = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score}, [{home_favorite} ]{home_abbrev} {home_score} ({top_bottom} {inning}, {outs} Out)[ ({delay} Delay)]'
     format_final = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Final[/{extra_innings}])'
     format_postponed = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) (PPD: {postponed})'
+    format_suspended = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Suspended: {suspended})'
     inning_top = 'Top'
     inning_bottom = 'Bot'
     team_colors = _default_colors
@@ -191,6 +193,12 @@ class MLB(ScoresBackend):
         game_list = self.get_nested(self.api_request(url),
                                     'data:games:game',
                                     default=[])
+        if not isinstance(game_list, list):
+            # When only one game is taking place during a given day, the game
+            # data is just a single dict containing that game's data, rather
+            # than a list of dicts. Encapsulate the single game dict in a list
+            # to make it process correctly in the loop below.
+            game_list = [game_list]
 
         # Convert list of games to dictionary for easy reference later on
         data = {}
@@ -198,7 +206,7 @@ class MLB(ScoresBackend):
         for game in game_list:
             try:
                 id_ = game['id']
-            except KeyError:
+            except (KeyError, TypeError):
                 continue
 
             try:
@@ -252,7 +260,7 @@ class MLB(ScoresBackend):
             # pregame
             ret['status'] = 'pregame'
 
-        for key in ('delay', 'postponed'):
+        for key in ('delay', 'postponed', 'suspended'):
             ret[key] = ''
 
         if ret['status'] == 'delayed_start':
@@ -263,7 +271,9 @@ class MLB(ScoresBackend):
             ret['delay'] = game.get('reason', 'Unknown')
         elif ret['status'] == 'postponed':
             ret['postponed'] = game.get('reason', 'Unknown Reason')
-        elif ret['status'] == 'game_over':
+        elif ret['status'] == 'suspended':
+            ret['suspended'] = game.get('reason', 'Unknown Reason')
+        elif ret['status'] in ('game_over', 'completed_early'):
             ret['status'] = 'final'
         elif ret['status'] not in ('in_progress', 'final'):
             ret['status'] = 'pregame'
@@ -271,7 +281,7 @@ class MLB(ScoresBackend):
         try:
             inning = game.get('inning', '0')
             ret['extra_innings'] = inning \
-                if ret['status'] == 'final' and int(inning) > 9 \
+                if ret['status'] == 'final' and int(inning) != 9 \
                 else ''
         except ValueError:
             ret['extra_innings'] = ''
@@ -293,10 +303,25 @@ class MLB(ScoresBackend):
                 'US/Eastern'
             )
         )
-        game_time_str = ' '.join((
-            game.get('time_date', ''),
-            game.get('ampm', '')
-        ))
+
+        date_and_time = []
+        if 'resume_time_date' in game and game['resume_time_date']:
+            date_and_time.append(game['resume_time_date'])
+        elif 'time_date' in game and game['time_date']:
+            date_and_time.append(game['time_date'])
+        else:
+            keys = ('original_date', 'time')
+            if all(key in game for key in keys):
+                for key in keys:
+                    if game[key]:
+                        date_and_time.append(game[key])
+        if 'resume_ampm' in game and game['resume_ampm']:
+            date_and_time.append(game['resume_ampm'])
+        elif 'ampm' in game and game['ampm']:
+            date_and_time.append(game['ampm'])
+
+        game_time_str = ' '.join(date_and_time)
+
         try:
             game_time = datetime.strptime(game_time_str, '%Y/%m/%d %I:%M %p')
         except ValueError as exc:
@@ -311,7 +336,7 @@ class MLB(ScoresBackend):
                 game['id'],
                 exc_info=True
             )
-            game_time = datetime.datetime(1970, 1, 1)
+            game_time = datetime(1970, 1, 1)
 
         ret['start_time'] = game_tz.localize(game_time).astimezone()
 

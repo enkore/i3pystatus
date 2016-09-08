@@ -70,6 +70,7 @@ class Status:
         if logfile:
             for handler in logger.handlers:
                 logger.removeHandler(handler)
+            logfile = os.path.expandvars(logfile)
             handler = logging.FileHandler(logfile, delay=True)
             logger.addHandler(handler)
             logger.setLevel(logging.CRITICAL)

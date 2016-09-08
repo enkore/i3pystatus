@@ -13,10 +13,13 @@ class MPD(IntervalModule):
     .. rubric:: Available formatters (uses :ref:`formatp`)
 
     * `{title}` — (the title of the current song)
-    * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
+    * `{album}` — (the album of the current song, can be an empty string \
+(e.g. for online streams))
     * `{artist}` — (can be empty, too)
-    * `{filename}` — (file name with out extension and path; empty unless title is empty)
-    * `{song_elapsed}` — (Position in the currently playing song, uses :ref:`TimeWrapper`, default is `%m:%S`)
+    * `{filename}` — (file name with out extension and path; empty unless \
+title is empty)
+    * `{song_elapsed}` — (Position in the currently playing song, uses \
+:ref:`TimeWrapper`, default is `%m:%S`)
     * `{song_length}` — (Length of the current song, same as song_elapsed)
     * `{pos}` — (Position of current song in playlist, one-based)
     * `{len}` — (Songs in playlist)
@@ -24,22 +27,38 @@ class MPD(IntervalModule):
     * `{bitrate}` — (Current bitrate in kilobit/s)
     * `{volume}` — (Volume set in MPD)
 
-    Left click on the module play/pauses, right click (un)mutes.
+    .. rubric:: Available callbacks
+
+    * ``switch_playpause`` — Plays if paused or stopped, otherwise pauses. \
+Emulates ``mpc toggle``.
+    * ``stop`` — Stops playback. Emulates ``mpc stop``.
+    * ``next_song`` — Goes to next track in the playlist. Emulates ``mpc \
+next``.
+    * ``previous_song`` — Goes to previous track in the playlist. Emulates \
+``mpc prev``.
     """
 
     interval = 1
 
     settings = (
         ("host"),
-        ("port", "MPD port. If set to 0, host will we interpreted as a Unix socket."),
+        ("port", "MPD port. If set to 0, host will we interpreted as a Unix \
+socket."),
         ("format", "formatp string"),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
-        ("max_field_len", "Defines max length for in truncate_fields defined fields, if truncated, ellipsis are appended as indicator. It's applied *before* max_len. Value of 0 disables this."),
-        ("max_len", "Defines max length for the hole string, if exceeding fields specefied in truncate_fields are truncated equaly. If truncated, ellipsis are appended as indicator. It's applied *after* max_field_len. Value of 0 disables this."),
-        ("truncate_fields", "fields that will be truncated if exceeding max_field_len or max_len."),
+        ("max_field_len", "Defines max length for in truncate_fields defined \
+fields, if truncated, ellipsis are appended as indicator. It's applied \
+*before* max_len. Value of 0 disables this."),
+        ("max_len", "Defines max length for the hole string, if exceeding \
+fields specefied in truncate_fields are truncated equaly. If truncated, \
+ellipsis are appended as indicator. It's applied *after* max_field_len. Value \
+of 0 disables this."),
+        ("truncate_fields", "fields that will be truncated if exceeding \
+max_field_len or max_len."),
         ("hide_inactive", "Hides status information when MPD is not running"),
-        ("password", "A password for access to MPD. (This is sent in cleartext to the server.)"),
+        ("password", "A password for access to MPD. (This is sent in \
+cleartext to the server.)"),
     )
 
     host = "localhost"
@@ -74,7 +93,8 @@ class MPD(IntervalModule):
             sock = self.s
             sock.recv(8192)
             if self.password is not None:
-                sock.send('password "{}"\n'.format(self.password).encode("utf-8"))
+                sock.send('password "{}"\n'.format(self.password).
+                          encode("utf-8"))
                 sock.recv(8192)
             sock.send((command + "\n").encode("utf-8"))
         try:
@@ -90,6 +110,7 @@ class MPD(IntervalModule):
     def run(self):
         try:
             status = self._mpd_command(self.s, "status")
+            playback_state = status["state"]
             currentsong = self._mpd_command(self.s, "currentsong")
         except Exception:
             if self.hide_inactive:
@@ -103,7 +124,7 @@ class MPD(IntervalModule):
         fdict = {
             "pos": int(status.get("song", 0)) + 1,
             "len": int(status.get("playlistlength", 0)),
-            "status": self.status[status["state"]],
+            "status": self.status[playback_state],
             "volume": int(status.get("volume", 0)),
 
             "title": currentsong.get("Title", ""),
@@ -143,8 +164,15 @@ class MPD(IntervalModule):
 
     def switch_playpause(self):
         try:
-            self._mpd_command(self.s, "%s" %
-                              ("play" if self._mpd_command(self.s, "status")["state"] in ["pause", "stop"] else "pause"))
+            self._mpd_command(self.s, "play"
+                              if self._mpd_command(self.s, "status")["state"]
+                              in ["pause", "stop"] else "pause")
+        except Exception as e:
+            pass
+
+    def stop(self):
+        try:
+            self._mpd_command(self.s, "stop")
         except Exception as e:
             pass
 

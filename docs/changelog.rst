@@ -2,10 +2,40 @@
 Changelog
 =========
 
-master branch
-+++++++++++++
+3.35 (2016-08-31)
++++++++++++++++++
 
-.. _r3.35:
+- New modules
+
+    - :py:mod:`.google_calendar`: Displays next Google Calendar event
+    - :py:mod:`.openfiles`: Report open files count
+    - :py:mod:`.ping`: Display ping time to host
+    - :py:mod:`.scores`: Display sport scores
+    - :py:mod:`.scratchpad`: Display number of windows and urgency hints on i3 scratchpad
+    - :py:mod:`.taskwarrior`: Pending tasks in taskwarrior
+    - :py:mod:`.wunderground`: Similar to :py:mod:`.weather`, but uses wunderground
+    - :py:mod:`.zabbix`: Zabbix alerts watcher
+- ``i3pystatus`` binary now takes an optional path to a config file
+
+  - (purely optional, doesn't change any existing configurations)
+- Fixed a bug with required settings (did only occur in develoment branch)
+- :py:mod:`.clock`: timezone-related fixes with multiple clocks
+- :py:mod:`.dpms`: Added format_disabled option
+- :py:mod:`.github`: Added support for acccess tokens
+- :py:mod:`.gpu_temp`: Added display_if setting
+- :py:mod:`.mail.imap`: Add support for IDLE if imaplib2 is installed
+- :py:mod:`.mpd`: Bug fixes
+- :py:mod:`.network`: Bug fixes. Upgrading to ``netifaces>=0.10.5`` is recommended for avoiding IPv6-related bugs (disabling IPv6 is of course also a well-working solution)
+- :py:mod:`.now_playing`: Also check activatable D-Bus services, bug fixes
+- :py:mod:`.openvpn`: Added support for toggling connection on click
+- :py:mod:`.pomodoro`: Bug fixes
+- :py:mod:`.pulseaudio`: Display/control active sink, bug fixes
+- :py:mod:`.reddit`: Fixes for praw
+- :py:mod:`.temp`: Added display_if setting
+- :py:mod:`.updates`: Added dnf (rpm-based distros) backend
+- updates: Added notification support with summary of all available updates
+- :py:mod:`.weather`: Added color_icons option, bug fixes
+- :py:mod:`.xkblayout`: Bug fixes
 
 3.34 (2016-02-14)
 +++++++++++++++++
