@@ -22,7 +22,7 @@ class NetSpeed(IntervalModule):
     color = "#FFFFFF"
     interval = 300
     units = 'bits'
-    format = "↓{speed_down:.2f}{down_units} ↑{speed_up:.2f}{up_units} ({hosting_provider})"
+    format = "↓{speed_down:.1f}{down_units} ↑{speed_up:.1f}{up_units} ({hosting_provider})"
 
     def form_b(self, n: float)->tuple:
         """
