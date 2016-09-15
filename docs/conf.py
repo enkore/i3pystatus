@@ -32,7 +32,7 @@ MOCK_MODULES = [
     "bs4",
     "dota2py",
     "novaclient",
-    "speedtest_cli",
+    "speedtest",
     "pyzabbix",
     "vk",
     "google-api-python-client",
