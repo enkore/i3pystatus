@@ -86,9 +86,9 @@ class GitHubStatus(IntervalModule):
         'major': 'GitHub',
     }
     _default_colors = {
-        'good': '#00ff00',
-        'minor': '#ffff00',
-        'major': '#ff0000',
+        'good': '#2f895c',
+        'minor': '#f29d50',
+        'major': '#cc3300',
     }
 
     status = _default_status
