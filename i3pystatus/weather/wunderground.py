@@ -248,7 +248,7 @@ class Wunderground(WeatherBackend):
             self.data['city'] = _find('city', response['observation_location'])
             self.data['condition'] = _find('weather')
             self.data['observation_time'] = observation_time
-            self.data['current_temp'] = _find('temp_' + temp_unit)
+            self.data['current_temp'] = _find('temp_' + temp_unit).split('.')[0]
             self.data['low_temp'] = low_temp
             self.data['high_temp'] = high_temp
             self.data['temp_unit'] = '°' + temp_unit.upper()
