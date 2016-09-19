@@ -1,3 +1,6 @@
+import logging
+
+
 class BaseDesktopNotification:
     """
     Class to display a desktop notification
@@ -9,12 +12,20 @@ class BaseDesktopNotification:
     :param timeout: Timeout in seconds for the notification. Zero means it needs to be dismissed by the user.
     """
 
-    def __init__(self, title, body, icon="dialog-information", urgency=1, timeout=0):
+    def __init__(self, title, body, icon="dialog-information", urgency=1,
+                 timeout=0, log_level=logging.WARNING):
         self.title = title
         self.body = body
         self.icon = icon
         self.urgency = urgency
         self.timeout = timeout
+        self.log_level = log_level
+
+        if self.__class__.__name__.startswith("i3pystatus"):
+            self.logger = logging.getLogger(self.__class__.__name__)
+        else:
+            self.logger = logging.getLogger("i3pystatus." + self.__class__.__name__)
+        self.logger.setLevel(self.log_level)
 
     def display(self):
         """
@@ -55,4 +66,12 @@ else:
             if self.timeout:
                 notification.set_timeout(self.timeout)
             notification.set_urgency(self.URGENCY_LUT[self.urgency])
-            return notification.show()
+            try:
+                return notification.show()
+            except Exception as exc:
+                self.logger.error(
+                    'Failed to display desktop notification (is a '
+                    'notification daemon running?)',
+                    exc_info=self.log_level <= logging.DEBUG
+                )
+                return False
