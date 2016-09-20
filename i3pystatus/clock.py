@@ -1,6 +1,13 @@
+import errno
 import os
 import locale
 from datetime import datetime
+
+try:
+    import pytz
+    HAS_PYTZ = True
+except ImportError:
+    HAS_PYTZ = False
 
 from i3pystatus import IntervalModule
 
@@ -85,21 +92,64 @@ class Clock(IntervalModule):
 
         elif isinstance(self.format, str) or isinstance(self.format, tuple):
             self.format = [self.format]
+
+        self.system_tz = self._get_system_tz()
         self.format = [self._expand_format(fmt) for fmt in self.format]
         self.current_format_id = 0
 
-    @staticmethod
-    def _expand_format(fmt):
+    def _expand_format(self, fmt):
         if isinstance(fmt, tuple):
             if len(fmt) == 1:
                 return (fmt[0], None)
             else:
-                try:
-                    from pytz import timezone
-                except ImportError as e:
-                    raise RuntimeError("Need `pytz` for timezone data") from e
-                return (fmt[0], timezone(fmt[1]))
-        return (fmt, None)
+                if not HAS_PYTZ:
+                    raise RuntimeError("Need `pytz` for timezone data")
+                return (fmt[0], pytz.timezone(fmt[1]))
+        return (fmt, self.system_tz)
+
+    def _get_system_tz(self):
+        '''
+        Get the system timezone for use when no timezone is explicitly provided
+
+        Requires pytz, if not available then no timezone will be set when not
+        explicitly provided.
+        '''
+        if not HAS_PYTZ:
+            return None
+
+        def _etc_localtime():
+            try:
+                with open('/etc/localtime', 'rb') as fp:
+                    return pytz.tzfile.build_tzinfo('system', fp)
+            except OSError as exc:
+                if exc.errno != errno.ENOENT:
+                    self.logger.error(
+                        'Unable to read from /etc/localtime: %s', exc.strerror
+                    )
+            except pytz.UnknownTimeZoneError:
+                self.logger.error(
+                    '/etc/localtime contains unrecognized tzinfo'
+                )
+            return None
+
+        def _etc_timezone():
+            try:
+                with open('/etc/timezone', 'r') as fp:
+                    tzname = fp.read().strip()
+                return pytz.timezone(tzname)
+            except OSError as exc:
+                if exc.errno != errno.ENOENT:
+                    self.logger.error(
+                        'Unable to read from /etc/localtime: %s', exc.strerror
+                    )
+            except pytz.UnknownTimeZoneError:
+                self.logger.error(
+                    '/etc/timezone contains unrecognized timezone \'%s\'',
+                    tzname
+                )
+            return None
+
+        return _etc_localtime() or _etc_timezone()
 
     def run(self):
         time = datetime.now(self.format[self.current_format_id][1])
