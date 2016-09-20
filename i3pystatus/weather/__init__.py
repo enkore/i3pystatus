@@ -1,9 +1,52 @@
+import json
+import re
+import threading
+import time
+from urllib.request import urlopen
+
 from i3pystatus import SettingsBase, IntervalModule, formatp
 from i3pystatus.core.util import user_open, internet, require
 
 
-class Backend(SettingsBase):
+class WeatherBackend(SettingsBase):
     settings = ()
+
+    @require(internet)
+    def api_request(self, url):
+        self.logger.debug('Making API request to %s', url)
+        try:
+            with urlopen(url) as content:
+                try:
+                    content_type = dict(content.getheaders())['Content-Type']
+                    charset = re.search(r'charset=(.*)', content_type).group(1)
+                except AttributeError:
+                    charset = 'utf-8'
+                response_json = content.read().decode(charset).strip()
+                if not response_json:
+                    self.logger.debug('JSON response from %s was blank', url)
+                    return {}
+                try:
+                    response = json.loads(response_json)
+                except json.decoder.JSONDecodeError as exc:
+                    self.logger.error('Error loading JSON: %s', exc)
+                    self.logger.debug('JSON text that failed to load: %s',
+                                      response_json)
+                    return {}
+                self.logger.log(5, 'API response: %s', response)
+                error = self.check_response(response)
+                if error:
+                    self.logger.error('Error in JSON response: %s', error)
+                    return {}
+                return response
+        except Exception as exc:
+            self.logger.error(
+                'Failed to make API request to %s. Exception follows:', url,
+                exc_info=True
+            )
+            return {}
+
+    def check_response(response):
+        raise NotImplementedError
 
 
 class Weather(IntervalModule):
@@ -11,8 +54,8 @@ class Weather(IntervalModule):
     This is a generic weather-checker which must use a configured weather
     backend. For list of all available backends see :ref:`weatherbackends`.
 
-    Left clicking on the module will launch the forecast page for the location
-    being checked.
+    Double-clicking on the module will launch the forecast page for the
+    location being checked, and single-clicking will trigger an update.
 
     .. _weather-formatters:
 
@@ -45,17 +88,26 @@ class Weather(IntervalModule):
       metric or imperial units are being used
     * `{humidity}` — Current humidity, excluding percentage symbol
     * `{uv_index}` — UV Index
+    * `{update_error}` — When the configured weather backend encounters an
+      error during an update, this formatter will be set to the value of the
+      backend's **update_error** config value. Otherwise, this formatter will
+      be an empty string.
 
     This module supports the :ref:`formatp <formatp>` extended string format
     syntax. This allows for values to be hidden when they evaluate as False.
-    This comes in handy for the :py:mod:`weathercom <.weather.weathercom>`
-    backend, which at a certain point in the afternoon will have a blank
-    ``{high_temp}`` value. Using the following snippet in your format string
-    will only display the high temperature information if it is not blank:
+    The default **format** string value for this module makes use of this
+    syntax to conditionally show the value of the **update_error** config value
+    when the backend encounters an error during an update.
+
+    The extended string format syntax also comes in handy for the
+    :py:mod:`weathercom <.weather.weathercom>` backend, which at a certain
+    point in the afternoon will have a blank ``{high_temp}`` value. Using the
+    following snippet in your format string will only display the high
+    temperature information if it is not blank:
 
     ::
 
-        {current_temp}{temp_unit}[ Hi: {high_temp}[{temp_unit}]] Lo: {low_temp}{temp_unit}
+        {current_temp}{temp_unit}[ Hi: {high_temp}] Lo: {low_temp}[ {update_error}]
 
     Brackets are evaluated from the outside-in, so the fact that the only
     formatter in the outer block (``{high_temp}``) is empty would keep the
@@ -67,6 +119,44 @@ class Weather(IntervalModule):
 
     - :ref:`Weather.com <weather-usage-weathercom>`
     - :ref:`Weather Underground <weather-usage-wunderground>`
+
+    .. rubric:: Troubleshooting
+
+    If an error is encountered while updating, the ``{update_error}`` formatter
+    will be set, and (provided it is in your ``format`` string) will show up
+    next to the forecast to alert you to the error. The error message will (by
+    default be logged to ``~/li3pystatus-<pid>`` where ``<pid>`` is the PID of
+    the update thread. However, it may be more convenient to manually set the
+    logfile to make the location of the log data predictable and avoid clutter
+    in your home directory. Additionally, using the ``DEBUG`` log level can
+    be helpful in revealing why the module is not working as expected. For
+    example:
+
+    .. code-block:: python
+
+        import logging
+        from i3pystatus import Status
+        from i3pystatus.weather import weathercom
+
+        status = Status(logfile='/home/username/var/i3pystatus.log')
+
+        status.register(
+            'weather',
+            format='{condition} {current_temp}{temp_unit}[ {icon}][ Hi: {high_temp}][ Lo: {low_temp}][ {update_error}]',
+            colorize=True,
+            hints={'markup': 'pango'},
+            update_error='<span color="#ff0000">!</span>',
+            log_level=logging.DEBUG,
+            backend=weathercom.Weathercom(
+                location_code='94107:4:US',
+                units='imperial',
+                log_level=logging.DEBUG,
+            ),
+        )
+
+    .. note::
+        The log level must be set separately in both the module and backend
+        contexts.
     '''
 
     settings = (
@@ -77,7 +167,10 @@ class Weather(IntervalModule):
         ('color', 'Display color (or fallback color if ``colorize`` is True). '
                   'If not specified, falls back to default i3bar color.'),
         ('backend', 'Weather backend instance'),
-        'interval',
+        ('refresh_icon', 'Text to display (in addition to any text currently '
+                         'shown by the module) when refreshing weather data. '
+                         '**NOTE:** Depending on how quickly the update is '
+                         'performed, the icon may not be displayed.'),
         'format',
     )
     required = ('backend',)
@@ -98,16 +191,77 @@ class Weather(IntervalModule):
     color = None
     backend = None
     interval = 1800
-    format = '{current_temp}{temp_unit}'
+    refresh_icon = '⟳'
+    format = '{current_temp}{temp_unit}[ {update_error}]'
 
-    on_leftclick = 'open_forecast_url'
+    output = {'full_text': ''}
 
-    def open_forecast_url(self):
+    on_doubleleftclick = ['launch_web']
+    on_leftclick = ['check_weather']
+
+    def launch_web(self):
         if self.backend.forecast_url and self.backend.forecast_url != 'N/A':
+            self.logger.debug('Launching %s in browser', self.backend.forecast_url)
             user_open(self.backend.forecast_url)
 
     def init(self):
-        pass
+        if self.backend is None:
+            raise RuntimeError('A backend is required')
+
+        self.backend.data = {
+            'city': '',
+            'condition': '',
+            'observation_time': '',
+            'current_temp': '',
+            'low_temp': '',
+            'high_temp': '',
+            'temp_unit': '',
+            'feelslike': '',
+            'dewpoint': '',
+            'wind_speed': '',
+            'wind_unit': '',
+            'wind_direction': '',
+            'wind_gust': '',
+            'pressure': '',
+            'pressure_unit': '',
+            'pressure_trend': '',
+            'visibility': '',
+            'visibility_unit': '',
+            'humidity': '',
+            'uv_index': '',
+            'update_error': '',
+        }
+
+        self.backend.init()
+
+        self.condition = threading.Condition()
+        self.thread = threading.Thread(target=self.update_thread, daemon=True)
+        self.thread.start()
+
+    def update_thread(self):
+        try:
+            self.check_weather()
+            while True:
+                with self.condition:
+                    self.condition.wait(self.interval)
+                self.check_weather()
+        except Exception:
+            msg = 'Exception in {thread} at {time}, module {name}'.format(
+                thread=threading.current_thread().name,
+                time=time.strftime('%c'),
+                name=self.__class__.__name__,
+            )
+            self.logger.error(msg, exc_info=True)
+
+    @require(internet)
+    def check_weather(self):
+        '''
+        Check the weather using the configured backend
+        '''
+        self.output['full_text'] = \
+            self.refresh_icon + self.output.get('full_text', '')
+        self.backend.check_weather()
+        self.refresh_display()
 
     def get_color_data(self, condition):
         '''
@@ -117,11 +271,13 @@ class Weather(IntervalModule):
         if condition not in self.color_icons:
             # Check for similarly-named conditions if no exact match found
             condition_lc = condition.lower()
-            if 'cloudy' in condition_lc:
+            if 'cloudy' in condition_lc or 'clouds' in condition_lc:
                 if 'partly' in condition_lc:
                     condition = 'Partly Cloudy'
                 else:
                     condition = 'Cloudy'
+            elif condition_lc == 'overcast':
+                condition = 'Cloudy'
             elif 'thunder' in condition_lc or 't-storm' in condition_lc:
                 condition = 'Thunderstorm'
             elif 'snow' in condition_lc:
@@ -139,13 +295,16 @@ class Weather(IntervalModule):
             if condition not in self.color_icons \
             else self.color_icons[condition]
 
-    @require(internet)
-    def run(self):
-        data = self.backend.weather_data()
-        data['icon'], condition_color = self.get_color_data(data['condition'])
+    def refresh_display(self):
+        self.logger.debug('Weather data: %s', self.backend.data)
+        self.backend.data['icon'], condition_color = \
+            self.get_color_data(self.backend.data['condition'])
         color = condition_color if self.colorize else self.color
 
         self.output = {
-            'full_text': formatp(self.format, **data).strip(),
+            'full_text': formatp(self.format, **self.backend.data).strip(),
             'color': color,
         }
+
+    def run(self):
+        pass
