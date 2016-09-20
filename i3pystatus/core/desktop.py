@@ -68,10 +68,9 @@ else:
             notification.set_urgency(self.URGENCY_LUT[self.urgency])
             try:
                 return notification.show()
-            except Exception as exc:
-                self.logger.error(
+            except Exception:
+                self.logger.exception(
                     'Failed to display desktop notification (is a '
-                    'notification daemon running?)',
-                    exc_info=self.log_level <= logging.DEBUG
+                    'notification daemon running?)'
                 )
                 return False
