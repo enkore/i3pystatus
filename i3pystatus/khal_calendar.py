@@ -11,66 +11,69 @@ from  datetime import datetime, date
 
 
 
-class Calendar(IntervalModule):
+class KhalCalendar(IntervalModule):
     """
-    Check events for pending events
-    Eventually we should support all theses
- http://khal.readthedocs.io/en/latest/usage.html#cmdoption--format
-event.format('{start-date} {summary}')
 
+    .. rubric:: Available formatters
 
-    Requires `requests`
+    * `{calendar}`        —  Current calendar
+    * `{nb_events}`  — number of events for the day
 
-    Availables authentication methods:
-
-    * username + password
-    * access_token (manually generate a new token at https://github.com/settings/tokens)
-
-    See https://developer.github.com/v3/#authentication for more informations.
-
-    Formatters:
-
-    * `{unread}`        — contains the value of unread_marker when there are pending notifications
-    * `{unread_count}`  — number of unread notifications, empty if 0
+        See http://khal.readthedocs.io/en/latest/usage.html#cmdoption--format
     """
 
     max_error_len = 50
-    next_event = ""
-    nb_events = ""
-    format_event = '{start-date} {summary}'
     color = '#78EAF2'
-    username = ''
-    password = ''
-    access_token = ''
-    format = '{name} / {nb_events}'
+    format = '{calendar} / {nb_events}'
     interval = 600
-    keyring_backend = None
 
-    on_leftclick = ''
+    current_calendar = None
+    config_filename = None
+    on_leftclick = 'termite -e ikhal'
+
+    on_upscroll = ["cycle_through_calendars", 1]
+    on_downscroll = ["cycle_through_calendars", -1]
 
     settings = (
-        ('format', 'format string'),
-        ('format_event', 'See http://khal.readthedocs.io/en/latest/usage.html#cmdoption--format'),
-        ("name", "calendar name"),
+        ('config_filename', "Path to your khal.conf"),
+        ('format', 'Format string'),
+        ("calendar", "calendar name"),
         ("next_event", "see https://developer.github.com/v3/#authentication"),
-        ("nb_events", "")
+        ("nb_events", "Number of events within the selection")
     )
 
     def init(self):
-        self.config = khal.settings.get_config()
-        self.collection = khal.cli.build_collection(self.config, None)
+        self.config = khal.settings.get_config(self.config_filename)
+        self.collection = None
+        self.current_calendar = None
 
         # CalendarCollection is defined in khalendar.py
-        # u can its use in khalendar_test.py
+    # def cycle_through_calendars(self, step=1):
+    #     # from itertools import cycle
+
+    #     logger.info(self.config["calendars"])
+    #     try:
+    #         idx = self.config["calendars"].index(self.current_calendar)
+    #         self.current_calendar = self.config["calendars"][idx + step % len(self.config["calendars"])]
+    #     except ValueError:
+    #         self.current_calendar = self.collection.default_calendar_name
+
+
+    def open_connection(self,):
+        logger.debug("Opening collection")
+        self.collection = khal.cli.build_collection(self.config, None,) 
+        self.current_calendar = self.collection.default_calendar_name
 
     def run(self):
 
-        format_values = dict(name='', next_event='', nb_events='')
+        format_values = dict(calendar='', next_event='', nb_events=0)
 
-        # print(self.collection)
-        format_values['name'] = self.collection.default_calendar_name
+        if self.collection is None:
+            self.open_connection()
+
+        format_values['calendar'] = self.current_calendar
         events = list(self.collection.get_events_on( date.today() ))
-        # of type event.py
+
         if len(events):
             format_values['next_event'] = events[0].summary
 
