@@ -21,13 +21,17 @@ class Ping(IntervalModule):
         "color",
         "format",
         ("color_disabled", "color when disabled"),
+        ("color", "color when latency is below threshold"),
+        ("color_bad", "color when latency is above threshold"),
         ("color_down", "color when ping fail"),
         ("format_disabled", "format string when disabled"),
         ("format_down", "format string when ping fail"),
+        ("latency_threshold", "latency threshold in ms"),
         ("host", "host to ping")
     )
 
     color = "#FFFFFF"
+    color_bad = "#FFFF00"
     color_down = "#FF0000"
     color_disabled = None
 
@@ -37,11 +41,14 @@ class Ping(IntervalModule):
     format_down = "down"
     format_disabled = None
 
+    latency_threshold = 120
     host = "8.8.8.8"
 
     on_leftclick = "switch_state"
 
     def init(self):
+        if not self.color_bad:
+            self.color_bad = self.color
         if not self.color_down:
             self.color_down = self.color
         if not self.format_disabled:
@@ -79,7 +86,11 @@ class Ping(IntervalModule):
             }
             return
 
+        color = self.color
+        if ping > self.latency_threshold:
+            color = self.color_bad
+
         self.output = {
             "full_text": self.format.format(ping=ping),
-            "color": self.color
+            "color": color
         }
