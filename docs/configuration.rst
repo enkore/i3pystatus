@@ -536,33 +536,83 @@ service that is not traditionally required for web browsing:
 Credentials
 -----------
 
-Settings that require credentials can utilize the keyring module to
-keep sensitive information out of config files.  To take advantage of
-this feature, simply use the ``i3pystatus-setting-util`` script
-installed along i3pystatus to set the credentials for a module. Once
-this is done you can add the module to your config without specifying
-the credentials, e.g.:
+For modules which require credentials, i3pystatus supports credential
+management using the keyring_ module from PyPI.
+
+.. important::
+    Many distributions have keyring_ pre-packaged, available as
+    ``python-keyring``. Unless you have KWallet_ or SecretService_ available,
+    you will also most likely need to install keyrings.alt_, which contains
+    additional keyring backends for use by the keyring_ module.
+
+    Both i3pystatus and ``i3pystatus-setting-util`` will abort with a
+    RuntimeError_ if keyring_ isinstalled but a usable keyring backend is not
+    present, so it is a good idea to install both if you plan to use a module
+    which supports credential handling.
+
+To store credentials in a keyring, use the ``i3pystatus-setting-util`` script
+installed along i3pystatus.
+
+.. note::
+    ``i3pystatus-setting-util`` will store credentials using the default
+    keyring backend. The method for determining which backend is the default
+    can be found :ref:`below <default-keyring-backend>`. If, for some reason,
+    it is necessary to use a keyring other than the default, then you will need
+    to override the default in your keyringrc.cfg_ for
+    ``i3pystatus-setting-util`` to successfully use it.
+
+Once you have successfully set up credentials, you can add the module to your
+config file without specifying the credentials in the registration, e.g.:
 
 .. code:: python
 
-    # Use the default keyring to retrieve credentials.
-    # To determine which backend is the default on your system, run
-    # python -c 'import keyring; print(keyring.get_keyring())'
+    # Use the default keyring to retrieve credentials
     status.register('github')
 
-If you don't want to use the default you can set a specific keyring like so:
+i3pystatus will locate and set the credentials during the module loading
+process. Currently supported credentials are ``password``, ``email`` and
+``username``.
 
-.. code:: python
+.. _default-keyring-backend:
 
-    # Requires the keyrings.alt package
-    from keyrings.alt.file import PlaintextKeyring
-    status.register('github', keyring_backend=PlaintextKeyring())
+.. note::
+    To determine which backend is the default on your system, run the
+    following:
 
-i3pystatus will locate and set the credentials during the module
-loading process. Currently supported credentials are "password",
-"email" and "username".
+    .. code-block:: bash
 
-.. note:: Credential handling requires the PyPI package
-   ``keyring``. Many distributions have it pre-packaged available as
-   ``python-keyring``.
+        python -c 'import keyring; print(keyring.get_keyring())'
 
+    If this command returns a ``keyring.backends.fail.Keyring`` object, none of
+    the keyrings supported out-of-the box by the keyring_ module are available,
+    and you will need to install the keyrings.alt_ Python module. keyrings.alt_
+    provides an encrypted keyring which will be seen as the default if both
+    keyrings.alt_ and keyring_ are installed, and none of the keyrings
+    supported by keyring_ are present:
+
+    .. code-block:: bash
+
+        $ python -c 'import keyring; print(keyring.get_keyring())'
+        <EncryptedKeyring at /home/username/.local/share/python_keyring/crypted_pass.cfg>
+
+If the keyring backend you used to store credentials using
+``i3pystatus-setting-util`` is not the default, then you can change which
+keyring backend i3pystatus will use in one of two ways:
+
+#. Override the default in your keyringrc.cfg_
+
+#. Import and instantiate a keyring backend class, and pass it as the
+   ``keyring_backend`` parameter when registering the module:
+
+   .. code:: python
+
+       # Requires the keyrings.alt package
+       from keyrings.alt.file import PlaintextKeyring
+       status.register('github', keyring_backend=PlaintextKeyring())
+
+.. _KWallet: http://www.kde.org/
+.. _SecretService: https://specifications.freedesktop.org/secret-service/re01.html
+.. _RuntimeError: https://docs.python.org/3/library/exceptions.html#RuntimeError
+.. _keyring: https://pypi.python.org/pypi/keyring
+.. _keyrings.alt: https://pypi.python.org/pypi/keyrings.alt
+.. _keyringrc.cfg: http://pythonhosted.org/keyring/#customize-your-keyring-by-config-file
