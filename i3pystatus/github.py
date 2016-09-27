@@ -362,13 +362,13 @@ class Github(IntervalModule):
             # event before we completed the initial status check.
             return
 
-        self.notify_status_change()
+        self.show_status_notification()
 
     @staticmethod
     def notify(message):
         return DesktopNotification(title='GitHub', body=message).display()
 
-    def skip_notify(message):
+    def skip_notify(self, message):
         self.logger.debug(
             'Desktop notifications turned off. Skipped notification: %s',
             message
@@ -468,7 +468,7 @@ class Github(IntervalModule):
                 return False
 
             if not HAS_REQUESTS:
-                self.log.error(
+                self.logger.error(
                     'The requests module is required to check GitHub notifications')
                 self.failed_update = True
                 return False
