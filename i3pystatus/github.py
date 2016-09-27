@@ -533,9 +533,19 @@ class Github(IntervalModule):
             return False
 
     def refresh_display(self):
-        color = self.colors.get(
-            self.current_status.get('status'),
-            self.unknown_color)
+        previous_color = self.output.get('color')
+        try:
+            if 'status' in self.current_status:
+                color = self.colors.get(
+                    self.current_status['status'],
+                    self.unknown_color)
+            else:
+                # Failed status update, keep the existing color
+                color = previous_color
+        except TypeError:
+            # Shouldn't get here, but this would happen if this function is
+            # called before we check the current status for the first time.
+            color = previous_color
         self.output = {'full_text': formatp(self.format, **self.data).strip(),
                        'color': color}
 
