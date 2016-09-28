@@ -13,6 +13,8 @@ class NetSpeed(IntervalModule):
     """
     Attempts to provide an estimation of internet speeds.
     Requires: speedtest-cli/modularize-2
+    speedtest-cli/modularize-2 can be installed using pip:
+    `pip install https://github.com/sivel/speedtest-cli/archive/modularize-2.zip`
     """
 
     settings = (
@@ -26,7 +28,7 @@ class NetSpeed(IntervalModule):
 
     def form_b(self, n: float)->tuple:
         """
-        formates a bps as bps/kbps/mbps/gbps etc
+        formats a bps as bps/kbps/mbps/gbps etc
         handles whether its meant to be in bytes
         :param n: input float
         :rtype tuple:
