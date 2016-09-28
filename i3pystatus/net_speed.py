@@ -14,7 +14,7 @@ class NetSpeed(IntervalModule):
     Attempts to provide an estimation of internet speeds.
     Requires: speedtest-cli/modularize-2
     speedtest-cli/modularize-2 can be installed using pip:
-    `pip install https://github.com/sivel/speedtest-cli/archive/modularize-2.zip`
+    `pip install git+https://github.com/sivel/speedtest-cli.git@modularize-2`
     """
 
     settings = (
