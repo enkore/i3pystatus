@@ -182,7 +182,7 @@ class NHL(ScoresBackend):
         'NYR': '#1576CA',
         'OTT': '#C50B2F',
         'PHI': '#FF690B',
-        'PIT': '#D9CBAE',
+        'PIT': '#FFB81C',
         'SJS': '#007888',
         'STL': '#1764AD',
         'TBL': '#296AD5',
