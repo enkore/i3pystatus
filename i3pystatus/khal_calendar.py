@@ -25,11 +25,11 @@ class KhalCalendar(IntervalModule):
     max_error_len = 50
     color = '#78EAF2'
     format = '{calendar} / {nb_events}'
-    interval = 600
+    interval = 1
 
     current_calendar = None
     config_filename = None
-    on_leftclick = 'termite -e ikhal'
+    on_rightclick = 'termite -e ikhal'
 
     on_upscroll = ["cycle_through_calendars", 1]
     on_downscroll = ["cycle_through_calendars", -1]
@@ -48,19 +48,23 @@ class KhalCalendar(IntervalModule):
         self.current_calendar = None
 
         # CalendarCollection is defined in khalendar.py
-    # def cycle_through_calendars(self, step=1):
-    #     # from itertools import cycle
+    def cycle_through_calendars(self, step=1):
+        # from itertools import cycle
 
-    #     logger.info(self.config["calendars"])
-    #     try:
-    #         idx = self.config["calendars"].index(self.current_calendar)
-    #         self.current_calendar = self.config["calendars"][idx + step % len(self.config["calendars"])]
-    #     except ValueError:
-    #         self.current_calendar = self.collection.default_calendar_name
+
+        # print(self.config["calendars"])
+        self.logger.info("hello world %s" % self.config["calendars"])
+        try:
+            calendars = self.config["calendars"].keys()
+            idx = calendars.index(self.current_calendar)
+            self.current_calendar  = calendars[ idx + step % len(calendars) ]
+            self.logger.info("Newly selected calender %s" % self.current_calendar)
+        except ValueError:
+            self.current_calendar = self.collection.default_calendar_name
 
 
     def open_connection(self,):
-        logger.debug("Opening collection")
+        self.logger.debug("Opening collection")
         self.collection = khal.cli.build_collection(self.config, None,) 
         self.current_calendar = self.collection.default_calendar_name
 
@@ -71,6 +75,7 @@ class KhalCalendar(IntervalModule):
         if self.collection is None:
             self.open_connection()
 
+        self.logger.info("Running")
         format_values['calendar'] = self.current_calendar
         events = list(self.collection.get_events_on( date.today() ))
 
