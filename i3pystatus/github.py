@@ -321,8 +321,8 @@ class Github(IntervalModule):
             self.logger.error(msg, exc_info=True)
 
     @require(internet)
-    def api_request(self, url):
-        self.logger.debug('Making API request to %s', url)
+    def status_api_request(self, url):
+        self.logger.debug('Making GitHub Status API request to %s', url)
         try:
             with urlopen(url) as content:
                 try:
@@ -332,7 +332,7 @@ class Github(IntervalModule):
                     charset = 'utf-8'
                 response_json = content.read().decode(charset).strip()
                 if not response_json:
-                    self.logger.debug('JSON response from %s was blank', url)
+                    self.logger.error('JSON response from %s was blank', url)
                     return {}
                 try:
                     response = json.loads(response_json)
@@ -439,8 +439,8 @@ class Github(IntervalModule):
             # Get most recent update
             if not hasattr(self, 'last_message_url'):
                 self.last_message_url = \
-                    self.api_request(API_METHODS_URL)['last_message_url']
-            self.current_status = self.api_request(self.last_message_url)
+                    self.status_api_request(API_METHODS_URL)['last_message_url']
+            self.current_status = self.status_api_request(self.last_message_url)
             if not self.current_status:
                 self.failed_update = True
                 return
