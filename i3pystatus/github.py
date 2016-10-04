@@ -122,12 +122,14 @@ class Github(IntervalModule):
     The below example enables desktop notifications, enables Pango hinting for
     differently-colored **update_error** and **refresh_icon** text, and alters
     the both the status text and the colors used to visually denote the current
-    status level.
+    status level. It also sets the log level to debug, for troubleshooting
+    purposes.
 
     .. code-block:: python
 
         status.register(
             'github',
+            log_level=logging.DEBUG,
             notify_status=True,
             notify_unread=True,
             access_token='0123456789abcdef0123456789abcdef01234567',
@@ -145,6 +147,11 @@ class Github(IntervalModule):
                 'major': '#af0000',
             },
         )
+
+    .. note::
+        Setting debug logging and authenticating with an access token will
+        include the access token in the log file, as the notification URL is
+        logged at this level.
 
     .. _`GitHub Status API`: https://status.github.com/api
     .. _`GitHub Status Dashboard`: https://status.github.com
@@ -465,7 +472,7 @@ class Github(IntervalModule):
                 # Auth not configured
                 self.logger.debug(
                     'No auth configured, notifications will not be checked')
-                return False
+                return True
 
             if not HAS_REQUESTS:
                 self.logger.error(
@@ -473,41 +480,114 @@ class Github(IntervalModule):
                 self.failed_update = True
                 return False
 
-            try:
-                self.logger.debug(
-                    'Making API request to retrieve unread notifications')
-                if self.access_token:
-                    self.logger.debug('Authenticating using access_token')
-                    response = requests.get(
-                        ACCESS_TOKEN_AUTH_URL % self.access_token)
-                else:
-                    self.logger.debug('Authenticating using username/password')
-                    response = requests.get(BASIC_AUTH_URL,
-                                            auth=(self.username, self.password))
-                self.logger.log(5,
-                                'Raw return from GitHub notification check: %s',
-                                response.text)
-                unread_data = json.loads(response.text)
-            except (requests.ConnectionError, requests.Timeout) as exc:
-                self.logger.error('Failed to check unread notifications: %s', exc)
-                self.failed_update = True
-                return False
-            except json.decoder.JSONDecodeError as exc:
-                self.logger.error('Error loading JSON: %s', exc)
-                self.logger.debug('JSON text that failed to load: %s', response.text)
-                self.failed_update = True
-                return False
+            self.logger.debug(
+                'Checking unread notifications using %s',
+                'access token' if self.access_token else 'username/password'
+            )
 
-            # Bad credentials or some other error
-            if isinstance(unread_data, dict):
-                raise ConfigError(
-                    unread_data.get(
-                        'message',
-                        'Unknown error encountered retrieving unread notifications'
+            old_unread_url = None
+            if self.access_token:
+                unread_url = ACCESS_TOKEN_AUTH_URL % self.access_token
+            else:
+                unread_url = BASIC_AUTH_URL
+
+            self.current_unread = set()
+            page_num = 0
+            while old_unread_url != unread_url:
+                old_unread_url = unread_url
+                page_num += 1
+                self.logger.debug(
+                    'Reading page %d of notifications (%s)',
+                    page_num, unread_url
+                )
+                try:
+                    if self.access_token:
+                        response = requests.get(unread_url)
+                    else:
+                        response = requests.get(
+                            unread_url,
+                            auth=(self.username, self.password)
+                        )
+                    self.logger.log(
+                        5,
+                        'Raw return from GitHub notification check: %s',
+                        response.text)
+                    unread_data = json.loads(response.text)
+                except (requests.ConnectionError, requests.Timeout) as exc:
+                    self.logger.error(
+                        'Failed to check unread notifications: %s', exc)
+                    self.failed_update = True
+                    return False
+                except json.decoder.JSONDecodeError as exc:
+                    self.logger.error('Error loading JSON: %s', exc)
+                    self.logger.debug(
+                        'JSON text that failed to load: %s', response.text)
+                    self.failed_update = True
+                    return False
+
+                # Bad credentials or some other error
+                if isinstance(unread_data, dict):
+                    raise ConfigError(
+                        unread_data.get(
+                            'message',
+                            'Unknown error encountered retrieving unread notifications'
+                        )
                     )
+
+                # Update the current count of unread notifications
+                self.current_unread.update(
+                    [x['id'] for x in unread_data if 'id' in x]
                 )
 
-            self.current_unread = set([x['id'] for x in unread_data if 'id' in x])
+                # Check 'Link' header for next page of notifications
+                # (https://tools.ietf.org/html/rfc5988#section-5)
+                self.logger.debug('Checking for next page of notifications')
+                try:
+                    link_header = response.headers['Link']
+                except AttributeError:
+                    self.logger.error(
+                        'No headers present in response. This might be due to '
+                        'an API change in the requests module.'
+                    )
+                    self.failed_update = True
+                    continue
+                except KeyError:
+                    self.logger.debug('Only one page of notifications present')
+                    continue
+                else:
+                    # Process 'Link' header
+                    try:
+                        links = requests.utils.parse_header_links(link_header)
+                    except Exception as exc:
+                        self.logger.error(
+                            'Failed to parse \'Link\' header: %s', exc
+                        )
+                        self.failed_update = True
+                        continue
+
+                    for link in links:
+                        try:
+                            link_rel = link['rel']
+                            if link_rel != 'next':
+                                # Link does not refer to the next page, skip it
+                                continue
+                            # Set the unread_url so that when we reach the top
+                            # of the outer loop, we have a new URL to check.
+                            unread_url = link['url']
+                            break
+                        except TypeError:
+                            # Malformed hypermedia link
+                            self.logger.warning(
+                                'Malformed hypermedia link (%s) in \'Link\' '
+                                'header (%s)', link, links
+                            )
+                            continue
+                    else:
+                        self.logger.debug('No more pages of notifications remain')
+
+            if self.failed_update:
+                return False
+
             self.data['unread_count'] = len(self.current_unread)
             self.data['unread'] = self.unread_marker \
                 if self.data['unread_count'] > 0 \
