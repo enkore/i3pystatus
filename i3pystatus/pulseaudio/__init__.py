@@ -191,10 +191,10 @@ class PulseAudio(Module, ColorRangeModule):
         subprocess.call("pacmd set-default-sink {}".format(sinks[next_sink]).split())
 
     def switch_mute(self):
-        subprocess.call(['pactl', 'set-sink-mute', self.sink, "toggle"])
+        subprocess.call(['pactl', '--', 'set-sink-mute', self.sink, "toggle"])
 
     def increase_volume(self):
-        subprocess.call(['pactl', 'set-sink-volume', self.sink, "+%s%%" % self.step])
+        subprocess.call(['pactl', '--', 'set-sink-volume', self.sink, "+%s%%" % self.step])
 
     def decrease_volume(self):
-        subprocess.call(['pactl', 'set-sink-volume', self.sink, "-%s%%" % self.step])
+        subprocess.call(['pactl', '--', 'set-sink-volume', self.sink, "-%s%%" % self.step])
