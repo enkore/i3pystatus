@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 import subprocess
 
 
-class TImewarrior(IntervalModule):
+class Timewarrior(IntervalModule):
     """
     Show current Timewarrior tracking
     Requires `json` `dateutil`
@@ -42,7 +42,7 @@ class TImewarrior(IntervalModule):
             self.track = tracks[-1]
 
         except ValueError as error:
-            print('Decoding JSON has failed')
+            self.logger.exception('Decoding JSON has failed')
             raise error
 
     def stop_or_continue(self):
