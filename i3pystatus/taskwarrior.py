@@ -72,7 +72,8 @@ class Taskwarrior(IntervalModule):
                 self.next_id = 0
 
         except ValueError:
-            print('Decoding JSON has failed')
+            self.logger.exception('Decoding JSON has failed')
+            raise
 
         format_values = dict(urgent=len(self.urgent_tasks), ready=len(self.ready_tasks), next='')
 
