@@ -41,8 +41,9 @@ class TImewarrior(IntervalModule):
             tracks = loads(tracks_json.decode("utf-8"))
             self.track = tracks[-1]
 
-        except ValueError:
+        except ValueError as error:
             print('Decoding JSON has failed')
+            raise error
 
     def stop_or_continue(self):
         self.loadTrack()
