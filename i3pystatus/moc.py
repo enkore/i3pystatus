@@ -82,7 +82,7 @@ class Moc(IntervalModule):
             self.data = fdict
 
             self.output = {
-                'full_text': formatp(self.format, **data),
+                'full_text': formatp(self.format, **self.data),
                 'color': self.color,
             }
         else:
