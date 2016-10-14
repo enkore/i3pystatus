@@ -79,11 +79,16 @@ class Moc(IntervalModule):
                 'tracknumber': re.match(r'(\d*).*', response.get('Title', '')).group(1) or 0,
             }
 
+            self.data = fdict
+
             self.output = {
-                'full_text': formatp(self.format, **fdict),
+                'full_text': formatp(self.format, **data),
                 'color': self.color,
             }
         else:
+            if hasattr(self, "data"):
+                del self.data
+
             self.output = {
                 'full_text': self.format_not_running,
                 'color': self.color_not_running,
