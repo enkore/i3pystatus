@@ -24,9 +24,9 @@ class Moc(IntervalModule):
 
     settings = (
         ('format', 'formatp string'),
-        ('format_not_running', 'Text to show if cmus is not running'),
+        ('format_not_running', 'Text to show if MOC is not running'),
         ('color', 'The color of the text'),
-        ('color_not_running', 'The color of the text, when cmus is not running'),
+        ('color_not_running', 'The color of the text, when MOC is not running'),
         ('status', 'Dictionary mapping status to output'),
     )
 
@@ -50,7 +50,7 @@ class Moc(IntervalModule):
         cmdline = 'mocp --{command}'.format(command=command)
         return run_through_shell(cmdline, enable_shell=True)
 
-    def _query_cmus(self):
+    def _query_moc(self):
         response = {}
 
         # Get raw information
@@ -65,7 +65,7 @@ class Moc(IntervalModule):
         return response
 
     def run(self):
-        response = self._query_cmus()
+        response = self._query_moc()
 
         if response:
             fdict = {
