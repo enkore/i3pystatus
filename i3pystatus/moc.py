@@ -8,7 +8,7 @@ from i3pystatus.core.util import TimeWrapper
 
 class Moc(IntervalModule):
     """
-    Display various information from MOC (musci on console)
+    Display various information from MOC (music on console)
 
     .. rubric:: Available formatters
 
