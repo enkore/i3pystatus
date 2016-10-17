@@ -21,11 +21,13 @@ class Zabbix(IntervalModule):
         ("zabbix_user", "Zabbix API User"),
         ("zabbix_password", "Zabbix users password"),
         ("interval", "Update interval"),
+        ("groups", "Provide groupids(e.g ['102', '10'])"),
         "format"
     )
 
     required = ("zabbix_server", "zabbix_user", "zabbix_password")
     interval = 60
+    groups = None
     format = "{default}"
 
     def run(self):
@@ -36,6 +38,7 @@ class Zabbix(IntervalModule):
             zapi.login(self.zabbix_user, self.zabbix_password)
             triggers = zapi.trigger.get(only_true=1,
                                         skipDependent=1,
+                                        groupids=self.groups,
                                         monitored=1,
                                         active=1,
                                         min_severity=2,
