@@ -31,7 +31,7 @@ class Zabbix(IntervalModule):
     interval = 60
     groups = None
     filter = None
-    min_severity=2
+    min_severity = 2
     format = "{default}"
 
     def run(self):
