@@ -22,12 +22,16 @@ class Zabbix(IntervalModule):
         ("zabbix_password", "Zabbix users password"),
         ("interval", "Update interval"),
         ("groups", "Provide groupids(e.g ['102', '10'])"),
+        ("filter", "Provide API-Filter(e.g {'status': '1'})"),
+        ("min_severity", "Specify min severity (0-5)"),
         "format"
     )
 
     required = ("zabbix_server", "zabbix_user", "zabbix_password")
     interval = 60
     groups = None
+    filter = None
+    min_severity=2
     format = "{default}"
 
     def run(self):
@@ -41,8 +45,9 @@ class Zabbix(IntervalModule):
                                         groupids=self.groups,
                                         monitored=1,
                                         active=1,
-                                        min_severity=2,
+                                        min_severity=self.min_severity,
                                         output=["priority"],
+                                        filter=self.filter,
                                         withLastEventUnacknowledged=1,
                                         )
             alerts_list = [t['priority'] for t in triggers]
