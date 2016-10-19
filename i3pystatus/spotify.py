@@ -1,7 +1,10 @@
 import math
 from i3pystatus import formatp
 from i3pystatus import IntervalModule
-from gi.repository import Playerctl
+
+import gi
+gi.require_version('Playerctl', '1.0')
+from gi.repository import Playerctl, GLib
 
 
 class Spotify(IntervalModule):
@@ -49,54 +52,40 @@ class Spotify(IntervalModule):
         album = player.get_album()
         status = player.props.status
 
-        # gets the length of spotify through the metadata command
-        length = ""
-
         # stores the metadata and checks if it is valid
         metadata = player.props.metadata
-        if metadata is not None:
-            # math to convert the number stored in mpris:length to a human readable format
+        try:
             time = dict(metadata)["mpris:length"] / 60.0e6
             minutes = math.floor(time)
             seconds = round(time % 1 * 60)
             if seconds < 10:
                 seconds = "0" + str(seconds)
             length = "{}:{}".format(minutes, seconds)
-
-        # sets length to an empty string if it does not exist for whatever reason. This should usually not happen
-        else:
+        except (KeyError, TypeError):
             length = ""
 
         # returns a dictionary of all spotify data
-        return {"artist": artist, "title": title, "album": album, "status": status, "length": length}
+        return {
+            "status": self.status[status.lower()] if status else None,
+            "title": title if title else "",
+            "album": album if album else "",
+            "artist": artist if artist else "",
+            "length": length,
+        }
 
     def run(self):
         """Main statement, executes all code every interval"""
 
-        # tries to create player object and get data from player
         try:
             self.player = Playerctl.Player(player_name="spotify")
 
-            response = self.get_info(self.player)
-
-            # creates a dictionary of the spotify data captured
-            fdict = {
-                'status': self.status[response['status'].lower()],
-                'title': response["title"],
-                'album': response.get('album', ''),
-                'artist': response.get('artist', ''),
-                'length': response.get('length', 0),
-            }
-            self.data = fdict
+            fdict = self.get_info(self.player)
+            
             self.output = {"full_text": formatp(self.format, **fdict),
                            "color": self.color}
-
-        # outputs the not running string if spotify is closed
-        except:
+        except GLib.Error:
             self.output = {"full_text": self.format_not_running,
                            "color": self.color_not_running}
-            if hasattr(self, "data"):
-                del self.data
 
     def playpause(self):
         """Pauses and plays spotify"""
