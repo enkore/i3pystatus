@@ -13,7 +13,7 @@ class Spotify(IntervalModule):
 
     .. rubric:: Available formatters
 
-    * `{status}` — current status icon (paused/playing)
+    * `{status}` — current status icon (paused/playing/stopped)
     * `{length}` — total song duration (mm:ss format)
     * `{artist}` — artist
     * `{title}` — title
@@ -39,6 +39,7 @@ class Spotify(IntervalModule):
     status = {
         'paused': '▷',
         'playing': '▶',
+        'stopped': '■',
     }
     player_name = None
 
@@ -69,7 +70,8 @@ class Spotify(IntervalModule):
 
         # returns a dictionary of all player data
         return {
-            "status": self.status[status.lower()] if status else None,
+            "status": self.status[status.lower()]
+            if status in self.status.keys() else "",
             "title": title if title else "",
             "album": album if album else "",
             "artist": artist if artist else "",
