@@ -50,16 +50,7 @@ class Spotify(IntervalModule):
     on_upscroll = 'next_song'
     on_downscroll = 'previous_song'
 
-    def get_info(self, player):
-        """gets player track info from playerctl"""
-
-        artist = player.get_artist()
-        title = player.get_title()
-        album = player.get_album()
-        status = player.props.status.lower()
-
-        # stores the metadata and checks if it is valid
-        metadata = player.props.metadata
+    def _get_length(self, metadata):
         try:
             time = dict(metadata)["mpris:length"] / 60.0e6
             minutes = math.floor(time)
@@ -67,28 +58,39 @@ class Spotify(IntervalModule):
             if seconds < 10:
                 seconds = "0" + str(seconds)
             length = "{}:{}".format(minutes, seconds)
-        except (KeyError, TypeError):
+        except KeyError:
             length = ""
 
-        # returns a dictionary of all player data
-        return {
-            "status": self.status[status]
-            if status in self.status.keys() else "",
-            "title": title if title else "",
-            "album": album if album else "",
-            "artist": artist if artist else "",
-            "length": length,
+        return length
+
+    def get_info(self, player):
+        """gets player track info from playerctl"""
+
+        result = {
+            "status": "",
+            "artist": "",
+            "title": "",
+            "album": "",
+            "length": "",
         }
+
+        if player.props.status:
+            result["status"] = player.props.status.lower()
+            result["artist"] = player.get_artist()
+            result["title"] = player.get_title()
+            result["album"] = player.get_album()
+            result["length"] = self._get_length(player.props.metadata)
+
+        return result
 
     def run(self):
         """Main statement, executes all code every interval"""
 
         try:
             self.player = Playerctl.Player(player_name=self.player_name)
+            data = self.get_info(self.player)
 
-            fdict = self.get_info(self.player)
-
-            self.output = {"full_text": formatp(self.format, **fdict),
+            self.output = {"full_text": formatp(self.format, **data),
                            "color": self.color}
         except GLib.Error:
             self.output = {"full_text": self.format_not_running,
