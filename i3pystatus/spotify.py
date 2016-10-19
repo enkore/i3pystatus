@@ -54,7 +54,7 @@ class Spotify(IntervalModule):
         artist = player.get_artist()
         title = player.get_title()
         album = player.get_album()
-        status = player.props.status
+        status = player.props.status.lower()
 
         # stores the metadata and checks if it is valid
         metadata = player.props.metadata
@@ -70,7 +70,7 @@ class Spotify(IntervalModule):
 
         # returns a dictionary of all player data
         return {
-            "status": self.status[status.lower()]
+            "status": self.status[status]
             if status in self.status.keys() else "",
             "title": title if title else "",
             "album": album if album else "",
