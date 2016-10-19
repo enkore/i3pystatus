@@ -74,8 +74,9 @@ class Spotify(IntervalModule):
             "length": "",
         }
 
-        if player.props.status:
-            result["status"] = player.props.status.lower()
+        status = player.props.status
+        if status:
+            result["status"] = self.status.get(status.lower(), None)
             result["artist"] = player.get_artist()
             result["title"] = player.get_title()
             result["album"] = player.get_album()
