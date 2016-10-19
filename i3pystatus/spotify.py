@@ -27,7 +27,9 @@ class Spotify(IntervalModule):
         ('color_not_running',
             'The color of the text, when player is not running'),
         ('status', 'Dictionary mapping status to output'),
-        ('player_name', 'Name of music player. If None, tries to autodetect'),
+        ('player_name',
+            'Name of music player, use `playerctl -l` with player running'
+            'to get. If None, tries to autodetect.'),
     )
 
     # default settings
