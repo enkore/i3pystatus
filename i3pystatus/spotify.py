@@ -3,13 +3,13 @@ from i3pystatus import formatp
 from i3pystatus import IntervalModule
 
 import gi
-gi.require_version('Playerctl', '1.0')
+gi.require_version('Playerctl', '1.0')  # nopep8
 from gi.repository import Playerctl, GLib
 
 
 class Spotify(IntervalModule):
     """
-    Gets Spotify info using playerctl
+    Gets Spotify (or any supported player) info using playerctl
 
     .. rubric:: Available formatters
 
@@ -22,10 +22,12 @@ class Spotify(IntervalModule):
 
     settings = (
         ('format', 'formatp string'),
-        ('format_not_running', 'Text to show if cmus is not running'),
+        ('format_not_running', 'Text to show if player is not running'),
         ('color', 'The color of the text'),
-        ('color_not_running', 'The color of the text, when cmus is not running'),
+        ('color_not_running',
+            'The color of the text, when player is not running'),
         ('status', 'Dictionary mapping status to output'),
+        ('player_name', 'Name of music player. If None, tries to autodetect'),
     )
 
     # default settings
@@ -38,6 +40,7 @@ class Spotify(IntervalModule):
         'paused': '▷',
         'playing': '▶',
     }
+    player_name = None
 
     on_leftclick = 'playpause'
     on_rightclick = 'next_song'
@@ -45,7 +48,7 @@ class Spotify(IntervalModule):
     on_downscroll = 'previous_song'
 
     def get_info(self, player):
-        """gets spotify track info from playerctl"""
+        """gets player track info from playerctl"""
 
         artist = player.get_artist()
         title = player.get_title()
@@ -64,7 +67,7 @@ class Spotify(IntervalModule):
         except (KeyError, TypeError):
             length = ""
 
-        # returns a dictionary of all spotify data
+        # returns a dictionary of all player data
         return {
             "status": self.status[status.lower()] if status else None,
             "title": title if title else "",
@@ -77,10 +80,10 @@ class Spotify(IntervalModule):
         """Main statement, executes all code every interval"""
 
         try:
-            self.player = Playerctl.Player(player_name="spotify")
+            self.player = Playerctl.Player(player_name=self.player_name)
 
             fdict = self.get_info(self.player)
-            
+
             self.output = {"full_text": formatp(self.format, **fdict),
                            "color": self.color}
         except GLib.Error:
@@ -88,7 +91,7 @@ class Spotify(IntervalModule):
                            "color": self.color_not_running}
 
     def playpause(self):
-        """Pauses and plays spotify"""
+        """Pauses and plays player"""
         self.player.play_pause()
 
     def next_song(self):
