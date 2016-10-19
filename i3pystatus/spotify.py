@@ -4,7 +4,7 @@ from i3pystatus import IntervalModule
 
 import gi
 gi.require_version('Playerctl', '1.0')  # nopep8
-from gi.repository import Playerctl, GLib
+from gi.repository import Playerctl
 
 
 class Spotify(IntervalModule):
@@ -51,8 +51,11 @@ class Spotify(IntervalModule):
     on_downscroll = 'previous_song'
 
     def _get_length(self, metadata):
+        if not metadata:
+            return ""
+
         try:
-            time = dict(metadata)["mpris:length"] / 60.0e6
+            time = metadata["mpris:length"] / 60.0e6
             minutes = math.floor(time)
             seconds = round(time % 1 * 60)
             if seconds < 10:
@@ -64,7 +67,7 @@ class Spotify(IntervalModule):
         return length
 
     def get_info(self, player):
-        """gets player track info from playerctl"""
+        """Get player track info from playerctl"""
 
         result = {
             "status": "",
@@ -76,7 +79,7 @@ class Spotify(IntervalModule):
 
         status = player.props.status
         if status:
-            result["status"] = self.status.get(status.lower(), None)
+            result["status"] = self.status.get(status.lower(), "")
             result["artist"] = player.get_artist()
             result["title"] = player.get_title()
             result["album"] = player.get_album()
@@ -87,13 +90,12 @@ class Spotify(IntervalModule):
     def run(self):
         """Main statement, executes all code every interval"""
 
-        try:
-            self.player = Playerctl.Player(player_name=self.player_name)
-            data = self.get_info(self.player)
-
+        self.player = Playerctl.Player(player_name=self.player_name)
+        data = self.get_info(self.player)
+        if data.get("status", ""):
             self.output = {"full_text": formatp(self.format, **data),
                            "color": self.color}
-        except GLib.Error:
+        else:
             self.output = {"full_text": self.format_not_running,
                            "color": self.color_not_running}
 
