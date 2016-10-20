@@ -24,8 +24,8 @@ class AptGet(Backend):
         apt = run_through_shell(command.split())
 
         out = apt.out.splitlines()
-        out = [line[5:] for line in apt.out if line.startswith("Inst ")]
-        return out.count("\n"), out
+        out = [line[5:] for line in out if line.startswith("Inst ")]
+        return len(out), out
 
 Backend = AptGet
 

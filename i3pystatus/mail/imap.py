@@ -1,60 +1,18 @@
 try:
-    from imaplib2 import IMAP4, IMAP4_SSL
+    from imaplib2.imaplib2 import IMAP4, IMAP4_SSL
     use_idle = True
-except:
+except ImportError:
     from imaplib import IMAP4, IMAP4_SSL
     use_idle = False
+import contextlib
+import time
 import socket
-from threading import *
+from threading import Thread
 
 from i3pystatus.mail import Backend
 
 
-# This is the threading object that does all the waiting on
-# the event
-class Idler(object):
-    def __init__(self, conn, callback, callback_reconnect):
-        self.thread = Thread(target=self.idle)
-        self.M = conn
-        self.callback_reconnect = callback_reconnect
-        self.event = Event()
-        self.callback = callback
-
-    def start(self):
-        self.thread.start()
-
-    def stop(self):
-        self.event.set()
-
-    def join(self):
-        self.thread.join()
-
-    def idle(self):
-
-        while True:
-            if self.event.isSet():
-                return
-
-            self.needsync = False
-
-            def callback(args):
-                if not self.event.isSet():
-                    self.needsync = True
-                    self.event.set()
-
-            try:
-                self.M.idle(callback=callback)
-                self.event.wait()
-
-                if self.needsync:
-                    self.event.clear()
-                    self.callback()
-            except:
-                break
-
-        self.M = self.callback_reconnect()
-        self.stop()
-        self.start()
+IMAP_EXCEPTIONS = (socket.error, socket.gaierror, IMAP4.abort, IMAP4.error)
 
 
 class IMAP(Backend):
@@ -84,47 +42,56 @@ class IMAP(Backend):
         if self.ssl:
             self.imap_class = IMAP4_SSL
 
-        self.conn = self.get_connection()
-
         if use_idle:
-            idler = Idler(self.conn, self.count_new_mail, self.get_connection)
-            idler.start()
+            self.thread = Thread(target=self._idle_thread)
+            self.daemon = True
+            self.thread.start()
 
-    def get_connection(self):
-        if self.connection:
-            try:
+    @contextlib.contextmanager
+    def ensure_connection(self):
+        try:
+            if self.connection:
                 self.connection.select(self.mailbox)
-            except socket.error:
-                # NOTE(sileht): retry just once if the connection have been
-                # broken to ensure this is not a sporadic connection lost.
-                # Like wifi reconnect, sleep wake up
-                try:
-                    self.connection.logout()
-                except socket.error:
-                    pass
-                self.connection = None
+            if not self.connection:
+                self.connection = self.imap_class(self.host, self.port)
+                self.connection.login(self.username, self.password)
+                self.connection.select(self.mailbox)
+            yield
+        except IMAP_EXCEPTIONS:
+            # NOTE(sileht): retry just once if the connection have been
+            # broken to ensure this is not a sporadic connection lost.
+            # Like wifi reconnect, sleep wake up
+            try:
+                self.connection.close()
+            except IMAP_EXCEPTIONS:
+                pass
+            try:
+                self.connection.logout()
+            except IMAP_EXCEPTIONS:
+                pass
+            # Wait a bit when disconnection occurs to not hog the cpu
+            time.sleep(1)
+            self.connection = None
 
-        if not self.connection:
-            self.connection = self.imap_class(self.host, self.port)
-            self.connection.login(self.username, self.password)
-            self.connection.select(self.mailbox)
-
-        return self.connection
+    def _idle_thread(self):
+        # update mail count on startup
+        with self.ensure_connection():
+            self.count_new_mail()
+        while True:
+            with self.ensure_connection():
+                # Block until new mails
+                self.connection.idle()
+                # Read how many
+                self.count_new_mail()
 
     def count_new_mail(self):
-        self.last = len(self.conn.search(None, "UnSeen")[1][0].split())
+        self.last = len(self.connection.search(None, "UnSeen")[1][0].split())
 
     @property
     def unread(self):
-        try:
-            conn = self.get_connection()
-        except socket.gaierror:
-            pass
-        else:
-            self.last = len(conn.search(None, "UnSeen")[1][0].split())
-        finally:
-            if not use_idle:
+        if not use_idle:
+            with self.ensure_connection():
                 self.count_new_mail()
-            return self.last
+        return self.last
 
 Backend = IMAP

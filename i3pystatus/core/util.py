@@ -373,7 +373,7 @@ class internet:
         try:
             socket.create_connection(cls.address, 1).close()
             return True
-        except OSError:
+        except (OSError, socket.gaierror):
             return False
 
 

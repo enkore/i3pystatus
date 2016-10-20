@@ -44,6 +44,8 @@ MOCK_MODULES = [
     "vlc",
     "dateutil.tz",
     "i3ipc",
+    "dateutil.parser",
+    "dateutil.relativedelta",
 ]
 
 for mod_name in MOCK_MODULES:
