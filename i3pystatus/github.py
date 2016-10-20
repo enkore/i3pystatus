@@ -430,8 +430,6 @@ class Github(IntervalModule):
             if self.failed_update \
             else ''
         self.refresh_display()
-        if self.failed_update:
-            self.notify('Error occurred updating module. See log for details.')
 
     @require(internet)
     def update_status(self):
