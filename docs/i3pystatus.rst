@@ -7,7 +7,7 @@ Module reference
 .. rubric:: Module overview:
 
 :System: `clock`_ - `cpu_freq`_ - `cpu_usage`_ - `disk`_ - `keyboard_locks`_ - `load`_ - `mem`_ -
-         `uname`_ - `uptime`_ - `xkblayout`_
+         `swap`_ - `uname`_ - `uptime`_ - `xkblayout`_
 :Audio: `alsa`_ - `pulseaudio`_
 :Hardware: `backlight`_ - `battery`_ - `temp`_
 :Network: `net_speed`_ - `network`_ - `online`_ - `openstack_vms`_ - `openvpn`_
