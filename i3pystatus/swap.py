@@ -19,7 +19,7 @@ class Swap(IntervalModule):
 
     format = "{free} MiB"
     format_no_swap = "No swap"
-    hide_if_empty = True
+    hide_if_empty = False
     divisor = 1024 ** 2
     color = "#00FF00"
     warn_color = "#FFFF00"
