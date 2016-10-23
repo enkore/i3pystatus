@@ -54,7 +54,6 @@ class Redshift(IntervalModule):
         self.error = ""
 
         # Setup signals to property changes
-        self._controller.connect('inhibit-changed', self.inhibit_change_cb)
         self._controller.connect('period-changed', self.period_change_cb)
         self._controller.connect('temperature-changed', self.temperature_change_cb)
         self._controller.connect('location-changed', self.location_change_cb)
@@ -81,11 +80,6 @@ class Redshift(IntervalModule):
                 "color": self.error_color
             }
 
-    # State update functions
-    def inhibit_change_cb(self, controller, inhibit):
-        """Callback when controller changes inhibition status"""
-        self.inhibit = inhibit
-
     def period_change_cb(self, controller, period):
         """Callback when controller changes period"""
         self.period = period
@@ -107,8 +101,10 @@ class Redshift(IntervalModule):
         """Enable/disable redshift"""
         if self.inhibit:
             self._controller.set_inhibit(False)
+            self.inhibit = False
         else:
             self._controller.set_inhibit(True)
+            self.inhibit = True
 
     def run(self):
         if self.error:
