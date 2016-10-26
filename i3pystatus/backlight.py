@@ -49,6 +49,8 @@ class Backlight(File):
 
         if len(backlight_entries) == 0:
             self.run = run_no_backlight
+            super().init()
+            return
 
         self.base_path = backlight_entries[0]
         self.has_xbacklight = shutil.which("xbacklight") is not None
