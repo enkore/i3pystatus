@@ -2,7 +2,7 @@ import os
 import re
 import signal
 import threading
-from subprocess import Popen, PIPE, CalledProcessError
+from subprocess import Popen, PIPE
 
 from i3pystatus import IntervalModule, formatp
 
@@ -100,9 +100,7 @@ class RedshiftController(threading.Thread):
             self.parse_output(line)
 
         self._p.stdout.close()
-        return_code = self._p.wait()
-        if return_code != 0:
-            raise CalledProcessError("redshift exited with {} return code".format(return_code))
+        self._p.wait(10)
 
 
 class Redshift(IntervalModule):
@@ -162,8 +160,8 @@ class Redshift(IntervalModule):
             self.inhibit = True
 
     def run(self):
-        self.update_values()
-        try:
+        if self._controller.is_alive():
+            self.update_values()
             fdict = {
                 "inhibit": self.format_inhibit[int(self.inhibit)],
                 "period": self.period,
@@ -171,12 +169,13 @@ class Redshift(IntervalModule):
                 "latitude": self.latitude,
                 "longitude": self.longitude,
             }
+            output = formatp(self.format, **fdict)
             color = self.color
-        except CalledProcessError as err:
-            fdict = {"error": err}
+        else:
+            output = "redshift exited unexpectedly"
             color = self.error_color
 
         self.output = {
-            "full_text": formatp(self.format, **fdict),
+            "full_text": output,
             "color": color,
         }
