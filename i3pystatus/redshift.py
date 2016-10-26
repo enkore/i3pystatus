@@ -32,7 +32,14 @@ class RedshiftController(threading.Thread):
 
         env = os.environ.copy()
         env['LANG'] = env['LANGUAGE'] = env['LC_ALL'] = env['LC_MESSAGES'] = 'C'
-        self._p = Popen(cmd, env=env, stdout=PIPE, bufsize=1, universal_newlines=True)
+
+        self._params = {
+            "args": cmd,
+            "env": env,
+            "bufsize": 1,
+            "stdout": PIPE,
+            "universal_newlines": True,
+        }
 
     def parse_output(self, line):
         """Convert output to key value pairs"""
@@ -96,11 +103,10 @@ class RedshiftController(threading.Thread):
             self._inhibited = inhibit
 
     def run(self):
-        for line in self._p.stdout:
-            self.parse_output(line)
-
-        self._p.stdout.close()
-        self._p.wait(10)
+        with Popen(**self._params) as proc:
+            for line in proc.stdout:
+                self.parse_output(line)
+            proc.wait(10)
 
 
 class Redshift(IntervalModule):
