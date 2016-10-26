@@ -9,7 +9,7 @@ from i3pystatus import IntervalModule, formatp
 
 class RedshiftController(threading.Thread):
 
-    def __init__(self, args=""):
+    def __init__(self, args=[]):
         """Initialize controller and start child process
 
         The parameter args is a list of command line arguments to pass on to
@@ -26,7 +26,7 @@ class RedshiftController(threading.Thread):
         self._period = 'Unknown'
         self._location = (0.0, 0.0)
 
-        cmd = ["redshift"]
+        cmd = ["redshift"] + args
         if "-v" not in cmd:
             cmd += ["-v"]
 
