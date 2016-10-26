@@ -48,7 +48,7 @@ class Backlight(File):
         backlight_entries = sorted(glob.glob(self.base_path))
 
         if len(backlight_entries) == 0:
-            self.run = run_no_backlight
+            self.run = self.run_no_backlight
             super().init()
             return
 
