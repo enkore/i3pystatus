@@ -25,6 +25,7 @@ class RedshiftController(threading.Thread):
         self._temperature = 0
         self._period = 'Unknown'
         self._location = (0.0, 0.0)
+        self._pid = None
 
         cmd = ["redshift"] + args
         if "-v" not in cmd:
@@ -98,12 +99,13 @@ class RedshiftController(threading.Thread):
 
     def set_inhibit(self, inhibit):
         """Set inhibition state"""
-        if inhibit != self._inhibited:
-            os.kill(self._p.pid, signal.SIGUSR1)
+        if self._pid and inhibit != self._inhibited:
+            os.kill(self._pid, signal.SIGUSR1)
             self._inhibited = inhibit
 
     def run(self):
         with Popen(**self._params) as proc:
+            self._pid = proc.pid
             for line in proc.stdout:
                 self.parse_output(line)
             proc.wait(10)
