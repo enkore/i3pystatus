@@ -106,13 +106,14 @@ class Status:
         if not module:
             return
 
+        err_colour = "#FF0000"
         try:
             return self.modules.append(module, *args, **kwargs)
         except ImportError as import_error:
             if import_error.name and not import_error.path and isinstance(module, str):
                 # This is a package/module not found exception raised by importing a module on-the-fly
                 return self.modules.append(Text(
-                    color="#FF0000",
+                    color=err_colour,
                     text="{i3py_mod}: Missing Python module '{missing_module}'".format(
                         i3py_mod=module,
                         missing_module=import_error.name)))
@@ -120,8 +121,17 @@ class Status:
                 raise import_error
         except ConfigError as configuration_error:
             return self.modules.append(Text(
-                color="#FF0000",
+                color=err_colour,
                 text=configuration_error.message))
+        except Exception as e:
+            return self.modules.append(Text(
+                color=err_colour,
+                text="{i3py_mod}: Fatal Error - {ex}({msg})".format(
+                    i3py_mod=module,
+                    ex=e.__class__.__name__,
+                    msg=e
+                )
+            ))
 
     def run(self):
         """
