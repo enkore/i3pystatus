@@ -16,6 +16,8 @@ class Xkblayout(IntervalModule):
     ``layouts`` can be stated with or without variants,
     e.g.: ``status.register("xkblayout", layouts=["de neo", "de"])``
 
+    Requires xkbgroup (from PyPI)
+
     .. rubric:: Available formatters
 
     * `{num}` — current group number
