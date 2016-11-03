@@ -47,6 +47,7 @@ MOCK_MODULES = [
     "dateutil.parser",
     "dateutil.relativedelta",
     "redshift_gtk.statusicon",
+    "xkbgroup",
 ]
 
 for mod_name in MOCK_MODULES:
