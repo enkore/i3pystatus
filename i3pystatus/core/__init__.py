@@ -9,6 +9,7 @@ from i3pystatus.core.imputil import ClassFinder
 from i3pystatus.core.modules import Module
 
 DEFAULT_LOG_FORMAT = '%(asctime)s [%(levelname)-8s][%(name)s %(lineno)d] %(message)s'
+log = logging.getLogger(__name__)
 
 
 class CommandEndpoint:
@@ -108,20 +109,16 @@ class Status:
 
         try:
             return self.modules.append(module, *args, **kwargs)
-        except ImportError as import_error:
-            if import_error.name and not import_error.path and isinstance(module, str):
-                # This is a package/module not found exception raised by importing a module on-the-fly
-                return self.modules.append(Text(
-                    color="#FF0000",
-                    text="{i3py_mod}: Missing Python module '{missing_module}'".format(
-                        i3py_mod=module,
-                        missing_module=import_error.name)))
-            else:
-                raise import_error
-        except ConfigError as configuration_error:
+        except Exception as e:
+            log.exception(e)
             return self.modules.append(Text(
                 color="#FF0000",
-                text=configuration_error.message))
+                text="{i3py_mod}: Fatal Error - {ex}({msg})".format(
+                    i3py_mod=module,
+                    ex=e.__class__.__name__,
+                    msg=e
+                )
+            ))
 
     def run(self):
         """
