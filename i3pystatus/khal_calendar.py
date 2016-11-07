@@ -39,12 +39,11 @@ class KhalCalendar(IntervalModule):
 
     def init(self):
         self.collection = None
- 
 
     def open_connection(self,):
-        self.logger.debug("Opening collection")
+        self.logger.debug("Opening collection with config %s" % (self.config_filename))
         config = khal.settings.get_config(self.config_filename)
-        self.collection = khal.cli.build_collection(config, None,)
+        self.collection = khal.cli.build_collection(config, None)
         self.logger.debug("Available calendars=%s" % self.collection.names)
 
     def run(self):
