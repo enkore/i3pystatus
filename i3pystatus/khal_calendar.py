@@ -38,18 +38,20 @@ class KhalCalendar(IntervalModule):
     )
 
     def init(self):
-        self.config = khal.settings.get_config(self.config_filename)
         self.collection = None
+ 
 
     def open_connection(self,):
         self.logger.debug("Opening collection")
-        self.collection = khal.cli.build_collection(self.config, None,)
+        config = khal.settings.get_config(self.config_filename)
+        self.collection = khal.cli.build_collection(config, None,)
         self.logger.debug("Available calendars=%s" % self.collection.names)
 
     def run(self):
 
         format_values = dict(calendar='', next_event='', nb_events=0)
 
+        # try:
         if self.collection is None:
             self.open_connection()
 
@@ -73,6 +75,8 @@ class KhalCalendar(IntervalModule):
             format_values['next_event'] = events[0].summary
 
         format_values['nb_events'] = len(events)
+        # except Exception as e:
+        #     self.logger.error(e)
 
         self.data = format_values
         self.output = {
