@@ -4,3 +4,4 @@ colour>=0.0.5
 mock>=1.0
 pycodestyle>=1.5.7
 i3ipc>=1.2.0
+khal>=0.8
