@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name="i3pystatus",
       version="3.35",
@@ -15,17 +15,7 @@ setup(name="i3pystatus",
           "Programming Language :: Python :: 3",
           "Topic :: Desktop Environment :: Window Managers",
       ],
-      packages=[
-          "i3pystatus",
-          "i3pystatus.core",
-          "i3pystatus.tools",
-          "i3pystatus.mail",
-          "i3pystatus.pulseaudio",
-          "i3pystatus.scores",
-          "i3pystatus.updates",
-          "i3pystatus.utils",
-          "i3pystatus.weather",
-      ],
+      packages=find_packages(include=['i3pystatus', 'i3pystatus.*']),
       entry_points={
           "console_scripts": [
               "i3pystatus = i3pystatus:main",
