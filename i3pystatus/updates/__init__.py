@@ -126,7 +126,10 @@ class Updates(Module):
         for backend in self.backends:
             name = backend.__class__.__name__
             updates, notif_body = backend.updates
-            updates_count += updates
+            try:
+                updates_count += updates
+            except TypeError:
+                pass
             self.data[name] = updates
             self.notif_body[name] = notif_body or ""
 
