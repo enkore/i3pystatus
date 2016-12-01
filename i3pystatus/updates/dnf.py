@@ -1,9 +1,17 @@
 from i3pystatus.updates import Backend
+import sys
+
+# Remove first dir from sys.path to avoid shadowing dnf module from
+# site-packages dir when this module executed directly on the CLI.
+__module_dir = sys.path.pop(0)
 try:
     import dnf
     HAS_DNF_BINDINGS = True
 except ImportError:
     HAS_DNF_BINDINGS = False
+finally:
+    # Replace the directory we popped earlier
+    sys.path.insert(0, __module_dir)
 
 
 class Dnf(Backend):
