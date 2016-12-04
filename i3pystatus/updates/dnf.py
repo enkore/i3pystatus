@@ -22,6 +22,31 @@ class Dnf(Backend):
     available update.
 
     .. _`DNF API`: http://dnf.readthedocs.io/en/latest/api.html
+
+    .. note::
+        Users running i3pystatus from a virtualenv may see the updates display
+        as ``?`` due to an inability to import the ``dnf`` module. To ensure
+        that i3pystatus can access the DNF Python bindings, the virtualenv
+        should be created with ``--system-site-packages``.
+
+        If using `pyenv-virtualenv`_, the virtualenv must additionally be
+        created to use the system Python binary:
+
+        .. code-block:: bash
+
+            $ pyenv virtualenv --system-site-packages --python=/usr/bin/python3 pyenv_name
+
+        To invoke i3pystatus with this virtualenv, your ``bar`` section in
+        ``~/.config/i3/config`` would look like this:
+
+        .. code-block:: bash
+
+            bar {
+                position top
+                status_command PYENV_VERSION=pyenv_name python /path/to/i3pystatus/script.py
+            }
+
+    .. _`pyenv-virtualenv`: https://github.com/yyuu/pyenv-virtualenv
     """
 
     @property
