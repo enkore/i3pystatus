@@ -27,12 +27,14 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
         ("graph_width", "Width of the cpu usage graph"),
         ("graph_style", "Graph style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake')"),
+        ("direction" , "Graph running direction ('lr', 'rl')"),
     )
 
     graph_width = 15
     graph_style = 'blocks'
     format = '{cpu_graph}'
     cpu = 'usage_cpu'
+    direction = 'lr'
 
     def init(self):
         super().init()
@@ -47,6 +49,10 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
         self.cpu_readings = self.cpu_readings[:self.graph_width]
 
         graph = make_graph(self.cpu_readings, 0.0, 100.0, self.graph_style)
+
+        if self.direction is "rl":
+            graph = graph[::-1]
+
         format_options.update({'cpu_graph': graph})
 
         color = self.get_gradient(core_reading, self.colors)
