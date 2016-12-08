@@ -27,14 +27,14 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
         ("graph_width", "Width of the cpu usage graph"),
         ("graph_style", "Graph style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake')"),
-        ("direction", "Graph running direction ('lr', 'rl')"),
+        ("direction", "Graph running direction ('left-to-right', 'right-to-left')"),
     )
 
     graph_width = 15
     graph_style = 'blocks'
     format = '{cpu_graph}'
     cpu = 'usage_cpu'
-    direction = 'lr'
+    direction = 'left-to-right'
 
     def init(self):
         super().init()
@@ -50,8 +50,12 @@ class CpuUsageGraph(CpuUsage, ColorRangeModule):
 
         graph = make_graph(self.cpu_readings, 0.0, 100.0, self.graph_style)
 
-        if self.direction is "rl":
+        if self.direction == "right-to-left":
             graph = graph[::-1]
+        elif self.direction == "left-to-right":
+            pass
+        else:
+            raise Exception("Invalid direction '%s'." % self.direction)
 
         format_options.update({'cpu_graph': graph})
 
