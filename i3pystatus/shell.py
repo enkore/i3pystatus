@@ -1,6 +1,5 @@
 from i3pystatus import IntervalModule
 from i3pystatus.core.command import run_through_shell
-import logging
 
 
 class Shell(IntervalModule):
@@ -14,9 +13,11 @@ class Shell(IntervalModule):
 
     color = "#FFFFFF"
     error_color = "#FF0000"
+    ignore_emtpy_stdout = False
 
     settings = (
         ("command", "command to be executed"),
+        ("ignore_emtpy_stdout", "Let the block be empty"),
         ("color", "standard color"),
         ("error_color", "color to use when non zero exit code is returned"),
         "format"
@@ -36,7 +37,11 @@ class Shell(IntervalModule):
         elif stderr:
             out = stderr
 
+        full_text = self.format.format(output=out).strip()
+        if not full_text and not self.ignore_emtpy_stdout:
+            full_text = "Command `%s` returned %d" % (self.command, retvalue)
+
         self.output = {
-            "full_text": self.format.format(output=out) if out else "Command `%s` returned %d" % (self.command, retvalue),
+            "full_text": full_text,
             "color": self.color if retvalue == 0 else self.error_color
         }
