@@ -2,5 +2,5 @@ pytest>=2.5
 sphinx>=1.1
 colour>=0.0.5
 mock>=1.0
-pep8>=1.5.7
+pycodestyle>=1.5.7
 i3ipc>=1.2.0

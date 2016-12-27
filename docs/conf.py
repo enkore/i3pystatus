@@ -24,7 +24,7 @@ MOCK_MODULES = [
     "netifaces", "psutil",
     "lxml.html", "lxml.cssselect", "lxml",
     "praw",
-    "gi.repository", "dbus.mainloop.glib", "dbus",
+    "gi", "gi.repository", "dbus.mainloop.glib", "dbus",
     "pywapi", "basiciw",
     "i3pystatus.pulseaudio.pulse",
     "notmuch",
@@ -46,6 +46,7 @@ MOCK_MODULES = [
     "i3ipc",
     "dateutil.parser",
     "dateutil.relativedelta",
+    "redshift_gtk.statusicon",
 ]
 
 for mod_name in MOCK_MODULES:
