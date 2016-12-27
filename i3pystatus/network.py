@@ -286,6 +286,7 @@ class Network(IntervalModule, ColorRangeModule):
         ("round_size", "defines number of digits in round"),
         ("detached_down", "If the interface doesn't exist, display it as if it were down"),
         ("unknown_up", "If the interface is in unknown state, display it as if it were up"),
+        ("next_if_down", "Change to next interface if current one is down"),
     )
 
     interval = 1
@@ -302,6 +303,7 @@ class Network(IntervalModule, ColorRangeModule):
     recv_limit = 2048
     sent_limit = 1024
     separate_color = False
+    next_if_down = False
 
     # Network traffic settings
     divisor = 1024
@@ -409,6 +411,8 @@ class Network(IntervalModule, ColorRangeModule):
         else:
             color = self.color_down
             format_str = self.format_down
+            if self.next_if_down:
+                self.cycle_interface()
 
         network_info = self.network_info.get_info(self.interface)
         format_values.update(network_info)

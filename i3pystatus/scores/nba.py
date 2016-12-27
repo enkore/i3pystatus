@@ -269,7 +269,7 @@ class NBA(ScoresBackend):
             period_diff = period_number - total_periods
             ret['quarter'] = 'OT' \
                 if period_diff == 1 \
-                else '%dOT' if period_diff > 1 \
+                else '%dOT' % period_diff if period_diff > 1 \
                 else self.add_ordinal(period_number)
         else:
             ret['quarter'] = ''
