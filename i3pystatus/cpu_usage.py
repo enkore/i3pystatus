@@ -31,7 +31,7 @@ class CpuUsage(IntervalModule, ColorRangeModule):
     format_all = "{core}:{usage:02}%"
     exclude_average = False
     interval = 1
-    color = None
+    color = '#FFFFFF'
     dynamic_color = False
     upper_limit = 100
     settings = (
@@ -56,9 +56,6 @@ class CpuUsage(IntervalModule, ColorRangeModule):
             self.key = self.key[0]
         else:
             self.key = 'usage_cpu'
-
-        if not self.color:
-            self.color = '#FFFFFF'
 
         if not self.dynamic_color:
             self.start_color = self.color
