@@ -181,7 +181,7 @@ cleartext to the server.)"),
         try:
             self._mpd_command(self.s, "play"
                               if self._mpd_command(self.s, "status")["state"]
-                              in ["pause", "stop"] else "pause")
+                              in ["pause", "stop"] else "pause 1")
         except Exception as e:
             pass
 
