@@ -36,6 +36,21 @@ Emulates ``mpc toggle``.
 next``.
     * ``previous_song`` — Goes to previous track in the playlist. Emulates \
 ``mpc prev``.
+    * ``mpd_command`` — Send a command directly to MPD's socket. The command \
+is the second element of the list. Documentation for available commands can \
+be found at https://www.musicpd.org/doc/protocol/command_reference.html
+
+    Example module registration with callbacks:
+
+    ::
+
+        status.register("mpd",
+            on_leftclick="switch_playpause",
+            on_rightclick=["mpd_command", "stop"],
+            on_middleclick=["mpd_command", "shuffle"],
+            on_upscroll=["mpd_command", "seekcur -10"],
+            on_downscroll=["mpd_command", "seekcur +10"])
+
     """
 
     interval = 1
@@ -185,5 +200,11 @@ cleartext to the server.)"),
     def previous_song(self):
         try:
             self._mpd_command(self.s, "previous")
+        except Exception as e:
+            pass
+
+    def mpd_command(self, command):
+        try:
+            self._mpd_command(self.s, command)
         except Exception as e:
             pass
