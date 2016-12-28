@@ -8,6 +8,14 @@ from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import TimeWrapper
 
 
+class Dbus:
+    obj_dbus = "org.freedesktop.DBus"
+    path_dbus = "/org/freedesktop/DBus"
+    obj_player = "org.mpris.MediaPlayer2"
+    path_player = "/org/mpris/MediaPlayer2"
+    intf_player = obj_player + ".Player"
+
+
 class NoPlayerException(Exception):
     pass
 
@@ -89,11 +97,11 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
     old_player = None
 
     def find_player(self):
-        obj = dbus.SessionBus().get_object("org.freedesktop.DBus", "/org/freedesktop/DBus")
+        obj = dbus.SessionBus().get_object(Dbus.obj_dbus, Dbus.path_dbus)
 
         def get_players(methodname):
-            method = obj.get_dbus_method(methodname, 'org.freedesktop.DBus')
-            return [a for a in method() if a.startswith("org.mpris.MediaPlayer2.")]
+            method = obj.get_dbus_method(methodname, Dbus.obj_dbus)
+            return [a for a in method() if a.startswith(Dbus.obj_player + ".")]
 
         players = get_players('ListNames')
         if not players:
@@ -107,23 +115,23 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
 
     def get_player(self):
         if self.player:
-            player = "org.mpris.MediaPlayer2." + self.player
+            player = Dbus.obj_player + "." + self.player
             try:
-                return dbus.SessionBus().get_object(player, "/org/mpris/MediaPlayer2")
+                return dbus.SessionBus().get_object(player, Dbus.path_player)
             except dbus.exceptions.DBusException:
                 raise NoPlayerException()
         else:
             player = self.find_player()
-            return dbus.SessionBus().get_object(player, "/org/mpris/MediaPlayer2")
+            return dbus.SessionBus().get_object(player, Dbus.path_player)
 
     def run(self):
         try:
             player = self.get_player()
-            properties = dbus.Interface(player, "org.freedesktop.DBus.Properties")
+            properties = dbus.Interface(player, Dbus.obj_dbus + ".Properties")
 
             def get_prop(name, default=None):
                 try:
-                    return properties.Get("org.mpris.MediaPlayer2.Player", name)
+                    return properties.Get(Dbus.intf_player, name)
                 except dbus.exceptions.DBusException:
                     return default
 
@@ -179,7 +187,7 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
 
     def playpause(self):
         try:
-            dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player").PlayPause()
+            dbus.Interface(self.get_player(), Dbus.intf_player).PlayPause()
         except NoPlayerException:
             return
         except dbus.exceptions.DBusException:
@@ -187,7 +195,7 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
 
     def next_song(self):
         try:
-            dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player").Next()
+            dbus.Interface(self.get_player(), Dbus.intf_player).Next()
         except NoPlayerException:
             return
         except dbus.exceptions.DBusException:
@@ -195,7 +203,7 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
 
     def player_command(self, command, *args):
         try:
-            interface = dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player")
+            interface = dbus.Interface(self.get_player(), Dbus.intf_player)
             getattr(interface, command)(*args)
         except NoPlayerException:
             return
