@@ -33,10 +33,13 @@ track.
     .. rubric:: Available formatters (uses :ref:`formatp`)
 
     * `{title}` — (the title of the current song)
-    * `{album}` — (the album of the current song, can be an empty string (e.g. for online streams))
+    * `{album}` — (the album of the current song, can be an empty string \
+(e.g. for online streams))
     * `{artist}` — (can be empty, too)
-    * `{filename}` — (file name with out extension and path; empty unless title is empty)
-    * `{song_elapsed}` — (position in the currently playing song, uses :ref:`TimeWrapper`, default is `%m:%S`)
+    * `{filename}` — (file name with out extension and path; empty unless \
+title is empty)
+    * `{song_elapsed}` — (position in the currently playing song, uses \
+:ref:`TimeWrapper`, default is `%m:%S`)
     * `{song_length}` — (length of the current song, same as song_elapsed)
     * `{status}` — (play, pause, stop mapped through the `status` dictionary)
     * `{volume}` — (volume)
@@ -146,22 +149,28 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
             currentsong = get_prop("Metadata")
 
             fdict = {
-                "status": self.status[self.statusmap[get_prop("PlaybackStatus")]],
-                "len": 0,  # TODO: Use optional(!) TrackList interface for this to gain 100 % mpd<->now_playing compat
+                "status": self.status[self.statusmap[
+                    get_prop("PlaybackStatus")]],
+                # TODO: Use optional(!) TrackList interface for this to
+                # gain 100 % mpd<->now_playing compat
+                "len": 0,
                 "pos": 0,
                 "volume": int(get_prop("Volume", 0) * 100),
 
                 "title": currentsong.get("xesam:title", ""),
                 "album": currentsong.get("xesam:album", ""),
                 "artist": ", ".join(currentsong.get("xesam:artist", "")),
-                "song_length": TimeWrapper((currentsong.get("mpris:length") or 0) / 1000 ** 2),
-                "song_elapsed": TimeWrapper((get_prop("Position") or 0) / 1000 ** 2),
+                "oong_length": TimeWrapper((currentsong.get("mpris:length") or
+                                            0) / 1000 ** 2),
+                "song_elapsed": TimeWrapper((get_prop("Position") or 0) /
+                                            1000 ** 2),
                 "filename": "",
             }
 
             if not fdict["title"]:
                 fdict["filename"] = '.'.join(
-                    basename((currentsong.get("xesam:url") or "")).split('.')[:-1])
+                    basename((currentsong.get("xesam:url") or "")).
+                    split('.')[:-1])
 
             self.data = fdict
             self.output = {
