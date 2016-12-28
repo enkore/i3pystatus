@@ -51,6 +51,9 @@ be found at https://www.musicpd.org/doc/protocol/command_reference.html
             on_upscroll=["mpd_command", "seekcur -10"],
             on_downscroll=["mpd_command", "seekcur +10"])
 
+    Note that ``next_song`` and ``previous_song``, and their ``mpd_command`` \
+equivalents, are ignored while mpd is stopped.
+
     """
 
     interval = 1
