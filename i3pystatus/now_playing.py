@@ -1,5 +1,3 @@
-
-import functools
 from os.path import basename
 
 import dbus
