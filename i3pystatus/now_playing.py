@@ -30,6 +30,26 @@ class NowPlaying(IntervalModule):
     * `{song_length}` — (length of the current song, same as song_elapsed)
     * `{status}` — (play, pause, stop mapped through the `status` dictionary)
     * `{volume}` — (volume)
+
+    .. rubric:: Available callbacks
+
+    * ``playpause`` — Plays if paused or stopped, otherwise pauses.
+    * ``next_song`` — Goes to next track in the playlist.
+    * ``player_command`` — Invoke a command with the `MediaPlayer2.Player` \
+interface. The method name and its arguments are appended as list elements. \
+Documentation for available methods can be found at \
+https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
+
+    Example module registration with callbacks:
+
+    ::
+
+        status.register("now_playing",
+            on_leftclick=["player_command", "PlayPause"],
+            on_rightclick=["player_command", "Stop"],
+            on_upscroll=["player_command", "Seek", -10000000],
+            on_downscroll=["player_command", "Seek", +10000000])
+
     """
 
     interval = 1
@@ -168,6 +188,15 @@ class NowPlaying(IntervalModule):
     def next_song(self):
         try:
             dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player").Next()
+        except NoPlayerException:
+            return
+        except dbus.exceptions.DBusException:
+            return
+
+    def player_command(self, command, *args):
+        try:
+            interface = dbus.Interface(self.get_player(), "org.mpris.MediaPlayer2.Player")
+            getattr(interface, command)(*args)
         except NoPlayerException:
             return
         except dbus.exceptions.DBusException:
