@@ -23,11 +23,14 @@ class NoPlayerException(Exception):
 
 class NowPlaying(IntervalModule):
     """
-    Shows currently playing track information, supports most media players
+    Shows currently playing track information. Supports media players that \
+conform to the Media Player Remote Interfacing Specification.
 
-    * Requires python-dbus available from every distros' package manager.
+    * Requires ``python-dbus`` from your distro package manager, or \
+``dbus-python`` from PyPI.
 
-    Left click on the module play/pauses, right click goes to the next track.
+    Left click on the module to play/pause, and right click to go to the next \
+track.
 
     .. rubric:: Available formatters (uses :ref:`formatp`)
 
