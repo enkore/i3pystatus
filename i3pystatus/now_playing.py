@@ -13,6 +13,7 @@ class Dbus:
     path_dbus = "/org/freedesktop/DBus"
     obj_player = "org.mpris.MediaPlayer2"
     path_player = "/org/mpris/MediaPlayer2"
+    intf_props = obj_dbus + ".Properties"
     intf_player = obj_player + ".Player"
 
 
@@ -44,9 +45,14 @@ class NowPlaying(IntervalModule):
     * ``playpause`` — Plays if paused or stopped, otherwise pauses.
     * ``next_song`` — Goes to next track in the playlist.
     * ``player_command`` — Invoke a command with the `MediaPlayer2.Player` \
-interface. The method name and its arguments are appended as list elements. \
-Documentation for available methods can be found at \
+interface. The method name and its arguments are appended as list elements.
+    * ``player_prop`` — Get or set a property of the `MediaPlayer2.Player` \
+interface. Append the property name to get, or the name and a value to set.
+
+    `MediaPlayer2.Player` methods and properties are documented at \
 https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
+
+    Your player may not support the full interface.
 
     Example module registration with callbacks:
 
@@ -55,6 +61,7 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
         status.register("now_playing",
             on_leftclick=["player_command", "PlayPause"],
             on_rightclick=["player_command", "Stop"],
+            on_middleclick=["player_prop", "Shuffle", True],
             on_upscroll=["player_command", "Seek", -10000000],
             on_downscroll=["player_command", "Seek", +10000000])
 
@@ -127,7 +134,7 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
     def run(self):
         try:
             player = self.get_player()
-            properties = dbus.Interface(player, Dbus.obj_dbus + ".Properties")
+            properties = dbus.Interface(player, Dbus.intf_props)
 
             def get_prop(name, default=None):
                 try:
@@ -205,6 +212,19 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
         try:
             interface = dbus.Interface(self.get_player(), Dbus.intf_player)
             getattr(interface, command)(*args)
+        except NoPlayerException:
+            return
+        except dbus.exceptions.DBusException:
+            return
+
+    def player_prop(self, name, value=None):
+        try:
+            properties = dbus.Interface(self.get_player(), Dbus.intf_props)
+            # None/null/nil implies get because it's not a valid DBus datatype.
+            if value is None:
+                return properties.Get(Dbus.intf_player, name)
+            else:
+                properties.Set(Dbus.intf_player, name, value)
         except NoPlayerException:
             return
         except dbus.exceptions.DBusException:
