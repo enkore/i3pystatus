@@ -7,7 +7,14 @@ __author__ = 'facetoe'
 class OpenVPN(IntervalModule):
     """
     Monitor OpenVPN connections.
-    Currently only supports systems that use Systemd.
+
+    .. note::
+        This module currently only supports systemd. Additionally, as of
+        OpenVPN 2.4 the unit names have changed, as the OpenVPN server and
+        client now have distinct unit files (``openvpn-server@.service`` and
+        ``openvpn-client@.service``, respectively). Those who have updated to
+        OpenVPN 2.4 will need to manually set the ``status_command``,
+        ``vpn_up_command``, and ``vpn_down_command``.
 
     Formatters:
 
