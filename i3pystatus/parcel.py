@@ -26,7 +26,6 @@ class DPD(TrackerAPI):
         self.idcode = idcode
         self.url = self.URL.format(idcode=self.idcode)
 
-    
     def status(self):
         ret = {}
         progress = "n/a"
@@ -41,7 +40,7 @@ class DPD(TrackerAPI):
                 import json
 
                 data = json.loads(page)
-                status = data["TrackingStatusJSON"]["statusInfos"][0]["contents"][0]["label"]
+                status = data["TrackingStatusJSON"]["statusInfos"][-1]["contents"][0]["label"]
             except:
                 pass
 
@@ -49,7 +48,6 @@ class DPD(TrackerAPI):
         ret["status"] = status
 
         return ret
-
 
     def get_url(self):
         return self.url
