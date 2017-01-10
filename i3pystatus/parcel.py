@@ -41,6 +41,11 @@ class DPD(TrackerAPI):
 
                 data = json.loads(page)
                 status = data["TrackingStatusJSON"]["statusInfos"][-1]["contents"][0]["label"]
+                delivery_status = data["TrackingStatusJSON"]["shipmentInfo"]["deliveryStatus"]
+
+                # I'm not exactly sure what the deliveryStatus values mean.
+                # This may break if the package can't get delivered etc.
+                progress = delivery_status * 20
             except:
                 pass
 
@@ -50,7 +55,7 @@ class DPD(TrackerAPI):
         return ret
 
     def get_url(self):
-        return self.url
+        return "https://tracking.dpd.de/parcelstatus?query={idcode}".format(idcode=self.idcode)
 
 
 class DHL(TrackerAPI):
