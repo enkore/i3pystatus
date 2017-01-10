@@ -172,10 +172,11 @@ class ParcelTracker(IntervalModule):
     """
     Used to track parcel/shipments.
 
-    Supported carriers: DHL, UPS, Itella
+    Supported carriers: DHL, UPS, DPD, Itella
 
     - parcel.UPS("<id_code>")
     - parcel.DHL("<id_code>")
+    - parcel.DPD("<id_code>")
     - parcel.Itella("<id_code>"[, "en"|"fi"|"sv"])
       Second parameter is language. Requires beautiful soup 4 (bs4)
 
