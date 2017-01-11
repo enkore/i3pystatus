@@ -4,6 +4,7 @@ import inspect
 import re
 import socket
 import string
+import threading
 import time
 from threading import Timer, RLock
 
@@ -371,6 +372,7 @@ class internet:
     address = ("google-public-dns-a.google.com", 53)
     last_time = 0.0
     last_result = False
+    lock = threading.Lock()
     update_delay_in_seconds = 5
 
     @classmethod
@@ -384,14 +386,11 @@ class internet:
     @classmethod
     def __bool__(cls):
         current_time = time.time()
-        if current_time - cls.last_time >= cls.update_delay_in_seconds:
-            cls.last_time = current_time
-            cls.last_result = cls._is_internet_available()
+        with cls.lock:
+            if current_time - cls.last_time >= cls.update_delay_in_seconds:
+                cls.last_time = current_time
+                cls.last_result = cls._is_internet_available()
         return cls.last_result
-
-
-# init right away the value to avoid concurrencies problems at startup
-internet.last_result = internet._is_internet_available()
 
 
 def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
