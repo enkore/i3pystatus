@@ -25,6 +25,7 @@ MOCK_MODULES = [
     "lxml.html", "lxml.cssselect", "lxml",
     "praw",
     "gi", "gi.repository", "dbus.mainloop.glib", "dbus",
+    "GeoIP",
     "pywapi", "basiciw",
     "i3pystatus.pulseaudio.pulse",
     "notmuch",
