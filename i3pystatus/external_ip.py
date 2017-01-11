@@ -1,4 +1,5 @@
 from i3pystatus import IntervalModule, formatp
+from i3pystatus.core.util import internet, require
 
 import GeoIP
 import urllib.request
@@ -16,6 +17,7 @@ class ExternalIP(IntervalModule):
     * {country_code} the country code of the country from the IP (eg. 'US')
     * {ip} the ip
     """
+    interval = 15
 
     settings = (
         "format",
@@ -28,7 +30,6 @@ class ExternalIP(IntervalModule):
         ("timeout", "timeout in seconds when the http request is taking too much time"),
     )
 
-    interval = 15
     format = "{country_name} {country_code} {ip}"
     format_hide = "{country_code}"
     format_down = "Timeout"
@@ -42,19 +43,25 @@ class ExternalIP(IntervalModule):
     on_leftclick = "switch_hide"
     on_rightclick = "run"
 
-    def run(self):
+    @require(internet)
+    def get_external_ip(self):
         try:
             request = urllib.request.urlopen(self.ip_website,
                                              timeout=self.timeout)
-            ip = request.read().decode().strip()
+            return request.read().decode().strip()
         except Exception:
+            return None
+
+    def run(self):
+        ip = self.get_external_ip()
+        if not ip:
             return self.disable()
 
         gi = GeoIP.GeoIP(GeoIP.GEOIP_STANDARD)
         country_code = gi.country_code_by_addr(ip)
         country_name = gi.country_name_by_addr(ip)
 
-        if not ip or not country_code:
+        if not country_code:
             return self.disable()  # fail here in the case of a bad IP
 
         fdict = {
