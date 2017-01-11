@@ -386,11 +386,15 @@ class internet:
     @classmethod
     def __bool__(cls):
         current_time = time.time()
-        with cls.lock:
-            if current_time - cls.last_time >= cls.update_delay_in_seconds:
+        if current_time - cls.last_time >= cls.update_delay_in_seconds:
+            with cls.lock:
                 cls.last_time = current_time
                 cls.last_result = cls._is_internet_available()
         return cls.last_result
+
+
+# init right away the value to avoid concurrencies problems at startup
+internet.last_result = internet._is_internet_available()
 
 
 def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
