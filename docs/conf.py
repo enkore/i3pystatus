@@ -47,6 +47,15 @@ MOCK_MODULES = [
     "dateutil.parser",
     "dateutil.relativedelta",
     "redshift_gtk.statusicon",
+    "dateutil.parser",
+    "dateutil.relativedelta",
+    "redshift_gtk.statusicon",
+    "dateutil.parser",
+    "dateutil.relativedelta",
+    "redshift_gtk.statusicon",
+    "khal",
+    "khal.settings",
+    "khal.cli",
 ]
 
 for mod_name in MOCK_MODULES:
