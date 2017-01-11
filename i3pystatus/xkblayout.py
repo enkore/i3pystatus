@@ -1,5 +1,8 @@
-from i3pystatus import IntervalModule
 import subprocess
+from itertools import zip_longest
+
+from i3pystatus import IntervalModule
+from xkbgroup import XKeyboard
 
 
 class Xkblayout(IntervalModule):
@@ -11,49 +14,81 @@ class Xkblayout(IntervalModule):
     is enabled.
 
     ``layouts`` can be stated with or without variants,
-    e.g.: status.register("xkblayout", layouts=["de neo", "de"])
+    e.g.: ``status.register("xkblayout", layouts=["de neo", "de"])``
+
+    Requires xkbgroup (from PyPI)
+
+    .. rubric:: Available formatters
+
+    * `{num}` — current group number
+    * `{name}` — current group name
+    * `{symbol}` — current group symbol
+    * `{variant}` — current group variant
+    * `{count}` — number of all groups
+    * `{names}` — names of all groups
+    * `{symbols}` — symbols of all groups
+    * `{variants}` — variants of all groups
     """
 
     interval = 1
-    format = u"\u2328 {name}"
+    format = "\u2328 {symbol}"
+    layouts = []
     uppercase = True
     settings = (
         ("format", "Format string"),
         ("layouts", "List of layouts"),
         ("uppercase", "Flag for uppercase output"),
     )
-    layouts = []
-    on_leftclick = "change_layout"
+
+    on_leftclick = ["change_layout", 1]
+    on_upscroll = ["change_layout", 1]
+    on_downscroll = ["change_layout", -1]
+
+    def init(self):
+        if self.layouts:
+            self.set_layouts(self.layouts)
+
+        self._xkb = XKeyboard(auto_open=True)
+
+    def set_layouts(self, layouts):
+        self.layouts = layouts    # Set, so that it could be used as a callback
+
+        layouts_parts = [x.split() for x in self.layouts]
+        symbols_variants_zipped = zip_longest(*layouts_parts, fillvalue="")
+        symbols_variants_str = [",".join(x) for x in symbols_variants_zipped]
+        assert len(symbols_variants_str) > 0
+
+        if len(symbols_variants_str) == 1:
+            symbols = symbols_variants_str[0]
+            args = "setxkbmap -layout {}".format(symbols)
+        elif len(symbols_variants_str) == 2:
+            (symbols, variants) = symbols_variants_str
+            args = "setxkbmap -layout {} -variant {}".format(symbols, variants)
+        else:
+            raise ValueError("Wrong layouts value: {}".format(self.layouts))
+
+        subprocess.check_call(args.split())
+
+    def change_layout(self, increment=1):
+        self._xkb.group_num += increment
 
     def run(self):
-        kblayout = self.kblayout()
-
-        full_text = self.format.format(name=kblayout)
-        if self.uppercase:
-            full_text = full_text.upper()
-
-        self.output = {
-            "full_text": full_text,
-            "color": "#ffffff"
+        cdict = {
+            "num": self._xkb.group_num,
+            "name": self._xkb.group_name,
+            "symbol": self._xkb.group_symbol,
+            "variant": self._xkb.group_variant,
+            "count": self._xkb.groups_count,
+            "names": self._xkb.groups_names,
+            "symbols": self._xkb.groups_symbols,
+            "variants": self._xkb.groups_variants,
         }
 
-    def change_layout(self):
-        layouts = self.layouts
-        kblayout = self.kblayout()
-        if kblayout in layouts:
-            position = layouts.index(kblayout)
-            try:
-                subprocess.check_call(["setxkbmap"] +
-                                      layouts[position + 1].split())
-            except IndexError:
-                subprocess.check_call(["setxkbmap"] + layouts[0].split())
-        else:
-            subprocess.check_call(["setxkbmap"] + layouts[0].split())
+        full_text = self.format.format(**cdict)
+        full_text = full_text.upper() if self.uppercase else full_text
 
-    def kblayout(self):
-        kblayout = subprocess.check_output("setxkbmap -query", shell=True)\
-            .decode("utf-8").splitlines()
-        kblayout = [l.split() for l in kblayout]
-        kblayout = [l[1].strip() for l in kblayout
-                    if l[0].startswith(("layout", "variant"))]
-        return (" ").join(kblayout)
+        self.data = cdict
+        self.output = {
+            "full_text": full_text,
+            "color": "#FFFFFF",
+        }
