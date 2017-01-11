@@ -65,26 +65,17 @@ class DHL(TrackerAPI):
         self.idcode = idcode
         self.url = self.URL.format(idcode=self.idcode)
 
-    def error(self, page):
-        result = ''.join(page.xpath('//div[@class="col col-lg-12"]/h2/text()'))
-
-        if self.idcode in result:
-            return False
-        return True
-
     def get_progress(self, page):
-        elements = page.xpath('//tr[@class="mm_mailing_process "]/td/ul/li')
+        elements = page.xpath('//div[contains(@class, "package-status")]/div/ol/li')
+        progress = "n/a"
+        status = 0
 
         for i, element in enumerate(elements, 1):
             picture_link = ''.join(element.xpath('./img/@src')).lower()
 
-            if 'active' in picture_link:
+            if picture_link.endswith("_on.svg"):
                 status = ''.join(element.xpath('./img/@alt'))
-
                 progress = '%i' % (i / len(elements) * 100)
-
-            elif 'default' in picture_link:
-                break
 
         return progress, status
 
@@ -93,13 +84,9 @@ class DHL(TrackerAPI):
         with urlopen(self.url) as page:
             page = lxml.html.fromstring(page.read())
 
-            if not self.error(page):
-                ret["progress"] = ret["status"] = "n/a"
-
-            else:
-                progress, status = self.get_progress(page)
-                ret["progress"] = progress
-                ret["status"] = status
+            progress, status = self.get_progress(page)
+            ret["progress"] = progress
+            ret["status"] = status
 
         return ret
 
