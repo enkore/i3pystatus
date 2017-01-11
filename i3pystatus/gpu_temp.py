@@ -24,7 +24,7 @@ class GPUTemperature(IntervalModule):
     color = "#FFFFFF"
     alert_temp = 90
     alert_color = "#FF0000"
-    display_if = True
+    display_if = 'True'
 
     def run(self):
         temp = gpu.query_nvidia_smi().temp
