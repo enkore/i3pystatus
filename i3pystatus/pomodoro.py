@@ -83,7 +83,7 @@ class Pomodoro(IntervalModule):
             color = self.color_running if self.state == RUNNING else self.color_break
             text = self.format.format(**sdict)
         else:
-            text = 'Start pomodoro',
+            text = 'Start pomodoro'
             color = self.color_stopped
 
         self.output = {
