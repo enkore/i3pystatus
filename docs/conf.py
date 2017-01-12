@@ -47,7 +47,6 @@ MOCK_MODULES = [
     "i3ipc",
     "dateutil.parser",
     "dateutil.relativedelta",
-    "redshift_gtk.statusicon",
     "xkbgroup",
 ]
 
