@@ -1,5 +1,4 @@
 import os
-import re
 import signal
 import threading
 from subprocess import Popen, PIPE
@@ -16,9 +15,6 @@ class RedshiftController(threading.Thread):
         the child process. The "-v" argument is automatically added."""
 
         threading.Thread.__init__(self)
-
-        # Regex to parse output
-        self._regex = re.compile(r'([\w ]+): (.+)')
 
         # Initialize state variables
         self._inhibited = False
@@ -45,37 +41,27 @@ class RedshiftController(threading.Thread):
     def parse_output(self, line):
         """Convert output to key value pairs"""
 
-        if line:
-            m = self._regex.match(line)
-            if m:
-                key = m.group(1)
-                value = m.group(2)
-                self.update_value(key, value)
+        try:
+            key, value = line.split(":")
+            self.update_value(key, value.strip())
+        except ValueError:
+            pass
 
     def update_value(self, key, value):
         """Parse key value pairs to update their values"""
 
-        def parse_coord(s):
-            """Parse coordinate like `42.0 N` or `91.5 W`"""
-            v, d = s.split(' ')
-            return float(v) * (1 if d in 'NE' else -1)
-
-        if key == 'Status':
-            new_inhibited = value != 'Enabled'
-            if new_inhibited != self._inhibited:
-                self._inhibited = new_inhibited
-        elif key == 'Color temperature':
-            new_temperature = int(value.rstrip('K'), 10)
-            if new_temperature != self._temperature:
-                self._temperature = new_temperature
-        elif key == 'Period':
-            new_period = value
-            if new_period != self._period:
-                self._period = new_period
-        elif key == 'Location':
-            new_location = tuple(parse_coord(x) for x in value.split(', '))
-            if new_location != self._location:
-                self._location = new_location
+        if key == "Status":
+            self._inhibited = value != "Enabled"
+        elif key == "Color temperature":
+            self._temperature = int(value.rstrip("K"), 10)
+        elif key == "Period":
+            self._period = value
+        elif key == "Location":
+            location = []
+            for x in value.split(", "):
+                v, d = x.split(" ")
+                location.append(float(v) * (1 if d in "NE" else -1))
+            self._location = (location)
 
     @property
     def inhibited(self):
@@ -115,7 +101,7 @@ class Redshift(IntervalModule):
     """
     Show status and control redshift - http://jonls.dk/redshift/.
 
-    This module runs a instace of redshift by itself, since it needs to parse
+    This module runs an instance of redshift by itself, since it needs to parse
     its output, so you should remove redshift/redshift-gtk from your i3 config
     before using this module.
 
