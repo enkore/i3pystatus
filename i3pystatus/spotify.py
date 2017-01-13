@@ -1,8 +1,8 @@
-from i3pystatus.playerctl import Playerctl
+from i3pystatus.now_playing import NowPlaying
 
 
-class Spotify(Playerctl):
+class Spotify(NowPlaying):
     """
-    Get Spotify info using playerctl. Based on `Playerctl`_ module.
+    Get Spotify info using dbus interface. Based on `now_playing`_ module.
     """
     player_name = "spotify"
