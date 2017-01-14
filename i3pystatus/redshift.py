@@ -43,8 +43,8 @@ class RedshiftController(threading.Thread):
         """Convert output to key value pairs"""
 
         try:
-            key, value = line.strip().split(":")
-            self.update_value(key, value)
+            key, value = line.split(":")
+            self.update_value(key.strip(), value.strip())
         except ValueError:
             pass
 
