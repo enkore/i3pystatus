@@ -21,6 +21,7 @@ class RedshiftController(threading.Thread):
         self._temperature = 0
         self._period = 'Unknown'
         self._location = (0.0, 0.0)
+        self._brightness = 0.0
         self._pid = None
 
         cmd = ["redshift"] + args
@@ -42,8 +43,8 @@ class RedshiftController(threading.Thread):
         """Convert output to key value pairs"""
 
         try:
-            key, value = line.split(":")
-            self.update_value(key, value.strip())
+            key, value = line.strip().split(":")
+            self.update_value(key, value)
         except ValueError:
             pass
 
@@ -56,6 +57,8 @@ class RedshiftController(threading.Thread):
             self._temperature = int(value.rstrip("K"), 10)
         elif key == "Period":
             self._period = value
+        elif key == "Brightness":
+            self._brightness = value
         elif key == "Location":
             location = []
             for x in value.split(", "):
@@ -82,6 +85,11 @@ class RedshiftController(threading.Thread):
     def location(self):
         """Current location"""
         return self._location
+
+    @property
+    def brightness(self):
+        """Current brightness"""
+        return self._brightness
 
     def set_inhibit(self, inhibit):
         """Set inhibition state"""
@@ -143,6 +151,7 @@ class Redshift(IntervalModule):
         self.period = self._controller.period
         self.temperature = self._controller.temperature
         self.latitude, self.longitude = self._controller.location
+        self.brightness = self._controller.brightness
 
     def toggle_inhibit(self):
         """Enable/disable redshift"""
@@ -162,6 +171,7 @@ class Redshift(IntervalModule):
                 "temperature": self.temperature,
                 "latitude": self.latitude,
                 "longitude": self.longitude,
+                "brightness": self.brightness,
             }
             output = formatp(self.format, **fdict)
             color = self.color
