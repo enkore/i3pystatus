@@ -72,7 +72,14 @@ class Xkblayout(IntervalModule):
     def change_layout(self, increment=1):
         self._xkb.group_num += increment
 
+    def update_state(self):
+        """Update internal state if keyboard layout changed externally"""
+        self._xkb.close_display()
+        self._xkb.open_display()
+
     def run(self):
+        self.update_state()
+
         cdict = {
             "num": self._xkb.group_num,
             "name": self._xkb.group_name,
