@@ -19,7 +19,7 @@ class NoPlayerException(Exception):
     pass
 
 
-class NowPlaying(IntervalModule):
+class Mpris(IntervalModule):
     """
     Shows currently playing track information. Supports media players that \
 conform to the Media Player Remote Interfacing Specification.
@@ -62,7 +62,7 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
 
     ::
 
-        status.register("now_playing",
+        status.register("mpris",
             on_leftclick=["player_command", "PlayPause"],
             on_rightclick=["player_command", "Stop"],
             on_middleclick=["player_prop", "Shuffle", True],
@@ -152,7 +152,7 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
                 "status": self.status[self.statusmap[
                     get_prop("PlaybackStatus")]],
                 # TODO: Use optional(!) TrackList interface for this to
-                # gain 100 % mpd<->now_playing compat
+                # gain 100 % mpd<->mpris compat
                 "len": 0,
                 "pos": 0,
                 "volume": int(get_prop("Volume", 0) * 100),
