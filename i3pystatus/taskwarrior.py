@@ -8,11 +8,18 @@ class Taskwarrior(IntervalModule):
     Check Taskwarrior for pending tasks
     Requires `json`
 
-    Formaters:
+    .. rubric:: Available formatters (uses :ref:`formatp`)
 
-    * `{ready}`   — contains number of tasks returned by ready_filter
-    * `{urgent}`  — contains number of tasks returned by urgent_filter
+    * `{ready}`   — contains number of tasks returned by `ready_filter`
+    * `{urgent}`  — contains number of tasks returned by `urgent_filter`
     * `{next}`    — contains the description of next task
+
+    .. rubric:: Available callbacks
+
+    * ``get_next_task`` — Display the next most urgent task.
+    * ``get_prev_task`` — Display the previous most urgent task.
+    * ``reset_next_task`` — Display the most urgent task, resetting any \
+            switching by other callbacks.
     """
 
     format = 'Task: {next}'
@@ -30,6 +37,7 @@ class Taskwarrior(IntervalModule):
     on_upscroll = "get_prev_task"
     on_downscroll = "get_next_task"
     on_rightclick = 'mark_task_as_done'
+    on_leftclick = "reset_next_task"
 
     settings = (
         ('format', 'format string'),
@@ -39,6 +47,10 @@ class Taskwarrior(IntervalModule):
         ('color_urgent', '#FF0000'),
         ('color_ready', '#78EAF2')
     )
+
+    def reset_next_task(self):
+        self.next_id = 0
+        self.next_task = self.current_tasks[self.next_id]
 
     def get_next_task(self):
         self.next_id = (self.next_id + 1) % len(self.current_tasks)
