@@ -13,6 +13,7 @@ class Taskwarrior(IntervalModule):
     * `{ready}`   — contains number of tasks returned by ready_filter
     * `{urgent}`  — contains number of tasks returned by urgent_filter
     * `{next}`    — contains the description of next task
+    * `{project}` — contains the projects the next task belongs to
     """
 
     format = 'Task: {next}'
@@ -79,6 +80,7 @@ class Taskwarrior(IntervalModule):
 
         if self.next_task is not None:
             format_values['next'] = self.next_task['description']
+            format_values['project'] = self.next_task['project']
 
         self.output = {
             'full_text': self.format.format(**format_values),
