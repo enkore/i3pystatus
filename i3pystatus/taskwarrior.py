@@ -92,7 +92,7 @@ class Taskwarrior(IntervalModule):
 
         if self.next_task is not None:
             format_values['next'] = self.next_task['description']
-            format_values['project'] = self.next_task['project']
+            format_values['project'] = self.next_task.get('project', '')
 
         self.output = {
             'full_text': self.format.format(**format_values),
