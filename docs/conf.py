@@ -48,6 +48,7 @@ MOCK_MODULES = [
     "dateutil.parser",
     "dateutil.relativedelta",
     "xkbgroup",
+    "sensors"
 ]
 
 for mod_name in MOCK_MODULES:
