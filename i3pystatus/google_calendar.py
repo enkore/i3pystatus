@@ -73,10 +73,11 @@ class GoogleCalendar(IntervalModule, ColorRangeModule):
     def init(self):
         self.colors = self.get_hex_color_range(self.end_color, self.start_color, self.urgent_seconds * 2)
         self.last_event_refresh = datetime.datetime.now(tz=pytz.UTC) - datetime.timedelta(seconds=self.update_interval)
-        self.connect_service()
 
     @require(internet)
     def run(self):
+        if self.service is None:
+            self.connect_service()
         now = datetime.datetime.now(tz=pytz.UTC)
         if self.should_update(now):
             threading.Thread(target=self.update_display_event, args=(now,), daemon=True).start()
