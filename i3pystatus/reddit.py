@@ -40,7 +40,6 @@ class Reddit(IntervalModule):
     settings = (
         ("format", "Format string used for output."),
         ("username", "Reddit username."),
-        ("password", "Reddit password."),
         ('keyring_backend', 'alternative keyring backend for retrieving \
                             credentials'),
         ("subreddit", "Subreddit to monitor. Uses frontpage if unspecified."),
@@ -56,7 +55,6 @@ class Reddit(IntervalModule):
     )
     format = "[{submission_subreddit}] {submission_title} ({submission_domain})"
     username = ""
-    password = ""
     keyring_backend = None
     subreddit = ""
     sort_by = "hot"
