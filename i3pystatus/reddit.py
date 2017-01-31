@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import re
-
+import pprint
 import praw
 
 from i3pystatus import IntervalModule
@@ -112,7 +112,8 @@ class Reddit(IntervalModule):
     def get_redditor(self, reddit):
         redditor_info = {}
         if self.username:
-            u = reddit.get_redditor(self.username)
+            u = reddit.redditor(self.username)
+            pprint.pprint(u.link_karma)
             redditor_info["link_karma"] = u.link_karma
             redditor_info["comment_karma"] = u.comment_karma
         else:
@@ -151,12 +152,12 @@ class Reddit(IntervalModule):
         fdict = {}
         subreddit_dict = {}
         if self.subreddit:
-            s = reddit.get_subreddit(self.subreddit)
+            s = reddit.subreddit(self.subreddit)
         else:
             s = reddit
         if self.sort_by == 'hot':
             if not self.subreddit:
-                subreddit_dict = vars(next(s.get_front_page(limit=1)))
+                subreddit_dict = vars(next(s.get_front(limit=1)))
             else:
                 subreddit_dict = vars(next(s.get_hot(limit=1)))
         elif self.sort_by == 'new':
@@ -193,3 +194,8 @@ class Reddit(IntervalModule):
 
     def open_link(self):
         user_open(self._url)
+
+if __name__ == "__main__":
+    reddit = Reddit()
+    reddit.username = "stay_at_home_daddy"
+    pprint.pprint(reddit.get_redditor(reddit.connect()))
