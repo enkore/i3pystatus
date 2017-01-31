@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import re
-import pprint
 import praw
 
 from i3pystatus import IntervalModule
@@ -118,14 +117,9 @@ class Reddit(IntervalModule):
 
     def get_redditor(self, reddit):
         redditor_info = {}
-        if self.username:
-            u = reddit.redditor(self.username)
-            pprint.pprint(u.link_karma)
-            redditor_info["link_karma"] = u.link_karma
-            redditor_info["comment_karma"] = u.comment_karma
-        else:
-            redditor_info["link_karma"] = ""
-            redditor_info["comment_karma"] = ""
+        u = reddit.redditor(self.username)
+        redditor_info["link_karma"] = u.link_karma
+        redditor_info["comment_karma"] = u.comment_karma
         return redditor_info
 
     def get_messages(self, reddit):
