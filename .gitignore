@@ -8,3 +8,5 @@ dist/*
 .i3pystatus-*
 ci-build
 docs/_build
+*.swp
+*.ropeproject
