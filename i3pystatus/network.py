@@ -118,9 +118,13 @@ class NetworkInfo:
         if netifaces.AF_INET6 in network_info:
             for v6 in network_info[netifaces.AF_INET6]:
                 info["v6"] = v6["addr"]
-                mask, bits = v6["netmask"].split("/")
-                info["v6mask"] = mask
-                info["v6cidr"] = cidr6(v6["addr"], bits)
+                try:
+                    mask, bits = v6["netmask"].split("/")
+                    info["v6mask"] = mask
+                    info["v6cidr"] = cidr6(v6["addr"], bits)
+                except ValueError:
+                    info["v6cidr"] = v6["addr"]
+                    info["v6mask"] = v6["netmask"]
                 if not v6["addr"].startswith("fe80::"):  # prefer non link-local addresses
                     break
         return info
