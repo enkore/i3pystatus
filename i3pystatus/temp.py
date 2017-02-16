@@ -11,7 +11,7 @@ class Sensor:
     def __init__(self, name, current, maximum, critical):
         self.name = name.replace(' ', '_')
         self.current = int(current)
-        self.maximum = int(maximum)
+        self.maximum = int(maximum) if maximum else int(critical)
         self.critical = int(critical)
 
     def __repr__(self):
