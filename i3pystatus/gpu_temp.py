@@ -16,6 +16,7 @@ class GPUTemperature(IntervalModule):
     settings = (
         ("format", "format string used for output. {temp} is the temperature in integer degrees celsius"),
         ("display_if", "snippet that gets evaluated. if true, displays the module output"),
+        ("gpu_number", "set the gpu number when you have several GPU"),
         "color",
         "alert_temp",
         "alert_color",
@@ -25,9 +26,10 @@ class GPUTemperature(IntervalModule):
     alert_temp = 90
     alert_color = "#FF0000"
     display_if = 'True'
+    gpu_number = 0
 
     def run(self):
-        temp = gpu.query_nvidia_smi().temp
+        temp = gpu.query_nvidia_smi(self.gpu_number).temp
         temp_alert = temp is None or temp >= self.alert_temp
 
         if eval(self.display_if):
