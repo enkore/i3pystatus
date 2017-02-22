@@ -64,7 +64,7 @@ class NetworkInfo:
     Retrieve network information.
     """
 
-    def __init__(self, interface, ignore_interfaces, detached_down, unknown_up, get_wifi_info=False):
+    def __init__(self, interface, ignore_interfaces, detached_down, unknown_up, freq_divisor, get_wifi_info=False):
         if interface not in netifaces.interfaces() and not detached_down:
             raise RuntimeError(
                 "Unknown interface {iface}!".format(iface=interface))
@@ -73,6 +73,11 @@ class NetworkInfo:
         self.detached_down = detached_down
         self.unknown_up = unknown_up
         self.get_wifi_info = get_wifi_info
+
+        if freq_divisor == 0:
+            raise RuntimeError("Frequency divider cannot be 0!")
+        else:
+            self.freq_divisor = freq_divisor
 
     def get_info(self, interface):
         format_dict = dict(v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="")
@@ -141,7 +146,7 @@ class NetworkInfo:
             return info
 
         info["essid"] = iwi["essid"]
-        info["freq"] = iwi["freq"]
+        info["freq"] = iwi["freq"] / self.freq_divisor
         quality = iwi["quality"]
         if quality["quality_max"] > 0:
             info["quality"] = quality["quality"] / quality["quality_max"]
@@ -247,6 +252,7 @@ class Network(IntervalModule, ColorRangeModule):
 
     * `{essid}` — ESSID of currently connected wifi
     * `{freq}` — Current frequency
+    * `{freq_divisor}` — Frequency divisor
     * `{quality}` — Link quality in percent
     * `{quality_bar}` —Bar graphically representing link quality
 
@@ -281,6 +287,7 @@ class Network(IntervalModule, ColorRangeModule):
         ("graph_type", "Whether to draw the network traffic graph for input or output. "
                        "Allowed values 'input' or 'output'"),
         ("divisor", "divide all byte values by this value"),
+        ("freq_divisor", "divide Wifi frequency by this value"),
         ("ignore_interfaces", "Array of interfaces to ignore when cycling through "
                               "on click, eg, ['lo']"),
         ("round_size", "defines number of digits in round"),
@@ -313,6 +320,7 @@ class Network(IntervalModule, ColorRangeModule):
     detached_down = True
     unknown_up = False
     ignore_interfaces = ["lo"]
+    freq_divisor = 1
 
     on_leftclick = "nm-connection-editor"
     on_rightclick = "cycle_interface"
@@ -328,7 +336,7 @@ class Network(IntervalModule, ColorRangeModule):
             get_wifi_info = False
 
         self.network_info = NetworkInfo(self.interface, self.ignore_interfaces, self.detached_down, self.unknown_up,
-                                        get_wifi_info)
+                                        self.freq_divisor, get_wifi_info)
 
         # Don't require importing psutil unless using the functionality it offers.
         if any(s in self.format_up or s in self.format_down for s in
