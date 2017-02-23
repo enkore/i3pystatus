@@ -37,7 +37,7 @@ class DPMS(IntervalModule):
 
         if self.status:
             self.output = {
-                "full_text": self.format.format(status="off"),
+                "full_text": self.format.format(status="on"),
                 "color": self.color
             }
         else:
