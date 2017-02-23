@@ -174,6 +174,7 @@ class BatteryChecker(IntervalModule):
         ("critical_level_command", "Runs a shell command in the case of a critical power state"),
         "critical_level_percentage",
         "alert_percentage",
+        "alert_timeout",
         ("alert_format_title", "The title of the notification, all formatters can be used"),
         ("alert_format_body", "The body text of the notification, all formatters can be used"),
         ("path", "Override the default-generated path and specify the full path for a single battery"),
@@ -203,6 +204,7 @@ class BatteryChecker(IntervalModule):
     critical_level_command = ""
     critical_level_percentage = 1
     alert_percentage = 10
+    alert_timeout = -1
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
     color = "#ffffff"
@@ -339,7 +341,7 @@ class BatteryChecker(IntervalModule):
                 body=formatp(self.alert_format_body, **fdict),
                 icon="battery-caution",
                 urgency=2,
-                timeout=60,
+                timeout=self.alert_timeout,
             ).display()
 
         fdict["status"] = self.status[fdict["status"]]
