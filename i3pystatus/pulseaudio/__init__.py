@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 
@@ -211,7 +212,11 @@ class PulseAudio(Module, ColorRangeModule):
                                                   universal_newlines=True)
             for input_index in re.findall('index:\s+(\d+)', sink_inputs):
                 command = "pacmd move-sink-input {} {}".format(input_index, next_sink)
-                subprocess.call(command.split())
+
+                # Not all applications can be moved and pulseaudio, and when
+                # this fail pacmd print error messaging
+                with open(os.devnull, 'w') as devnull:
+                    subprocess.call(command.split(), stdout=devnull)
         subprocess.call("pacmd set-default-sink {}".format(next_sink).split())
 
     def switch_mute(self):
