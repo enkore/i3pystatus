@@ -13,7 +13,7 @@ class BaseDesktopNotification:
     """
 
     def __init__(self, title, body, icon="dialog-information", urgency=1,
-                 timeout=0, log_level=logging.WARNING):
+                 timeout=-1, log_level=logging.WARNING):
         self.title = title
         self.body = body
         self.icon = icon
