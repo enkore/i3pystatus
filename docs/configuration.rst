@@ -453,7 +453,7 @@ recieved/sent part is changing color depending on the amount of traffic.
             )
 
 Or you can use pango to customize the color of ``status`` setting in
-:py:mod:`.now_playing` and :py:mod:`.mpd` modules.
+:py:mod:`.mpris` and :py:mod:`.mpd` modules.
 
     .. code:: python
 
