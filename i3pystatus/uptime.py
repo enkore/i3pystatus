@@ -34,6 +34,8 @@ class Uptime(IntervalModule):
         with open(self.file, "r") as f:
             seconds = int(float(f.read().split()[0]))
 
+        raw_seconds = seconds
+
         days = seconds // (60 * 60 * 24)
         hours = seconds // (60 * 60)
         minutes = seconds // 60
@@ -56,7 +58,7 @@ class Uptime(IntervalModule):
         }
         self.data = fdict
         if self.alert:
-            if seconds > self.seconds_alert:
+            if raw_seconds > self.seconds_alert:
                 self.color = self.color_alert
         self.output = {
             "full_text": formatp(self.format, **fdict),
