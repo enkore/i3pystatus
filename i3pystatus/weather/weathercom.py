@@ -65,8 +65,9 @@ class Weathercom(WeatherBackend):
     '''
     This module gets the weather from weather.com. The ``location_code``
     parameter should be set to the location code from weather.com. To obtain
-    this code, search for the location on weather.com, and the location code
-    will be everything after the last slash (e.g. ``94107:4:US``).
+    this code, search for your location on weather.com, and when you go to the
+    forecast page, the code you need will be everything after the last slash in
+    the URL (e.g. ``94107:4:US``).
 
     .. _weather-usage-weathercom:
 
