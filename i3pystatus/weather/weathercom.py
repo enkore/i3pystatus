@@ -40,25 +40,79 @@ class WeathercomHTMLParser(HTMLParser):
                 exc_info=True
             )
 
+    def load_json(self, json_input):
+        self.logger.debug('Loading the following data as JSON: %s', json_input)
+        try:
+            return json.loads(json_string)
+        except json.decoder.JSONDecodeError as exc:
+            self.logger.debug('Error loading JSON: %s', exc)
+            self.logger.debug('String that failed to load: %s', json_input)
+        return None
+
     def handle_data(self, content):
+        '''
+        Sometimes the weather data is set under an attribute of the "window"
+        DOM object. Sometimes it appears as part of a javascript function.
+        Catch either possibility.
+        '''
+        if self.weather_data is not None:
+            # We've already found weather data, no need to continue parsing
+            return
+        content = content.strip().rstrip(';')
         try:
             tag_text = self.get_starttag_text().lower()
         except AttributeError:
             tag_text = ''
         if tag_text.startswith('<script'):
+            # Look for feed information embedded as a javascript variable
+            begin = content.find('window.__data')
+            if begin != -1:
+                self.logger.debug('Located window.__data')
+                # Look for end of JSON dict and end of javascript statement
+                end = content.find('};', begin)
+                if end == -1:
+                    self.logger.debug('Failed to locate end of javascript statement')
+                else:
+                    # Strip the "window.__data=" from the beginning
+                    json_data = self.load_json(
+                        content[begin:end + 1].split('=', 1)[1].lstrip()
+                    )
+                    if json_data is not None:
+                        def _find_weather_data(data):
+                            '''
+                            Helper designed to minimize impact of potential
+                            structural changes to this data.
+                            '''
+                            if isinstance(data, dict):
+                                if 'observation' in data and 'dailyForecast' in data:
+                                    return data
+                                else:
+                                    for key in data:
+                                        ret = _find_weather_data(data[key])
+                                        if ret is not None:
+                                            return ret
+                                return None
+
+                        weather_data = _find_weather_data(json_data)
+                        if weather_data is None:
+                            self.logger.debug(
+                                'Failed to locate weather data in the '
+                                'following data structure: %s', json_data
+                            )
+                        else:
+                            self.weather_data = weather_data
+                            return
+
             for line in content.splitlines():
-                line = line.strip()
+                line = line.strip().rstrip(';')
                 if line.startswith('var adaptorParams'):
                     # Strip off the "var adaptorParams = " from the beginning,
                     # and the javascript semicolon from the end. This will give
                     # us JSON that we can load.
-                    line = line.split('=', 1)[1].lstrip().rstrip(';')
-                    self.logger.debug('Loading the following data as JSON: %s', line)
-                    try:
-                        self.weather_data = json.loads(line)
-                    except json.decoder.JSONDecodeError as exc:
-                        self.logger.error('Error loading JSON: %s', exc)
-                    break
+                    weather_data = self.load_json(line.split('=', 1)[1].lstrip())
+                    if weather_data is not None:
+                        self.weather_data = weather_data
+                        return
 
 
 class Weathercom(WeatherBackend):
