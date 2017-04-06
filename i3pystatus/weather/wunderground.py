@@ -68,7 +68,7 @@ class Wunderground(WeatherBackend):
             colorize=True,
             hints={'markup': 'pango'},
             backend=wunderground.Wunderground(
-                api_key='dbafe887d56ba4ad',
+                api_key='api_key_goes_here',
                 location_code='pws:MAT645',
                 units='imperial',
                 forecast=True,
