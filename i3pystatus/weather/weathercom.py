@@ -43,7 +43,7 @@ class WeathercomHTMLParser(HTMLParser):
     def load_json(self, json_input):
         self.logger.debug('Loading the following data as JSON: %s', json_input)
         try:
-            return json.loads(json_string)
+            return json.loads(json_input)
         except json.decoder.JSONDecodeError as exc:
             self.logger.debug('Error loading JSON: %s', exc)
             self.logger.debug('String that failed to load: %s', json_input)
