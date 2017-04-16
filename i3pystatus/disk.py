@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from i3pystatus import IntervalModule
 from .core.util import round_dict
@@ -83,3 +84,6 @@ class Disk(IntervalModule):
             "color": self.critical_color if critical else self.color,
             "urgent": critical
         }
+
+    def on_leftclick(self):
+        subprocess.Popen(["thunar", self.path ])
