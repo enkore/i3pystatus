@@ -220,10 +220,9 @@ class BatteryChecker(IntervalModule):
     paths = []
 
     def percentage(self, batteries, design=False):
-        total = 0
-        for battery in batteries:
-            total += battery.percentage(design)
-        return total / len(batteries)
+        total_now = [battery.battery_info["ENERGY_NOW"] for battery in batteries]
+        total_full = [battery.battery_info["ENERGY_FULL"] for battery in batteries]
+        return sum(total_now) / sum(total_full) * 100
 
     def consumption(self, batteries):
         consumption = 0
