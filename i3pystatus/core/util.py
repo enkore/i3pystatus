@@ -62,7 +62,7 @@ def round_dict(dic, places):
             dic[key] = round(value, places)
 
 
-class ModuleList(collections.UserList):
+class ModuleList(collections.deque):
     def __init__(self, status_handler, class_finder):
         self.status_handler = status_handler
         self.finder = class_finder
@@ -72,7 +72,7 @@ class ModuleList(collections.UserList):
         module = self.finder.instanciate_class_from_module(
             module, *args, **kwargs)
         module.registered(self.status_handler)
-        super().append(module)
+        super().appendleft(module)
         return module
 
     def get(self, find_id):
