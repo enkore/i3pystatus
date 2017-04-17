@@ -101,7 +101,7 @@ class Dota2wins(IntervalModule):
             "screenname": screenname,
             "wins": wins,
             "losses": losses,
-            "win_percent": win_percent,
+            "win_percent": "%.2f" % win_percent,
         }
 
         self.output = {
