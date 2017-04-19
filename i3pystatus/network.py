@@ -59,6 +59,15 @@ def sysfs_interface_up(interface, unknown_up=False):
     return status == "up" or unknown_up and status == "unknown"
 
 
+def detect_active_interface(ignore_ifaces, default_interface):
+    default_gateway = netifaces.gateways()['default']
+    for af in (netifaces.AF_INET, netifaces.AF_INET6):
+        _, interface = default_gateway.get(af, (None, None))
+        if interface and interface not in ignore_ifaces:
+            return interface
+    return default_interface
+
+
 class NetworkInfo:
     """
     Retrieve network information.
@@ -298,6 +307,7 @@ class Network(IntervalModule, ColorRangeModule):
         ("detached_down", "If the interface doesn't exist, display it as if it were down"),
         ("unknown_up", "If the interface is in unknown state, display it as if it were up"),
         ("next_if_down", "Change to next interface if current one is down"),
+        ("detect_active", "Attempt to detect the active interface"),
     )
 
     interval = 1
@@ -315,6 +325,7 @@ class Network(IntervalModule, ColorRangeModule):
     sent_limit = 1024
     separate_color = False
     next_if_down = False
+    detect_active = False
 
     # Network traffic settings
     divisor = 1024
@@ -380,6 +391,10 @@ class Network(IntervalModule, ColorRangeModule):
                              rx_tot_Mbytes="", tx_tot_Mbytes="",
                              interface="", v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="", mac="",
                              essid="", freq="", quality="", quality_bar="")
+
+        if self.detect_active:
+            self.interface = detect_active_interface(self.ignore_interfaces, self.interface)
+
         if self.network_traffic:
             network_usage = self.network_traffic.get_usage(self.interface)
             format_values.update(network_usage)
