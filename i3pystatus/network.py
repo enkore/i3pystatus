@@ -1,3 +1,5 @@
+from fnmatch import fnmatch
+
 import netifaces
 
 from i3pystatus import IntervalModule, formatp
@@ -284,6 +286,10 @@ class Network(IntervalModule, ColorRangeModule):
 
     settings = (
         ("format_up", "format string"),
+        ("format_active_up", "Dictionary containing format strings for auto-detected interfaces. "
+                             "Each key can be either a full interface name, or a pattern matching "
+                             "a interface, eg 'e*' for ethernet interfaces. "
+                             "Fallback to format_up if no pattern could be matched."),
         ("format_down", "format string"),
         "color_up",
         "color_down",
@@ -314,6 +320,7 @@ class Network(IntervalModule, ColorRangeModule):
     interface = 'eth0'
 
     format_up = "{interface} {network_graph}{kbs}KB/s"
+    format_active_up = {}
     format_down = "{interface}: DOWN"
     color_up = "#00FF00"
     color_down = "#FF0000"
@@ -435,6 +442,11 @@ class Network(IntervalModule, ColorRangeModule):
             if not color:
                 color = self.color_up
             format_str = self.format_up
+
+            if self.detect_active:
+                for pattern in self.format_active_up:
+                    if fnmatch(self.interface, pattern):
+                        format_str = self.format_active_up.get(pattern, self.format_up)
         else:
             color = self.color_down
             format_str = self.format_down
