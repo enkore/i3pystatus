@@ -1,3 +1,5 @@
+from fnmatch import fnmatch
+
 import netifaces
 
 from i3pystatus import IntervalModule, formatp
@@ -284,6 +286,10 @@ class Network(IntervalModule, ColorRangeModule):
 
     settings = (
         ("format_up", "format string"),
+        ("format_active_up", "Dictionary containing format strings for auto-detected interfaces. "
+                             "Each key can be either a full interface name, or a pattern matching "
+                             "a interface, eg 'e*' for ethernet interfaces. "
+                             "Fallback to format_up if no pattern could be matched."),
         ("format_down", "format string"),
         "color_up",
         "color_down",
@@ -314,6 +320,7 @@ class Network(IntervalModule, ColorRangeModule):
     interface = 'eth0'
 
     format_up = "{interface} {network_graph}{kbs}KB/s"
+    format_active_up = {}
     format_down = "{interface}: DOWN"
     color_up = "#00FF00"
     color_down = "#FF0000"
@@ -410,24 +417,27 @@ class Network(IntervalModule, ColorRangeModule):
             format_values['network_graph'] = self.get_network_graph(kbs, limit)
             format_values['kbs'] = "{0:.1f}".format(round(kbs, 2))
 
-            if self.separate_color and self.pango_enabled:
-                color = self.color_up
-                color_template = "<span color=\"{}\">{}</span>"
-                per_recv = network_usage["bytes_recv"] * self.divisor / (self.recv_limit * 1024)
-                per_sent = network_usage["bytes_sent"] * self.divisor / (self.sent_limit * 1024)
-                c_recv = self.get_gradient(int(per_recv * 100), self.colors, 100)
-                c_sent = self.get_gradient(int(per_sent * 100), self.colors, 100)
-                format_values["bytes_recv"] = color_template.format(c_recv, network_usage["bytes_recv"])
-                format_values["bytes_sent"] = color_template.format(c_sent, network_usage["bytes_sent"])
-                if self.graph_type == 'output':
-                    c_kbs = c_sent
+            if self.dynamic_color:
+                if self.separate_color and self.pango_enabled:
+                    color = self.color_up
+                    color_template = "<span color=\"{}\">{}</span>"
+                    per_recv = network_usage["bytes_recv"] * self.divisor / (self.recv_limit * 1024)
+                    per_sent = network_usage["bytes_sent"] * self.divisor / (self.sent_limit * 1024)
+                    c_recv = self.get_gradient(int(per_recv * 100), self.colors, 100)
+                    c_sent = self.get_gradient(int(per_sent * 100), self.colors, 100)
+                    format_values["bytes_recv"] = color_template.format(c_recv, network_usage["bytes_recv"])
+                    format_values["bytes_sent"] = color_template.format(c_sent, network_usage["bytes_sent"])
+                    if self.graph_type == 'output':
+                        c_kbs = c_sent
+                    else:
+                        c_kbs = c_recv
+                    format_values['network_graph'] = color_template.format(c_kbs, format_values["network_graph"])
+                    format_values['kbs'] = color_template.format(c_kbs, format_values["kbs"])
                 else:
-                    c_kbs = c_recv
-                format_values['network_graph'] = color_template.format(c_kbs, format_values["network_graph"])
-                format_values['kbs'] = color_template.format(c_kbs, format_values["kbs"])
+                    percent = int(kbs * 100 / limit)
+                    color = self.get_gradient(percent, self.colors, 100)
             else:
-                percent = int(kbs * 100 / limit)
-                color = self.get_gradient(percent, self.colors, 100)
+                color = None
         else:
             color = None
 
@@ -435,6 +445,11 @@ class Network(IntervalModule, ColorRangeModule):
             if not color:
                 color = self.color_up
             format_str = self.format_up
+
+            if self.detect_active:
+                for pattern in self.format_active_up:
+                    if fnmatch(self.interface, pattern):
+                        format_str = self.format_active_up.get(pattern, self.format_up)
         else:
             color = self.color_down
             format_str = self.format_down
