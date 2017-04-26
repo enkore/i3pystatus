@@ -30,10 +30,10 @@ class OpenVPN(IntervalModule):
     status_up = '▲'
     status_down = '▼'
     format = "{vpn_name} {status}"
-    status_command = "bash -c 'systemctl show openvpn@%(vpn_name)s | grep ActiveState=active'"
+    status_command = "bash -c 'systemctl show openvpn-client@%(vpn_name)s | grep ActiveState=active'"
 
-    vpn_up_command = "sudo /bin/systemctl start openvpn@%(vpn_name)s.service"
-    vpn_down_command = "sudo /bin/systemctl stop openvpn@%(vpn_name)s.service"
+    vpn_up_command = "sudo /bin/systemctl start openvpn-client@%(vpn_name)s.service"
+    vpn_down_command = "sudo /bin/systemctl stop openvpn-client@%(vpn_name)s.service"
 
     connected = False
     label = ''
