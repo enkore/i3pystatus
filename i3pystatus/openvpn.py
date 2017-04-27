@@ -47,7 +47,7 @@ class OpenVPN(IntervalModule):
         ("status_down", "Symbol to display when down"),
         ("status_up", "Symbol to display when up"),
         ("vpn_name", "Name of VPN"),
-        ("openvpn_lastest", "Use lastest openvpn service names"),
+        ("use_new_service_name", "Use lastest openvpn service names"),
         ("vpn_up_command", "Command to bring up the VPN - default requires editing /etc/sudoers"),
         ("vpn_down_command", "Command to bring up the VPN - default requires editing /etc/sudoers"),
         ("status_command", "command to find out if the VPN is active"),
