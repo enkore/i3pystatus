@@ -56,7 +56,6 @@ class OpenVPN(IntervalModule):
     def init(self):
         if not self.vpn_name:
             raise Exception("vpn_name is required")
-                # use new service names if openvpn version is 2.4 (2.5 is not out yet...)
 
         if self.openvpn_lastest:
             self.status_command = "bash -c 'systemctl show openvpn-client@%(vpn_name)s | grep ActiveState=active'"
