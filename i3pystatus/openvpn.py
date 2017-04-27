@@ -30,8 +30,9 @@ class OpenVPN(IntervalModule):
     status_up = '▲'
     status_down = '▼'
     format = "{vpn_name} {status}"
-    status_command = "bash -c 'systemctl show openvpn@%(vpn_name)s | grep ActiveState=active'"
 
+    openvpn_lastest = False
+    status_command = "bash -c 'systemctl show openvpn@%(vpn_name)s | grep ActiveState=active'"
     vpn_up_command = "sudo /bin/systemctl start openvpn@%(vpn_name)s.service"
     vpn_down_command = "sudo /bin/systemctl stop openvpn@%(vpn_name)s.service"
 
@@ -46,6 +47,7 @@ class OpenVPN(IntervalModule):
         ("status_down", "Symbol to display when down"),
         ("status_up", "Symbol to display when up"),
         ("vpn_name", "Name of VPN"),
+        ("openvpn_lastest", "Use lastest openvpn service names"),
         ("vpn_up_command", "Command to bring up the VPN - default requires editing /etc/sudoers"),
         ("vpn_down_command", "Command to bring up the VPN - default requires editing /etc/sudoers"),
         ("status_command", "command to find out if the VPN is active"),
@@ -54,12 +56,12 @@ class OpenVPN(IntervalModule):
     def init(self):
         if not self.vpn_name:
             raise Exception("vpn_name is required")
+                # use new service names if openvpn version is 2.4 (2.5 is not out yet...)
 
-        # use new service names if openvpn version is 2.4 (2.5 is not out yet...)
-        if run_through_shell('openvpn --version | grep -i "openvpn 2.4"', True).out.strip():
-            status_command = "bash -c 'systemctl show openvpn-client@%(vpn_name)s | grep ActiveState=active'"
-            vpn_up_command = "sudo /bin/systemctl start openvpn-client@%(vpn_name)s.service"
-            vpn_down_command = "sudo /bin/systemctl stop openvpn-client@%(vpn_name)s.service"
+        if self.openvpn_lastest:
+            self.status_command = "bash -c 'systemctl show openvpn-client@%(vpn_name)s | grep ActiveState=active'"
+            self.vpn_up_command = "sudo /bin/systemctl start openvpn-client@%(vpn_name)s.service"
+            self.vpn_down_command = "sudo /bin/systemctl stop openvpn-client@%(vpn_name)s.service"
 
     def toggle_connection(self):
         if self.connected:
