@@ -31,7 +31,7 @@ class OpenVPN(IntervalModule):
     status_down = '▼'
     format = "{vpn_name} {status}"
 
-    openvpn_lastest = False
+    use_new_service_name = False
     status_command = "bash -c 'systemctl show openvpn@%(vpn_name)s | grep ActiveState=active'"
     vpn_up_command = "sudo /bin/systemctl start openvpn@%(vpn_name)s.service"
     vpn_down_command = "sudo /bin/systemctl stop openvpn@%(vpn_name)s.service"
@@ -57,7 +57,7 @@ class OpenVPN(IntervalModule):
         if not self.vpn_name:
             raise Exception("vpn_name is required")
 
-        if self.openvpn_lastest:
+        if self.use_new_service_name:
             self.status_command = "bash -c 'systemctl show openvpn-client@%(vpn_name)s | grep ActiveState=active'"
             self.vpn_up_command = "sudo /bin/systemctl start openvpn-client@%(vpn_name)s.service"
             self.vpn_down_command = "sudo /bin/systemctl stop openvpn-client@%(vpn_name)s.service"
