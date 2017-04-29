@@ -21,7 +21,6 @@ def is_method_of(method, object):
 
 
 class Module(SettingsBase):
-    output = None
     position = 0
 
     settings = (
@@ -38,6 +37,7 @@ class Module(SettingsBase):
         ('on_doubledownscroll', "Callback called on double scroll down (see :ref:`callbacks`)"),
         ('on_otherclick', "Callback called on other click (see :ref:`callbacks`)"),
         ('on_doubleotherclick', "Callback called on double other click (see :ref:`callbacks`)"),
+        ('on_change', "Callback called when output is changed (see :ref:`callbacks`)"),
         ('multi_click_timeout', "Time (in seconds) before a single click is executed."),
         ('hints', "Additional output blocks for module output (see :ref:`hints`)"),
     )
@@ -54,6 +54,7 @@ class Module(SettingsBase):
     on_doubledownscroll = None
 
     on_otherclick = None
+    on_change = None
     on_doubleotherclick = None
 
     multi_click_timeout = 0.25
@@ -62,8 +63,19 @@ class Module(SettingsBase):
 
     def __init__(self, *args, **kwargs):
         super(Module, self).__init__(*args, **kwargs)
+        self._output = None
         self.__multi_click = MultiClickHandler(self.__button_callback_handler,
                                                self.multi_click_timeout)
+
+    @property
+    def output(self):
+        return self._output
+
+    @output.setter
+    def output(self, value):
+        self._output = value
+        if self.on_change:
+            self.on_change()
 
     def registered(self, status_handler):
         """Called when this module is registered with a status handler"""
