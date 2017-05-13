@@ -20,8 +20,11 @@ class Shell(IntervalModule):
         ("ignore_empty_stdout", "Let the block be empty"),
         ("color", "standard color"),
         ("error_color", "color to use when non zero exit code is returned"),
+        ("hide_if_empty", "Hide output when zero exit code and output is empty"),
         "format"
     )
+
+    hide_if_empty = False
 
     required = ("command",)
     format = "{output}"
@@ -31,6 +34,10 @@ class Shell(IntervalModule):
 
         if retvalue != 0:
             self.logger.error(stderr if stderr else "Unknown error")
+        else:
+            if self.hide_if_empty and not out:
+                self.output = None
+                return
 
         if out:
             out = out.replace("\n", " ").strip()
