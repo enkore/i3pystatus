@@ -1,0 +1,20 @@
+
+#module-reference dl.class dt .property,
+#module-reference dl.class dt .descclassname,
+#module-reference dl.class dt .descname
+{
+    display: none;
+}
+
+#module-reference dl.class dd {
+    margin-top: -1.5em;
+}
+
+#module-reference dl.class .modheader {
+    margin-left: -2em;
+    margin-bottom: .5em;
+}
+
+#module-reference dl.class .modname {
+    font-weight: bold;
+}
