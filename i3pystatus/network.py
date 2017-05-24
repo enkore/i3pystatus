@@ -357,6 +357,12 @@ class Network(IntervalModule, ColorRangeModule):
         else:
             get_wifi_info = False
 
+        # wildcard interface names
+        for s in netifaces.interfaces():
+            if self.interface in s:
+                self.interface = s
+                break
+
         self.network_info = NetworkInfo(self.interface, self.ignore_interfaces, self.detached_down, self.unknown_up,
                                         self.freq_divisor, get_wifi_info)
 
