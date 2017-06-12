@@ -24,7 +24,7 @@ Installation
 
 ::
 
-    pip3 install git+https://github.com/enkore/i3pystatus
+    pip3 install git+https://github.com/enkore/i3pystatus.git
 
 Documentation
 -------------
