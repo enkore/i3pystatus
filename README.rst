@@ -53,6 +53,6 @@ The ``output`` attribute should be set to a dictionary which represents your mod
 the protocol is documented `here <http://i3wm.org/docs/i3bar-protocol.html>`_.
 
 Developer documentation is available in the source code and `here
-<http://docs.enkore.de/i3pystatus>`_.
+<https://i3pystatus.readthedocs.io/en/latest/module.html>`_.
 
 **Patches and pull requests are very welcome :-)**
