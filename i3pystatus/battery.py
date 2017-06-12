@@ -1,11 +1,11 @@
+import configparser
 import os
 import re
-import configparser
 
 from i3pystatus import IntervalModule, formatp
-from i3pystatus.core.util import lchop, TimeWrapper, make_bar
-from i3pystatus.core.desktop import DesktopNotification
 from i3pystatus.core.command import run_through_shell
+from i3pystatus.core.desktop import DesktopNotification
+from i3pystatus.core.util import lchop, TimeWrapper, make_bar
 
 
 class UEventParser(configparser.ConfigParser):
@@ -192,7 +192,8 @@ class BatteryChecker(IntervalModule):
         ("charging_color", "The charging color"),
         ("critical_color", "The critical color"),
         ("not_present_color", "The not present color."),
-        ("not_present_text", "The text to display when the battery is not present. Provides {battery_ident} as formatting option"),
+        ("not_present_text",
+         "The text to display when the battery is not present. Provides {battery_ident} as formatting option"),
         ("no_text_full", "Don't display text when battery is full - 100%"),
     )
 
@@ -224,6 +225,8 @@ class BatteryChecker(IntervalModule):
     base_path = '/sys/class/power_supply'
     path = None
     paths = []
+
+    notification = None
 
     def percentage(self, batteries, design=False):
         total_now = [battery.wh_remaining() for battery in batteries]
@@ -337,17 +340,27 @@ class BatteryChecker(IntervalModule):
         else:
             fdict["status"] = "FULL"
             color = self.full_color
-        if self.critical_level_command and fdict["status"] == "DIS" and fdict["percentage"] <= self.critical_level_percentage:
+        if self.critical_level_command and \
+                        fdict["status"] == "DIS" and \
+                        fdict["percentage"] <= self.critical_level_percentage:
             run_through_shell(self.critical_level_command, enable_shell=True)
 
-        if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
-            DesktopNotification(
-                title=formatp(self.alert_format_title, **fdict),
-                body=formatp(self.alert_format_body, **fdict),
-                icon="battery-caution",
-                urgency=2,
-                timeout=self.alert_timeout,
-            ).display()
+        if self.alert and \
+                        fdict["status"] == "DIS" and \
+                        fdict["percentage"] <= self.alert_percentage:
+            title, body = formatp(self.alert_format_title, **fdict), formatp(self.alert_format_body, **fdict)
+            if not self.notification:
+                self.notification = DesktopNotification(
+                    title=title,
+                    body=body,
+                    icon="battery-caution",
+                    urgency=2,
+                    timeout=self.alert_timeout,
+                )
+                self.notification.display()
+            else:
+                self.notification.update(title=title,
+                                         body=body)
 
         fdict["status"] = self.status[fdict["status"]]
 

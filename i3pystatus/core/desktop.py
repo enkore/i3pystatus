@@ -35,6 +35,18 @@ class BaseDesktopNotification:
         """
         return False
 
+    def update(self, title=None, body=None, icon=None):
+        """
+        Update this notification.
+
+        :param title: Title of the notification
+        :param body: Body text of the notification, depending on the users system configuration HTML may be used, but is not recommended
+        :param icon: A XDG icon name, see http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
+
+        :return boolean indicating success
+        """
+        return False
+
 
 class DesktopNotification(BaseDesktopNotification):
     pass
@@ -42,6 +54,7 @@ class DesktopNotification(BaseDesktopNotification):
 
 try:
     import gi
+
     gi.require_version('Notify', '0.7')
     from gi.repository import Notify
 except (ImportError, ValueError):
@@ -49,6 +62,7 @@ except (ImportError, ValueError):
 else:
     if not Notify.init("i3pystatus"):
         raise ImportError("Couldn't initialize libnotify")
+
 
     # List of some useful icon names:
     # battery, battery-caution, battery-low
@@ -61,16 +75,23 @@ else:
             Notify.Urgency.CRITICAL,
         )
 
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.notification = Notify.Notification.new(self.title, self.body, self.icon)
+
         def display(self):
-            notification = Notify.Notification.new(self.title, self.body, self.icon)
             if self.timeout:
-                notification.set_timeout(self.timeout)
-            notification.set_urgency(self.URGENCY_LUT[self.urgency])
+                self.notification.set_timeout(self.timeout)
+            self.notification.set_urgency(self.URGENCY_LUT[self.urgency])
             try:
-                return notification.show()
+                return self.notification.show()
             except Exception:
                 self.logger.exception(
                     'Failed to display desktop notification (is a '
                     'notification daemon running?)'
                 )
                 return False
+
+        def update(self, title=None, body=None, icon=None):
+            self.notification.update(title or self.title, body or self.body, icon or self.icon)
+            return self.notification.show()
