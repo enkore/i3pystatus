@@ -23,20 +23,9 @@ Installation
     Python 2.x. Some modules require additional dependencies
     documented in the docs.
 
-From PyPI package `i3pystatus <https://pypi.python.org/pypi/i3pystatus>`_
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 ::
 
-    pip install i3pystatus
-
-Packages for your OS
-++++++++++++++++++++
-
-* `Arch Linux <https://aur.archlinux.org/packages/i3pystatus/>`_ (stable
-  release)
-* `Arch Linux <https://aur.archlinux.org/packages/i3pystatus-git/>`_ (latest
-  version)
+    pip3 install git+https://github.com/enkore/i3pystatus
 
 Documentation
 -------------
