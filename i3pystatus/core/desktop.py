@@ -63,7 +63,6 @@ else:
     if not Notify.init("i3pystatus"):
         raise ImportError("Couldn't initialize libnotify")
 
-
     # List of some useful icon names:
     # battery, battery-caution, battery-low
     # …

@@ -340,14 +340,10 @@ class BatteryChecker(IntervalModule):
         else:
             fdict["status"] = "FULL"
             color = self.full_color
-        if self.critical_level_command and \
-                        fdict["status"] == "DIS" and \
-                        fdict["percentage"] <= self.critical_level_percentage:
+        if self.critical_level_command and fdict["status"] == "DIS" and fdict["percentage"] <= self.critical_level_percentage:
             run_through_shell(self.critical_level_command, enable_shell=True)
 
-        if self.alert and \
-                        fdict["status"] == "DIS" and \
-                        fdict["percentage"] <= self.alert_percentage:
+        if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
             title, body = formatp(self.alert_format_title, **fdict), formatp(self.alert_format_body, **fdict)
             if not self.notification:
                 self.notification = DesktopNotification(
