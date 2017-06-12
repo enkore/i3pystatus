@@ -17,9 +17,8 @@ i3pystatus is a large collection of status modules compatible with i3bar from th
 Installation
 ------------
 
-.. note:: Supported Python versions
-
-    i3pystatus requires Python 3.2 or newer and is not compatible with
+**Supported Python versions**
+    i3pystatus requires Python 3.4 or newer and is not compatible with
     Python 2.x. Some modules require additional dependencies
     documented in the docs.
 
@@ -30,12 +29,12 @@ Installation
 Documentation
 -------------
 
-`All further user documentation has been moved here. <http://docs.enkore.de/i3pystatus>`_
+`All further user documentation has been moved here. <https://i3pystatus.readthedocs.io/>`_
 
 Changelog
 ---------
 
-`Located here. <http://docs.enkore.de/i3pystatus/changelog.html>`_
+`Located here. <https://i3pystatus.readthedocs.io/en/latest/changelog.html>`_ Note: no further releases are planned. Install it from Git.
 
 Contributors
 ------------
