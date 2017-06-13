@@ -53,7 +53,6 @@ class Systemd(Backend):
             command = self.vpn_up_command
         run_through_shell(command % {'vpn_name': self.vpn_name}, enable_shell=True)
 
-
     @property
     def connected(self):
         command_result = run_through_shell(self.status_command % {'vpn_name': self.vpn_name}, enable_shell=True)

@@ -28,12 +28,10 @@ class File(SettingsBase):
 
     openvpn_pid = False
 
-
     def init(self):
         """Initialize"""
         if not self.conf_file and not self.pid_file:
             raise Exception("either conf_file or pid_file must be passed in")
-
 
     def toggle_connection(self):
         """Toggle the  state of the openvpn connection"""
@@ -43,7 +41,6 @@ class File(SettingsBase):
             else:
                 run_through_shell(self.up_command, enable_shell=True)
 
-
     def find_pid(self):
         """Search /proc to find the PID of the openvpn client"""
         pids = [pid for pid in os.listdir('/proc') if pid.isdigit()]
@@ -51,7 +48,6 @@ class File(SettingsBase):
             return True
         else:
             return False
-
 
     @property
     def connected(self):
@@ -67,7 +63,7 @@ class File(SettingsBase):
         else:
             pid_file = self.pid_file
 
-        if not pid_file:
+        if not 'pid_file' in vars():
             raise Exception("No pid_file found")
 
         # read pid from pid_file

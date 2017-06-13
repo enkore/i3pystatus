@@ -33,7 +33,6 @@ class Openvpn(IntervalModule):
     def toggle_connection(self):
         self.backend.toggle_connection()
 
-
     def run(self):
         self.backend.init()
 
