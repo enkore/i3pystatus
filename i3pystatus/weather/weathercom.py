@@ -120,9 +120,6 @@ class Weathercom(WeatherBackend):
     forecast page, the code you need will be everything after the last slash in
     the URL (e.g. ``94107:4:US``).
 
-    To receive values in units standard to your country, pass the relevant locale.
-    For example, locale='en_AU'.
-
     .. _weather-usage-weathercom:
 
     .. rubric:: Usage example
@@ -154,7 +151,6 @@ class Weathercom(WeatherBackend):
     '''
     settings = (
         ('location_code', 'Location code from www.weather.com'),
-        ('locale', 'Optional locale, eg "en-AU", causes weather.com to return data in units standard for the country.'),
         ('units', '\'metric\' or \'imperial\''),
         ('update_error', 'Value for the ``{update_error}`` formatter when an '
                          'error is encountered while checking weather data'),
@@ -162,7 +158,6 @@ class Weathercom(WeatherBackend):
     required = ('location_code',)
 
     location_code = None
-    locale = None
     units = 'metric'
     update_error = '!'
 
@@ -177,7 +172,10 @@ class Weathercom(WeatherBackend):
             # Ensure that the location code is a string, in the event that a
             # ZIP code (or other all-numeric code) is passed as a non-string.
             self.location_code = str(self.location_code)
-        self.locale = self.locale or ''
+
+        # Setting the locale to en-AU returns units in metric. Leaving it blank
+        # causes weather.com to return the default, which is imperial.
+        self.locale = 'en-AU' if self.units == 'metric' else ''
 
         self.forecast_url = self.url_template.format(**vars(self))
         self.parser = WeathercomHTMLParser(self.logger)
@@ -192,6 +190,10 @@ class Weathercom(WeatherBackend):
         '''
         Fetches the current weather from wxdata.weather.com service.
         '''
+
+        if self.units not in ('imperial', 'metric'):
+            raise Exception("units must be one of (imperial, metric)!")
+
         if self.location_code is None:
             self.logger.error(
                 'A location_code is required to check Weather.com. See the '
