@@ -18,7 +18,6 @@ class File(SettingsBase):
 
     conf_file = '/etc/openvpn/openvpn.conf'
     pid_file = ''
-    openvpn_pid = False
     up_command = 'sudo openvpn --config %s' % conf_file
 
     settings = (
@@ -27,13 +26,17 @@ class File(SettingsBase):
         ("up_command", "Command to bring the openvpn connection up."),
     )
 
+    openvpn_pid = False
+
 
     def init(self):
+        """Initialize"""
         if not self.conf_file and not self.pid_file:
             raise Exception("either conf_file or pid_file must be passed in")
 
 
     def toggle_connection(self):
+        """Toggle the  state of the openvpn connection"""
         if self.conf_file:
             if self.connected:
                 os.kill(self.openvpn_pid, signal.SIGKILL)
@@ -42,6 +45,7 @@ class File(SettingsBase):
 
 
     def find_pid(self):
+        """Search /proc to find the PID of the openvpn client"""
         pids = [pid for pid in os.listdir('/proc') if pid.isdigit()]
         if self.openvpn_pid in pids:
             return True
@@ -51,7 +55,7 @@ class File(SettingsBase):
 
     @property
     def connected(self):
-
+        """Return True if the openvpn client is running"""
         # get pid_file from config
         if self.conf_file:
             p = re.compile('^writepid .*')
@@ -62,6 +66,9 @@ class File(SettingsBase):
             f.close()
         else:
             pid_file = self.pid_file
+
+        if not pid_file:
+            raise Exception("No pid_file found")
 
         # read pid from pid_file
         f = open(pid_file)
