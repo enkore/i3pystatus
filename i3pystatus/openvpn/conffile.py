@@ -63,12 +63,12 @@ class File(SettingsBase):
         else:
             pid_file = self.pid_file
 
-        if not 'pid_file' in vars():
+        if 'pid_file' in vars():
+            # read pid from pid_file
+            f = open(pid_file)
+            self.openvpn_pid = f.readlines()[0].split()[0]
+            f.close()
+        else:
             raise Exception("No pid_file found")
-
-        # read pid from pid_file
-        f = open(pid_file)
-        self.openvpn_pid = f.readlines()[0].split()[0]
-        f.close()
 
         return self.find_pid()
