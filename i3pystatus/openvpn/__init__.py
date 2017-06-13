@@ -5,7 +5,7 @@ class Openvpn(IntervalModule):
     """
     Generic OpenVPN manager
 
-    The `backends` setting determines the backends to use. For available backends see :ref:`openvpnbackends`.
+    The `backend` setting determines the backends to use.
     """
 
     settings = (
