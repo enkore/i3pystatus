@@ -29,33 +29,35 @@ class Systemd(SettingsBase):
     status_command = "bash -c 'systemctl show openvpn@%(vpn_name)s | grep ActiveState=active'"
     vpn_up_command = "sudo /bin/systemctl start openvpn@%(vpn_name)s.service"
     vpn_down_command = "sudo /bin/systemctl stop openvpn@%(vpn_name)s.service"
+    name = False
 
     settings = (
         ("use_new_service_name", "Use new openvpn service names (openvpn 2.4^)"),
         ("vpn_up_command", "Command to bring up the VPN - default requires editing /etc/sudoers"),
         ("vpn_down_command", "Command to bring up the VPN - default requires editing /etc/sudoers"),
         ("status_command", "command to find out if the VPN is active"),
+        ("name", "Systemd name of this VPN connection."),
     )
 
     def init(self):
-        if not self.vpn_name:
-            raise Exception("vpn_name is required")
+        if not self.name:
+            raise Exception("name is required")
 
         if self.use_new_service_name:
-            self.status_command = "bash -c 'systemctl show openvpn-client@%(vpn_name)s | grep ActiveState=active'"
-            self.vpn_up_command = "sudo /bin/systemctl start openvpn-client@%(vpn_name)s.service"
-            self.vpn_down_command = "sudo /bin/systemctl stop openvpn-client@%(vpn_name)s.service"
+            self.status_command = "bash -c 'systemctl show openvpn-client@%(name)s | grep ActiveState=active'"
+            self.vpn_up_command = "sudo /bin/systemctl start openvpn-client@%(name)s.service"
+            self.vpn_down_command = "sudo /bin/systemctl stop openvpn-client@%(name)s.service"
 
     def toggle_connection(self):
         if self.connected:
             command = self.vpn_down_command
         else:
             command = self.vpn_up_command
-        run_through_shell(command % {'vpn_name': self.vpn_name}, enable_shell=True)
+        run_through_shell(command % {'name': self.name}, enable_shell=True)
 
     @property
     def connected(self):
-        command_result = run_through_shell(self.status_command % {'vpn_name': self.vpn_name}, enable_shell=True)
+        command_result = run_through_shell(self.status_command % {'name': self.name}, enable_shell=True)
         connected = True if command_result.out.strip() else False
 
         return connected

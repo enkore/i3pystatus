@@ -8,17 +8,22 @@ class Openvpn(IntervalModule):
     The `backend` setting determines the backends to use.
 
     Example for conffile backend:
+
     .. code-block:: python
+
         status.register('openvpn',
             vpn_name='OpenVPN',
             backend=conffile.File(
-            conf_file='/home/user/ovpn.conf'))
+                conf_file='/home/user/ovpn.conf'))
 
     Example for systemd backend:
+
     .. code-block:: python
+
         status.register('openvpn',
             vpn_name='OpenVPN',
-            backend=conffile.systemd())
+            backend=conffile.systemd(
+                name='work'))
     """
 
     settings = (
