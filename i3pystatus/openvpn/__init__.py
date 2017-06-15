@@ -6,7 +6,7 @@ class Openvpn(IntervalModule):
     Generic OpenVPN manager
 
     The `backend` setting determines the backends to use.
-    
+
     Example for conffile backend:
     status.register('openvpn',
         vpn_name='OpenVPN',
