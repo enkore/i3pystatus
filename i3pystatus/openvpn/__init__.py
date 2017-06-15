@@ -6,6 +6,17 @@ class Openvpn(IntervalModule):
     Generic OpenVPN manager
 
     The `backend` setting determines the backends to use.
+    
+    Example for conffile backend:
+    status.register('openvpn',
+        vpn_name='OpenVPN',
+        backend=conffile.File(
+        conf_file='/home/user/ovpn.conf'))
+
+    Example for systemd backend:
+    status.register('openvpn',
+        vpn_name='OpenVPN',
+        backend=conffile.systemd())
     """
 
     settings = (
