@@ -1,13 +1,11 @@
-from i3pystatus.core.util import internet, require
-from i3pystatus.weather import WeatherBackend
-
-from datetime import datetime
-from urllib.request import urlopen
-from html.parser import HTMLParser
 import json
 import re
+from datetime import datetime
+from html.parser import HTMLParser
+from urllib.request import urlopen
 
-WEATHER_URL = 'https://weather.com/weather/today/l/%s'
+from i3pystatus.core.util import internet, require
+from i3pystatus.weather import WeatherBackend
 
 
 class WeathercomHTMLParser(HTMLParser):
@@ -16,13 +14,12 @@ class WeathercomHTMLParser(HTMLParser):
     through some other source at runtime and added as <script> elements to the
     page source.
     '''
-    def __init__(self, logger, location_code):
+
+    def __init__(self, logger):
         self.logger = logger
-        self.location_code = location_code
         super(WeathercomHTMLParser, self).__init__()
 
-    def get_weather_data(self):
-        url = WEATHER_URL % self.location_code
+    def get_weather_data(self, url):
         self.logger.debug('Making request to %s to retrieve weather data', url)
         self.weather_data = None
         with urlopen(url) as content:
@@ -164,6 +161,8 @@ class Weathercom(WeatherBackend):
     units = 'metric'
     update_error = '!'
 
+    url_template = 'https://weather.com/{locale}/weather/today/l/{location_code}'
+
     # This will be set in the init based on the passed location code
     forecast_url = None
 
@@ -173,8 +172,13 @@ class Weathercom(WeatherBackend):
             # Ensure that the location code is a string, in the event that a
             # ZIP code (or other all-numeric code) is passed as a non-string.
             self.location_code = str(self.location_code)
-            self.forecast_url = WEATHER_URL % self.location_code
-        self.parser = WeathercomHTMLParser(self.logger, self.location_code)
+
+        # Setting the locale to en-AU returns units in metric. Leaving it blank
+        # causes weather.com to return the default, which is imperial.
+        self.locale = 'en-AU' if self.units == 'metric' else ''
+
+        self.forecast_url = self.url_template.format(**vars(self))
+        self.parser = WeathercomHTMLParser(self.logger)
 
     def check_response(self, response):
         # Errors for weather.com API manifest in HTTP error codes, not in the
@@ -186,6 +190,10 @@ class Weathercom(WeatherBackend):
         '''
         Fetches the current weather from wxdata.weather.com service.
         '''
+
+        if self.units not in ('imperial', 'metric'):
+            raise Exception("units must be one of (imperial, metric)!")
+
         if self.location_code is None:
             self.logger.error(
                 'A location_code is required to check Weather.com. See the '
@@ -196,7 +204,7 @@ class Weathercom(WeatherBackend):
         self.data['update_error'] = ''
         try:
 
-            self.parser.get_weather_data()
+            self.parser.get_weather_data(self.forecast_url)
             if self.parser.weather_data is None:
                 self.logger.error(
                     'Failed to read weather data from page. Run module with '
