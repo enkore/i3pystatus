@@ -1,10 +1,10 @@
-from i3pystatus.openvpn import Backend
+from i3pystatus import SettingsBase
 from i3pystatus.core.command import run_through_shell
 
 __author__ = 'facetoe'
 
 
-class Systemd(Backend):
+class Systemd(SettingsBase):
     """
     Monitor systemd managed OpenVPN connections.
 
