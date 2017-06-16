@@ -62,8 +62,8 @@ class Module(SettingsBase):
     hints = {"markup": "none"}
 
     def __init__(self, *args, **kwargs):
-        super(Module, self).__init__(*args, **kwargs)
         self._output = None
+        super(Module, self).__init__(*args, **kwargs)
         self.__multi_click = MultiClickHandler(self.__button_callback_handler,
                                                self.multi_click_timeout)
 
