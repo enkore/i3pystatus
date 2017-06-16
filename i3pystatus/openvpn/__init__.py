@@ -47,17 +47,14 @@ class Openvpn(IntervalModule):
     connected = False
     on_leftclick = ['toggle_connection']
 
-    def __init__(self):
-        if 'systemd.Systemd' in self.backend:
-            self.backend.init(self.vpn_name)
-        else:
-            self.backend.init()
-
     def toggle_connection(self):
         self.backend.toggle_connection()
 
     def run(self):
-        self.backend.init()
+        if 'systemd.Systemd' in str(self.backend):
+            self.backend.init(vpn_name=self.vpn_name)
+        else:
+            self.backend.init()
 
         self.connected = self.backend.connected
 

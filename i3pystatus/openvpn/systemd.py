@@ -38,7 +38,7 @@ class Systemd(SettingsBase):
         ("status_command", "command to find out if the VPN is active"),
     )
 
-    def init(self, vpn_name):
+    def init(self):
         if not vpn_name:
             raise Exception("vpn_name is required")
 
