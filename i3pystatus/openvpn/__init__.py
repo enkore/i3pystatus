@@ -22,8 +22,7 @@ class Openvpn(IntervalModule):
 
         status.register('openvpn',
             vpn_name='OpenVPN',
-            backend=conffile.systemd(
-                name='work'))
+            backend=systemd.Systemd)
     """
 
     settings = (
@@ -47,6 +46,12 @@ class Openvpn(IntervalModule):
     backend = None
     connected = False
     on_leftclick = ['toggle_connection']
+
+    def __init__(self):
+        if 'systemd.Systemd' in 'backend':
+            self.backend.init(self.vpn_name)
+        else:
+            self.backend.init()
 
     def toggle_connection(self):
         self.backend.toggle_connection()
