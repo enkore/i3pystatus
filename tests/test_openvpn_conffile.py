@@ -11,7 +11,7 @@ import os
 
 class OpenvpnConffileTest(unittest.TestCase):
 
-    @patch('i3pystatus.openvpn.conffile.os', autospec=True)
+    @patch('i3pystatus.openvpn.conffile.os')
     def test_openvpnconffile_up(self, os):
         """
         Test status output of openvpn being "up"
@@ -22,7 +22,7 @@ class OpenvpnConffileTest(unittest.TestCase):
         ovpnconffile.run()
         self.assertTrue(ovpnconffile.output['full_text'] == 'testvpn up')
 
-    @patch('i3pystatus.openvpn.conffile.os', autospec=True)
+    @patch('i3pystatus.openvpn.conffile.os')
     def test_openvpnconffile_down(self, os):
         """
         Test status output of openvpn being "down"
