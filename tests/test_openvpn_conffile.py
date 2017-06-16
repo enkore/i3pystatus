@@ -6,7 +6,6 @@ import unittest
 from mock import patch
 from i3pystatus import openvpn
 from i3pystatus.openvpn import conffile
-import os
 
 
 class OpenvpnConffileTest(unittest.TestCase):
