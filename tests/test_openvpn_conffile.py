@@ -17,7 +17,7 @@ class OpenvpnConffileTest(unittest.TestCase):
         Test status output of openvpn being "up"
         """
 
-        openvpn.conffile.os.listdir.return_value = ['1', '11', '2', '22', '3', '33']
+        os.listdir.return_value = ['1', '11', '2', '22', '3', '33']
         ovpnconffile = openvpn.Openvpn(vpn_name='testvpn', status_up='up', backend=conffile.File(conf_file='tests/ovpn.conf'))
         ovpnconffile.run()
         self.assertTrue(ovpnconffile.output['full_text'] == 'testvpn up')
@@ -28,7 +28,7 @@ class OpenvpnConffileTest(unittest.TestCase):
         Test status output of openvpn being "down"
         """
 
-        openvpn.conffile.os.listdir.return_value = ['11', '2', '22', '3', '33']
+        os.listdir.return_value = ['11', '2', '22', '3', '33']
         ovpnconffile = openvpn.Openvpn(vpn_name='testvpn', status_down='down', backend=conffile.File(conf_file='tests/ovpn.conf'))
         ovpnconffile.run()
         self.assertTrue(ovpnconffile.output['full_text'] == 'testvpn down')
