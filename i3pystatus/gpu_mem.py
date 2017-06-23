@@ -25,7 +25,7 @@ class GPUMemory(IntervalModule):
         ("warn_color", "defines the color used when warn percentage is exceeded"),
         ("alert_color", "defines the color used when alert percentage is exceeded"),
         ("round_size", "defines number of digits in round"),
-
+        ("gpu_number", "set the gpu number when you have several GPU"),
     )
 
     format = "{avail_mem} MiB"
@@ -36,9 +36,10 @@ class GPUMemory(IntervalModule):
     warn_percentage = 50
     alert_percentage = 80
     round_size = 1
+    gpu_number = 0
 
     def run(self):
-        info = gpu.query_nvidia_smi()
+        info = gpu.query_nvidia_smi(self.gpu_number)
 
         if info.used_mem is not None and info.total_mem is not None:
             mem_percent = 100 * info.used_mem / info.total_mem

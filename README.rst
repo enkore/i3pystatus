@@ -7,42 +7,34 @@ i3pystatus
 .. image:: https://travis-ci.org/enkore/i3pystatus.svg?branch=master
     :target: https://travis-ci.org/enkore/i3pystatus
 
-i3pystatus is a growing collection of python scripts for
-status output compatible to i3status / i3bar of the i3 window manager.
+i3pystatus is a large collection of status modules compatible with i3bar from the i3 window manager.
+
+:License: MIT
+:Python: 3.4+
+:Governance: Patches that don't break the build (Travis or docs) are generally just merged.
+:Releases: No further releases are planned. Install it from Git.
 
 Installation
 ------------
 
-.. note:: Supported Python versions
-
-    i3pystatus requires Python 3.2 or newer and is not compatible with
+**Supported Python versions**
+    i3pystatus requires Python 3.4 or newer and is not compatible with
     Python 2.x. Some modules require additional dependencies
     documented in the docs.
 
-From PyPI package `i3pystatus <https://pypi.python.org/pypi/i3pystatus>`_
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 ::
 
-    pip install i3pystatus
-
-Packages for your OS
-++++++++++++++++++++
-
-* `Arch Linux <https://aur.archlinux.org/packages/i3pystatus/>`_ (stable
-  release)
-* `Arch Linux <https://aur.archlinux.org/packages/i3pystatus-git/>`_ (latest
-  version)
+    pip3 install git+https://github.com/enkore/i3pystatus.git
 
 Documentation
 -------------
 
-`All further user documentation has been moved here. <http://docs.enkore.de/i3pystatus>`_
+`All further user documentation has been moved here. <https://i3pystatus.readthedocs.io/>`_
 
 Changelog
 ---------
 
-`Located here. <http://docs.enkore.de/i3pystatus/changelog.html>`_
+`Located here. <https://i3pystatus.readthedocs.io/en/latest/changelog.html>`_ Note: no further releases are planned. Install it from Git.
 
 Contributors
 ------------
@@ -61,6 +53,6 @@ The ``output`` attribute should be set to a dictionary which represents your mod
 the protocol is documented `here <http://i3wm.org/docs/i3bar-protocol.html>`_.
 
 Developer documentation is available in the source code and `here
-<http://docs.enkore.de/i3pystatus>`_.
+<https://i3pystatus.readthedocs.io/en/latest/module.html>`_.
 
 **Patches and pull requests are very welcome :-)**

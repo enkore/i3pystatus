@@ -25,6 +25,7 @@ MOCK_MODULES = [
     "lxml.html", "lxml.cssselect", "lxml",
     "praw",
     "gi", "gi.repository", "dbus.mainloop.glib", "dbus",
+    "GeoIP",
     "pywapi", "basiciw",
     "i3pystatus.pulseaudio.pulse",
     "notmuch",
@@ -32,7 +33,7 @@ MOCK_MODULES = [
     "bs4",
     "dota2py",
     "novaclient",
-    "speedtest_cli",
+    "speedtest",
     "pyzabbix",
     "vk",
     "google-api-python-client",
@@ -46,7 +47,8 @@ MOCK_MODULES = [
     "i3ipc",
     "dateutil.parser",
     "dateutil.relativedelta",
-    "redshift_gtk.statusicon",
+    "xkbgroup",
+    "sensors"
 ]
 
 for mod_name in MOCK_MODULES:
@@ -79,7 +81,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'i3pystatus'
-copyright = '2012-2016 i3pystatus developers. Free and open software under the MIT license'
+copyright = '2012-2017 i3pystatus developers. Free and open software under the MIT license'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -161,7 +163,7 @@ html_theme = "haiku"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -342,3 +344,6 @@ epub_copyright = '2013, Author'
 
 # If false, no index is generated.
 #epub_use_index = True
+
+def setup(app):
+    app.add_stylesheet('i3pystatus.css')

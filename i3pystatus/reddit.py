@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import re
-
 import praw
 
 from i3pystatus import IntervalModule
@@ -15,6 +14,9 @@ class Reddit(IntervalModule):
     page using webbrowser.open() while right-clicking opens the URL of the
     submission directly. Depends on the Python Reddit API Wrapper (PRAW)
     <https://github.com/praw-dev/praw>.
+
+    PRAW must be configured for this module to work.
+    https://praw.readthedocs.io/en/latest/
 
     .. rubric:: Available formatters
 
@@ -38,10 +40,11 @@ class Reddit(IntervalModule):
     settings = (
         ("format", "Format string used for output."),
         ("username", "Reddit username."),
-        ("password", "Reddit password."),
-        ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
+        ('keyring_backend', 'alternative keyring backend for retrieving \
+                            credentials'),
         ("subreddit", "Subreddit to monitor. Uses frontpage if unspecified."),
         ("sort_by", "'hot', 'new', 'rising', 'controversial', or 'top'."),
+        ("time_filter", "'all', 'day','hour', 'month', 'week', 'year'"),
         ("color", "Standard color."),
         ("colorize", "Enable color change on new message."),
         ("color_orangered", "Color for new messages."),
@@ -52,10 +55,10 @@ class Reddit(IntervalModule):
     )
     format = "[{submission_subreddit}] {submission_title} ({submission_domain})"
     username = ""
-    password = ""
     keyring_backend = None
     subreddit = ""
     sort_by = "hot"
+    time_filter = "all"
     color = "#FFFFFF"
     colorize = True
     color_orangered = "#FF4500"
@@ -106,18 +109,15 @@ class Reddit(IntervalModule):
 
     def connect(self):
         if not self.reddit_session:
-            self.reddit_session = praw.Reddit(user_agent='i3pystatus', disable_update_check=True)
+            self.reddit_session = praw.Reddit(user_agent='i3pystatus',
+                                              disable_update_check=True)
         return self.reddit_session
 
     def get_redditor(self, reddit):
         redditor_info = {}
-        if self.username:
-            u = reddit.get_redditor(self.username)
-            redditor_info["link_karma"] = u.link_karma
-            redditor_info["comment_karma"] = u.comment_karma
-        else:
-            redditor_info["link_karma"] = ""
-            redditor_info["comment_karma"] = ""
+        u = reddit.redditor(self.username)
+        redditor_info["link_karma"] = u.link_karma
+        redditor_info["comment_karma"] = u.comment_karma
         return redditor_info
 
     def get_messages(self, reddit):
@@ -128,45 +128,42 @@ class Reddit(IntervalModule):
             "message_subject": "",
             "message_body": ""
         }
-        if self.password:
-            self.log_in(reddit)
-            unread_messages = sum(1 for i in reddit.get_unread())
-            if unread_messages:
-                d = vars(next(reddit.get_unread()))
-                message_info = {
-                    "message_unread": unread_messages,
-                    "message_author": d["author"],
-                    "message_subject": d["subject"],
-                    "message_body": d["body"].replace("\n", " "),
-                    "status": self.status["new_mail"]
-                }
-
+        unread_messages = sum(1 for i in reddit.inbox.unread())
+        if unread_messages:
+            d = vars(next(reddit.inbox.unread()))
+            message_info = {
+                "message_unread": unread_messages,
+                "message_author": d["author"],
+                "message_subject": d["subject"],
+                "message_body": d["body"].replace("\n", " "),
+                "status": self.status["new_mail"]
+            }
         return message_info
-
-    def log_in(self, reddit):
-        if not reddit.is_logged_in():
-            reddit.login(self.username, self.password, disable_warning=True)
 
     def get_subreddit(self, reddit):
         fdict = {}
         subreddit_dict = {}
         if self.subreddit:
-            s = reddit.get_subreddit(self.subreddit)
+            s = reddit.subreddit(self.subreddit)
         else:
-            s = reddit
+            s = reddit.front
+
         if self.sort_by == 'hot':
-            if not self.subreddit:
-                subreddit_dict = vars(next(s.get_front_page(limit=1)))
-            else:
-                subreddit_dict = vars(next(s.get_hot(limit=1)))
+            subreddit_dict = vars(next(s.hot(limit=1)))
         elif self.sort_by == 'new':
-            subreddit_dict = vars(next(s.get_new(limit=1)))
+            subreddit_dict = vars(next(s.new(limit=1)))
         elif self.sort_by == 'rising':
-            subreddit_dict = vars(next(s.get_rising(limit=1)))
+            try:
+                subreddit_dict = vars(next(s.rising(limit=1)))
+            except StopIteration:
+                return
         elif self.sort_by == 'controversial':
-            subreddit_dict = vars(next(s.get_controversial(limit=1)))
+            subreddit_dict = vars(next(s.controversial(
+                time_filter=self.time_filter,
+                limit=1))
+            )
         elif self.sort_by == 'top':
-            subreddit_dict = vars(next(s.get_top(limit=1)))
+            subreddit_dict = vars(next(s.top(limit=1)))
         fdict["submission_title"] = subreddit_dict["title"]
         fdict["submission_author"] = subreddit_dict["author"]
         fdict["submission_points"] = subreddit_dict["ups"]

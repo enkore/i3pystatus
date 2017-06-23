@@ -1,11 +1,11 @@
+import configparser
 import os
 import re
-import configparser
 
 from i3pystatus import IntervalModule, formatp
-from i3pystatus.core.util import lchop, TimeWrapper, make_bar
-from i3pystatus.core.desktop import DesktopNotification
 from i3pystatus.core.command import run_through_shell
+from i3pystatus.core.desktop import DesktopNotification
+from i3pystatus.core.util import lchop, TimeWrapper, make_bar
 
 
 class UEventParser(configparser.ConfigParser):
@@ -78,6 +78,9 @@ class BatteryCharge(Battery):
     def wh_remaining(self):
         return self.battery_info['CHARGE_NOW'] * self.battery_info['VOLTAGE_NOW']
 
+    def wh_total(self):
+        return self.battery_info['CHARGE_FULL'] * self.battery_info['VOLTAGE_NOW']
+
     def wh_depleted(self):
         return (self.battery_info['CHARGE_FULL'] - self.battery_info['CHARGE_NOW']) * self.battery_info['VOLTAGE_NOW']
 
@@ -102,6 +105,9 @@ class BatteryEnergy(Battery):
 
     def wh_remaining(self):
         return self.battery_info['ENERGY_NOW']
+
+    def wh_total(self):
+        return self.battery_info['ENERGY_FULL']
 
     def wh_depleted(self):
         return self.battery_info['ENERGY_FULL'] - self.battery_info['ENERGY_NOW']
@@ -174,6 +180,7 @@ class BatteryChecker(IntervalModule):
         ("critical_level_command", "Runs a shell command in the case of a critical power state"),
         "critical_level_percentage",
         "alert_percentage",
+        "alert_timeout",
         ("alert_format_title", "The title of the notification, all formatters can be used"),
         ("alert_format_body", "The body text of the notification, all formatters can be used"),
         ("path", "Override the default-generated path and specify the full path for a single battery"),
@@ -185,7 +192,8 @@ class BatteryChecker(IntervalModule):
         ("charging_color", "The charging color"),
         ("critical_color", "The critical color"),
         ("not_present_color", "The not present color."),
-        ("not_present_text", "The text to display when the battery is not present. Provides {battery_ident} as formatting option"),
+        ("not_present_text",
+         "The text to display when the battery is not present. Provides {battery_ident} as formatting option"),
         ("no_text_full", "Don't display text when battery is full - 100%"),
     )
 
@@ -203,6 +211,7 @@ class BatteryChecker(IntervalModule):
     critical_level_command = ""
     critical_level_percentage = 1
     alert_percentage = 10
+    alert_timeout = -1
     alert_format_title = "Low battery"
     alert_format_body = "Battery {battery_ident} has only {percentage:.2f}% ({remaining:%E%hh:%Mm}) remaining!"
     color = "#ffffff"
@@ -217,11 +226,12 @@ class BatteryChecker(IntervalModule):
     path = None
     paths = []
 
+    notification = None
+
     def percentage(self, batteries, design=False):
-        total = 0
-        for battery in batteries:
-            total += battery.percentage(design)
-        return total / len(batteries)
+        total_now = [battery.wh_remaining() for battery in batteries]
+        total_full = [battery.wh_total() for battery in batteries]
+        return sum(total_now) / sum(total_full) * 100
 
     def consumption(self, batteries):
         consumption = 0
@@ -334,13 +344,19 @@ class BatteryChecker(IntervalModule):
             run_through_shell(self.critical_level_command, enable_shell=True)
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
-            DesktopNotification(
-                title=formatp(self.alert_format_title, **fdict),
-                body=formatp(self.alert_format_body, **fdict),
-                icon="battery-caution",
-                urgency=2,
-                timeout=60,
-            ).display()
+            title, body = formatp(self.alert_format_title, **fdict), formatp(self.alert_format_body, **fdict)
+            if not self.notification:
+                self.notification = DesktopNotification(
+                    title=title,
+                    body=body,
+                    icon="battery-caution",
+                    urgency=2,
+                    timeout=self.alert_timeout,
+                )
+                self.notification.display()
+            else:
+                self.notification.update(title=title,
+                                         body=body)
 
         fdict["status"] = self.status[fdict["status"]]
 

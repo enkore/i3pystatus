@@ -1,17 +1,11 @@
-from i3pystatus.core.util import internet, require
-from i3pystatus.weather import WeatherBackend
-
-from datetime import datetime
-from urllib.request import urlopen
-from html.parser import HTMLParser
 import json
 import re
+from datetime import datetime
+from html.parser import HTMLParser
+from urllib.request import urlopen
 
-API_PARAMS = ('api_key', 'lang', 'latitude', 'longitude')
-
-API_URL = 'https://api.weather.com/v2/turbo/vt1precipitation;vt1currentdatetime;vt1pollenforecast;vt1dailyForecast;vt1observation?units=%s&language=%s&geocode=%s,%s&format=json&apiKey=%s'
-
-FORECAST_URL = 'https://weather.com/weather/today/l/%s'
+from i3pystatus.core.util import internet, require
+from i3pystatus.weather import WeatherBackend
 
 
 class WeathercomHTMLParser(HTMLParser):
@@ -20,31 +14,15 @@ class WeathercomHTMLParser(HTMLParser):
     through some other source at runtime and added as <script> elements to the
     page source.
     '''
-    def __init__(self, logger, location_code):
+
+    def __init__(self, logger):
         self.logger = logger
-        self.location_code = location_code
-        for attr in API_PARAMS:
-            setattr(self, attr, None)
-        # Not required for API call, but still parsed from the forecast page
-        self.city_name = ''
         super(WeathercomHTMLParser, self).__init__()
 
-    def safe_eval(self, data):
-        '''
-        Execute an eval with no builtins and no locals
-        '''
-        try:
-            return eval(data, {'__builtins__': None}, {})
-        except Exception as exc:
-            self.logger.log(
-                5,
-                'Failed to eval() data: %s\n\nOriginal data follows:\n%s',
-                exc, data
-            )
-            return {}
-
-    def read_forecast_page(self):
-        with urlopen(FORECAST_URL % self.location_code) as content:
+    def get_weather_data(self, url):
+        self.logger.debug('Making request to %s to retrieve weather data', url)
+        self.weather_data = None
+        with urlopen(url) as content:
             try:
                 content_type = dict(content.getheaders())['Content-Type']
                 charset = re.search(r'charset=(.*)', content_type).group(1)
@@ -53,73 +31,94 @@ class WeathercomHTMLParser(HTMLParser):
             html = content.read().decode(charset)
         try:
             self.feed(html)
-        except Exception as exc:
-            self.logger.debug(
+        except Exception:
+            self.logger.exception(
                 'Exception raised while parsing forecast page',
-                exc
+                exc_info=True
             )
 
+    def load_json(self, json_input):
+        self.logger.debug('Loading the following data as JSON: %s', json_input)
+        try:
+            return json.loads(json_input)
+        except json.decoder.JSONDecodeError as exc:
+            self.logger.debug('Error loading JSON: %s', exc)
+            self.logger.debug('String that failed to load: %s', json_input)
+        return None
+
     def handle_data(self, content):
+        '''
+        Sometimes the weather data is set under an attribute of the "window"
+        DOM object. Sometimes it appears as part of a javascript function.
+        Catch either possibility.
+        '''
+        if self.weather_data is not None:
+            # We've already found weather data, no need to continue parsing
+            return
+        content = content.strip().rstrip(';')
         try:
             tag_text = self.get_starttag_text().lower()
         except AttributeError:
             tag_text = ''
-        if tag_text == '<script>':
-            if 'apiKey' in content:
-                # Key is part of a javascript data structure which looks
-                # similar to the following:
-                #
-                # 'sunTurbo': {
-                #     'baseUrl': 'https://api.weather.com',
-                #     'apiKey': 'c1ea9f47f6a88b9acb43aba7faf389d4',
-                #     'locale': 'en-US' || 'en-us'
-                # }
-                #
-                # For our purposes this is close enough to a Python data
-                # structure such that it should be able to be eval'ed to a
-                # Python dict.
-                sunturbo = content.find('\'sunTurbo\'')
-                if sunturbo != -1:
-                    # Look for the left curly brace after the 'sunTurbo' key
-                    lbrace = content.find('{', sunturbo)
-                    if lbrace != -1:
-                        # Now look for the right curly brace
-                        rbrace = content.find('}', lbrace)
-                        if rbrace != -1:
-                            api_info = content[lbrace:rbrace + 1]
-                            # Change '||' to 'or' to allow it to be eval'ed
-                            api_info = api_info.replace('||', 'or')
-                            api_data = self.safe_eval(api_info)
-                            for attr, key in (('api_key', 'apiKey'),
-                                              ('lang', 'locale')):
-                                try:
-                                    setattr(self, attr, api_data[key])
-                                except (KeyError, TypeError):
-                                    self.logger.debug(
-                                        '\'%s\' key not present in %s',
-                                        key, api_data
-                                    )
-            if 'explicit_location' in content and self.location_code in content:
-                lbrace = content.find('{')
-                rbrace = content.rfind('}')
-                if lbrace != rbrace != -1:
-                    loc_data = json.loads(content[lbrace:rbrace + 1])
-                    for attr, key in (('latitude', 'lat'),
-                                      ('longitude', 'long'),
-                                      ('city_name', 'prsntNm')):
-                        try:
-                            setattr(self, attr, loc_data[key])
-                        except (KeyError, TypeError):
-                            self.logger.debug('\'%s\' key not present in %s',
-                                              key, loc_data)
+        if tag_text.startswith('<script'):
+            # Look for feed information embedded as a javascript variable
+            begin = content.find('window.__data')
+            if begin != -1:
+                self.logger.debug('Located window.__data')
+                # Look for end of JSON dict and end of javascript statement
+                end = content.find('};', begin)
+                if end == -1:
+                    self.logger.debug('Failed to locate end of javascript statement')
+                else:
+                    # Strip the "window.__data=" from the beginning
+                    json_data = self.load_json(
+                        content[begin:end + 1].split('=', 1)[1].lstrip()
+                    )
+                    if json_data is not None:
+                        def _find_weather_data(data):
+                            '''
+                            Helper designed to minimize impact of potential
+                            structural changes to this data.
+                            '''
+                            if isinstance(data, dict):
+                                if 'observation' in data and 'dailyForecast' in data:
+                                    return data
+                                else:
+                                    for key in data:
+                                        ret = _find_weather_data(data[key])
+                                        if ret is not None:
+                                            return ret
+                                return None
+
+                        weather_data = _find_weather_data(json_data)
+                        if weather_data is None:
+                            self.logger.debug(
+                                'Failed to locate weather data in the '
+                                'following data structure: %s', json_data
+                            )
+                        else:
+                            self.weather_data = weather_data
+                            return
+
+            for line in content.splitlines():
+                line = line.strip().rstrip(';')
+                if line.startswith('var adaptorParams'):
+                    # Strip off the "var adaptorParams = " from the beginning,
+                    # and the javascript semicolon from the end. This will give
+                    # us JSON that we can load.
+                    weather_data = self.load_json(line.split('=', 1)[1].lstrip())
+                    if weather_data is not None:
+                        self.weather_data = weather_data
+                        return
 
 
 class Weathercom(WeatherBackend):
     '''
     This module gets the weather from weather.com. The ``location_code``
     parameter should be set to the location code from weather.com. To obtain
-    this code, search for the location on weather.com, and the location code
-    will be everything after the last slash (e.g. ``94107:4:US``).
+    this code, search for your location on weather.com, and when you go to the
+    forecast page, the code you need will be everything after the last slash in
+    the URL (e.g. ``94107:4:US``).
 
     .. _weather-usage-weathercom:
 
@@ -162,39 +161,24 @@ class Weathercom(WeatherBackend):
     units = 'metric'
     update_error = '!'
 
-    # This will be set once weather data has been checked
+    url_template = 'https://weather.com/{locale}/weather/today/l/{location_code}'
+
+    # This will be set in the init based on the passed location code
     forecast_url = None
 
     @require(internet)
     def init(self):
-        if self.location_code is None:
-            raise RuntimeError('A location_code is required')
-        self.location_code = str(self.location_code)
-        if ':' in self.location_code:
-            # Set the URL so that clicking the weather will launch the
-            # weather.com forecast page. Only set it though if there is a colon
-            # in the location_code. Technically, the weather.com API will
-            # successfully return weather data if a U.S. ZIP code is used as
-            # the location_code (e.g. 94107), but if substituted in
-            # FORECAST_URl it may or may not result in a valid URL.
-            self.forecast_url = FORECAST_URL % self.location_code
+        if self.location_code is not None:
+            # Ensure that the location code is a string, in the event that a
+            # ZIP code (or other all-numeric code) is passed as a non-string.
+            self.location_code = str(self.location_code)
 
-        parser = WeathercomHTMLParser(self.logger, self.location_code)
-        parser.read_forecast_page()
+        # Setting the locale to en-AU returns units in metric. Leaving it blank
+        # causes weather.com to return the default, which is imperial.
+        self.locale = 'en-AU' if self.units == 'metric' else ''
 
-        for attr in API_PARAMS:
-            value = getattr(parser, attr, None)
-            if value is None:
-                raise RuntimeError(
-                    'Unable to parse %s from forecast page' % attr)
-            setattr(self, attr, value)
-        self.city_name = parser.city_name
-
-        units = 'e' if self.units == 'imperial' or self.units == '' else 'm'
-        self.url = API_URL % (
-            'e' if self.units in ('imperial', '') else 'm',
-            self.lang, self.latitude, self.longitude, self.api_key
-        )
+        self.forecast_url = self.url_template.format(**vars(self))
+        self.parser = WeathercomHTMLParser(self.logger)
 
     def check_response(self, response):
         # Errors for weather.com API manifest in HTTP error codes, not in the
@@ -206,15 +190,57 @@ class Weathercom(WeatherBackend):
         '''
         Fetches the current weather from wxdata.weather.com service.
         '''
+
+        if self.units not in ('imperial', 'metric'):
+            raise Exception("units must be one of (imperial, metric)!")
+
+        if self.location_code is None:
+            self.logger.error(
+                'A location_code is required to check Weather.com. See the '
+                'documentation for more information.'
+            )
+            self.data['update_error'] = self.update_error
+            return
         self.data['update_error'] = ''
         try:
-            response = self.api_request(self.url)
-            if not response:
+
+            self.parser.get_weather_data(self.forecast_url)
+            if self.parser.weather_data is None:
+                self.logger.error(
+                    'Failed to read weather data from page. Run module with '
+                    'debug logging to get more information.'
+                )
                 self.data['update_error'] = self.update_error
                 return
 
-            observed = response.get('vt1observation', {})
-            forecast = response.get('vt1dailyForecast', {})
+            try:
+                observed = self.parser.weather_data['observation']['data']['vt1observation']
+            except KeyError:
+                self.logger.error(
+                    'Failed to retrieve current conditions from API response. '
+                    'Run module with debug logging to get more information.'
+                )
+                self.data['update_error'] = self.update_error
+                return
+
+            try:
+                forecast = self.parser.weather_data['dailyForecast']['data']['vt1dailyForecast'][0]
+            except (IndexError, KeyError):
+                self.logger.error(
+                    'Failed to retrieve forecast data from API response. '
+                    'Run module with debug logging to get more information.'
+                )
+                self.data['update_error'] = self.update_error
+                return
+
+            try:
+                self.city_name = self.parser.weather_data['location']['prsntNm']
+            except KeyError:
+                self.logger.warning(
+                    'Failed to get city name from API response, falling back '
+                    'to location code \'%s\'', self.location_code
+                )
+                self.city_name = self.location_code
 
             # Cut off the timezone from the end of the string (it's after the last
             # space, hence the use of rpartition). International timezones (or ones
@@ -240,7 +266,7 @@ class Weathercom(WeatherBackend):
                 pressure_trend = ''
 
             try:
-                high_temp = forecast.get('day', {}).get('temperature', [])[0]
+                high_temp = forecast.get('day', {}).get('temperature', '')
             except (AttributeError, IndexError):
                 high_temp = ''
             else:
@@ -250,7 +276,7 @@ class Weathercom(WeatherBackend):
                     high_temp = ''
 
             try:
-                low_temp = forecast.get('night', {}).get('temperature', [])[0]
+                low_temp = forecast.get('night', {}).get('temperature', '')
             except (AttributeError, IndexError):
                 low_temp = ''
 

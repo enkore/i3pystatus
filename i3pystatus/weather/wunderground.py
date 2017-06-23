@@ -68,7 +68,7 @@ class Wunderground(WeatherBackend):
             colorize=True,
             hints={'markup': 'pango'},
             backend=wunderground.Wunderground(
-                api_key='dbafe887d56ba4ad',
+                api_key='api_key_goes_here',
                 location_code='pws:MAT645',
                 units='imperial',
                 forecast=True,
@@ -239,10 +239,13 @@ class Wunderground(WeatherBackend):
                 return str(data.get(key, default))
 
             try:
-                observation_time = datetime.fromtimestamp(
-                    int(_find('observation_epoch'))
+                observation_epoch = _find('observation_epoch') or _find('local_epoch')
+                observation_time = datetime.fromtimestamp(int(observation_epoch))
+            except (TypeError, ValueError):
+                log.debug(
+                    'Observation time \'%s\' is not a UNIX timestamp',
+                    observation_epoch
                 )
-            except TypeError:
                 observation_time = datetime.fromtimestamp(0)
 
             self.data['city'] = _find('city', response['observation_location'])

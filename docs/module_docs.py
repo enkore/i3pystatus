@@ -80,6 +80,27 @@ def process_docstring(app, what, name, obj, options, lines):
     if is_module(obj) and obj.settings:
         fail_on_missing_dependency_hints(obj, lines)
 
+        if issubclass(obj, i3pystatus.core.modules.Module):
+            mod = obj.__module__
+            if mod.startswith("i3pystatus."):
+                mod = mod[len("i3pystatus."):]
+            lines[0:0] = [
+                ".. raw:: html",
+                "",
+                "    <div class='modheader'>" +
+                "Module name: <code class='modname descclassname'>" + mod + "</code> " +
+                "(class <code class='descclassname'>" + name + "</code>)" +
+                "</div>",
+                "",
+            ]
+        else:
+            lines[0:0] = [
+                ".. raw:: html",
+                "",
+                "    <div class='modheader'>class <code class='descclassname'>" + name + "</code></div>",
+                "",
+            ]
+
         lines.append(".. rubric:: Settings")
         lines.append("")
 

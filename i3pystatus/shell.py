@@ -13,11 +13,11 @@ class Shell(IntervalModule):
 
     color = "#FFFFFF"
     error_color = "#FF0000"
-    ignore_emtpy_stdout = False
+    ignore_empty_stdout = False
 
     settings = (
         ("command", "command to be executed"),
-        ("ignore_emtpy_stdout", "Let the block be empty"),
+        ("ignore_empty_stdout", "Let the block be empty"),
         ("color", "standard color"),
         ("error_color", "color to use when non zero exit code is returned"),
         "format"
@@ -38,7 +38,7 @@ class Shell(IntervalModule):
             out = stderr
 
         full_text = self.format.format(output=out).strip()
-        if not full_text and not self.ignore_emtpy_stdout:
+        if not full_text and not self.ignore_empty_stdout:
             full_text = "Command `%s` returned %d" % (self.command, retvalue)
 
         self.output = {

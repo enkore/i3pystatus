@@ -14,8 +14,7 @@ class Yaourt(Backend):
         status.register("updates", backends = \
 [pacman.Pacman(), yaourt.Yaourt()])
 
-    If you want to count both pacman and aur packages with this module you can
-    set the variable count_only_aur = False like this:
+    To count both pacman and aur packages, pass False in the constructor:
 
     .. code-block:: python
 
@@ -32,7 +31,8 @@ class Yaourt(Backend):
         checkupdates = run_through_shell(command)
         out = checkupdates.out
         if(self.aur_only):
-            out = [line for line in out if line.startswith("aur")]
+            out = "".join([line for line in out.splitlines(True)
+                           if line.startswith("aur")])
         return out.count("\n"), out
 
 Backend = Yaourt

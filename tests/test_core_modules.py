@@ -2,7 +2,7 @@ import time
 from unittest.mock import MagicMock
 
 import pytest
-from i3pystatus import IntervalModule
+from i3pystatus import IntervalModule, Status
 from i3pystatus.core.exceptions import ConfigMissingError
 from i3pystatus.core.modules import is_method_of, Module
 
@@ -160,6 +160,24 @@ def test_required_raises():
         TestRequired()
 
     TestRequired(some_setting='foo')
+
+
+def test_invalid_module_kwarg_shows_error():
+    """ Ensure that when an invalid module kwarg is passed an error is shown in the bar. """
+    status = Status(standalone=False)
+    status.register("text", foo='bar')
+    assert len(status.modules) > 0
+    assert status.modules[0].output is not None
+    assert "ConfigKeyError" in status.modules[0].output['full_text']
+
+
+def test_missing_required_shows_error():
+    """ Ensure that when an a required module parameter is missing an error is shown in the bar. """
+    status = Status(standalone=False)
+    status.register("text")
+    assert len(status.modules) > 0
+    assert status.modules[0].output is not None
+    assert "ConfigMissingError" in status.modules[0].output['full_text']
 
 
 def test_required_defined_raises():

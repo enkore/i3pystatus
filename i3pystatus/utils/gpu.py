@@ -6,7 +6,7 @@ GPUUsageInfo = namedtuple('GPUUsageInfo', ['total_mem', 'avail_mem', 'used_mem',
                                            'usage_gpu', 'usage_mem'])
 
 
-def query_nvidia_smi() -> GPUUsageInfo:
+def query_nvidia_smi(gpu_number) -> GPUUsageInfo:
     """
     :return:
         all memory fields are in megabytes,
@@ -34,7 +34,7 @@ def query_nvidia_smi() -> GPUUsageInfo:
     except subprocess.CalledProcessError:
         raise Exception("nvidia-smi call failed")
 
-    output = output.decode('utf-8').strip()
+    output = output.decode('utf-8').split("\n")[gpu_number].strip()
     values = output.split(", ")
 
     # If value contains 'not' - it is not supported for this GPU (in fact, for now nvidia-smi returns '[Not Supported]')

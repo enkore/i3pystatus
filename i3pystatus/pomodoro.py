@@ -1,6 +1,7 @@
 import subprocess
 from datetime import datetime, timedelta
 from i3pystatus import IntervalModule
+from i3pystatus.core.desktop import DesktopNotification
 
 
 STOPPED = 0
@@ -82,7 +83,7 @@ class Pomodoro(IntervalModule):
             color = self.color_running if self.state == RUNNING else self.color_break
             text = self.format.format(**sdict)
         else:
-            text = 'Start pomodoro',
+            text = 'Start pomodoro'
             color = self.color_stopped
 
         self.output = {
@@ -100,9 +101,9 @@ class Pomodoro(IntervalModule):
         self.time = None
 
     def _alarm(self, text):
-        subprocess.call(['notify-send',
-                         'Alarm!',
-                         text])
+        notification = DesktopNotification('Alarm!', text)
+        notification.display()
+
         subprocess.Popen(['aplay',
                           self.sound,
                           '-q'],
