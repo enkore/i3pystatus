@@ -90,20 +90,18 @@ class Bitcoin(IntervalModule):
     def _get_age(self, bitcoinaverage_timestamp):
         with setlocale('C'):  # Deal with locales (months name differ)
             # Assume format is always utc, to avoid import pytz
-            utc_tstamp = datetime.strptime(
-                bitcoinaverage_timestamp.split(', ')[1],
-                u'%d %b %Y %H:%M:%S -0000')
-        diff = datetime.utcnow() - utc_tstamp
+            diff = datetime.utcnow() - \
+                datetime.fromtimestamp(bitcoinaverage_timestamp)
         return int(diff.total_seconds())
 
     def _query_api(self, api_url):
-        url = "{}{}".format(api_url, self.currency.upper())
+        url = "{}BTC{}".format(api_url, self.currency.upper())
         response = urllib.request.urlopen(url).read().decode("utf-8")
         return json.loads(response)
 
     def _fetch_price_data(self):
         if self.exchange is None:
-            api_url = "https://api.bitcoinaverage.com/ticker/global/"
+            api_url = "https://apiv2.bitcoinaverage.com/indices/global/ticker/"
             return self._query_api(api_url)
         else:
             api_url = "https://api.bitcoinaverage.com/exchanges/"
@@ -129,12 +127,12 @@ class Bitcoin(IntervalModule):
 
         fdict = {
             "symbol": self.symbol,
-            "daily_average": price_data["24h_avg"],
+            "daily_average": price_data["averages"]["day"],
             "ask_price": price_data["ask"],
             "bid_price": price_data["bid"],
             "last_price": price_data["last"],
-            "volume": price_data["volume_btc"],
-            "volume_thousend": price_data["volume_btc"] / 1000,
+            "volume": price_data["volume"],
+            "volume_thousend": price_data["volume"] / 1000,
             "volume_percent": price_data["volume_percent"],
             "age": self._get_age(price_data['timestamp'])
         }
