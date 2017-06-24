@@ -1,11 +1,16 @@
-import json
 from i3pystatus import IntervalModule
 from urllib.request import urlopen
+
+import json
+import webbrowser
 
 
 class sabnzbd(IntervalModule):
     """
     Displays the current status of SABnzbd.
+
+    A leftclick pauses/resumes downloading.
+    A rightclick opens SABnzbd inside a browser.
 
     .. rubric:: Available formatters
 
@@ -36,6 +41,7 @@ class sabnzbd(IntervalModule):
     )
 
     on_leftclick = "pause_resume"
+    on_rightclick = "open_browser"
 
     def init(self):
         """Initialize the URL used to connect to SABnzbd."""
@@ -76,3 +82,8 @@ class sabnzbd(IntervalModule):
     def is_downloading(self):
         """Return True if downloads are running."""
         return (self.status == "Downloading")
+
+    def open_browser(self):
+        """Open the URL of SABnzbd inside a browser."""
+        webbrowser.open(
+            "http://{host}:{port}/".format(host=self.host, port=self.port))
