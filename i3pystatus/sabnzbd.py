@@ -1,5 +1,6 @@
 from i3pystatus import IntervalModule
 from urllib.request import urlopen
+from urllib.error import HTTPError, URLError
 
 import json
 import webbrowser
@@ -50,9 +51,25 @@ class sabnzbd(IntervalModule):
 
     def run(self):
         """Connect to SABnzbd and get the data."""
-        queue = urlopen(self.url + "&mode=queue").read().decode("UTF-8")
-        queue = json.loads(queue)["queue"]
+        try:
+            answer = urlopen(self.url + "&mode=queue").read().decode("UTF-8")
+            answer = json.loads(answer)
+        except (HTTPError, URLError) as error:
+            self.output = {
+                "full_text": str(error.reason),
+                "color": "#FF0000"
+            }
+            return
 
+        # if answer["status"] exists and is False, an error occured
+        if (not answer.get("status", True)):
+            self.output = {
+                "full_text": answer["error"],
+                "color": "#FF0000"
+            }
+            return
+
+        queue = answer["queue"]
         self.status = queue["status"]
 
         if (self.is_paused()):
