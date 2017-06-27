@@ -52,8 +52,7 @@ class sabnzbd(IntervalModule):
     def run(self):
         """Connect to SABnzbd and get the data."""
         try:
-            answer = urlopen(self.url + "&mode=queue").read().decode("UTF-8")
-            answer = json.loads(answer)
+            answer = urlopen(self.url + "&mode=queue").read().decode()
         except (HTTPError, URLError) as error:
             self.output = {
                 "full_text": str(error.reason),
@@ -61,8 +60,10 @@ class sabnzbd(IntervalModule):
             }
             return
 
+        answer = json.loads(answer)
+
         # if answer["status"] exists and is False, an error occured
-        if (not answer.get("status", True)):
+        if not answer.get("status", True):
             self.output = {
                 "full_text": answer["error"],
                 "color": "#FF0000"
@@ -72,33 +73,37 @@ class sabnzbd(IntervalModule):
         queue = answer["queue"]
         self.status = queue["status"]
 
-        if (self.is_paused()):
+        if self.is_paused():
             color = self.color_paused
-        elif (self.is_downloading()):
+        elif self.is_downloading():
             color = self.color_downloading
         else:
             color = self.color
 
+        if self.is_downloading():
+            full_text = self.format.format(**queue)
+        else:
+            full_text = self.format_paused.format(**queue)
+
         self.output = {
-            "full_text": self.format.format(**queue) if (self.is_downloading())
-            else self.format_paused.format(**queue),
+            "full_text": full_text,
             "color": color
         }
 
     def pause_resume(self):
         """Toggle between pausing or resuming downloading."""
-        if (self.is_paused()):
+        if self.is_paused():
             urlopen(self.url + "&mode=resume")
         else:
             urlopen(self.url + "&mode=pause")
 
     def is_paused(self):
         """Return True if downloads are currently paused."""
-        return (self.status == "Paused")
+        return self.status == "Paused"
 
     def is_downloading(self):
         """Return True if downloads are running."""
-        return (self.status == "Downloading")
+        return self.status == "Downloading"
 
     def open_browser(self):
         """Open the URL of SABnzbd inside a browser."""
