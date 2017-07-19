@@ -6,6 +6,8 @@ import string
 import inspect
 from threading import Timer, RLock
 
+import time
+
 
 def lchop(string, prefix):
     """Removes a prefix from string
@@ -357,8 +359,9 @@ class internet:
     """
     Checks for internet connection by connecting to a server.
 
-    Used server is determined by the `address` class variable which consists of
-    server host name and port number.
+    Used server can be configured via the `address` class variable which expects a tuple in the form
+    (hostname/IP, port). The rate at which the connection status is checked
+    can be configured via the `check_frequency` class variable (in seconds).
 
     :rtype: bool
 
@@ -367,11 +370,24 @@ class internet:
         :py:func:`require`
 
     """
-    address = ("google-public-dns-a.google.com", 53)
+    address = ("8.8.8.8", 53)
+
+    check_frequency = 1
+    last_checked = time.perf_counter() - check_frequency
+    status = False
 
     def __new__(cls):
+        now = time.perf_counter()
+        elapsed = now - internet.last_checked
+        if elapsed > internet.check_frequency:
+            internet.last_checked = now
+            internet.status = internet.check()
+        return internet.status
+
+    @staticmethod
+    def check():
         try:
-            socket.create_connection(cls.address, 1).close()
+            socket.create_connection(internet.address, 1).close()
             return True
         except (OSError, socket.gaierror):
             return False
