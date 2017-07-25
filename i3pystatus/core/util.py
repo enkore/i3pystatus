@@ -370,7 +370,7 @@ class internet:
         :py:func:`require`
 
     """
-    address = ("8.8.8.8", 53)
+    address = ("google-public-dns-a.google.com", 53)
 
     check_frequency = 1
     last_checked = time.perf_counter() - check_frequency
