@@ -359,9 +359,9 @@ class internet:
     """
     Checks for internet connection by connecting to a server.
 
-    Used server can be configured via the `address` class variable which expects a tuple in the form
-    (hostname/IP, port). The rate at which the connection status is checked
-    can be configured via the `check_frequency` class variable (in seconds).
+    This class exposes two configuration variables:
+        * address - a tuple containing (host,port) of the server to connect to
+        * check_frequency - the frequency in seconds for checking the connection
 
     :rtype: bool
 
@@ -370,27 +370,57 @@ class internet:
         :py:func:`require`
 
     """
-    address = ("8.8.8.8", 53)
-
+    address = ("google-public-dns-a.google.com", 53)
     check_frequency = 1
+
+    dns_cache = []
     last_checked = time.perf_counter() - check_frequency
-    status = False
+
+    connected = False
 
     def __new__(cls):
+        if not internet.connected:
+            internet.dns_cache = internet.resolve()
+
         now = time.perf_counter()
         elapsed = now - internet.last_checked
-        if elapsed > internet.check_frequency:
+        if not internet.connected or elapsed > internet.check_frequency:
             internet.last_checked = now
-            internet.status = internet.check()
-        return internet.status
+            internet.connected = internet.check_connection()
+        return internet.connected
 
     @staticmethod
-    def check():
+    def check_connection():
+        for res in internet.dns_cache:
+            try:
+                if internet.check(res):
+                    return True
+            except OSError:
+                pass
+        return False
+
+    @staticmethod
+    def check(res):
+        af, socktype, proto, canonname, sa = res
+        sock = None
         try:
-            socket.create_connection(internet.address, 1).close()
+            sock = socket.socket(af, socktype, proto)
+            sock.settimeout(1)
+            sock.connect(sa)
+            sock.close()
             return True
-        except (OSError, socket.gaierror):
-            return False
+        except socket.error:
+            if sock is not None:
+                sock.close()
+            raise
+
+    @staticmethod
+    def resolve():
+        host, port = internet.address
+        try:
+            return socket.getaddrinfo(host, port, 0, socket.SOCK_STREAM)
+        except socket.gaierror:
+            return []
 
 
 def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
