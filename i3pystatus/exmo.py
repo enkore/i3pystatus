@@ -30,7 +30,7 @@ class Exmo(IntervalModule):
         'status'
     )
     format = '{buy_price}[ {status}] {pair}'
-    pairs = 'BTC_USD'
+    pair = 'BTC_USD'
     color = '#FFFFFF'
     colorize = False
     color_up = '#00FF00'
