@@ -1,10 +1,16 @@
 import threading
 import time
 import sys
-import traceback
 from i3pystatus.core.util import partition
 
 timer = time.perf_counter if hasattr(time, "perf_counter") else time.clock
+
+
+def unwrap_workload(workload):
+    """ Obtain the module from it's wrapper. """
+    while isinstance(workload, Wrapper):
+        workload = workload.workload
+    return workload
 
 
 class Thread(threading.Thread):
@@ -13,6 +19,7 @@ class Thread(threading.Thread):
         self.workloads = workloads or []
         self.target_interval = target_interval
         self.start_barrier = start_barrier
+        self._suspended = threading.Event()
         self.daemon = True
 
     def __iter__(self):
@@ -37,8 +44,19 @@ class Thread(threading.Thread):
 
     def execute_workloads(self):
         for workload in self:
-            workload()
+            if self.should_execute(workload):
+                workload()
         self.workloads.sort(key=lambda workload: workload.time)
+
+    def should_execute(self, workload):
+        """
+        If we have been suspended by i3bar, only execute those modules that set the keep_alive flag to a truthy
+        value. See the docs on the suspend_signal_handler method of the io module for more information.
+        """
+        if not self._suspended.is_set():
+            return True
+        workload = unwrap_workload(workload)
+        return hasattr(workload, 'keep_alive') and getattr(workload, 'keep_alive')
 
     def run(self):
         while self:
@@ -52,6 +70,12 @@ class Thread(threading.Thread):
             remove = self.pop()
             return [remove] + self.branch(vtime - remove.time, bound)
         return []
+
+    def suspend(self):
+        self._suspended.set()
+
+    def resume(self):
+        self._suspended.clear()
 
 
 class Wrapper:
@@ -143,3 +167,11 @@ class Manager:
     def start(self):
         for thread in self.threads:
             thread.start()
+
+    def suspend(self):
+        for thread in self.threads:
+            thread.suspend()
+
+    def resume(self):
+        for thread in self.threads:
+            thread.resume()

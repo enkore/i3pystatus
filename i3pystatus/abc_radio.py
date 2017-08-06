@@ -57,6 +57,8 @@ class ABCRadio(IntervalModule):
     # Destroy the player after this many seconds of inactivity
     PLAYER_LIFETIME = 5
 
+    # Do not suspend the player when i3bar is hidden.
+    keep_alive = True
     show_info = {}
     player = None
     station_info = None

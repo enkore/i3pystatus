@@ -316,6 +316,8 @@ class Network(IntervalModule, ColorRangeModule):
         ("detect_active", "Attempt to detect the active interface"),
     )
 
+    # Continue processing statistics when i3bar is hidden.
+    keep_alive = True
     interval = 1
     interface = 'eth0'
 
