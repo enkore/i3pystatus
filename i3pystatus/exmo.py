@@ -58,7 +58,14 @@ class Exmo(IntervalModule):
 
     @require(internet)
     def run(self):
-        price_data = self.fetch_data().get(self.pair)
+        try:
+            price_data = self.fetch_data().get(self.pair)
+        except Exception as e:
+            self.output = {
+                'full_text': 'Failed fetching data from server: ' + str(e),
+                'color': '#FF0000'
+            }
+            return
         fdict = {
             'pair': self.pair.replace('_', '/'),
             'buy_price': price_data.get('buy_price', 0),
