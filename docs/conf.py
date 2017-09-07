@@ -50,7 +50,10 @@ MOCK_MODULES = [
     "dateutil.parser",
     "dateutil.relativedelta",
     "xkbgroup",
-    "sensors"
+    "sensors",
+    "khal",
+    "khal.cli",
+    "khal.settings",
 ]
 
 for mod_name in MOCK_MODULES:
