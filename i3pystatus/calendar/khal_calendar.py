@@ -34,8 +34,6 @@ class Khal(CalendarBackend):
         ('days', 'Check for the next X days'),
     )
 
-    required = ('config_path', 'calendars')
-
     days = 7
 
     config_path = None

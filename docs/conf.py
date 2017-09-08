@@ -30,6 +30,7 @@ MOCK_MODULES = [
     "i3pystatus.pulseaudio.pulse",
     "notmuch",
     "requests",
+    "requests.exceptions",
     "bs4",
     "dota2py",
     "novaclient",
@@ -38,6 +39,7 @@ MOCK_MODULES = [
     "vk",
     "google-api-python-client",
     "dateutil",
+    "dateutil.rrule",
     "httplib2",
     "oauth2client",
     "apiclient",
@@ -48,7 +50,10 @@ MOCK_MODULES = [
     "dateutil.parser",
     "dateutil.relativedelta",
     "xkbgroup",
-    "sensors"
+    "sensors",
+    "khal",
+    "khal.cli",
+    "khal.settings",
 ]
 
 for mod_name in MOCK_MODULES:

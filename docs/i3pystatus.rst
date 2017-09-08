@@ -70,3 +70,39 @@ Weather Backends
 .. autogen:: i3pystatus.weather SettingsBase
 
     .. nothin'
+
+.. calendarbackends:
+
+Calendar Backends
+-----------------
+
+Generic calendar interface. Requires the PyPI package ``colour``.
+
+.. rubric:: Available formatters
+
+* {title} - the title or summary of the event
+* {remaining_time} - how long until this event is due
+
+Additional formatters may be provided by the backend, consult their documentation for details.
+
+.. rubric:: Settings
+
+* {update_interval} - how often (in seconds) the calendar backend should be called to update events
+* {dynamic_color} - when set, the color shifts as the event approaches
+* {urgent_blink} - when set, urgent is toggled every second when within urgent_seconds of the event
+* {urgent_seconds} - how many seconds before the event to begin blinking
+* {skip_recurring} - when set, recurring events are skipped
+
+Here is an example of configuring the calendar module to use the ``Lightning`` backend:
+
+.. code:: python
+
+    status.register("calendar",
+                format="{title} {remaining}",
+                update_interval=10,
+                urgent_blink=True,
+                backend=Lightning(database_path=path, days=2))
+
+.. autogen:: i3pystatus.calendar SettingsBase
+
+    .. nothin'
