@@ -345,7 +345,7 @@ class BatteryChecker(IntervalModule):
 
         if self.alert and fdict["status"] == "DIS" and fdict["percentage"] <= self.alert_percentage:
             title, body = formatp(self.alert_format_title, **fdict), formatp(self.alert_format_body, **fdict)
-            if not self.notification:
+            if self.notification is None:
                 self.notification = DesktopNotification(
                     title=title,
                     body=body,
