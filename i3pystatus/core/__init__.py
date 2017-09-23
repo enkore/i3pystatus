@@ -59,11 +59,12 @@ class Status:
     :param bool click_events: Enable click events, if `standalone` is True.
     :param str logfile: Path to log file that will be used by i3pystatus.
     :param tuple internet_check: Address of server that will be used to check for internet connection by :py:class:`.internet`.
+    :param keep_alive: If True, modules that define the keep_alive flag will not be put to sleep when the status bar is hidden.
     """
 
     def __init__(self, standalone=True, click_events=True, interval=1,
                  input_stream=None, logfile=None, internet_check=None,
-                 logformat=DEFAULT_LOG_FORMAT):
+                 keep_alive=False, logformat=DEFAULT_LOG_FORMAT):
         self.standalone = standalone
         self.click_events = standalone and click_events
         input_stream = input_stream or sys.stdin
@@ -83,7 +84,7 @@ class Status:
 
         self.modules = util.ModuleList(self, ClassFinder(Module))
         if self.standalone:
-            self.io = io.StandaloneIO(self.click_events, self.modules, interval)
+            self.io = io.StandaloneIO(self.click_events, self.modules, keep_alive, interval)
             if self.click_events:
                 self.command_endpoint = CommandEndpoint(
                     self.modules,
