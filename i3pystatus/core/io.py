@@ -59,12 +59,10 @@ class StandaloneIO(IOHandler):
         {
             "version": 1,
             "click_events": True,
-            "stop_signal": signal.SIGUSR2,
-            "cont_signal": signal.SIGUSR2
         }, "[", "[]", ",[]",
     ]
 
-    def __init__(self, click_events, modules, interval=1):
+    def __init__(self, click_events, modules, keep_alive, interval=1):
         """
         StandaloneIO instance must be created in main thread to be able to set
         the SIGUSR1 signal handler.
@@ -75,6 +73,12 @@ class StandaloneIO(IOHandler):
         self.modules = modules
 
         self.proto[0]['click_events'] = click_events
+
+        if keep_alive:
+            self.proto[0].update(dict(stop_signal=signal.SIGUSR2,
+                                      cont_signal=signal.SIGUSR2))
+            signal.signal(signal.SIGUSR2, self.suspend_signal_handler)
+
         self.proto[0] = json.dumps(self.proto[0])
 
         self.refresh_cond = Condition()
@@ -82,7 +86,6 @@ class StandaloneIO(IOHandler):
 
         self.stopped = False
         signal.signal(signal.SIGUSR1, self.refresh_signal_handler)
-        signal.signal(signal.SIGUSR2, self.suspend_signal_handler)
 
     def read(self):
         self.compute_treshold_interval()
