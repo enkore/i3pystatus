@@ -110,6 +110,7 @@ class NHL(ScoresBackend):
     * **TBL** — Tampa Bay Lightning
     * **TOR** — Toronto Maple Leafs
     * **VAN** — Vancouver Canucks
+    * **VGK** — Vegas Golden Knights
     * **WPG** — Winnipeg Jets
     * **WSH** — Washington Capitals
     '''
@@ -188,6 +189,7 @@ class NHL(ScoresBackend):
         'TBL': '#296AD5',
         'TOR': '#296AD5',
         'VAN': '#0454FA',
+        'VGK': '#B4975A',
         'WPG': '#1568C5',
         'WSH': '#E51937',
     }
