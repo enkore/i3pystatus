@@ -274,7 +274,6 @@ class Network(IntervalModule, ColorRangeModule):
     Network Traffic Formatters (requires PyPI package `psutil`):
 
     * `{interface}` — the configured network interface
-    * `{kbs}` – Float representing KiB\s corresponds to graph type
     * `{network_graph_recv}` – Unicode graph representing incoming network traffic
     * `{network_graph_sent}` – Unicode graph representing outgoing network traffic
     * `{bytes_sent}` — bytes sent per second (divided by divisor)
@@ -322,7 +321,7 @@ class Network(IntervalModule, ColorRangeModule):
     interval = 1
     interface = 'eth0'
 
-    format_up = "{interface} {network_graph}{kbs}KB/s"
+    format_up = "{interface} {network_graph}{bytes_recv}KB/s"
     format_active_up = {}
     format_down = "{interface}: DOWN"
     color_up = "#00FF00"
@@ -366,7 +365,7 @@ class Network(IntervalModule, ColorRangeModule):
         # Don't require importing psutil unless using the functionality it offers.
         if any(s in self.format_up or s in self.format_down for s in
                ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph_recv',
-                'network_grap_sent', 'rx_tot_Mbytes', 'tx_tot_Mbytes', 'kbs']):
+                'network_graph_sent', 'rx_tot_Mbytes', 'tx_tot_Mbytes']):
             self.network_traffic = NetworkTraffic(self.unknown_up, self.divisor, self.round_size)
         else:
             self.network_traffic = None
@@ -404,7 +403,7 @@ class Network(IntervalModule, ColorRangeModule):
         return make_graph(self.kbs_sent_arr, 0.0, limit, self.graph_style)
 
     def run(self):
-        format_values = dict(kbs="", network_graph_recv="", network_graph_sent="", bytes_sent="", bytes_recv="",
+        format_values = dict(network_graph_recv="", network_graph_sent="", bytes_sent="", bytes_recv="",
                              packets_sent="", packets_recv="", rx_tot_Mbytes="", tx_tot_Mbytes="",
                              interface="", v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="", mac="",
                              essid="", freq="", quality="", quality_bar="")
