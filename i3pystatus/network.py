@@ -435,7 +435,7 @@ class Network(IntervalModule, ColorRangeModule):
                         color = self.get_gradient(network_usage['bytes_recv'], self.colors, self.recv_limit)
                     elif self.coloring_type == "sent":
                         color = self.get_gradient(network_usage['bytes_sent'], self.colors, self.sent_limit)
-                    else :
+                    else:
                         raise Exception("coloring_type must be either 'recv' or 'sent'!")
             else:
                 color = None
