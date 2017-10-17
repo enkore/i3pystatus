@@ -274,8 +274,8 @@ class Network(IntervalModule, ColorRangeModule):
     Network Traffic Formatters (requires PyPI package `psutil`):
 
     * `{interface}` — the configured network interface
-    * `{kbs}` – Float representing KiB\s corresponds to graph type
-    * `{network_graph}` – Unicode graph representing network usage
+    * `{network_graph_recv}` – Unicode graph representing incoming network traffic
+    * `{network_graph_sent}` – Unicode graph representing outgoing network traffic
     * `{bytes_sent}` — bytes sent per second (divided by divisor)
     * `{bytes_recv}` — bytes received per second (divided by divisor)
     * `{packets_sent}` — bytes sent per second (divided by divisor)
@@ -303,8 +303,8 @@ class Network(IntervalModule, ColorRangeModule):
         ("sent_limit", "Expected max KiB/s. similar with receive_limit"),
         ("separate_color", "display recv/send color separate in dynamic color mode."
                            "Note: only network speed formatters will display with range color "),
-        ("graph_type", "Whether to draw the network traffic graph for input or output. "
-                       "Allowed values 'input' or 'output'"),
+        ("coloring_type", "Whether to use the sent or received kb/s for dynamic coloring with non-separate colors. "
+                          "Allowed values 'recv' or 'sent'"),
         ("divisor", "divide all byte values by this value"),
         ("freq_divisor", "divide Wifi frequency by this value"),
         ("ignore_interfaces", "Array of interfaces to ignore when cycling through "
@@ -321,13 +321,13 @@ class Network(IntervalModule, ColorRangeModule):
     interval = 1
     interface = 'eth0'
 
-    format_up = "{interface} {network_graph}{kbs}KB/s"
+    format_up = "{interface} {network_graph}{bytes_recv}KB/s"
     format_active_up = {}
     format_down = "{interface}: DOWN"
     color_up = "#00FF00"
     color_down = "#FF0000"
     dynamic_color = True
-    graph_type = 'input'
+    coloring_type = 'recv'
     graph_width = 15
     graph_style = 'blocks'
     recv_limit = 2048
@@ -364,8 +364,8 @@ class Network(IntervalModule, ColorRangeModule):
 
         # Don't require importing psutil unless using the functionality it offers.
         if any(s in self.format_up or s in self.format_down for s in
-               ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph',
-                'rx_tot_Mbytes', 'tx_tot_Mbytes', 'kbs']):
+               ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph_recv',
+                'network_graph_sent', 'rx_tot_Mbytes', 'tx_tot_Mbytes']):
             self.network_traffic = NetworkTraffic(self.unknown_up, self.divisor, self.round_size)
         else:
             self.network_traffic = None
@@ -373,7 +373,8 @@ class Network(IntervalModule, ColorRangeModule):
         if not self.dynamic_color:
             self.end_color = self.start_color = self.color_up
         self.colors = self.get_hex_color_range(self.start_color, self.end_color, 100)
-        self.kbs_arr = [0.0] * self.graph_width
+        self.kbs_recv_arr = [0.0] * self.graph_width
+        self.kbs_sent_arr = [0.0] * self.graph_width
         self.pango_enabled = self.hints.get("markup", False) and self.hints["markup"] == "pango"
 
     def cycle_interface(self, increment=1):
@@ -389,15 +390,21 @@ class Network(IntervalModule, ColorRangeModule):
             self.network_traffic.clear_counters()
             self.kbs_arr = [0.0] * self.graph_width
 
-    def get_network_graph(self, kbs, limit):
+    def get_network_graph_recv(self, kbs, limit):
         # Cycle array by inserting at the start and chopping off the last element
-        self.kbs_arr.insert(0, kbs)
-        self.kbs_arr = self.kbs_arr[:self.graph_width]
-        return make_graph(self.kbs_arr, 0.0, limit, self.graph_style)
+        self.kbs_recv_arr.insert(0, kbs)
+        self.kbs_recv_arr = self.kbs_recv_arr[:self.graph_width]
+        return make_graph(self.kbs_recv_arr, 0.0, limit, self.graph_style)
+
+    def get_network_graph_sent(self, kbs, limit):
+        # Cycle array by inserting at the start and chopping off the last element
+        self.kbs_sent_arr.insert(0, kbs)
+        self.kbs_sent_arr = self.kbs_sent_arr[:self.graph_width]
+        return make_graph(self.kbs_sent_arr, 0.0, limit, self.graph_style)
 
     def run(self):
-        format_values = dict(kbs="", network_graph="", bytes_sent="", bytes_recv="", packets_sent="", packets_recv="",
-                             rx_tot_Mbytes="", tx_tot_Mbytes="",
+        format_values = dict(network_graph_recv="", network_graph_sent="", bytes_sent="", bytes_recv="",
+                             packets_sent="", packets_recv="", rx_tot_Mbytes="", tx_tot_Mbytes="",
                              interface="", v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="", mac="",
                              essid="", freq="", quality="", quality_bar="")
 
@@ -407,17 +414,8 @@ class Network(IntervalModule, ColorRangeModule):
         if self.network_traffic:
             network_usage = self.network_traffic.get_usage(self.interface)
             format_values.update(network_usage)
-            if self.graph_type == 'input':
-                limit = self.recv_limit
-                kbs = network_usage['bytes_recv'] * self.divisor / 1024
-            elif self.graph_type == 'output':
-                limit = self.sent_limit
-                kbs = network_usage['bytes_sent'] * self.divisor / 1024
-            else:
-                raise Exception("graph_type must be either 'input' or 'output'!")
-
-            format_values['network_graph'] = self.get_network_graph(kbs, limit)
-            format_values['kbs'] = "{0:.1f}".format(round(kbs, 2))
+            format_values['network_graph_recv'] = self.get_network_graph_recv(network_usage['bytes_recv'], self.recv_limit)
+            format_values['network_graph_sent'] = self.get_network_graph_sent(network_usage['bytes_sent'], self.sent_limit)
 
             if self.dynamic_color:
                 if self.separate_color and self.pango_enabled:
@@ -429,15 +427,15 @@ class Network(IntervalModule, ColorRangeModule):
                     c_sent = self.get_gradient(int(per_sent * 100), self.colors, 100)
                     format_values["bytes_recv"] = color_template.format(c_recv, network_usage["bytes_recv"])
                     format_values["bytes_sent"] = color_template.format(c_sent, network_usage["bytes_sent"])
-                    if self.graph_type == 'output':
-                        c_kbs = c_sent
-                    else:
-                        c_kbs = c_recv
-                    format_values['network_graph'] = color_template.format(c_kbs, format_values["network_graph"])
-                    format_values['kbs'] = color_template.format(c_kbs, format_values["kbs"])
+                    format_values['network_graph_recv'] = color_template.format(c_recv, format_values["network_graph_recv"])
+                    format_values['network_graph_sent'] = color_template.format(c_sent, format_values["network_graph_sent"])
                 else:
-                    percent = int(kbs * 100 / limit)
-                    color = self.get_gradient(percent, self.colors, 100)
+                    if self.coloring_type == "recv":
+                        color = self.get_gradient(network_usage['bytes_recv'], self.colors, self.recv_limit)
+                    elif self.coloring_type == "sent":
+                        color = self.get_gradient(network_usage['bytes_sent'], self.colors, self.sent_limit)
+                    else:
+                        raise Exception("coloring_type must be either 'recv' or 'sent'!")
             else:
                 color = None
         else:
