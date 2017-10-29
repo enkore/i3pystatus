@@ -321,7 +321,7 @@ class Network(IntervalModule, ColorRangeModule):
     interval = 1
     interface = 'eth0'
 
-    format_up = "{interface} {network_graph}{bytes_recv}KB/s"
+    format_up = "{interface} {network_graph_recv}{bytes_recv}KB/s"
     format_active_up = {}
     format_down = "{interface}: DOWN"
     color_up = "#00FF00"
