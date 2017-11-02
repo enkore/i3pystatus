@@ -33,10 +33,10 @@ class CpuFreq(IntervalModule):
             with open('/sys/devices/system/cpu/online') as f:
                 line = f.readline()
                 cpus_online = [int(cpu) for cpu in line.split(',') if cpu.find('-') < 0]
-                cpus_online_range = [cpu_range for cpu_range in line.split('-') if cpu_range.find('-') > 0]
+                cpus_online_range = [cpu_range for cpu_range in line.split(',') if cpu_range.find('-') > 0]
 
             for cpu_range in cpus_online_range:
-                cpus_online += [cpu for cpu in range(int(cpu_range[0]), int(cpu_range[1]) + 1)]
+                cpus_online += [cpu for cpu in range(int(cpu_range.split('-')[0]), int(cpu_range.split('-')[1]) + 1)]
 
             mhz_values = [0.0 for cpu in range(max(cpus_online) + 1)]
             ghz_values = [0.0 for cpu in range(max(cpus_online) + 1)]
