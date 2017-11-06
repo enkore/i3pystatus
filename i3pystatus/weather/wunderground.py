@@ -125,29 +125,7 @@ class Wunderground(WeatherBackend):
             # it below and perform a lookup.
             pass
 
-        extra_opts = '/pws:0' if not self.use_pws else ''
-        api_url = GEOLOOKUP_URL % (self.api_key,
-                                   extra_opts,
-                                   self.location_code)
-        response = self.api_request(api_url)
-        station_type = 'pws' if self.use_pws else 'airport'
-        try:
-            stations = response['location']['nearby_weather_stations']
-            nearest = stations[station_type]['station'][0]
-        except (KeyError, IndexError):
-            raise Exception(
-                'No locations matched location_code %s' % self.location_code)
-
-        if self.use_pws:
-            nearest_pws = nearest.get('id', '')
-            if not nearest_pws:
-                raise Exception('No id entry for nearest PWS')
-            self.station_id = 'pws:%s' % nearest_pws
-        else:
-            nearest_airport = nearest.get('icao', '')
-            if not nearest_airport:
-                raise Exception('No icao entry for nearest airport')
-            self.station_id = 'icao:%s' % nearest_airport
+        self.get_station_id()
 
     @require(internet)
     def get_forecast(self):
@@ -177,6 +155,36 @@ class Wunderground(WeatherBackend):
         else:
             return no_data
 
+    @require(internet)
+    def get_station_id(self):
+        '''
+        Use geolocation to get the station ID
+        '''
+        extra_opts = '/pws:0' if not self.use_pws else ''
+        api_url = GEOLOOKUP_URL % (self.api_key,
+                                   extra_opts,
+                                   self.location_code)
+        response = self.api_request(api_url)
+        station_type = 'pws' if self.use_pws else 'airport'
+        try:
+            stations = response['location']['nearby_weather_stations']
+            nearest = stations[station_type]['station'][0]
+        except (KeyError, IndexError):
+            raise Exception(
+                'No locations matched location_code %s' % self.location_code)
+
+        self.logger.error('nearest = %s', nearest)
+        if self.use_pws:
+            nearest_pws = nearest.get('id', '')
+            if not nearest_pws:
+                raise Exception('No id entry for nearest PWS')
+            self.station_id = 'pws:%s' % nearest_pws
+        else:
+            nearest_airport = nearest.get('icao', '')
+            if not nearest_airport:
+                raise Exception('No icao entry for nearest airport')
+            self.station_id = 'icao:%s' % nearest_airport
+
     def check_response(self, response):
         try:
             return response['response']['error']['description']
@@ -189,6 +197,11 @@ class Wunderground(WeatherBackend):
         '''
         Query the configured/queried station and return the weather data
         '''
+        if self.station_id is None:
+            # Failed to get the nearest station ID when first launched, so
+            # retry it.
+            self.get_station_id()
+
         self.data['update_error'] = ''
         try:
             query_url = STATION_QUERY_URL % (self.api_key,
