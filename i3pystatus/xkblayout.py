@@ -33,7 +33,7 @@ class Xkblayout(IntervalModule):
     interval = 1
     format = "\u2328 {symbol}"
     layouts = []
-    uppercase = True
+    uppercase = False
     settings = (
         ("format", "Format string"),
         ("layouts", "List of layouts"),
@@ -73,6 +73,7 @@ class Xkblayout(IntervalModule):
         self._xkb.group_num += increment
 
     def run(self):
+        caps = "on" in str(subprocess.check_output(["xset", "q"])).split("Caps Lock:")[1][0:8]
         cdict = {
             "num": self._xkb.group_num,
             "name": self._xkb.group_name,
@@ -85,10 +86,10 @@ class Xkblayout(IntervalModule):
         }
 
         full_text = self.format.format(**cdict)
-        full_text = full_text.upper() if self.uppercase else full_text
+        full_text = full_text.upper() if self.uppercase or caps else full_text
 
         self.data = cdict
         self.output = {
             "full_text": full_text,
-            "color": "#FFFFFF",
+            "color": "#FFFFFF" if cdict['num'] == 0 else '#FF0000',
         }
