@@ -28,13 +28,18 @@ class NiceHashSpeed(IntervalModule):
         ('addr', 'You BTC address'),
         ('algo', 'Algorithm number, for showing speed per one algorithm'),
         ('format', 'Format string used for output'),
+        ('color', 'Standard color'),
         ('colorize', 'Enable color change on price increase/decrease'),
+        ('color_up', 'Color for price increases'),
+        ('color_down', 'Color for price decreases'),
+        ('interval', 'Update interval.'),
+        'status'
     )
     addr = '17a212wdrvEXWuipCV5gcfxdALfMdhMoqh'
     # Default: 20 = DaggerHashimoto
     algo = 20  # List of algorithm numbers may be looking on https://www.nicehash.com/doc-api.
     format = '{addr:.6}: {algo}[ {status}] {speed}'
-    interval = 30
+    interval = 60
     color = '#FFFFFF'
     colorize = False
     color_up = '#00FF00'
