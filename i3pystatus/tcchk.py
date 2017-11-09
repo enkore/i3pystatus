@@ -116,7 +116,7 @@ class Tcchk(IntervalModule):
         m.logout()
 
         try:
-            total_hours = reduce(lambda x, y: x+y, times)
+            total_hours = reduce(lambda x, y: x + y, times)
         except TypeError as ex:
             total_hours = 0.0
 
@@ -129,7 +129,7 @@ class Tcchk(IntervalModule):
             mt = []
             with open(self.calendar_times_json, "r") as in_file:
                 mt = json.load(in_file)
-            tdiff = round(total_hours, 2) - int(mt[self.date.month-1]["time"])
+            tdiff = round(total_hours, 2) - int(mt[self.date.month - 1]["time"])
             self.output["full_text"] = "{} | {}".format(self.output["full_text"], tdiff)
             if tdiff >= 0:
                 self.output["color"] = "#19d100"
