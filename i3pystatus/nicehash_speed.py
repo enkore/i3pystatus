@@ -28,6 +28,7 @@ class NiceHashSpeed(IntervalModule):
         ('addr', 'You BTC address'),
         ('algo', 'Algorithm number, for showing speed per one algorithm'),
         ('format', 'Format string used for output'),
+        ('colorize', 'Enable color change on price increase/decrease'),
     )
     addr = '17a212wdrvEXWuipCV5gcfxdALfMdhMoqh'
     # Default: 20 = DaggerHashimoto
