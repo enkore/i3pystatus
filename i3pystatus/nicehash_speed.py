@@ -2,6 +2,7 @@ import datetime
 import requests
 import re
 import time
+import json
 
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import internet, require, user_open
@@ -54,6 +55,7 @@ class NiceHashSpeed(IntervalModule):
     _prev_color = '#FFFFFF'
 
     _api_url = 'https://api.nicehash.com/api?method=stats.provider.ex&addr={addr}&from={from_unixtime}'
+    _api_query_interval = 3
 
     def __init__(self, *args, **kwargs):
         super(NiceHashSpeed, self).__init__(*args, **kwargs)
@@ -67,6 +69,13 @@ class NiceHashSpeed(IntervalModule):
 
         :return: Return JSON data with statistic information about miners
         """
+        with open('/tmp/nhapi.json', 'w+') as f:
+            try:
+                fetch_date_time = json.load(f).get('fetch_date_time')
+                if (time.time() - fetch_date_time) < self._api_query_interval:
+                    time.sleep(self._api_query_interval)
+            except ValueError:
+                json.dump({'fetch_date_time': time.time()}, f)
         return requests.get(self._api_url.format(addr=self.addr,
                                                  from_unixtime=(datetime.datetime.now() - datetime.timedelta(days=1))
                                                  .timestamp())).json()
