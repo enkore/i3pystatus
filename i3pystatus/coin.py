@@ -1,7 +1,9 @@
 import requests
 import json
+
 from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require
+
 
 class Coin(IntervalModule):
     """
@@ -27,11 +29,11 @@ class Coin(IntervalModule):
     """
 
     settings = (
-        ("format",          "format string used for output."),
-        ("coin",            "cryptocurrency to fetch"),
-        ("currency",        "fiat currency to show fiscal data"),
-        ("symbol",          "coin symbol"),
-        ("interval",        "update interval in seconds"),
+        ("format", "format string used for output."),
+        ("coin", "cryptocurrency to fetch"),
+        ("currency", "fiat currency to show fiscal data"),
+        ("symbol", "coin symbol"),
+        ("interval", "update interval in seconds"),
         ("status_interval", "percent change status in the last: '1h' / '24h' / '7d'")
     )
 
