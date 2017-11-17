@@ -7,6 +7,8 @@ class Coin(IntervalModule):
     """
     Fetches live data of various cryptocurrencies from https://coinmarketcap.com/
     coin setting should be equal to the 'id' field of your coin in https://api.coinmarketcap.com/v1/ticker/
+    example coin settings: bitcoin, bitcoin-cash, ethereum, litecoin, dash, lisk
+    example currency settings: usd, eur, huf
 
     .. rubric:: Available formatters
     * {symbol}
