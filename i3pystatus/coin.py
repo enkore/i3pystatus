@@ -7,12 +7,14 @@ from i3pystatus.core.util import internet, require
 
 class Coin(IntervalModule):
     """
-    Fetches live data of various cryptocurrencies from https://coinmarketcap.com/
-    coin setting should be equal to the 'id' field of your coin in https://api.coinmarketcap.com/v1/ticker/
-    example coin settings: bitcoin, bitcoin-cash, ethereum, litecoin, dash, lisk
-    example currency settings: usd, eur, huf
+    Fetches live data of all cryptocurrencies availible at coinmarketcap <https://coinmarketcap.com/>.
+    Coin setting should be equal to the 'id' field of your coin in <https://api.coinmarketcap.com/v1/ticker/>.
+
+    Example coin settings: bitcoin, bitcoin-cash, ethereum, litecoin, dash, lisk.
+    Example currency settings: usd, eur, huf.
 
     .. rubric:: Available formatters
+
     * {symbol}
     * {price}
     * {rank}
@@ -24,7 +26,7 @@ class Coin(IntervalModule):
     * {percent_change_1h}
     * {percent_change_24h}
     * {percent_change_7d}
-    * {last_updated}         //on website
+    * {last_updated} - time of last update on the API's part
     * {status}
     """
 
