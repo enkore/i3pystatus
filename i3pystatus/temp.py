@@ -42,12 +42,15 @@ def get_sensors():
     for chip in sensors.get_detected_chips():
         for feature in chip.get_features():
             if feature.type == sensors.FEATURE_TEMP:
-                name = chip.get_label(feature)
-                max = get_subfeature_value(feature, sensors.SUBFEATURE_TEMP_MAX)
-                current = get_subfeature_value(feature, sensors.SUBFEATURE_TEMP_INPUT)
-                critical = get_subfeature_value(feature, sensors.SUBFEATURE_TEMP_CRIT)
-                if critical:
-                    found_sensors.append(Sensor(name=name, current=current, maximum=max, critical=critical))
+                try:
+                    name = chip.get_label(feature)
+                    max = get_subfeature_value(feature, sensors.SUBFEATURE_TEMP_MAX)
+                    current = get_subfeature_value(feature, sensors.SUBFEATURE_TEMP_INPUT)
+                    critical = get_subfeature_value(feature, sensors.SUBFEATURE_TEMP_CRIT)
+                    if critical:
+                        found_sensors.append(Sensor(name=name, current=current, maximum=max, critical=critical))
+                except sensors.SensorsException:
+                    continue
     return found_sensors
 
 
