@@ -209,7 +209,8 @@ class Temperature(IntervalModule, ColorRangeModule):
         data['temp'] = max((s.current for s in found_sensors))
         return {
             'full_text': self.format.format(**data),
-            'urgent': self.get_urgent(found_sensors)
+            'urgent': self.get_urgent(found_sensors),
+            'color': self.color if not self.dynamic_color else None,
         }
 
     def get_urgent(self, sensors):
@@ -230,9 +231,7 @@ class Temperature(IntervalModule, ColorRangeModule):
             percentage = self.percentage(sensor.current, sensor.critical)
             if self.dynamic_color:
                 color = self.colors[int(percentage)]
-            else:
-                color = self.color
-            return self.format_pango(color, current_val)
+                return self.format_pango(color, current_val)
         return current_val
 
     def format_sensor_bar(self, sensor):
@@ -242,9 +241,7 @@ class Temperature(IntervalModule, ColorRangeModule):
         if self.pango_enabled:
             if self.dynamic_color:
                 color = self.colors[int(percentage)]
-            else:
-                color = self.color
-            return self.format_pango(color, bar)
+                return self.format_pango(color, bar)
         return bar
 
     def format_pango(self, color, value):
