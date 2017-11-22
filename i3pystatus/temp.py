@@ -203,6 +203,9 @@ class Temperature(IntervalModule, ColorRangeModule):
         """
         data = dict()
         found_sensors = get_sensors()
+        if len(found_sensors) == 0:
+            raise Exception("No sensors detected! "
+                            "Ensure lm-sensors is installed and check the output of the `sensors` command.")
         for sensor in found_sensors:
             data[sensor.name] = self.format_sensor(sensor)
             data["{}_bar".format(sensor.name)] = self.format_sensor_bar(sensor)
