@@ -353,8 +353,9 @@ class Network(IntervalModule, ColorRangeModule):
 
     def init(self):
         # Don't require importing basiciw unless using the functionality it offers.
-        if any(s in self.format_down or s in self.format_up for s in
-               ['essid', 'freq', 'quality', 'quality_bar']):
+        if any(s in self.format_down or s in self.format_up or
+               any(s in f for f in self.format_active_up.values())
+               for s in ['essid', 'freq', 'quality', 'quality_bar']):
             get_wifi_info = True
         else:
             get_wifi_info = False
