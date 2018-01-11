@@ -11,7 +11,7 @@ i3pystatus is a large collection of status modules compatible with i3bar from th
 
 :License: MIT
 :Python: 3.4+
-:Governance: Patches that don't break the build (Travis or docs) are generally just merged.
+:Governance: Patches that don't break the build (Travis or docs) are generally just merged. This is a "do-it-yourself" project, so to speak.
 :Releases: No further releases are planned. Install it from Git.
 
 Installation
@@ -39,9 +39,7 @@ Changelog
 Contributors
 ------------
 
-A list of all contributors can be found in `CONTRIBUTORS <https://github.com/enkore/i3pystatus/blob/master/CONTRIBUTORS>`_.
-Particular noteworthy contributors are former maintainer Jan Oliver Oelerich and
-current maintainer enkore.
+A list of all contributors can be found in `CONTRIBUTORS <https://github.com/enkore/i3pystatus/blob/master/CONTRIBUTORS>`_ (git likely has more up-to-date information). i3pystatus was initially written by Jan Oliver Oelerich and later ported to Python 3 and mostly rewritten by enkore.
 
 Contribute
 ----------
