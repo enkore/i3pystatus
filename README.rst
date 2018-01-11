@@ -31,15 +31,12 @@ Documentation
 
 `All further user documentation has been moved here. <https://i3pystatus.readthedocs.io/>`_
 
-Changelog
----------
-
-`Located here. <https://i3pystatus.readthedocs.io/en/latest/changelog.html>`_ Note: no further releases are planned. Install it from Git.
+The changelog for old releases can be found `here. <https://i3pystatus.readthedocs.io/en/latest/changelog.html>`_
 
 Contributors
 ------------
 
-A list of all contributors can be found in `CONTRIBUTORS <https://github.com/enkore/i3pystatus/blob/master/CONTRIBUTORS>`_ (git likely has more up-to-date information). i3pystatus was initially written by Jan Oliver Oelerich and later ported to Python 3 and mostly rewritten by enkore.
+A list of all contributors can be found in `CONTRIBUTORS <https://github.com/enkore/i3pystatus/blob/master/CONTRIBUTORS>`_, but git likely has more up-to-date information. i3pystatus was initially written by Jan Oliver Oelerich and later ported to Python 3 and mostly rewritten by enkore.
 
 Contribute
 ----------
