@@ -2,9 +2,9 @@ from i3pystatus import IntervalModule
 from .utils import gpu
 
 
-class GPUMemory(IntervalModule):
+class GPUUsage(IntervalModule):
     """
-    Shows GPU memory load
+    Shows GPU load in percent
 
     Currently Nvidia only and nvidia-smi required
 
@@ -20,7 +20,6 @@ class GPUMemory(IntervalModule):
         ("color", "standard color"),
         ("warn_color", "defines the color used when warn percentage is exceeded"),
         ("alert_color", "defines the color used when alert percentage is exceeded"),
-        ("round_size", "defines number of digits in round"),
         ("gpu_number", "set the gpu number when you have several GPU"),
     )
 
@@ -49,9 +48,10 @@ class GPUMemory(IntervalModule):
         cdict = {
             "usage": gpu_percent,
         }
+
         for key, value in cdict.items():
             if value is not None:
-                cdict[key] = round(value, self.round_size)
+                cdict[key] = value
 
         self.data = cdict
         self.output = {
