@@ -5,10 +5,7 @@ import time
 from i3pystatus.mail import Backend
 
 
-EWS_EXCEPTIONS = (Exception)
-
-
-class EWS(Backend):
+class ExchangeMailAccount(Backend):
     """
     Checks for mail on an Exchange account.
 
@@ -51,12 +48,12 @@ class EWS(Backend):
                         autodiscover=True,
                         access_type=exchangelib.DELEGATE)
             yield
-        except EWS_EXCEPTIONS as e:
+        except Exception as e:
             # NOTE(sileht): retry just once if the connection have been
             # broken to ensure this is not a sporadic connection lost.
             # Like wifi reconnect, sleep wake up
             # Wait a bit when disconnection occurs to not hog the cpu
-            print(e)
+            self.logger.warn(e)
             time.sleep(1)
             self.connection = None
 
@@ -71,4 +68,4 @@ class EWS(Backend):
         return self.last
 
 
-Backend = EWS
+Backend = ExchangeMailAccount
