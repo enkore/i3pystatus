@@ -54,6 +54,14 @@ MOCK_MODULES = [
     "khal",
     "khal.cli",
     "khal.settings",
+    "requests.auth",
+    "requests.sessions",
+    "requests.packages",
+    "requests.packages.urllib3",
+    "requests.packages.urllib3.response",
+    "lxml.etree",
+    "requests.adapters",
+    "exchangelib"
 ]
 
 for mod_name in MOCK_MODULES:
