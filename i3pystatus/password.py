@@ -23,10 +23,6 @@ class Password(Module):
     text = ''
     length = 12
     charset = ['lowercase', 'uppercase', 'digits', 'special']
-    # charset = { 'lowercase': True,
-                # 'uppercase': True,
-                # 'digits':    True,
-                # 'special':   True, }
     color = None
 
     on_doubleleftclick = 'generate_password'
@@ -34,6 +30,8 @@ class Password(Module):
     def init(self):
         if self._cliptool_exists('xsel'): self.cliptool = 'xsel'
         elif self._cliptool_exists('xclip'): self.cliptool = 'xclip'
+
+        assert self.cliptool, 'It was no possible to find xsel or xclip installed in your system.'
 
         self.output = {
             "full_text": self.text
@@ -53,14 +51,12 @@ class Password(Module):
         p.communicate(input=text.encode('utf-8'))
 
     def generate_password(self):
+        # If a blank list is provided for the charset, it will generate an empty password
         chars = ''
         if 'lowercase' in self.charset: chars = string.ascii_lowercase
         if 'uppercase' in self.charset: chars += string.ascii_uppercase
         if 'digits' in self.charset: chars += string.digits
         if 'special' in self.charset: chars += string.punctuation
-        # if self.charset['uppercase'] == True: chars += string.ascii_uppercase
-        # if self.charset['digits'] == True: chars += string.digits
-        # if self.charset['special'] == True: chars += string.punctuation
 
         passwd = ''.join(random.SystemRandom().choice(chars) for x in range(self.length))
         if self.cliptool == 'xsel': self._xsel_copy(passwd)
