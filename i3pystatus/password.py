@@ -16,22 +16,22 @@ class Password(Module):
         # ("uppercase", "Generate passwords with uppercase characters"),
         # ("digits", "Generate passwords with digits"),
         # ("special", "Generate passwords with special characters"),
-        ("color", "HTML color hex code #RRGGBB"),
         ("charset", "Dictionary containing settings"),
+        ("color", "HTML color hex code #RRGGBB"),
+        ("cliptool", "Dictionary containing settings"),
     )
 
     text = ''
     length = 12
     charset = ['lowercase', 'uppercase', 'digits', 'special']
+    cliptool = None
     color = None
 
     on_doubleleftclick = 'generate_password'
 
     def init(self):
-        if self._cliptool_exists('xsel'): self.cliptool = 'xsel'
-        elif self._cliptool_exists('xclip'): self.cliptool = 'xclip'
-
-        assert self.cliptool, 'It was no possible to find xsel or xclip installed in your system.'
+        # Finds out if either xsel or xclip exist
+        self._find_cliptool()
 
         self.output = {
             "full_text": self.text
@@ -39,16 +39,16 @@ class Password(Module):
         if self.color:
             self.output["color"] = self.color
 
-    def _cliptool_exists(self, tool):
-        return subprocess.call(['which', tool], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+    def _find_cliptool(self):
+        if subprocess.call(['which', 'xsel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
+            self.cliptool = 'xsel'
+            self._clip_params = ['-b', '-i']
+        elif subprocess.call(['which', 'xclip'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
+            self.cliptool = 'xclip'
+            self._clip_params = ['-selection', 'c']
 
-    def _xsel_copy(self, text):
-        p = subprocess.Popen(['xsel', '-b', '-i'], stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(input=text.encode('utf-8'))
-
-    def _xclip_copy(self, text):
-        p = subprocess.Popen(['xclip', '-selection', 'c'], stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(input=text.encode('utf-8'))
+        # Asserts that either xsel or xclip was found
+        assert self.cliptool and self._clip_params, 'It was no possible to find xsel or xclip installed in your system.'
 
     def generate_password(self):
         # If a blank list is provided for the charset, it will generate an empty password
@@ -59,6 +59,7 @@ class Password(Module):
         if 'special' in self.charset: chars += string.punctuation
 
         passwd = ''.join(random.SystemRandom().choice(chars) for x in range(self.length))
-        if self.cliptool == 'xsel': self._xsel_copy(passwd)
-        elif self.cliptool == 'xclip': self._xclip_copy(passwd)
+
+        p = subprocess.Popen([self.cliptool, self._clip_params[0], self._clip_params[1]], stdin=subprocess.PIPE, close_fds=True)
+        p.communicate(input=passwd.encode('utf-8'))
 
