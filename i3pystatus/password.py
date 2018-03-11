@@ -6,22 +6,28 @@ import subprocess
 
 class Password(Module):
     """
-    Generates a random password and copies it to clipboard.
+    Generates a random password and copies it to the clipboard. Useful if you use any password manager and you want to generate a password in the moment and save it later in you manager's database.
+
+    Uses `SystemRandom` class as a cryptographically secure pseudo-number generator - <https://docs.python.org/3/library/random.html#random.SystemRandom>
+
+    - Requires `xsel` or `xclip` for copying to the clipboard.
+    - Generates a new password with a left click by default.
+    - Generates a password with a default length of 12 and with lowercase, uppercase,  digits and special symbols.
+
+    .. rubric:: Available formatters
+
+    * `{length}` — length of generated password
     """
 
     settings = (
-        "text",
+        ("format", "Format string to be displayed in the status bar"),
         ("length", "Length of the generated password"),
-        # ("lowercase", "Generate passwords with lowercase characters"),
-        # ("uppercase", "Generate passwords with uppercase characters"),
-        # ("digits", "Generate passwords with digits"),
-        # ("special", "Generate passwords with special characters"),
-        ("charset", "Dictionary containing settings"),
+        ("charset", "Dictionary containing character types to be included in the password"),
+        ("cliptool", "Currently supports xsel and xclip"),
         ("color", "HTML color hex code #RRGGBB"),
-        ("cliptool", "Dictionary containing settings"),
     )
 
-    text = ''
+    format = ''
     length = 12
     charset = ['lowercase', 'uppercase', 'digits', 'special']
     cliptool = None
@@ -33,11 +39,15 @@ class Password(Module):
         # Finds out if either xsel or xclip exist
         self._find_cliptool()
 
-        self.output = {
-            "full_text": self.text
+        cdict = {
+            'length': self.length
         }
-        if self.color:
-            self.output["color"] = self.color
+
+        self.output = {
+            "full_text": self.format.format(**cdict)
+        }
+
+        if self.color: self.output["color"] = self.color
 
     def _find_cliptool(self):
         if subprocess.call(['which', 'xsel'], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0:
