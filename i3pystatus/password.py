@@ -12,14 +12,19 @@ class Password(Module):
     settings = (
         "text",
         ("length", "Length of the generated password"),
-        # ("characters", "Character set used to generate a new password"),
+        ("lowercase", "Generate passwords with lowercase characters"),
+        ("uppercase", "Generate passwords with uppercase characters"),
+        ("digits", "Generate passwords with digits"),
+        ("special", "Generate passwords with special characters"),
         ("color", "HTML color hex code #RRGGBB"),
     )
 
-    text = 'test'
+    text = ''
     length = 12
+    lowercase = True
     uppercase = True
-    digits = False
+    digits = True
+    special = True
     color = None
 
     on_doubleleftclick = 'generate_password'
@@ -32,12 +37,12 @@ class Password(Module):
             self.output["color"] = self.color
 
     def generate_password(self):
-        chars = string.ascii_lowercase
+        if self.lowercase: chars = string.ascii_lowercase
         if self.uppercase: chars += string.ascii_uppercase
         if self.digits: chars += string.digits
+        if self.special: chars += string.punctuation
 
         passwd = ''.join(random.SystemRandom().choice(chars) for x in range(self.length))
-        p = subprocess.Popen(['xclip', '-selection', 'c'],
-                             stdin=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(['xclip', '-selection', 'c'], stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=passwd.encode('utf-8'))
 
