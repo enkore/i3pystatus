@@ -1,3 +1,4 @@
+from collections import defaultdict
 import socket
 from os.path import basename
 from math import floor
@@ -65,6 +66,7 @@ socket."),
         ("format", "formatp string"),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
+        ("color_map", "The mapping from state to color of the text"),
         ("max_field_len", "Defines max length for in truncate_fields defined \
 fields, if truncated, ellipsis are appended as indicator. It's applied \
 *before* max_len. Value of 0 disables this."),
@@ -90,6 +92,7 @@ cleartext to the server.)"),
         "stop": "◾",
     }
     color = "#FFFFFF"
+    color_map = {}
     max_field_len = 25
     max_len = 100
     truncate_fields = ("title", "album", "artist")
@@ -175,9 +178,10 @@ cleartext to the server.)"),
                 fdict[key] = fdict[key][:shrink] + "…"
 
             full_text = formatp(self.format, **fdict).strip()
+        color_map = defaultdict(lambda: self.color, self.color_map)
         self.output = {
             "full_text": full_text,
-            "color": self.color,
+            "color": color_map[playback_state],
         }
 
     def switch_playpause(self):
