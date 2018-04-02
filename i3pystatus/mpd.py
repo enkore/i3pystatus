@@ -67,6 +67,7 @@ socket."),
         ("status", "Dictionary mapping pause, play and stop to output"),
         ("color", "The color of the text"),
         ("color_map", "The mapping from state to color of the text"),
+        ("dummy_output", "Text to replace output with in hidden state"),
         ("max_field_len", "Defines max length for in truncate_fields defined \
 fields, if truncated, ellipsis are appended as indicator. It's applied \
 *before* max_len. Value of 0 disables this."),
@@ -91,6 +92,8 @@ cleartext to the server.)"),
         "play": "▶",
         "stop": "◾",
     }
+    hidden = False
+    dummy_output = "###"
     color = "#FFFFFF"
     color_map = {}
     max_field_len = 25
@@ -129,6 +132,13 @@ cleartext to the server.)"),
             return None
 
     def run(self):
+        if self.hidden:
+            self.output = {
+                "full_text": self.dummy_output,
+                "color": self.color,
+            }
+            return
+
         try:
             status = self._mpd_command(self.s, "status")
             playback_state = status["state"]
@@ -215,3 +225,6 @@ cleartext to the server.)"),
             self._mpd_command(self.s, command)
         except Exception as e:
             pass
+
+    def toggle_hidden(self):
+        self.hidden = not self.hidden
