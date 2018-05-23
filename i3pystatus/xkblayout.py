@@ -31,10 +31,12 @@ class Xkblayout(IntervalModule):
     """
 
     interval = 1
+    color = "#FFFFFF"
     format = "\u2328 {symbol}"
     layouts = []
     uppercase = True
     settings = (
+        ("color", "RGB hexadecimal code color specifier, defaults to #FFFFFF"),
         ("format", "Format string"),
         ("layouts", "List of layouts"),
         ("uppercase", "Flag for uppercase output"),
@@ -90,5 +92,5 @@ class Xkblayout(IntervalModule):
         self.data = cdict
         self.output = {
             "full_text": full_text,
-            "color": "#FFFFFF",
+            "color": self.color,
         }
