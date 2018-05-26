@@ -39,13 +39,20 @@ class Battery:
         self.battery_info = battery_info
         self.normalize_micro()
 
+    @staticmethod
+    def _full_suffix(design):
+        return "_DESIGN" if design else ""
+
     def normalize_micro(self):
         for key, micro_value in self.battery_info.items():
             if re.match(r"(VOLTAGE|CHARGE|CURRENT|POWER|ENERGY)_(NOW|FULL|MIN)(_DESIGN)?", key):
                 self.battery_info[key] = float(micro_value) / 1000000.0
 
     def percentage(self, design=False):
-        return self._percentage("_DESIGN" if design else "") * 100
+        return self._percentage(self._full_suffix(design)) * 100
+
+    def wh_total(self, design=False):
+        return self._wh_total(self._full_suffix(design))
 
     def status(self):
         if self.consumption() is None:
@@ -78,8 +85,8 @@ class BatteryCharge(Battery):
     def wh_remaining(self):
         return self.battery_info['CHARGE_NOW'] * self.battery_info['VOLTAGE_NOW']
 
-    def wh_total(self):
-        return self.battery_info['CHARGE_FULL'] * self.battery_info['VOLTAGE_NOW']
+    def _wh_total(self, design):
+        return self.battery_info['CHARGE_FULL' + design] * self.battery_info['VOLTAGE_NOW']
 
     def wh_depleted(self):
         return (self.battery_info['CHARGE_FULL'] - self.battery_info['CHARGE_NOW']) * self.battery_info['VOLTAGE_NOW']
@@ -106,8 +113,8 @@ class BatteryEnergy(Battery):
     def wh_remaining(self):
         return self.battery_info['ENERGY_NOW']
 
-    def wh_total(self):
-        return self.battery_info['ENERGY_FULL']
+    def _wh_total(self, design):
+        return self.battery_info['ENERGY_FULL' + design]
 
     def wh_depleted(self):
         return self.battery_info['ENERGY_FULL'] - self.battery_info['ENERGY_NOW']
@@ -230,7 +237,7 @@ class BatteryChecker(IntervalModule):
 
     def percentage(self, batteries, design=False):
         total_now = [battery.wh_remaining() for battery in batteries]
-        total_full = [battery.wh_total() for battery in batteries]
+        total_full = [battery.wh_total(design) for battery in batteries]
         return sum(total_now) / sum(total_full) * 100
 
     def consumption(self, batteries):
