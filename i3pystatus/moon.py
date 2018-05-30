@@ -32,9 +32,10 @@ class MoonPhase(IntervalModule):
         ("status", "Current moon phase"),
         ("illum", "Percentage that is illuminated"),
         ("color", "Set color"),
+        ("moonicon", 'Set icon')
     )
 
-    format = "{illum} {status}"
+    format = "{illum} {status} {moonicon}"
 
     interval = 60 * 60 * 2  # every 2 hours
 
@@ -58,6 +59,17 @@ class MoonPhase(IntervalModule):
         "Waning Gibbous": "#871181",
         "Last Quarter": "#C32250",
         "Waning Crescent": "#FF341F",
+    }
+
+    moonicon = {
+        "New Moon": b'\xf0\x9f\x8c\x91'.decode(),
+        "Waxing Crescent": b'\xf0\x9f\x8c\x92'.decode(),
+        "First Quarter": b'\xf0\x9f\x8c\x93'.decode(),
+        "Waxing Gibbous": b'\xf0\x9f\x8c\x94'.decode(),
+        "Full Moon": b'\xf0\x9f\x8c\x95'.decode(),
+        "Waning Gibbous": b'\xf0\x9f\x8c\x96'.decode(),
+        "Last Quarter": b'\xf0\x9f\x8c\x97'.decode(),
+        "Waning Crescent": b'\xf0\x9f\x8c\x98'.decode()
     }
 
     def pos(now=None):
@@ -104,6 +116,7 @@ class MoonPhase(IntervalModule):
         fdict = {
             "status": self.status[self.current_phase()],
             "illum": self.illum(),
+            "moonicon": self.moonicon[self.current_phase()]
         }
         self.data = fdict
         self.output = {
