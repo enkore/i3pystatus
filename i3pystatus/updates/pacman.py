@@ -5,7 +5,7 @@ from i3pystatus.updates import Backend
 class Pacman(Backend):
     """
     Checks for updates in Arch Linux repositories using the
-    `checkupdates` script which is part of the `pacman` package.
+    `checkupdates` script which is part of the `pacman-contrib` package.
     """
 
     @property
