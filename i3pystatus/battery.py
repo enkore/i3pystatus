@@ -1,3 +1,4 @@
+import bisect
 import configparser
 import os
 import re
@@ -187,6 +188,15 @@ class BatteryChecker(IntervalModule):
         ("base_path", "Override the default base path for searching for batteries"),
         ("battery_prefix", "Override the default battery prefix"),
         ("status", "A dictionary mapping ('DPL', 'DIS', 'CHR', 'FULL') to alternative names"),
+        ("levels",
+         "A dictionary mapping of charge levels to corresponding names. Let the keys be a < b < c < d. "
+         "Then the following intervals correspond to each value:\n"
+         "  0              -> status['DPL']\n"
+         "  |0 < x <= a|   -> levels[a]\n"
+         "  |a < x <= b|   -> levels[b]\n"
+         "  |b < x <= c|   -> levels[c]\n"
+         "  |c < x <= d|   -> levels[d]\n"
+         "  |d < x <= 100| -> status['FULL']"),
         ("color", "The text color"),
         ("full_color", "The full color"),
         ("charging_color", "The charging color"),
@@ -205,6 +215,7 @@ class BatteryChecker(IntervalModule):
         "DIS": "DIS",
         "FULL": "FULL",
     }
+    levels = None
     not_present_text = "Battery {battery_ident} not present"
 
     alert = False
@@ -358,7 +369,14 @@ class BatteryChecker(IntervalModule):
                 self.notification.update(title=title,
                                          body=body)
 
-        fdict["status"] = self.status[fdict["status"]]
+        if self.levels and fdict['status'] == 'DIS':
+            self.levels.setdefault(0, self.status.get('DPL', 'DPL'))
+            self.levels.setdefault(100, self.status.get('FULL', 'FULL'))
+            keys = sorted(self.levels.keys())
+            index = bisect.bisect_left(keys, fdict['percentage'])
+            fdict["status"] = self.levels[keys[index]]
+        else:
+            fdict["status"] = self.status[fdict["status"]]
 
         self.data = fdict
         self.output = {
