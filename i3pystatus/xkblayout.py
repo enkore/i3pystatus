@@ -34,10 +34,12 @@ class Xkblayout(IntervalModule):
     format = "\u2328 {symbol}"
     layouts = []
     uppercase = True
+    color = "#FFFFFF"
     settings = (
         ("format", "Format string"),
         ("layouts", "List of layouts"),
         ("uppercase", "Flag for uppercase output"),
+        ("color", "The text color"),
     )
 
     on_leftclick = ["change_layout", 1]
@@ -90,5 +92,5 @@ class Xkblayout(IntervalModule):
         self.data = cdict
         self.output = {
             "full_text": full_text,
-            "color": "#FFFFFF",
+            "color": self.color,
         }
