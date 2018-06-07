@@ -160,10 +160,10 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
                 "title": currentsong.get("xesam:title", ""),
                 "album": currentsong.get("xesam:album", ""),
                 "artist": ", ".join(currentsong.get("xesam:artist", "")),
-                "song_length": TimeWrapper((currentsong.get("mpris:length") or
-                                            0) / 1000 ** 2),
-                "song_elapsed": TimeWrapper((get_prop("Position") or 0) /
-                                            1000 ** 2),
+                "song_length": TimeWrapper(
+                    (currentsong.get("mpris:length") or 0) / 1000 ** 2),
+                "song_elapsed": TimeWrapper(
+                    (get_prop("Position") or 0) / 1000 ** 2),
                 "filename": "",
             }
 

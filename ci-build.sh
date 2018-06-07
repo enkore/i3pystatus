@@ -9,7 +9,7 @@ BUILD=${1:-ci-build}
 rm -rf ${BUILD}/
 mkdir -p $BUILD
 
-python3 -mpycodestyle --ignore E501,E741,E305,E722 i3pystatus tests
+python3 -mpycodestyle --ignore E501,E741,E305,E722,W503 i3pystatus tests
 
 # Check that the setup.py script works
 rm -rf ${BUILD}/test-install ${BUILD}/test-install-bin

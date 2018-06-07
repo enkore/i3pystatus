@@ -189,7 +189,7 @@ class KeyConstraintDictAdvancedTests(unittest.TestCase):
 
 class FormatPTests(unittest.TestCase):
     def test_escaping(self):
-        assert util.formatp("[razamba \[ mabe \]]") == "razamba [ mabe ]"
+        assert util.formatp(r"[razamba \[ mabe \]]") == "razamba [ mabe ]"
 
     def test_numerical(self):
         assert util.formatp("[{t} - [schmuh {x}]]", t=1, x=2) == "1 - schmuh 2"
