@@ -373,7 +373,7 @@ class BatteryChecker(IntervalModule):
             self.levels.setdefault(0, self.status.get('DPL', 'DPL'))
             self.levels.setdefault(100, self.status.get('FULL', 'FULL'))
             keys = sorted(self.levels.keys())
-            index = bisect.bisect_left(keys, fdict['percentage'])
+            index = bisect.bisect_left(keys, int(fdict['percentage']))
             fdict["status"] = self.levels[keys[index]]
         else:
             fdict["status"] = self.status[fdict["status"]]
