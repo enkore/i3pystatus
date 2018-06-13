@@ -61,7 +61,8 @@ MOCK_MODULES = [
     "requests.packages.urllib3.response",
     "lxml.etree",
     "requests.adapters",
-    "exchangelib"
+    "exchangelib",
+    "soco"
 ]
 
 for mod_name in MOCK_MODULES:
