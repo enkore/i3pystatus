@@ -127,10 +127,12 @@ class NetworkInfo:
     def extract_network_info(network_info):
         info = dict()
         if netifaces.AF_INET in network_info:
-            v4 = network_info[netifaces.AF_INET][0]
-            info["v4"] = v4["addr"]
-            info["v4mask"] = v4["netmask"]
-            info["v4cidr"] = cidr4(v4["addr"], v4["netmask"])
+            for v4 in network_info[netifaces.AF_INET]:
+                info["v4"] = v4["addr"]
+                info["v4mask"] = v4["netmask"]
+                info["v4cidr"] = cidr4(v4["addr"], v4["netmask"])
+                if not v4["addr"].startswith("169.254"):  # prefer non link-local addresses
+                    break
         if netifaces.AF_INET6 in network_info:
             for v6 in network_info[netifaces.AF_INET6]:
                 info["v6"] = v6["addr"]
