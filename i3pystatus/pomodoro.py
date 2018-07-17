@@ -101,7 +101,7 @@ class Pomodoro(IntervalModule):
         self.time = None
 
     def _alarm(self, text):
-        notification = DesktopNotification('Alarm!', text)
+        notification = DesktopNotification(title='Alarm!', body=text)
         notification.display()
 
         subprocess.Popen(['aplay',
