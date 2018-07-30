@@ -33,6 +33,7 @@ class Coin(IntervalModule):
     settings = (
         ("format", "format string used for output."),
         ("coin", "cryptocurrency to fetch"),
+        ("decimal", "round coin price down to this decimal place"),
         ("currency", "fiat currency to show fiscal data"),
         ("symbol", "coin symbol"),
         ("interval", "update interval in seconds"),
@@ -45,6 +46,7 @@ class Coin(IntervalModule):
     currency = "USD"
     interval = 600
     status_interval = "24h"
+    decimal = 2
 
     def fetch_data(self):
         response = requests.get("https://api.coinmarketcap.com/v1/ticker/{}/?convert={}".format(self.coin, self.currency))
@@ -74,7 +76,9 @@ class Coin(IntervalModule):
         symbols = dict(bitcoin='฿', ethereum='Ξ', litecoin='Ł', dash='Đ')
         if self.coin in symbols:
             fdict["symbol"] = symbols[self.coin]
+
         fdict["status"] = self.set_status(float(fdict["percent_change_{}".format(self.status_interval)]))
+        fdict["price"] = str(round(Decimal(fdict["price"]), self.decimal))
 
         self.data = fdict
         self.output = {"full_text": self.format.format(**fdict)}
