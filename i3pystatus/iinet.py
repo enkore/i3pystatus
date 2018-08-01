@@ -15,6 +15,7 @@ class IINet(IntervalModule, ColorRangeModule):
 
     * `{percentage_used}`        — percentage of your quota that is used
     * `{percentage_available}`   — percentage of your quota that is available
+    * `{used}`                   - GB of your quota used
     """
 
     settings = (
@@ -75,6 +76,7 @@ class IINet(IntervalModule, ColorRangeModule):
 
         usage['percent_used'] = '{0:.2f}%'.format(percent_used)
         usage['percent_available'] = '{0:.2f}%'.format(percent_avaliable)
+        usage['used'] = '{0:.2f}'.format(used / 1000 ** 3)
 
         self.data = usage
         self.output = {
@@ -88,7 +90,7 @@ class IINet(IntervalModule, ColorRangeModule):
                                 '_SERVICE=%(service_token)s' % self.__dict__).json()
         if self.valid_response(response):
             for traffic_type in response['response']['usage']['traffic_types']:
-                if traffic_type['name'] == 'anytime':
+                if traffic_type['name'] in ('anytime', 'usage'):
                     return traffic_type
         else:
             raise Exception("Failed to retrieve usage information for: %s" % self.username)
