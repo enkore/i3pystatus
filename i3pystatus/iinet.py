@@ -76,7 +76,7 @@ class IINet(IntervalModule, ColorRangeModule):
 
         usage['percent_used'] = '{0:.2f}%'.format(percent_used)
         usage['percent_available'] = '{0:.2f}%'.format(percent_avaliable)
-        usage['used'] = '{0:.2f}'.format(used/1000**3)
+        usage['used'] = '{0:.2f}'.format(used / 1000 ** 3)
 
         self.data = usage
         self.output = {
