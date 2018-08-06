@@ -271,7 +271,7 @@ def formatp(string, **kwargs):
         return subtree
 
     def merge_tree(items):
-        return "".join(flatten(items)).replace("\]", "]").replace("\[", "[")
+        return "".join(flatten(items)).replace(r"\]", "]").replace(r"\[", "[")
 
     stack = build_stack(string)
     tree = build_tree(stack, 0)

@@ -210,7 +210,7 @@ class PulseAudio(Module, ColorRangeModule):
         if self.move_sink_inputs:
             sink_inputs = subprocess.check_output("pacmd list-sink-inputs".split(),
                                                   universal_newlines=True)
-            for input_index in re.findall('index:\s+(\d+)', sink_inputs):
+            for input_index in re.findall(r'index:\s+(\d+)', sink_inputs):
                 command = "pacmd move-sink-input {} {}".format(input_index, next_sink)
 
                 # Not all applications can be moved and pulseaudio, and when

@@ -75,9 +75,9 @@ class Reddit(IntervalModule):
     _permalink = ""
     _url = ""
 
-    subreddit_pattern = re.compile("\{submission_\w+\}")
-    message_pattern = re.compile("\{message_\w+\}")
-    user_pattern = re.compile("\{comment_karma\}|\{link_karma\}")
+    subreddit_pattern = re.compile(r"{submission_\w+}")
+    message_pattern = re.compile(r"{message_\w+\}")
+    user_pattern = re.compile(r"{comment_karma}|{link_karma}")
 
     reddit_session = None
 
