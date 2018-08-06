@@ -85,7 +85,7 @@ class CpuUsage(IntervalModule):
                 continue
 
             core = core.replace('usage_', '')
-            string = self.formatter.format(format_string=self.format_all,
+            string = self.formatter.format(self.format_all,
                                            core=core,
                                            usage=usage)
             core_strings.append(string)
