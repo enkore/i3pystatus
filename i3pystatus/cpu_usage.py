@@ -85,9 +85,8 @@ class CpuUsage(IntervalModule):
                 continue
 
             core = core.replace('usage_', '')
-            string = self.formatter.format(self.format_all,
-                                           core=core,
-                                           usage=usage)
+            string = self.formatter.vformat(self.format_all, (),
+                                            {'core': core, 'usage': usage})
             core_strings.append(string)
 
         core_strings = sorted(core_strings)
