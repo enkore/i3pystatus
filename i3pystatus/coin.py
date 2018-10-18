@@ -1,5 +1,6 @@
 import requests
 import json
+from decimal import Decimal
 
 from i3pystatus import IntervalModule
 from i3pystatus.core.util import internet, require
