@@ -92,7 +92,7 @@ cleartext to the server.)"),
         "play": "▶",
         "stop": "◾",
     }
-    hidden = False
+    hidden = True
     dummy_output = "###"
     color = "#FFFFFF"
     color_map = {}
