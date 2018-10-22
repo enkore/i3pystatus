@@ -7,6 +7,11 @@ from i3pystatus import IntervalModule, formatp, SettingsBase
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.desktop import DesktopNotification
 
+try:
+    import humanize
+except ImportError:
+    pass
+
 
 def strip_microseconds(delta):
     return delta - timedelta(microseconds=delta.microseconds)
@@ -49,7 +54,8 @@ class CalendarEvent:
         """
         event_dict = dict(
             title=self.title,
-            remaining=self.time_remaining
+            remaining=self.time_remaining,
+            humanize_remaining=self.humanize_time_remaining,
         )
 
         def is_formatter(x):
@@ -62,6 +68,13 @@ class CalendarEvent:
     @property
     def time_remaining(self):
         return strip_microseconds(self.start - datetime.now(tz=self.start.tzinfo))
+
+    @property
+    def humanize_time_remaining(self):
+        try:
+            return humanize.naturaltime(datetime.now(tz=self.start.tzinfo) - self.start)
+        except NameError:
+            raise ImportError('Missing humanize module')
 
     def __str__(self):
         return "{}(title='{}', start={}, end={}, recurring={})" \
