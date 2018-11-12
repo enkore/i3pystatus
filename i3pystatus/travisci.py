@@ -1,10 +1,11 @@
+import os
+
 import dateutil.parser
 
-from datetime import timedelta
 from travispy import TravisPy
 
 from i3pystatus import IntervalModule
-from i3pystatus.core.util import TimeWrapper
+from i3pystatus.core.util import TimeWrapper, formatp
 
 __author__ = 'chestm007'
 
@@ -12,7 +13,7 @@ __author__ = 'chestm007'
 class TravisCI(IntervalModule):
     """
     Get current status of travis builds
-    Requires `travispy`
+    Requires `travispy` `dateutil.parser`
 
     Formatters:
 
@@ -33,7 +34,7 @@ class TravisCI(IntervalModule):
 
     required = ('github_token', 'repo_slug')
 
-    format = '[{repo_owner}/{repo_name}-{repo_status} ({last_build_finished}({last_build_duration}))]'
+    format = '{repo_owner}/{repo_name}-{repo_status} [({last_build_finished}({last_build_duration}))]'
     short_format = '{repo_name}-{repo_status}'
     time_format = '%m/%d'
     duration_format = '%m:%S'
@@ -43,8 +44,11 @@ class TravisCI(IntervalModule):
         'failed': '#FF0000',
         'errored': '#FFAA00',
         'cancelled': '#EEEEEE',
+        'started': '#0000AA',
 
     }
+
+    on_leftclick = 'open_build_webpage'
 
     def init(self):
         self.repo_status = None
@@ -59,12 +63,24 @@ class TravisCI(IntervalModule):
 
     def run(self):
         repo = self.travis.repo(self.repo_slug)
-        self.last_build_finished = self._format_time(repo.last_build_finished_at)
-        self.last_build_duration = str(timedelta)
-        self.last_build_duration = TimeWrapper(repo.last_build_duration, default_format=self.duration_format)
         self.repo_status = repo.last_build_state
+        self.last_build_id = repo.last_build_id
+        if self.repo_status in self.status_color_map:
+            if self.repo_status == 'started':
+                self.last_build_finished = None
+                self.last_build_duration = None
+            else:
+                self.last_build_finished = self._format_time(repo.last_build_finished_at)
+                self.last_build_duration = TimeWrapper(repo.last_build_duration, default_format=self.duration_format)
+
         self.output = dict(
-            full_text=self.format.format(**vars(self)),
+            full_text=formatp(self.format, **vars(self)),
             short_text=self.short_format.format(**vars(self)),
             color=self.status_color_map.get(self.repo_status, '#DDDDDD',)
         )
+
+    def open_build_webpage(self):
+        os.popen('xdg-open https://travis-ci.org/{owner}/{repository_name}/builds/{build_id} > /dev/null'
+                 .format(owner=self.repo_owner,
+                         repository_name=self.repo_name,
+                         build_id=self.last_build_id))
