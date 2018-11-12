@@ -34,8 +34,17 @@ class TravisCI(IntervalModule):
     required = ('github_token', 'repo_slug')
 
     format = '[{repo_owner}/{repo_name}-{repo_status} ({last_build_finished}({last_build_duration}))]'
+    short_format = '{repo_name}-{repo_status}'
     time_format = '%m/%d'
     duration_format = '%m:%S'
+
+    status_color_map = {
+        'passed': '#00FF00',
+        'failed': '#FF0000',
+        'errored': '#FFAA00',
+        'cancelled': '#EEEEEE',
+
+    }
 
     def init(self):
         self.repo_status = None
@@ -54,4 +63,8 @@ class TravisCI(IntervalModule):
         self.last_build_duration = str(timedelta)
         self.last_build_duration = TimeWrapper(repo.last_build_duration, default_format=self.duration_format)
         self.repo_status = repo.last_build_state
-        self.output = dict(full_text=self.format.format(**vars(self)))
+        self.output = dict(
+            full_text=self.format.format(**vars(self)),
+            short_text=self.short_format.format(**vars(self)),
+            color=self.status_color_map.get(self.repo_status, '#DDDDDD',)
+        )
