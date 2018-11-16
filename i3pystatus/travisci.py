@@ -21,8 +21,31 @@ class TravisCI(IntervalModule):
     * `{repo_status}` - repository status
     * `{repo_name}` - repository name
     * `{repo_owner}` - repository owner
-    * `{last_build_finished}` - <
-    * `{last_build_duration}` - <
+    * `{last_build_finished}` - date of the last finished build
+    * `{last_build_duration}` - duration of the last build
+
+
+    Examples
+
+    .. code-block:: python
+
+        status_color_map = {
+            'passed': '#00FF00',
+            'failed': '#FF0000',
+            'errored': '#FFAA00',
+            'cancelled': '#EEEEEE',
+            'started': '#0000AA',
+
+        }
+
+    .. code-block:: python
+
+        repo_status_map={
+            'passed': '<span color="#00af00">passed</span>',
+            'started': '<span color="#0000af">started</span>',
+            'failed': '<span color="#af0000">failed</span>',
+        }
+
     """
 
     settings = (
@@ -30,7 +53,10 @@ class TravisCI(IntervalModule):
         ('github_token', 'github personal access token'),
         ('repo_slug', 'repository identifier eg. "enkore/i3pystatus"'),
         ('time_format', 'passed directly to .strftime() for `last_build_finished`'),
-        ('duration_format', '`last_build_duration` format string'))
+        ('repo_status_map', 'map representing how to display status'),
+        ('duration_format', '`last_build_duration` format string'),
+        ('status_color_map', 'color for all text based on status'),
+        ('color', 'color for all text not otherwise colored'))
 
     required = ('github_token', 'repo_slug')
 
@@ -38,15 +64,10 @@ class TravisCI(IntervalModule):
     short_format = '{repo_name}-{repo_status}'
     time_format = '%m/%d'
     duration_format = '%m:%S'
-
-    status_color_map = {
-        'passed': '#00FF00',
-        'failed': '#FF0000',
-        'errored': '#FFAA00',
-        'cancelled': '#EEEEEE',
-        'started': '#0000AA',
-
-    }
+    status_color_map = None
+    repo_status_map = None
+    color = '#DDDDDD'
+    travis = None
 
     on_leftclick = 'open_build_webpage'
 
@@ -55,29 +76,42 @@ class TravisCI(IntervalModule):
         self.last_build_duration = None
         self.last_build_finished = None
         self.repo_owner, self.repo_name = self.repo_slug.split('/')
-        self.travis = TravisPy.github_auth(self.github_token)
 
     def _format_time(self, time):
         _datetime = dateutil.parser.parse(time)
         return _datetime.strftime(self.time_format)
 
     def run(self):
-        repo = self.travis.repo(self.repo_slug)
-        self.repo_status = repo.last_build_state
-        self.last_build_id = repo.last_build_id
-        if self.repo_status in self.status_color_map:
-            if self.repo_status == 'started':
+        try:
+            if self.travis is None:
+                self.travis = TravisPy.github_auth(self.github_token)
+            repo = self.travis.repo(self.repo_slug)
+
+            self.repo_status = self.repo_status_map.get(repo.last_build_state, repo.last_build_state)
+
+            self.last_build_id = repo.last_build_id
+
+            if repo.last_build_state == 'started':
                 self.last_build_finished = None
                 self.last_build_duration = None
-            else:
+
+            elif repo.last_build_state in ('failed', 'errored', 'cancelled', 'passed'):
                 self.last_build_finished = self._format_time(repo.last_build_finished_at)
                 self.last_build_duration = TimeWrapper(repo.last_build_duration, default_format=self.duration_format)
 
-        self.output = dict(
-            full_text=formatp(self.format, **vars(self)),
-            short_text=self.short_format.format(**vars(self)),
-            color=self.status_color_map.get(self.repo_status, '#DDDDDD',)
-        )
+            self.output = dict(
+                full_text=formatp(self.format, **vars(self)),
+                short_text=self.short_format.format(**vars(self)),
+            )
+            if self.status_color_map:
+                self.output['color'] = self.status_color_map.get(repo.last_build_state, self.color)
+            else:
+                self.output['color'] = self.color
+        except Exception as e:
+            self.output = dict(
+                full_text=e,
+                short_text=e
+            )
 
     def open_build_webpage(self):
         os.popen('xdg-open https://travis-ci.org/{owner}/{repository_name}/builds/{build_id} > /dev/null'
