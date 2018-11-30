@@ -2,6 +2,7 @@ import requests
 
 from i3pystatus import IntervalModule
 from i3pystatus.core.color import ColorRangeModule
+from i3pystatus.core.util import internet
 
 __author__ = 'facetoe'
 
@@ -64,25 +65,26 @@ class IINet(IntervalModule, ColorRangeModule):
         return "success" in response and response['success'] == 1
 
     def run(self):
-        self.set_tokens()
+        if internet():
+            self.set_tokens()
 
-        usage = self.get_usage()
-        allocation = usage['allocation']
-        used = usage['used']
+            usage = self.get_usage()
+            allocation = usage['allocation']
+            used = usage['used']
 
-        percent_used = self.percentage(used, allocation)
-        percent_avaliable = self.percentage(allocation - used, allocation)
-        color = self.get_gradient(percent_used, self.colors)
+            percent_used = self.percentage(used, allocation)
+            percent_avaliable = self.percentage(allocation - used, allocation)
+            color = self.get_gradient(percent_used, self.colors)
 
-        usage['percent_used'] = '{0:.2f}%'.format(percent_used)
-        usage['percent_available'] = '{0:.2f}%'.format(percent_avaliable)
-        usage['used'] = '{0:.2f}'.format(used / 1000 ** 3)
+            usage['percent_used'] = '{0:.2f}%'.format(percent_used)
+            usage['percent_available'] = '{0:.2f}%'.format(percent_avaliable)
+            usage['used'] = '{0:.2f}'.format(used / 1000 ** 3)
 
-        self.data = usage
-        self.output = {
-            "full_text": self.format.format(**usage),
-            "color": color
-        }
+            self.data = usage
+            self.output = {
+                "full_text": self.format.format(**usage),
+                "color": color
+            }
 
     def get_usage(self):
         response = requests.get('https://toolbox.iinet.net.au/cgi-bin/api.cgi?Usage&'
