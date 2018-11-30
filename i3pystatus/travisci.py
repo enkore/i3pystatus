@@ -5,7 +5,7 @@ import dateutil.parser
 from travispy import TravisPy
 
 from i3pystatus import IntervalModule
-from i3pystatus.core.util import TimeWrapper, formatp
+from i3pystatus.core.util import TimeWrapper, formatp, internet
 
 __author__ = 'chestm007'
 
@@ -82,7 +82,7 @@ class TravisCI(IntervalModule):
         return _datetime.strftime(self.time_format)
 
     def run(self):
-        try:
+        if internet():
             if self.travis is None:
                 self.travis = TravisPy.github_auth(self.github_token)
             repo = self.travis.repo(self.repo_slug)
@@ -107,11 +107,6 @@ class TravisCI(IntervalModule):
                 self.output['color'] = self.status_color_map.get(repo.last_build_state, self.color)
             else:
                 self.output['color'] = self.color
-        except Exception as e:
-            self.output = dict(
-                full_text=e,
-                short_text=e
-            )
 
     def open_build_webpage(self):
         os.popen('xdg-open https://travis-ci.org/{owner}/{repository_name}/builds/{build_id} > /dev/null'
