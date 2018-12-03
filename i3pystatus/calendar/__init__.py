@@ -1,4 +1,5 @@
 import inspect
+import re
 import threading
 from abc import abstractmethod
 from datetime import datetime, timedelta
@@ -119,6 +120,8 @@ class Calendar(IntervalModule, ColorRangeModule):
         ('format', 'Format string to display in the bar'),
         ('backend', 'Backend to use for collecting calendar events'),
         ('skip_recurring', 'Whether or not to skip recurring events'),
+        ('skip_all_day', 'Whether or not to skip all day events'),
+        ('skip_regex', 'Skip events with titles that match this regex'),
         ('update_interval', "How often in seconds to call the backend's update method"),
         ('urgent_seconds', "When within this many seconds of the event, set the urgent flag"),
         ('urgent_blink', 'Whether or not to blink when within urgent_seconds of the event'),
@@ -128,6 +131,8 @@ class Calendar(IntervalModule, ColorRangeModule):
     required = ('backend',)
 
     skip_recurring = False
+    skip_all_day = False
+    skip_regex = None
     interval = 1
     backend = None
     update_interval = 600
@@ -160,7 +165,11 @@ class Calendar(IntervalModule, ColorRangeModule):
         self.backend.update()
 
         def valid_event(ev):
+            if self.skip_all_day and not isinstance(ev.start, datetime):
+                return False
             if self.skip_recurring and ev.recurring:
+                return False
+            if self.skip_regex and re.search(self.skip_regex, ev.title) is not None:
                 return False
             elif ev.time_remaining < timedelta(seconds=0):
                 return False
