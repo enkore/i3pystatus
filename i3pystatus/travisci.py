@@ -5,7 +5,7 @@ import dateutil.parser
 from travispy import TravisPy
 
 from i3pystatus import IntervalModule
-from i3pystatus.core.util import TimeWrapper, formatp, internet
+from i3pystatus.core.util import TimeWrapper, formatp, internet, require
 
 __author__ = 'chestm007'
 
@@ -81,32 +81,32 @@ class TravisCI(IntervalModule):
         _datetime = dateutil.parser.parse(time)
         return _datetime.strftime(self.time_format)
 
+    @require(internet)
     def run(self):
-        if internet():
-            if self.travis is None:
-                self.travis = TravisPy.github_auth(self.github_token)
-            repo = self.travis.repo(self.repo_slug)
+        if self.travis is None:
+            self.travis = TravisPy.github_auth(self.github_token)
+        repo = self.travis.repo(self.repo_slug)
 
-            self.repo_status = self.repo_status_map.get(repo.last_build_state, repo.last_build_state)
+        self.repo_status = self.repo_status_map.get(repo.last_build_state, repo.last_build_state)
 
-            self.last_build_id = repo.last_build_id
+        self.last_build_id = repo.last_build_id
 
-            if repo.last_build_state == 'started':
-                self.last_build_finished = None
-                self.last_build_duration = None
+        if repo.last_build_state == 'started':
+            self.last_build_finished = None
+            self.last_build_duration = None
 
-            elif repo.last_build_state in ('failed', 'errored', 'cancelled', 'passed'):
-                self.last_build_finished = self._format_time(repo.last_build_finished_at)
-                self.last_build_duration = TimeWrapper(repo.last_build_duration, default_format=self.duration_format)
+        elif repo.last_build_state in ('failed', 'errored', 'cancelled', 'passed'):
+            self.last_build_finished = self._format_time(repo.last_build_finished_at)
+            self.last_build_duration = TimeWrapper(repo.last_build_duration, default_format=self.duration_format)
 
-            self.output = dict(
-                full_text=formatp(self.format, **vars(self)),
-                short_text=self.short_format.format(**vars(self)),
-            )
-            if self.status_color_map:
-                self.output['color'] = self.status_color_map.get(repo.last_build_state, self.color)
-            else:
-                self.output['color'] = self.color
+        self.output = dict(
+            full_text=formatp(self.format, **vars(self)),
+            short_text=self.short_format.format(**vars(self)),
+        )
+        if self.status_color_map:
+            self.output['color'] = self.status_color_map.get(repo.last_build_state, self.color)
+        else:
+            self.output['color'] = self.color
 
     def open_build_webpage(self):
         os.popen('xdg-open https://travis-ci.org/{owner}/{repository_name}/builds/{build_id} > /dev/null'
