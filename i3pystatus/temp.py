@@ -189,7 +189,10 @@ class Temperature(IntervalModule, ColorRangeModule):
             temp = float(f.read().strip()) / 1000
 
         if self.dynamic_color:
-            color = self.colors[int(self.percentage(int(temp), self.alert_temp))]
+            perc = int(self.percentage(int(temp), self.alert_temp))
+            if (perc > 99):
+                perc = 99
+            color = self.colors[perc]
         else:
             color = self.color if temp < self.alert_temp else self.alert_color
         return {
