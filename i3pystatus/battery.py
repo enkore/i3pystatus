@@ -162,13 +162,23 @@ class BatteryChecker(IntervalModule):
             format='{battery_ident}: [{status} ]{percentage_design:.2f}%',
             alert=True,
             alert_percentage=15,
-            status = {
+            status={
                 'DPL': 'DPL',
                 'CHR': 'CHR',
                 'DIS': 'DIS',
                 'FULL': '',
             }
         )
+
+        # status.register(
+        #     'battery',
+        #     format='{status} {percentage:.0f}%',
+        #     levels={
+        #         25: "<=25",
+        #         50: "<=50",
+        #         75: "<=75",
+        #     },
+        # )
 
         status.run()
 
@@ -189,15 +199,7 @@ class BatteryChecker(IntervalModule):
         ("base_path", "Override the default base path for searching for batteries"),
         ("battery_prefix", "Override the default battery prefix"),
         ("status", "A dictionary mapping ('DPL', 'DIS', 'CHR', 'FULL') to alternative names"),
-        ("levels",
-         "A dictionary mapping of charge levels to corresponding names. Let the keys be a < b < c < d. "
-         "Then the following intervals correspond to each value:\n"
-         "  0              -> status['DPL']\n"
-         "  |0 < x <= a|   -> levels[a]\n"
-         "  |a < x <= b|   -> levels[b]\n"
-         "  |b < x <= c|   -> levels[c]\n"
-         "  |c < x <= d|   -> levels[d]\n"
-         "  |d < x <= 100| -> status['FULL']"),
+        ("levels", "A dictionary mapping percentages of charge levels to corresponding names."),
         ("color", "The text color"),
         ("full_color", "The full color"),
         ("charging_color", "The charging color"),
