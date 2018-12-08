@@ -59,6 +59,7 @@ MOCK_MODULES = [
     "requests.packages",
     "requests.packages.urllib3",
     "requests.packages.urllib3.response",
+    'travispy',
     "lxml.etree",
     "requests.adapters",
     "exchangelib",
