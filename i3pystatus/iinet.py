@@ -2,6 +2,7 @@ import requests
 
 from i3pystatus import IntervalModule
 from i3pystatus.core.color import ColorRangeModule
+from i3pystatus.core.util import internet, require
 
 __author__ = 'facetoe'
 
@@ -63,6 +64,7 @@ class IINet(IntervalModule, ColorRangeModule):
     def valid_response(self, response):
         return "success" in response and response['success'] == 1
 
+    @require(internet)
     def run(self):
         self.set_tokens()
 
