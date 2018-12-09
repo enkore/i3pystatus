@@ -124,8 +124,11 @@ class Calendar(IntervalModule, ColorRangeModule):
 
     * {title} - the title or summary of the event
     * {remaining_time} - how long until this event is due
+    * {humanize_remaining} - how long until this event is due in human readable format
 
     Additional formatters may be provided by the backend, consult their documentation for details.
+
+    .. note:: Optionally requires `humanize` to display time in human readable format.
     """
 
     settings = (
