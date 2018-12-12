@@ -8,6 +8,7 @@ from i3pystatus.core.util import bytes_info_dict
 class Deluge(IntervalModule):
     """
     Deluge torrent module
+    You will need to enable the web ui in deluge.
     Requires `requests`
 
     .. rubric:: Formatters:
