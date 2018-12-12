@@ -89,7 +89,6 @@ class Deluge(IntervalModule):
 
             self.last_tick = float(this_tick)
             self.last_session_statistics = dict(format_values)
-            self.parse_values(format_values)
 
         torrents = self.get_torrents_status()
         if torrents:
@@ -101,6 +100,8 @@ class Deluge(IntervalModule):
             format_values['used_space_bytes'] = self.get_path_size(self.path)
         if 'daemon_version' in self.format:
             format_values['daemon_version'] = self.get_version()
+
+        self.parse_values(format_values)
 
         self.data = format_values
         self.output = {
