@@ -12,10 +12,12 @@ class Deluge(IntervalModule):
 
     .. rubric:: Formatters:
 
-    * `{num_torrents}`   - number of torrents in deluge
-    * `{free_space_bytes}`     - bytes free in path
-    * `{daemon_version}` - current version of deluge running on the server
-    * `{used_space_bytes}`     - bytes used in path
+    * `{num_torrents}`       - number of torrents in deluge
+    * `{free_space_bytes}`   - bytes free in path
+    * `{daemon_version}`     - current version of deluge running on the server
+    * `{used_space_bytes}`   - bytes used in path
+    * `{net_sent_sec_bytes}` - bytes sent per second
+    * `{net_recv_sec_bytes}` - bytes received per second
 
     .. rubric:: Unlisted Formatters:
 
@@ -23,7 +25,7 @@ class Deluge(IntervalModule):
     libtorrent stats the keys are in the link below, just click 'session statistics'
     from the table of contents (for compatibility reasons, replace the fullstop in
     the name with an underscore, eg `net.recv_bytes` -> `net_recv_bytes`.
-    <https://www.libtorrent.org/manual-ref.html#session-statistics>
+    https://www.libtorrent.org/manual-ref.html#session-statistics
 
     """
     # TODO: convert this module to run off a python library rather then requests
@@ -59,13 +61,35 @@ class Deluge(IntervalModule):
     id = int(time.time())  # something random
 
     def init(self):
+        if any(s in self.format for s in ('net_sent_sec_bytes', 'net_recv_sec_bytes')):
+            self.libtorrent_stats = True
+
         self.session = None
+        self.last_tick = None
+        self.last_session_statistics = None
+        self.data = {}
 
     def run(self):
-        format_values = dict(num_torrents='', free_space='', daemon_version='', used_space='')
+        format_values = dict(num_torrents='', free_space='', daemon_version='', used_space='',
+                             net_recv_sec_bytes='', net_sent_sec_bytes='')
 
         if not self.check_session():
             self.authenticate()
+
+        if self.libtorrent_stats:
+            format_values.update(self.get_session_statistics())
+
+            def calculate_bytes_per_sec(key):
+                return (format_values[key] - self.last_session_statistics[key]) / (this_tick - self.last_tick)
+
+            this_tick = time.time()
+            if self.data is not None and self.last_session_statistics is not None:
+                format_values['net_sent_sec_bytes'] = calculate_bytes_per_sec('net_sent_bytes')
+                format_values['net_recv_sec_bytes'] = calculate_bytes_per_sec('net_recv_bytes')
+
+            self.last_tick = float(this_tick)
+            self.last_session_statistics = dict(format_values)
+            self.parse_values(format_values)
 
         torrents = self.get_torrents_status()
         if torrents:
@@ -77,10 +101,7 @@ class Deluge(IntervalModule):
             format_values['used_space_bytes'] = self.get_path_size(self.path)
         if 'daemon_version' in self.format:
             format_values['daemon_version'] = self.get_version()
-        if self.libtorrent_stats:
-            format_values.update(self.get_session_statistics())
 
-        self.parse_values(format_values)
         self.data = format_values
         self.output = {
             'full_text': self.format.format(**self.data)
@@ -88,8 +109,9 @@ class Deluge(IntervalModule):
 
     def parse_values(self, values):
         for k, v in values.items():
-            if k.endswith('_bytes'):
-                values[k] = '{value:.{round}f}{unit}'.format(round=self.rounding, **bytes_info_dict(v))
+            if v:
+                if k.endswith('_bytes'):
+                    values[k] = '{value:.{round}f}{unit}'.format(round=self.rounding, **bytes_info_dict(v))
 
     def authenticate(self):
         payload = self._gen_request('auth.login', [self.password])
