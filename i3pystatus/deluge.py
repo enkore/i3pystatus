@@ -10,20 +10,20 @@ class Deluge(IntervalModule):
     Deluge torrent module
     Requires `requests`
 
-    Formatters:
+    .. rubric:: Formatters:
 
     * `{num_torrents}`   - number of torrents in deluge
     * `{free_space_bytes}`     - bytes free in path
     * `{daemon_version}` - current version of deluge running on the server
     * `{used_space_bytes}`     - bytes used in path
 
-    Unlisted Formatters:
+    .. rubric:: Unlisted Formatters:
 
     due to the sheer number of options in libtorrent, if you enable collection of
     libtorrent stats the keys are in the link below, just click 'session statistics'
     from the table of contents (for compatibility reasons, replace the fullstop in
     the name with an underscore, eg `net.recv_bytes` -> `net_recv_bytes`.
-        <https://www.libtorrent.org/manual-ref.html#session-statistics>
+    <https://www.libtorrent.org/manual-ref.html#session-statistics>
 
     """
     # TODO: convert this module to run off a python library rather then requests
