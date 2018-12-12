@@ -56,15 +56,13 @@ class Deluge(IntervalModule):
         'Accept': 'application/json',
     }
 
-    id = int(time.time()) # something random
+    id = int(time.time())  # something random
 
     def init(self):
         self.session = None
 
     def run(self):
-        format_values = dict(
-            num_torrents='', free_space='', daemon_version='', used_space='',
-                             )
+        format_values = dict(num_torrents='', free_space='', daemon_version='', used_space='')
 
         if not self.check_session():
             self.authenticate()
