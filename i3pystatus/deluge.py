@@ -49,7 +49,7 @@ class Deluge(IntervalModule):
     libtorrent_stats = False
     rounding = 2
 
-    format = '{num_torrents} {free_space_bytes}'
+    format = '⛆{num_torrents} ✇{free_space_bytes}'
 
     headers = {
         'Content-Type': 'application/json',
