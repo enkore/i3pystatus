@@ -4,7 +4,7 @@ import netifaces
 
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.color import ColorRangeModule
-from i3pystatus.core.util import make_graph, round_dict, make_bar
+from i3pystatus.core.util import make_graph, round_dict, make_bar, bytes_info_dict
 
 
 def count_bits(integer):
@@ -184,10 +184,8 @@ class NetworkTraffic:
     pnic = None
     pnic_before = None
 
-    def __init__(self, unknown_up, divisor, round_size):
+    def __init__(self, unknown_up):
         self.unknown_up = unknown_up
-        self.divisor = divisor
-        self.round_size = round_size
 
     def update_counters(self, interface):
         import psutil
@@ -201,10 +199,10 @@ class NetworkTraffic:
         self.pnic = None
 
     def get_bytes_sent(self):
-        return (self.pnic.bytes_sent - self.pnic_before.bytes_sent) / self.divisor
+        return self.pnic.bytes_sent - self.pnic_before.bytes_sent
 
     def get_bytes_received(self):
-        return (self.pnic.bytes_recv - self.pnic_before.bytes_recv) / self.divisor
+        return self.pnic.bytes_recv - self.pnic_before.bytes_recv
 
     def get_packets_sent(self):
         return self.pnic.packets_sent - self.pnic_before.packets_sent
@@ -212,17 +210,17 @@ class NetworkTraffic:
     def get_packets_received(self):
         return self.pnic.packets_recv - self.pnic_before.packets_recv
 
-    def get_rx_tot_Mbytes(self, interface):
+    def get_rx_total(self, interface):
         try:
             with open("/sys/class/net/{}/statistics/rx_bytes".format(interface)) as f:
-                return int(f.readline().split('\n')[0]) / (1024 * 1024)
+                return int(f.readline().split('\n')[0])
         except FileNotFoundError:
             return False
 
-    def get_tx_tot_Mbytes(self, interface):
+    def get_tx_total(self, interface):
         try:
             with open("/sys/class/net/{}/statistics/tx_bytes".format(interface)) as f:
-                return int(f.readline().split('\n')[0]) / (1024 * 1024)
+                return int(f.readline().split('\n')[0])
         except FileNotFoundError:
             return False
 
@@ -237,9 +235,8 @@ class NetworkTraffic:
             usage["bytes_recv"] = self.get_bytes_received()
             usage["packets_sent"] = self.get_packets_sent()
             usage["packets_recv"] = self.get_packets_received()
-            usage["rx_tot_Mbytes"] = self.get_rx_tot_Mbytes(interface)
-            usage["tx_tot_Mbytes"] = self.get_tx_tot_Mbytes(interface)
-            round_dict(usage, self.round_size)
+            usage["rx_total"] = self.get_rx_total(interface)
+            usage["tx_total"] = self.get_tx_total(interface)
         return usage
 
 
@@ -278,12 +275,14 @@ class Network(IntervalModule, ColorRangeModule):
     * `{interface}` — the configured network interface
     * `{network_graph_recv}` – Unicode graph representing incoming network traffic
     * `{network_graph_sent}` – Unicode graph representing outgoing network traffic
-    * `{bytes_sent}` — bytes sent per second (divided by divisor)
-    * `{bytes_recv}` — bytes received per second (divided by divisor)
-    * `{packets_sent}` — bytes sent per second (divided by divisor)
-    * `{packets_recv}` — bytes received per second (divided by divisor)
+    * `{bytes_sent}` — bytes sent per second (divided by divisor | auto calculated if auto_units == True)
+    * `{bytes_recv}` — bytes received per second (divided by divisor | auto calculated if auto_units == True)
+    * `{packets_sent}` — packets sent per second
+    * `{packets_recv}` — packets received per second
     * `{rx_tot_Mbytes}` — total Mbytes received
     * `{tx_tot_Mbytes}` — total Mbytes sent
+    * `{rx_tot}` — total traffic recieved (rounded to nearest unit: KB, MB, GB)
+    * `{tx_tot}` — total traffic sent (rounded to nearest unit: KB, MB, GB)
     """
 
     settings = (
@@ -301,13 +300,13 @@ class Network(IntervalModule, ColorRangeModule):
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
         ("graph_width", "Width of the network traffic graph"),
         ("graph_style", "Graph style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake')"),
-        ("recv_limit", "Expected max KiB/s. This value controls the drawing color of receive speed"),
-        ("sent_limit", "Expected max KiB/s. similar with receive_limit"),
         ("separate_color", "display recv/send color separate in dynamic color mode."
                            "Note: only network speed formatters will display with range color "),
         ("coloring_type", "Whether to use the sent or received kb/s for dynamic coloring with non-separate colors. "
                           "Allowed values 'recv' or 'sent'"),
         ("divisor", "divide all byte values by this value"),
+        ("recv_limit", "Expected max KiB/s. This value controls the drawing color of receive speed"),
+        ("sent_limit", "Expected max KiB/s. similar with receive_limit"),
         ("freq_divisor", "divide Wifi frequency by this value"),
         ("ignore_interfaces", "Array of interfaces to ignore when cycling through "
                               "on click, eg, ['lo']"),
@@ -316,6 +315,7 @@ class Network(IntervalModule, ColorRangeModule):
         ("unknown_up", "If the interface is in unknown state, display it as if it were up"),
         ("next_if_down", "Change to next interface if current one is down"),
         ("detect_active", "Attempt to detect the active interface"),
+        ("auto_units", "foo"),
     )
 
     # Continue processing statistics when i3bar is hidden.
@@ -341,6 +341,7 @@ class Network(IntervalModule, ColorRangeModule):
     # Network traffic settings
     divisor = 1024
     round_size = None
+    auto_units = False
 
     # Network info settings
     detached_down = True
@@ -368,8 +369,8 @@ class Network(IntervalModule, ColorRangeModule):
         # Don't require importing psutil unless using the functionality it offers.
         if any(s in self.format_up or s in self.format_down for s in
                ['bytes_sent', 'bytes_recv', 'packets_sent', 'packets_recv', 'network_graph_recv',
-                'network_graph_sent', 'rx_tot_Mbytes', 'tx_tot_Mbytes']):
-            self.network_traffic = NetworkTraffic(self.unknown_up, self.divisor, self.round_size)
+                'network_graph_sent', 'rx_tot_Mbytes', 'tx_tot_Mbytes', 'tx_tot', 'rx_tot']):
+            self.network_traffic = NetworkTraffic(self.unknown_up)
         else:
             self.network_traffic = None
 
@@ -379,6 +380,10 @@ class Network(IntervalModule, ColorRangeModule):
         self.kbs_recv_arr = [0.0] * self.graph_width
         self.kbs_sent_arr = [0.0] * self.graph_width
         self.pango_enabled = self.hints.get("markup", False) and self.hints["markup"] == "pango"
+
+        # convert settings from the nominated unit to bytes (backwards compatibility)
+        self.sent_limit *= 1024
+        self.recv_limit *= 1024
 
     def cycle_interface(self, increment=1):
         """Cycle through available interfaces in `increment` steps. Sign indicates direction."""
@@ -409,7 +414,7 @@ class Network(IntervalModule, ColorRangeModule):
         format_values = dict(network_graph_recv="", network_graph_sent="", bytes_sent="", bytes_recv="",
                              packets_sent="", packets_recv="", rx_tot_Mbytes="", tx_tot_Mbytes="",
                              interface="", v4="", v4mask="", v4cidr="", v6="", v6mask="", v6cidr="", mac="",
-                             essid="", freq="", quality="", quality_bar="")
+                             essid="", freq="", quality="", quality_bar="", rx_tot='', tx_tot="")
 
         if self.detect_active:
             self.interface = detect_active_interface(self.ignore_interfaces, self.interface)
@@ -420,12 +425,20 @@ class Network(IntervalModule, ColorRangeModule):
             format_values['network_graph_recv'] = self.get_network_graph_recv(network_usage['bytes_recv'], self.recv_limit)
             format_values['network_graph_sent'] = self.get_network_graph_sent(network_usage['bytes_sent'], self.sent_limit)
 
+            format_values['tx_tot_Mbytes'] = network_usage['tx_total'] / (1024 * 1024)
+            format_values['rx_tot_Mbytes'] = network_usage['rx_total'] / (1024 * 1024)
+
+            format_values['rx_tot'] = '{value:.{round}f}{unit}'.format(
+                round=self.round_size, **bytes_info_dict(network_usage['rx_total']))
+            format_values['tx_tot'] = '{value:.{round}f}{unit}'.format(
+                round=self.round_size, **bytes_info_dict(network_usage['tx_total']))
+
             if self.dynamic_color:
                 if self.separate_color and self.pango_enabled:
                     color = self.color_up
                     color_template = "<span color=\"{}\">{}</span>"
-                    per_recv = network_usage["bytes_recv"] * self.divisor / (self.recv_limit * 1024)
-                    per_sent = network_usage["bytes_sent"] * self.divisor / (self.sent_limit * 1024)
+                    per_recv = network_usage["bytes_recv"] / self.recv_limit
+                    per_sent = network_usage["bytes_sent"] / self.sent_limit
                     c_recv = self.get_gradient(int(per_recv * 100), self.colors, 100)
                     c_sent = self.get_gradient(int(per_sent * 100), self.colors, 100)
                     format_values["bytes_recv"] = color_template.format(c_recv, network_usage["bytes_recv"])
@@ -462,6 +475,13 @@ class Network(IntervalModule, ColorRangeModule):
         network_info = self.network_info.get_info(self.interface)
         format_values.update(network_info)
         format_values['interface'] = self.interface
+
+        for metric in ('bytes_recv', 'bytes_sent'):
+            if self.auto_units:
+                format_values[metric] = '{value:.{round}f}{unit}'.format(
+                    round=self.round_size, **bytes_info_dict(format_values[metric]))
+            else:
+                format_values[metric] = '{:.{round}f}'.format(format_values[metric] / self.divisor, round=self.round_size)
 
         self.data = format_values
         self.output = {
