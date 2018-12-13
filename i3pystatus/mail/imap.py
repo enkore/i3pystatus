@@ -59,8 +59,6 @@ class IMAP(Backend):
                 self.connection.select(self.mailbox)
             if not self.connection:
                 self.connection = self.imap_class(self.host, self.port)
-                if self.starttls:
-                    self.connection.starttls()
                 self.connection.login(self.username, self.password)
                 self.connection.select(self.mailbox)
             yield
