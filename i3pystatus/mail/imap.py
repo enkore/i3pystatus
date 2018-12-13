@@ -30,12 +30,10 @@ class IMAP(Backend):
         ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
         "ssl",
         "mailbox",
-        'starttls'
     )
     required = ("host", "username", "password")
     keyring_backend = None
 
-    starttls = False
 
     port = 993
     ssl = True
@@ -56,7 +54,7 @@ class IMAP(Backend):
 
     @contextlib.contextmanager
     def ensure_connection(self):
-        #try:
+        try:
             if self.connection:
                 self.connection.select(self.mailbox)
             if not self.connection:
@@ -66,21 +64,21 @@ class IMAP(Backend):
                 self.connection.login(self.username, self.password)
                 self.connection.select(self.mailbox)
             yield
-        #except IMAP_EXCEPTIONS:
-        #    # NOTE(sileht): retry just once if the connection have been
-        #    # broken to ensure this is not a sporadic connection lost.
-        #    # Like wifi reconnect, sleep wake up
-        #    try:
-        #        self.connection.close()
-        #    except IMAP_EXCEPTIONS:
-        #        pass
-        #    try:
-        #        self.connection.logout()
-        #    except IMAP_EXCEPTIONS:
-        #        pass
-        #    # Wait a bit when disconnection occurs to not hog the cpu
-        #    time.sleep(1)
-        #    self.connection = None
+        except IMAP_EXCEPTIONS:
+            # NOTE(sileht): retry just once if the connection have been
+            # broken to ensure this is not a sporadic connection lost.
+            # Like wifi reconnect, sleep wake up
+            try:
+                self.connection.close()
+            except IMAP_EXCEPTIONS:
+                pass
+            try:
+                self.connection.logout()
+            except IMAP_EXCEPTIONS:
+                pass
+            # Wait a bit when disconnection occurs to not hog the cpu
+            time.sleep(1)
+            self.connection = None
 
     def _idle_thread(self):
         # update mail count on startup
