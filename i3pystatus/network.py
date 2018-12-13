@@ -226,7 +226,7 @@ class NetworkTraffic:
 
     def get_usage(self, interface):
         self.update_counters(interface)
-        usage = dict(bytes_sent=0, bytes_recv=0, packets_sent=0, packets_recv=0)
+        usage = dict(bytes_sent=0, bytes_recv=0, packets_sent=0, packets_recv=0, rx_total=0, tx_total=0)
 
         if not sysfs_interface_up(interface, self.unknown_up) or not self.pnic_before:
             return usage
