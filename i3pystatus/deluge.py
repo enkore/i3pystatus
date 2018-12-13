@@ -19,9 +19,12 @@ class Deluge(IntervalModule):
     * `{used_space_bytes}`   - bytes used in path
     * `{net_sent_sec_bytes}` - bytes sent per second
     * `{net_recv_sec_bytes}` - bytes received per second
+    * `{net_sent_bytes}`     - bytes sent total
+    * `{net_recv_bytes}`     - bytes received total
 
     .. rubric:: Unlisted Formatters:
 
+    Deluge 2+ only:
     due to the sheer number of options in libtorrent, if you enable collection of
     libtorrent stats the keys are in the link below, just click 'session statistics'
     from the table of contents (for compatibility reasons, replace the fullstop in
@@ -69,27 +72,32 @@ class Deluge(IntervalModule):
         self.last_tick = None
         self.last_session_statistics = None
         self.data = {}
+        self.daemon_version = None
 
     def run(self):
-        format_values = dict(num_torrents='', free_space='', daemon_version='', used_space='',
-                             net_recv_sec_bytes='', net_sent_sec_bytes='')
-
         if not self.check_session():
             self.authenticate()
+
+        if not self.daemon_version:
+            self.daemon_version = self.detect_version()
+            format_values = {'daemon_version': self.daemon_version}
+        format_values = dict(num_torrents='', free_space='', daemon_version='', used_space='',
+                             net_recv_sec_bytes='', net_sent_sec_bytes='')
 
         if self.libtorrent_stats:
             format_values.update(self.get_session_statistics())
 
-            def calculate_bytes_per_sec(key):
-                return (format_values[key] - self.last_session_statistics[key]) / (this_tick - self.last_tick)
+            if self.daemon_version >= '2':
+                def calculate_bytes_per_sec(key):
+                    return (format_values[key] - self.last_session_statistics[key]) / (this_tick - self.last_tick)
 
-            this_tick = time.time()
-            if self.data is not None and self.last_session_statistics is not None:
-                format_values['net_sent_sec_bytes'] = calculate_bytes_per_sec('net_sent_bytes')
-                format_values['net_recv_sec_bytes'] = calculate_bytes_per_sec('net_recv_bytes')
+                this_tick = time.time()
+                if self.data is not None and self.last_session_statistics is not None:
+                    format_values['net_sent_sec_bytes'] = calculate_bytes_per_sec('net_sent_bytes')
+                    format_values['net_recv_sec_bytes'] = calculate_bytes_per_sec('net_recv_bytes')
 
-            self.last_tick = float(this_tick)
-            self.last_session_statistics = dict(format_values)
+                self.last_tick = float(this_tick)
+                self.last_session_statistics = dict(format_values)
 
         torrents = self.get_torrents_status()
         if torrents:
@@ -99,12 +107,10 @@ class Deluge(IntervalModule):
             format_values['free_space_bytes'] = self.get_free_space(self.path)
         if 'used_space_bytes' in self.format:
             format_values['used_space_bytes'] = self.get_path_size(self.path)
-        if 'daemon_version' in self.format:
-            format_values['daemon_version'] = self.get_version()
 
         self.parse_values(format_values)
 
-        self.data = format_values
+        self.data.update(format_values)
         self.output = {
             'full_text': self.format.format(**self.data)
         }
@@ -120,7 +126,7 @@ class Deluge(IntervalModule):
         return self._send_request(payload)
 
     def check_session(self):
-        payload = self._gen_request('auth.check_session', [])
+        payload = self._gen_request('auth.check_session')
         return self._send_request(payload)
 
     def get_path_size(self, path=None):
@@ -149,13 +155,36 @@ class Deluge(IntervalModule):
         payload = self._gen_request('core.get_torrents_status', [torrent_id, keys])
         return self._send_request(payload)
 
-    def get_version(self):
-        payload = self._gen_request('daemon.get_version', [])
-        return self._send_request(payload)
+    def detect_version(self):
+        payload = self._gen_request('daemon.get_method_list')
+        response = self._send_request(payload)
+        if 'daemon.info' in response:
+            ver_meth = 'daemon.info'
+        else:
+            ver_meth = 'daemon.get_version'
+
+        payload = self._gen_request(ver_meth, [])
+        daemon_version = self._send_request(payload)
+        self.data['daemon_version'] = daemon_version
+        return daemon_version
 
     def get_session_statistics(self):
-        payload = self._gen_request('core.get_session_status', [None])
-        return {k.replace('.', '_'): v for k, v in self._send_request(payload).items()}
+        keys = []
+        if self.data['daemon_version'] < '2':
+            keys = [['upload_rate', 'download_rate', 'total_upload', 'total_download']]
+
+        payload = self._gen_request('core.get_session_status', keys)
+        response = self._send_request(payload)
+
+        if self.data['daemon_version'] < '2':
+            return {
+                'net_sent_sec_bytes': response['upload_rate'],
+                'net_recv_sec_bytes': response['download_rate'],
+                'net_recv_bytes': response['total_download'],
+                'net_sent_bytes': response['total_upload']
+            }
+        else:
+            return {k.replace('.', '_'): v for k, v in response.items()}
 
     def _send_request(self, payload):
         if self.session is None:
@@ -167,8 +196,11 @@ class Deluge(IntervalModule):
             if not content['error']:
                 return content['result']
 
-    def _gen_request(self, method, params=None):
+    def _gen_request(self, method, args=None, kwargs=None):
         req = {"method": method, "id": self.id}
-        if params is not None:
-            req['params'] = params
+        if args is None:
+            req['params'] = []
+        else:
+            req['params'] = args
+
         return req
