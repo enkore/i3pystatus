@@ -43,7 +43,7 @@ class Deluge(IntervalModule):
         ('port', 'port of deluge server (default: 58846)'),
         ('password', 'password to authenticate to deluge (default: deluge)'),
         ('path', 'override "download path" server-side when checking space used/free'),
-        ('libtorrent_stats', 'bool. set to True to pull all stats from libtorrent '
+        ('libtorrent_stats', 'Deluge 2+ only. bool. set to True to pull all stats from libtorrent '
                              '(may cause high memory usage on older machines)(default: False)',
          )
     )
