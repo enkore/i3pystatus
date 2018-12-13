@@ -103,6 +103,8 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
 
     on_leftclick = "playpause"
     on_rightclick = "next_song"
+    on_upscroll = 'volume_up'
+    on_downscroll = 'volume_down'
 
     player = None
     old_player = None
@@ -137,25 +139,16 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
 
     def run(self):
         try:
-            player = self.get_player()
-            properties = dbus.Interface(player, Dbus.intf_props)
-
-            def get_prop(name, default=None):
-                try:
-                    return properties.Get(Dbus.intf_player, name)
-                except dbus.exceptions.DBusException:
-                    return default
-
-            currentsong = get_prop("Metadata")
+            currentsong = self.get_player_prop("Metadata")
 
             fdict = {
                 "status": self.status[self.statusmap[
-                    get_prop("PlaybackStatus")]],
+                    self.get_player_prop("PlaybackStatus")]],
                 # TODO: Use optional(!) TrackList interface for this to
                 # gain 100 % mpd<->now_playing compat
                 "len": 0,
                 "pos": 0,
-                "volume": int(get_prop("Volume", 0) * 100),
+                "volume": int(self.get_player_prop("Volume", 0) * 100),
 
                 "title": currentsong.get("xesam:title", ""),
                 "album": currentsong.get("xesam:album", ""),
@@ -163,7 +156,7 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
                 "song_length": TimeWrapper(
                     (currentsong.get("mpris:length") or 0) / 1000 ** 2),
                 "song_elapsed": TimeWrapper(
-                    (get_prop("Position") or 0) / 1000 ** 2),
+                    (self.get_player_prop("Position") or 0) / 1000 ** 2),
                 "filename": "",
             }
 
@@ -203,28 +196,43 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
             return
 
     def playpause(self):
-        try:
-            dbus.Interface(self.get_player(), Dbus.intf_player).PlayPause()
-        except NoPlayerException:
-            return
-        except dbus.exceptions.DBusException:
-            return
+        self.player_command('PlayPause')
 
     def next_song(self):
-        try:
-            dbus.Interface(self.get_player(), Dbus.intf_player).Next()
-        except NoPlayerException:
-            return
-        except dbus.exceptions.DBusException:
-            return
+        self.player_command('Next')
+
+    def volume_up(self):
+        self.set_player_prop('Volume', self.volume + 1.0)
+
+    def volume_down(self):
+        self.set_player_prop('Volume', self.volume - 1.0)
+
+    @property
+    def volume(self):
+        return self.get_player_prop('Volume')
 
     def player_command(self, command, *args):
         try:
             interface = dbus.Interface(self.get_player(), Dbus.intf_player)
-            getattr(interface, command)(*args)
+            return getattr(interface, command)(*args)
         except NoPlayerException:
             return
         except dbus.exceptions.DBusException:
+            return
+
+    def get_player_prop(self, name, default=None):
+        properties = dbus.Interface(self.get_player(), Dbus.intf_props)
+        try:
+            return properties.Get(Dbus.intf_player, name)
+        except dbus.exceptions.DBusException:
+            return default
+
+    def set_player_prop(self, name, value):
+        properties = dbus.Interface(self.get_player(), Dbus.intf_props)
+        try:
+            return properties.Set(Dbus.intf_player, name, value)
+        except dbus.exceptions.DBusException as e:
+            self.logger.error('error setting player property: %s', e)
             return
 
     def player_prop(self, name, value=None):
