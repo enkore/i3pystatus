@@ -1,5 +1,3 @@
-import ssl as ssl_
-
 from i3pystatus.core.util import require, internet
 
 try:
