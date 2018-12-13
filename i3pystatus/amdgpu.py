@@ -5,11 +5,17 @@ from i3pystatus import IntervalModule
 
 class Amdgpu(IntervalModule):
     """
-    does things
+    Shows information about gpu's using the amdgpu driver
+
+    .. rubric :: Available formatters
+
+    * `{temp}`
+    * `{sclk}`  - Gpu clock speed
+    * `{mclk}`  - Memory clock speed
     """
 
     settings = (
-        ('format', ),
+        'format',
         ('card', '[1, 2, ...] card to read (options are in /sys/class/drm/)')
     )
 
