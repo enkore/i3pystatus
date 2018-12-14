@@ -58,7 +58,7 @@ class Google(CalendarBackend):
     afterwards
 
     If you already have a token `credentials_json` is not required (though highly recomended incase your token gets broken)
-    
+
     .. rubric:: Available formatters
 
     * `{kind}` — type of event
