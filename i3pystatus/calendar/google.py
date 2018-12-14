@@ -52,6 +52,12 @@ class Google(CalendarBackend):
     Requires the Google Calendar API package - https://developers.google.com/google-apps/calendar/quickstart/python.
     Additionally requires the `colour`, `httplib2`, `oauth2client`, `pytz`, `google-api-python-client` and `dateutil` modules.
 
+    The first time this module is ran, you will need to specify the location of `credentials.json` (as credentials_json)
+    acquired from: https://developers.google.com/google-apps/calendar/quickstart/python
+    this will open a browser window for auth, and save a token to `credential_path`
+
+    If you already have a token `credentials_json` is not required (though highly recomended incase your token gets broken)
+    
     .. rubric:: Available formatters
 
     * `{kind}` — type of event
