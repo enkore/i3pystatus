@@ -43,6 +43,7 @@ MOCK_MODULES = [
     "httplib2",
     "oauth2client",
     "apiclient",
+    "googleapiclient",
     "googleapiclient.errors",
     "vlc",
     "dateutil.tz",
