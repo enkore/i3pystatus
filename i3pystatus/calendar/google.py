@@ -54,7 +54,8 @@ class Google(CalendarBackend):
 
     The first time this module is ran, you will need to specify the location of `credentials.json` (as credentials_json)
     acquired from: https://developers.google.com/google-apps/calendar/quickstart/python
-    this will open a browser window for auth, and save a token to `credential_path`
+    this will open a browser window for auth, and save a token to `credential_path`. you will need to reload i3poystatus
+    afterwards
 
     If you already have a token `credentials_json` is not required (though highly recomended incase your token gets broken)
     
