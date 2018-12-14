@@ -74,6 +74,7 @@ class Google(CalendarBackend):
 
     required = ('credential_path',)
 
+    credentials_json = None
     days = 7
 
     def init(self):
