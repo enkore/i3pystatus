@@ -33,7 +33,7 @@ MOCK_MODULES = [
     "requests.exceptions",
     "bs4",
     "dota2py",
-    'deluge-client',
+    'deluge_client',
     "novaclient",
     "speedtest",
     "pyzabbix",
