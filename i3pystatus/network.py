@@ -481,7 +481,10 @@ class Network(IntervalModule, ColorRangeModule):
                 format_values[metric] = '{value:.{round}f}{unit}'.format(
                     round=self.round_size, **bytes_info_dict(format_values[metric]))
             else:
-                format_values[metric] = '{:.{round}f}'.format(format_values[metric] / self.divisor, round=self.round_size)
+                try:
+                    format_values[metric] = '{:.{round}f}'.format(format_values[metric] / self.divisor, round=self.round_size)
+                except TypeError:
+                    pass
 
         self.data = format_values
         self.output = {
