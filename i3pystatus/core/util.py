@@ -136,6 +136,20 @@ def convert_position(pos, json):
     return pos
 
 
+def bytes_info_dict(in_bytes):
+    power = 2**10  # 2 ** 10 == 1024
+    n = 0
+    pow_dict = {0: '', 1: 'K', 2: 'M', 3: 'G', 4: 'T'}
+    out_bytes = int(in_bytes)
+    while out_bytes > power:
+        out_bytes /= power
+        n += 1
+    return {
+        'value': out_bytes,
+        'unit': '{prefix}B'.format(prefix=pow_dict[n])
+    }
+
+
 def flatten(l):
     """
     Flattens a hierarchy of nested lists into a single list containing all elements in order
