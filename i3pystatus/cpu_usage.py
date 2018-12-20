@@ -51,7 +51,7 @@ class CpuUsage(IntervalModule, ColorRangeModule):
         self.prev_busy = defaultdict(int)
         self.formatter = Formatter()
 
-        self.key = re.findall('usage_cpu\d+', self.format)
+        self.key = re.findall(r'usage_cpu\d+', self.format)
         if len(self.key) == 1:
             self.key = self.key[0]
         else:
