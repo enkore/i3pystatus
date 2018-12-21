@@ -340,7 +340,7 @@ class Network(IntervalModule, ColorRangeModule):
 
     # Network traffic settings
     divisor = 1024
-    round_size = None
+    round_size = 0
     auto_units = False
 
     # Network info settings
