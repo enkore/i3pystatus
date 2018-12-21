@@ -340,7 +340,7 @@ class Network(IntervalModule, ColorRangeModule):
 
     # Network traffic settings
     divisor = 1024
-    round_size = None
+    round_size = 0
     auto_units = False
 
     # Network info settings
@@ -476,12 +476,14 @@ class Network(IntervalModule, ColorRangeModule):
         format_values.update(network_info)
         format_values['interface'] = self.interface
 
-        for metric in ('bytes_recv', 'bytes_sent'):
-            if self.auto_units:
-                format_values[metric] = '{value:.{round}f}{unit}'.format(
-                    round=self.round_size, **bytes_info_dict(format_values[metric]))
-            else:
-                format_values[metric] = '{:.{round}f}'.format(format_values[metric] / self.divisor, round=self.round_size)
+        if self.network_traffic:
+            for metric in ('bytes_recv', 'bytes_sent'):
+                if self.auto_units:
+                    format_values[metric] = '{value:.{round}f}{unit}'.format(
+                        round=self.round_size, **bytes_info_dict(format_values[metric]))
+                else:
+                    format_values[metric] = '{:.{round}f}'.format(format_values[metric] / self.divisor,
+                                                                  round=self.round_size)
 
         self.data = format_values
         self.output = {
