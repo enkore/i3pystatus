@@ -17,7 +17,7 @@ except ImportError:
     HAS_REQUESTS = False
 
 API_METHODS_URL = 'https://status.github.com/api.json'
-STATUS_URL = 'https://status.github.com'
+STATUS_URL = 'https://www.githubstatus.com'
 NOTIFICATIONS_URL = 'https://github.com/notifications'
 ACCESS_TOKEN_AUTH_URL = 'https://api.github.com/notifications?access_token=%s'
 BASIC_AUTH_URL = 'https://api.github.com/notifications'
