@@ -8,8 +8,10 @@ from i3pystatus import IntervalModule, formatp, SettingsBase
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.desktop import DesktopNotification
 
+humanize_imported = False
 try:
     import humanize
+    humanize_imported = True
 except ImportError:
     pass
 
@@ -72,10 +74,8 @@ class CalendarEvent:
 
     @property
     def humanize_time_remaining(self):
-        try:
+        if humanize_imported:
             return humanize.naturaltime(datetime.now(tz=self.start.tzinfo) - self.start)
-        except NameError:
-            raise ImportError('Missing humanize module')
 
     def __str__(self):
         return "{}(title='{}', start={}, end={}, recurring={})" \
@@ -165,6 +165,9 @@ class Calendar(IntervalModule, ColorRangeModule):
     on_leftclick = 'acknowledge'
 
     def init(self):
+        if 'humanize_remaining' in self.format and not humanize_imported:
+            raise ImportError('Missing humanize module')
+
         self.condition = threading.Condition()
         self.thread = threading.Thread(target=self.update_thread, daemon=True)
         self.thread.start()
