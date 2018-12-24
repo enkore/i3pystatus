@@ -1,6 +1,6 @@
 import time
 
-from deluge_client import DelugeRPCClient
+from deluge_client import DelugeRPCClient, FailedToReconnectException
 
 from i3pystatus import IntervalModule, logger
 from i3pystatus.core.util import bytes_info_dict
@@ -60,16 +60,19 @@ class Deluge(IntervalModule):
                 }
                 return
 
-        self.data = self.get_session_statistics()
+        try:
+            self.data = self.get_session_statistics()
 
-        torrents = self.get_torrents_status()
-        if torrents:
-            self.data['num_torrents'] = len(torrents)
+            torrents = self.get_torrents_status()
+            if torrents:
+                self.data['num_torrents'] = len(torrents)
 
-        if 'free_space_bytes' in self.format:
-            self.data['free_space_bytes'] = self.get_free_space(self.path)
-        if 'used_space_bytes' in self.format:
-            self.data['used_space_bytes'] = self.get_path_size(self.path)
+            if 'free_space_bytes' in self.format:
+                self.data['free_space_bytes'] = self.get_free_space(self.path)
+            if 'used_space_bytes' in self.format:
+                self.data['used_space_bytes'] = self.get_path_size(self.path)
+        except FailedToReconnectException:
+            return
 
         self.parse_values(self.data)
 
