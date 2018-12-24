@@ -60,7 +60,7 @@ class Mail(IntervalModule):
         current_unread = 0
         for id, backend in enumerate(self.backends):
             temp = backend.unread or 0
-            unread = unread + backend.unread
+            unread = unread + temp
             if id == self.current_backend:
                 current_unread = temp
 
