@@ -194,6 +194,7 @@ class Weather(IntervalModule):
     backend = None
     interval = 1800
     offline_interval = 300
+    online_interval = None
     refresh_icon = '⟳'
     format = '{current_temp}{temp_unit}[ {update_error}]'
 
@@ -208,10 +209,8 @@ class Weather(IntervalModule):
             user_open(self.backend.forecast_url)
 
     def init(self):
-        if not hasattr(self, 'online_interval'):
+        if self.online_interval is None:
             self.online_interval = int(self.interval)
-        if not hasattr(self, 'offline_interval'):
-            self.offline_interval = int(self.interval)
 
         if self.backend is None:
             raise RuntimeError('A backend is required')
