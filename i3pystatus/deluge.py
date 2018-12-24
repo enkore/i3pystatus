@@ -31,6 +31,7 @@ class Deluge(IntervalModule):
         ('username', 'username to authenticate with deluge'),
         ('password', 'password to authenticate to deluge'),
         ('path', 'override "download path" server-side when checking space used/free'),
+        ('offline_string', 'string to output while unable to connect to deluge daemon')
     )
     required = ('username', 'password')
 
@@ -39,6 +40,7 @@ class Deluge(IntervalModule):
     path = None
     libtorrent_stats = False
     rounding = 2
+    offline_string = 'offline'
 
     format = '⛆{num_torrents} ✇{free_space_bytes}'
 
@@ -50,7 +52,13 @@ class Deluge(IntervalModule):
 
     def run(self):
         if not self.client.connected:
-            self.client.connect()
+            try:
+                self.client.connect()
+            except OSError:
+                self.output = {
+                    'full_text': self.offline_string
+                }
+                return
 
         self.data = self.get_session_statistics()
 
