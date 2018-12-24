@@ -171,6 +171,8 @@ class Weather(IntervalModule):
                          'shown by the module) when refreshing weather data. '
                          '**NOTE:** Depending on how quickly the update is '
                          'performed, the icon may not be displayed.'),
+        ('online_interval', 'seconds between updates when online (defaults to interval)'),
+        ('offline_interval', 'seconds between updates when offline (default: 300)'),
         'format',
     )
     required = ('backend',)
@@ -191,6 +193,7 @@ class Weather(IntervalModule):
     color = None
     backend = None
     interval = 1800
+    offline_interval = 300
     refresh_icon = '⟳'
     format = '{current_temp}{temp_unit}[ {update_error}]'
 
@@ -205,6 +208,11 @@ class Weather(IntervalModule):
             user_open(self.backend.forecast_url)
 
     def init(self):
+        if not hasattr(self, 'online_interval'):
+            self.online_interval = int(self.interval)
+        if not hasattr(self, 'offline_interval'):
+            self.offline_interval = int(self.interval)
+
         if self.backend is None:
             raise RuntimeError('A backend is required')
 
@@ -239,6 +247,10 @@ class Weather(IntervalModule):
         self.thread.start()
 
     def update_thread(self):
+        if internet():
+            self.interval = self.online_interval
+        else:
+            self.interval = self.offline_interval
         try:
             self.check_weather()
             while True:
@@ -253,7 +265,6 @@ class Weather(IntervalModule):
             )
             self.logger.error(msg, exc_info=True)
 
-    @require(internet)
     def check_weather(self):
         '''
         Check the weather using the configured backend
