@@ -166,7 +166,6 @@ class Weathercom(WeatherBackend):
     # This will be set in the init based on the passed location code
     forecast_url = None
 
-    @require(internet)
     def init(self):
         if self.location_code is not None:
             # Ensure that the location code is a string, in the event that a
