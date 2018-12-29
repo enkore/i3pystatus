@@ -7,6 +7,10 @@ class Plexstatus(IntervalModule):
     """
     Displays what is currently being streamed from your Plex Media Server.
 
+    If you dont have an apikey you will need to follow this:
+        https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-account-token-X-Plex-Token
+
+
     .. rubric:: Available formatters
 
     * `{title}`       - title currently being streamed
@@ -18,9 +22,7 @@ class Plexstatus(IntervalModule):
     """
 
     settings = (
-        ("apikey", "Your Plex API authentication key "
-         "(https://support.plex.tv/hc/en-us/articles/204059436-Finding-your-"
-         "account-token-X-Plex-Token) ."),
+        ("apikey", "Your Plex API authentication key"),
         ("address", "Hostname or IP address of the Plex Media Server."),
         ("port", "Port which Plex Media Server is running on."),
         ("interval", "Update interval (in seconds)."),
