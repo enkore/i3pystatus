@@ -15,7 +15,7 @@ class Plexstatus(IntervalModule):
 
     * `{title}`       - title currently being streamed
     * `{platform}`    - plex recognised platform of the streamer
-    * `{product}`     - plex product name on the streamer (Plex Web/Plex Media Player)
+    * `{product}`     - plex product name on the streamer (Plex Web, Plex Media Player)
     * `{address}`     - address of the streamer
     * `{streamer_os}` - operating system on the streaming device
 
@@ -27,8 +27,7 @@ class Plexstatus(IntervalModule):
         ("port", "Port which Plex Media Server is running on."),
         ("interval", "Update interval (in seconds)."),
         ("stream_divider", "divider between stream info when multiple streams are active"),
-        ("format_no_streams", "String that is shown if nothing is being "
-         "streamed."),
+        ("format_no_streams", "String that is shown if nothing is being streamed."),
         "format"
     )
     required = ("apikey", "address")
