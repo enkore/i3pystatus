@@ -71,7 +71,7 @@ class Plexstatus(IntervalModule):
 
         if len(streams) < 1:
             self.output = {} if not self.format_no_streams else {
-                "full_text": self.format_no_stream,
+                "full_text": self.format_no_streams,
                 "color": self.no_stream_color
             }
         else:
