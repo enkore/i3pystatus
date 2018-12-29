@@ -12,7 +12,7 @@ class Plexstatus(IntervalModule):
     * `{title}`  – title currently being streamed
     * `{platform}` – plex recognised platform of the streamer
     * `{product}`  – plex product name on the streamer [Plex Web/Plex Media Player]
-    * `{remote_public_address}` – public address of the streamer
+    * `{address}` – address of the streamer
     * `{streamer_os}`   – operating system on the streaming device
     """
 
@@ -61,7 +61,7 @@ class Plexstatus(IntervalModule):
                 try:
                     info['platform'] = play.attrib['platform']
                     info['product'] = play.attrib['product']
-                    info['remote_public_address'] = play.attrib['remotePublicAddress']
+                    info['address'] = play.attrib['address']
                     info['streamer_os'] = play.attrib['device']
                 except AttributeError as e:
                     self.logger.error(e)
