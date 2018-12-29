@@ -6,6 +6,14 @@ from urllib.request import urlopen
 class Plexstatus(IntervalModule):
     """
     Displays what is currently being streamed from your Plex Media Server.
+
+    .. rubric:: Available formatters
+
+    * `{title}`  – title currently being streamed
+    * `{platform}` – plex recognised platform of the streamer
+    * `{product}`  – plex product name on the streamer [Plex Web/Plex Media Player]
+    * `{remote_public_address}` – public address of the streamer
+    * `{streamer_os}`   – operating system on the streaming device
     """
 
     settings = (
@@ -15,6 +23,7 @@ class Plexstatus(IntervalModule):
         ("address", "Hostname or IP address of the Plex Media Server."),
         ("port", "Port which Plex Media Server is running on."),
         ("interval", "Update interval (in seconds)."),
+        ("stream_divider", "divider between stream info when multiple streams are active"),
         ("format_no_streams", "String that is shown if nothing is being "
          "streamed."),
         "format"
@@ -26,6 +35,7 @@ class Plexstatus(IntervalModule):
     interval = 120
     format_no_streams = None
     format = "{platform}: {title}"
+    stream_divider = ' | '
 
     def run(self):
         PMS_URL = '%s%s%s%s' % ('http://', self.address, ':', self.port)
@@ -35,29 +45,38 @@ class Plexstatus(IntervalModule):
         xml_response = response.read()
         tree = ET.fromstring(xml_response)
 
-        cdict = {'title': '',
-                 'platform': ''}
-
+        streams = []
         for vid in tree.iter('Video'):
+            info = {'title': '',
+                    'platform': '',
+                    'product': '',
+                    'remote_public_address': '',
+                    'streamer_os': ''}
             try:
-                cdict['title'] = vid.attrib['title']
-            except AttributeError:
-                pass
+                info['title'] = vid.attrib['title']
+            except AttributeError as e:
+                self.logger.error(e)
 
-        for play in tree.iter('Player'):
-            try:
-                cdict['platform'] = play.attrib['platform']
-            except AttributeError:
-                pass
+            for play in vid.iter('Player'):
+                try:
+                    info['platform'] = play.attrib['platform']
+                    info['product'] = play.attrib['product']
+                    info['remote_public_address'] = play.attrib['remotePublicAddress']
+                    info['streamer_os'] = play.attrib['device']
+                except AttributeError as e:
+                    self.logger.error(e)
+            streams.append(info)
 
-        self.data = cdict
-        if not cdict['title'] or not cdict['platform']:
+        self.data = streams
+
+        if len(streams) < 1:
             self.output = {} if not self.format_no_streams else {
                 "full_text": self.format_no_stream,
                 "color": self.no_stream_color
             }
         else:
+            full_text = self.stream_divider.join(self.format.format(**s) for s in streams)
             self.output = {
-                "full_text": self.format.format(**cdict),
+                "full_text": full_text,
                 "color": self.color
             }
