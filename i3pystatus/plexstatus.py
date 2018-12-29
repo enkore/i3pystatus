@@ -9,11 +9,12 @@ class Plexstatus(IntervalModule):
 
     .. rubric:: Available formatters
 
-    * `{title}`  – title currently being streamed
-    * `{platform}` – plex recognised platform of the streamer
-    * `{product}`  – plex product name on the streamer (Plex Web/Plex Media Player)
-    * `{address}` – address of the streamer
-    * `{streamer_os}`   – operating system on the streaming device
+    * `{title}`       - title currently being streamed
+    * `{platform}`    - plex recognised platform of the streamer
+    * `{product}`     - plex product name on the streamer (Plex Web/Plex Media Player)
+    * `{address}`     - address of the streamer
+    * `{streamer_os}` - operating system on the streaming device
+
     """
 
     settings = (
