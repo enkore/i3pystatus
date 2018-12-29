@@ -33,7 +33,7 @@ class Plexstatus(IntervalModule):
     no_stream_color = "#FF0000"  # red
     port = 32400
     interval = 120
-    format_no_streams = 'No Streams'
+    format_no_streams = None
     format = "{platform}: {title}"
     stream_divider = '-'
 
