@@ -358,6 +358,24 @@ If ``self`` is needed to access the calling module, the
         on_rightclick = change_text,
         )
 
+If the module your attaching the callback too is not a subclass of
+:py:class:`.IntervalModule` you will need to invoke ``init()``.
+using :py:class:`.Uname` as an example, the following code would suffice.
+
+.. code:: python
+
+    from i3pystatus import get_module
+
+    @get_module
+    def sys_info(self):
+        if self.format == "{nodename}":
+                self.format = "{sysname} {release} on {machine}"
+            else:
+                self.format = "{nodename}"
+            self.init()
+
+    status.register("uname", format="{nodename}", on_rightclick=sys_info)
+
 You can also create callbacks with parameters.
 
 .. code:: python
