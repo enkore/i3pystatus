@@ -426,6 +426,8 @@ Some possible uses for these attributes are:
     align the text if its width is shorter than `minimal_width`.
 *   `separator` and `separator_block_width` can be used to remove the
     vertical bar that is separating modules.
+*   `background` can be used to set an alternative background color for the
+    module. supports RGBA if your i3bar version does.
 *   `markup` can be set to `"none"` or `"pango"`.
     `Pango markup
     <https://developer.gnome.org/pango/stable/PangoMarkupFormat.html>`_
