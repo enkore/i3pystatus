@@ -11,6 +11,11 @@ tools for this which make this even easier:
 - Common base classes: :py:class:`.Module` for everything and
   :py:class:`.IntervalModule` specifically for the aforementioned
   usecase of updating stuff periodically.
+
+  the :py:class:`.Module` class inherits a `logger` attribute and as such
+  all logging should be implemented via `self.logger.<level>` rather then
+  initializing a new logger in the module.
+
 - Settings (already built into above classes) allow you to easily
   specify user-modifiable attributes of your class for configuration.
 
