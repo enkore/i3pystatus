@@ -564,9 +564,9 @@ def make_glyph(number, glyphs="▁▂▃▄▅▆▇█", lower_bound=0, upper_b
     if lower_bound >= upper_bound:
         raise Exception("Invalid upper/lower bounds")
     elif number <= lower_bound:
-            return glyphs[0]
+        return glyphs[0]
     elif number >= upper_bound:
-            return glyphs[-1]
+        return glyphs[-1]
 
     if enable_boundary_glyphs:
         # Trim first and last items from glyphs as boundary conditions already

@@ -115,18 +115,18 @@ class SettingsBase(metaclass=SettingsBaseMeta):
         user_backend = settings_source.get('keyring_backend')
         found_settings = dict()
         for setting_name in self.__PROTECTED_SETTINGS:
-                # Nothing to do if the setting is already defined.
-                if settings_source.get(setting_name):
-                    continue
+            # Nothing to do if the setting is already defined.
+            if settings_source.get(setting_name):
+                continue
 
-                setting = None
-                identifier = "%s.%s" % (self.__name__, setting_name)
-                if hasattr(self, 'required') and setting_name in getattr(self, 'required'):
-                    setting = self.get_setting_from_keyring(identifier, user_backend)
-                elif hasattr(self, setting_name):
-                    setting = self.get_setting_from_keyring(identifier, user_backend)
-                if setting:
-                    found_settings.update({setting_name: setting})
+            setting = None
+            identifier = "%s.%s" % (self.__name__, setting_name)
+            if hasattr(self, 'required') and setting_name in getattr(self, 'required'):
+                setting = self.get_setting_from_keyring(identifier, user_backend)
+            elif hasattr(self, setting_name):
+                setting = self.get_setting_from_keyring(identifier, user_backend)
+            if setting:
+                found_settings.update({setting_name: setting})
         return found_settings
 
     def get_setting_from_keyring(self, setting_identifier, keyring_backend=None):
