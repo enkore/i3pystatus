@@ -358,6 +358,24 @@ If ``self`` is needed to access the calling module, the
         on_rightclick = change_text,
         )
 
+If the module your attaching the callback too is not a subclass of
+:py:class:`.IntervalModule` you will need to invoke ``init()``.
+using :py:class:`.Uname` as an example, the following code would suffice.
+
+.. code:: python
+
+    from i3pystatus import get_module
+
+    @get_module
+    def sys_info(self):
+        if self.format == "{nodename}":
+                self.format = "{sysname} {release} on {machine}"
+            else:
+                self.format = "{nodename}"
+            self.init()
+
+    status.register("uname", format="{nodename}", on_rightclick=sys_info)
+
 You can also create callbacks with parameters.
 
 .. code:: python
@@ -426,6 +444,8 @@ Some possible uses for these attributes are:
     align the text if its width is shorter than `minimal_width`.
 *   `separator` and `separator_block_width` can be used to remove the
     vertical bar that is separating modules.
+*   `background` can be used to set an alternative background color for the
+    module. supports RGBA if your i3bar version does.
 *   `markup` can be set to `"none"` or `"pango"`.
     `Pango markup
     <https://developer.gnome.org/pango/stable/PangoMarkupFormat.html>`_

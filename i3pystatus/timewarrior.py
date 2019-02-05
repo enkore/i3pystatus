@@ -49,9 +49,9 @@ class Timewarrior(IntervalModule):
         self.loadTrack()
 
         if 'end' in self.track and self.enable_continue:
-                subprocess.check_output(['timew', 'continue'])
+            subprocess.check_output(['timew', 'continue'])
         elif self.enable_stop:
-                subprocess.check_output(['timew', 'stop'])
+            subprocess.check_output(['timew', 'stop'])
 
     def run(self):
         self.loadTrack()

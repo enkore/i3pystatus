@@ -1,3 +1,4 @@
+import bisect
 import configparser
 import os
 import re
@@ -161,13 +162,23 @@ class BatteryChecker(IntervalModule):
             format='{battery_ident}: [{status} ]{percentage_design:.2f}%',
             alert=True,
             alert_percentage=15,
-            status = {
+            status={
                 'DPL': 'DPL',
                 'CHR': 'CHR',
                 'DIS': 'DIS',
                 'FULL': '',
             }
         )
+
+        # status.register(
+        #     'battery',
+        #     format='{status} {percentage:.0f}%',
+        #     levels={
+        #         25: "<=25",
+        #         50: "<=50",
+        #         75: "<=75",
+        #     },
+        # )
 
         status.run()
 
@@ -188,6 +199,7 @@ class BatteryChecker(IntervalModule):
         ("base_path", "Override the default base path for searching for batteries"),
         ("battery_prefix", "Override the default battery prefix"),
         ("status", "A dictionary mapping ('DPL', 'DIS', 'CHR', 'FULL') to alternative names"),
+        ("levels", "A dictionary mapping percentages of charge levels to corresponding names."),
         ("color", "The text color"),
         ("full_color", "The full color"),
         ("charging_color", "The charging color"),
@@ -207,6 +219,7 @@ class BatteryChecker(IntervalModule):
         "DIS": "DIS",
         "FULL": "FULL",
     }
+    levels = None
     not_present_text = "Battery {battery_ident} not present"
 
     alert = False
@@ -362,7 +375,14 @@ class BatteryChecker(IntervalModule):
                 self.notification.update(title=title,
                                          body=body)
 
-        fdict["status"] = self.status[fdict["status"]]
+        if self.levels and fdict['status'] == 'DIS':
+            self.levels.setdefault(0, self.status.get('DPL', 'DPL'))
+            self.levels.setdefault(100, self.status.get('FULL', 'FULL'))
+            keys = sorted(self.levels.keys())
+            index = bisect.bisect_left(keys, int(fdict['percentage']))
+            fdict["status"] = self.levels[keys[index]]
+        else:
+            fdict["status"] = self.status[fdict["status"]]
 
         self.data = fdict
         self.output = {

@@ -136,6 +136,20 @@ def convert_position(pos, json):
     return pos
 
 
+def bytes_info_dict(in_bytes):
+    power = 2**10  # 2 ** 10 == 1024
+    n = 0
+    pow_dict = {0: '', 1: 'K', 2: 'M', 3: 'G', 4: 'T'}
+    out_bytes = int(in_bytes)
+    while out_bytes > power:
+        out_bytes /= power
+        n += 1
+    return {
+        'value': out_bytes,
+        'unit': '{prefix}B'.format(prefix=pow_dict[n])
+    }
+
+
 def flatten(l):
     """
     Flattens a hierarchy of nested lists into a single list containing all elements in order
@@ -550,9 +564,9 @@ def make_glyph(number, glyphs="▁▂▃▄▅▆▇█", lower_bound=0, upper_b
     if lower_bound >= upper_bound:
         raise Exception("Invalid upper/lower bounds")
     elif number <= lower_bound:
-            return glyphs[0]
+        return glyphs[0]
     elif number >= upper_bound:
-            return glyphs[-1]
+        return glyphs[-1]
 
     if enable_boundary_glyphs:
         # Trim first and last items from glyphs as boundary conditions already
