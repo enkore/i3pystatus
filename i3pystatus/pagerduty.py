@@ -37,7 +37,7 @@ class PagerDuty(IntervalModule):
                     '`https://subdomain.pagerduty.com/users/<user_id>')
     )
 
-    required = ('api_key', )
+    required = ['api_key']
 
     format = '{num_triggered_incidents} triggered  {num_acknowledged_incidents} acknowledged'
     api_key = None
