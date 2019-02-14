@@ -23,8 +23,8 @@ class PagerDuty(IntervalModule):
 
         status.register(
             'pagerduty',
-            api_key=mah_api_key,
-            user_id=LKJ19QW
+            api_key='mah_api_key',
+            user_id='LKJ19QW'
         )
     """
 
@@ -34,7 +34,7 @@ class PagerDuty(IntervalModule):
         ('color', 'module text color'),
         ('interval', 'refresh interval'),
         ('user_id', 'your pagerduty user id, shows up in the url when viewing your profile '
-                    '`https://subdomain.pagerduty.com/users/<user_id>')
+                    '`https://subdomain.pagerduty.com/users/<user_id>`')
     )
 
     required = ['api_key']
