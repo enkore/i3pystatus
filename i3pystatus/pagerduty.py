@@ -17,7 +17,7 @@ class PagerDuty(IntervalModule):
     * `{num_acknowledged_incidents}` - as it sounds
     * `{num_triggered_incidents}` - number of unacknowledged incidents
 
-    Example
+    Example:
 
     .. code-block:: python
 
@@ -26,8 +26,8 @@ class PagerDuty(IntervalModule):
             api_key=mah_api_key,
             user_id=LKJ19QW
         )
-
     """
+
     settings = (
         'format',
         'api_key',
