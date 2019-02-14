@@ -30,9 +30,9 @@ class PagerDuty(IntervalModule):
 
     settings = (
         'format',
-        'api_key',
-        'color',
-        'interval',
+        ('api_key', 'pagerduty api key'),
+        ('color', 'module text color'),
+        ('interval', 'refresh interval'),
         ('user_id', 'your pagerduty user id, shows up in the url when viewing your profile '
                     '`https://subdomain.pagerduty.com/users/<user_id>')
     )
