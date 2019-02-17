@@ -61,6 +61,7 @@ MOCK_MODULES = [
     "requests.packages",
     "requests.packages.urllib3",
     "requests.packages.urllib3.response",
+    'pypd',
     'travispy',
     "lxml.etree",
     "requests.adapters",
