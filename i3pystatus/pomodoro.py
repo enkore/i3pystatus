@@ -16,6 +16,16 @@ class Pomodoro(IntervalModule):
 
     Left click starts/restarts timer.
     Right click stops it.
+
+    Example color settings.
+
+    .. code-block:: python
+
+        color_map = {
+            'stopped': '#2ECCFA',
+            'running': '#FFFF00',
+            'break': '#37FF00'
+        }
     """
 
     settings = (
@@ -27,13 +37,22 @@ class Pomodoro(IntervalModule):
         ('long_break_duration', 'Long break duration in seconds'),
         ('short_break_count', 'Short break count before first long break'),
         ('format', 'format string, available formatters: current_pomodoro, '
-                   'total_pomodoro, time')
+                   'total_pomodoro, time'),
+        ('inactive_format', 'format string to display when no timer is running'),
+        ('color', 'dictionary containing a mapping of statuses to colours')
     )
-    required = ('sound',)
 
-    color_stopped = '#2ECCFA'
-    color_running = '#FFFF00'
-    color_break = '#37FF00'
+    inactive_format = 'Start Pomodoro'
+
+    color_map = {
+        'stopped': '#2ECCFA',
+        'running': '#FFFF00',
+        'break': '#37FF00'
+    }
+
+    color = None
+    sound = None
+
     interval = 1
     short_break_count = 3
     format = '☯ {current_pomodoro}/{total_pomodoro} {time}'
@@ -51,6 +70,9 @@ class Pomodoro(IntervalModule):
         self.current_pomodoro = 0
         self.total_pomodoro = self.short_break_count + 1  # and 1 long break
         self.time = None
+
+        if self.color is not None and type(self.color) == dict:
+            self.color_map.update(self.color)
 
     def run(self):
         if self.time and datetime.utcnow() >= self.time:
@@ -80,11 +102,11 @@ class Pomodoro(IntervalModule):
                 'total_pomodoro': self.total_pomodoro
             }
 
-            color = self.color_running if self.state == RUNNING else self.color_break
+            color = self.color_map['running'] if self.state == RUNNING else self.color_map['break']
             text = self.format.format(**sdict)
         else:
-            text = 'Start pomodoro'
-            color = self.color_stopped
+            text = self.inactive_format
+            color = self.color_map['stopped']
 
         self.output = {
             'full_text': text,
@@ -104,7 +126,8 @@ class Pomodoro(IntervalModule):
         notification = DesktopNotification(title='Alarm!', body=text)
         notification.display()
 
-        subprocess.Popen(['aplay',
-                          self.sound,
-                          '-q'],
-                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if self.sound is not None:
+            subprocess.Popen(['aplay',
+                              self.sound,
+                              '-q'],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
