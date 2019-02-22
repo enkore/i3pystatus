@@ -389,7 +389,7 @@ class Network(IntervalModule, ColorRangeModule):
 
         self.graph_direction = self.graph_direction.lower()
         if self.graph_direction not in ('left-to-right', 'right-to-left'):
-            raise Exception("Invalid direction '%s'." % self.direction)
+            raise Exception("Invalid direction '%s'." % self.graph_direction)
 
     def cycle_interface(self, increment=1):
         """Cycle through available interfaces in `increment` steps. Sign indicates direction."""
