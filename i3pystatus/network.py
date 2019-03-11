@@ -486,7 +486,6 @@ class Network(IntervalModule, ColorRangeModule):
             format_values["bytes_recv"] = color_template.format(c_recv, format_values["bytes_recv"])
             format_values["bytes_sent"] = color_template.format(c_sent, format_values["bytes_sent"])
 
-
         self.data = format_values
         self.output = {
             "full_text": formatp(format_str, **format_values).strip(),
