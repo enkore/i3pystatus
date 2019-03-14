@@ -510,6 +510,7 @@ def make_vertical_bar(percentage, width=1):
     """
     bar = ' _▁▂▃▄▅▆▇█'
     percentage //= 10
+    percentage = int(percentage)
     if percentage < 0:
         output = bar[0]
     elif percentage >= len(bar):
