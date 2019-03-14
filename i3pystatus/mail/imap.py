@@ -1,3 +1,5 @@
+from i3pystatus.core.util import require, internet
+
 try:
     from imaplib2.imaplib2 import IMAP4, IMAP4_SSL
     use_idle = True
@@ -88,6 +90,7 @@ class IMAP(Backend):
         self.last = len(self.connection.search(None, "UnSeen")[1][0].split())
 
     @property
+    @require(internet)
     def unread(self):
         if not use_idle:
             with self.ensure_connection():

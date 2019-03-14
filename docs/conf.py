@@ -33,6 +33,7 @@ MOCK_MODULES = [
     "requests.exceptions",
     "bs4",
     "dota2py",
+    'deluge_client',
     "novaclient",
     "speedtest",
     "pyzabbix",
@@ -43,6 +44,7 @@ MOCK_MODULES = [
     "httplib2",
     "oauth2client",
     "apiclient",
+    "googleapiclient",
     "googleapiclient.errors",
     "vlc",
     "dateutil.tz",
@@ -59,9 +61,12 @@ MOCK_MODULES = [
     "requests.packages",
     "requests.packages.urllib3",
     "requests.packages.urllib3.response",
+    'pypd',
+    'travispy',
     "lxml.etree",
     "requests.adapters",
-    "exchangelib"
+    "exchangelib",
+    "soco"
 ]
 
 for mod_name in MOCK_MODULES:

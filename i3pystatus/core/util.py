@@ -136,6 +136,20 @@ def convert_position(pos, json):
     return pos
 
 
+def bytes_info_dict(in_bytes):
+    power = 2**10  # 2 ** 10 == 1024
+    n = 0
+    pow_dict = {0: '', 1: 'K', 2: 'M', 3: 'G', 4: 'T'}
+    out_bytes = int(in_bytes)
+    while out_bytes > power:
+        out_bytes /= power
+        n += 1
+    return {
+        'value': out_bytes,
+        'unit': '{prefix}B'.format(prefix=pow_dict[n])
+    }
+
+
 def flatten(l):
     """
     Flattens a hierarchy of nested lists into a single list containing all elements in order
@@ -271,7 +285,7 @@ def formatp(string, **kwargs):
         return subtree
 
     def merge_tree(items):
-        return "".join(flatten(items)).replace("\]", "]").replace("\[", "[")
+        return "".join(flatten(items)).replace(r"\]", "]").replace(r"\[", "[")
 
     stack = build_stack(string)
     tree = build_tree(stack, 0)
@@ -521,6 +535,53 @@ def make_bar(percentage):
         result = result + bars[ones]
     result = result + (10 - len(result)) * ' '
     return result
+
+
+def make_glyph(number, glyphs="▁▂▃▄▅▆▇█", lower_bound=0, upper_bound=100, enable_boundary_glyphs=False):
+    """
+    Returns a single glyph from the list of glyphs provided relative to where
+    the number is in the range (by default a percentage value is expected).
+
+    This can be used to create an icon based representation of a value with an
+    arbitrary number of glyphs (e.g. 4 different battery status glyphs for
+    battery percentage level).
+
+    :param number: The number being represented.  By default a percentage value\
+    between 0 and 100 (but any range can be defined with lower_bound and\
+    upper_bound).
+    :param glyphs: Either a string of glyphs, or an array of strings.  Using an array\
+    of strings allows for additional pango formatting to be applied such that\
+    different colors could be shown for each glyph).
+    :param lower_bound:  A custom lower bound value for the range.
+    :param upper_bound:  A custom upper bound value for the range.
+    :param enable_boundary_glyphs: Whether the first and last glyphs should be used\
+    for the special case of the number being <= lower_bound or >= upper_bound\
+    respectively.
+    :returns: The glyph found to represent the number
+    """
+
+    # Handle edge cases first
+    if lower_bound >= upper_bound:
+        raise Exception("Invalid upper/lower bounds")
+    elif number <= lower_bound:
+        return glyphs[0]
+    elif number >= upper_bound:
+        return glyphs[-1]
+
+    if enable_boundary_glyphs:
+        # Trim first and last items from glyphs as boundary conditions already
+        # handled
+        glyphs = glyphs[1:-1]
+
+    # Determine a value 0 - 1 that represents the position in the range
+    adjusted_value = (number - lower_bound) / (upper_bound - lower_bound)
+
+    # Determine the closest glyph to show
+    # As we have positive indices, we can use int for floor rounding
+    # Adjusted_value should always be < 1
+    glyph_index = int(len(glyphs) * adjusted_value)
+
+    return glyphs[glyph_index]
 
 
 def user_open(url_or_command):

@@ -17,6 +17,7 @@ class MPD(IntervalModule):
     * `{album}` — (the album of the current song, can be an empty string \
 (e.g. for online streams))
     * `{artist}` — (can be empty, too)
+    * `{album_artist}` — (can be empty)
     * `{filename}` — (file name with out extension and path; empty unless \
 title is empty)
     * `{song_elapsed}` — (Position in the currently playing song, uses \
@@ -95,7 +96,7 @@ cleartext to the server.)"),
     color_map = {}
     max_field_len = 25
     max_len = 100
-    truncate_fields = ("title", "album", "artist")
+    truncate_fields = ("title", "album", "artist", "album_artist")
     hide_inactive = False
     on_leftclick = "switch_playpause"
     on_rightclick = "next_song"
@@ -151,6 +152,7 @@ cleartext to the server.)"),
             "title": currentsong.get("Title", ""),
             "album": currentsong.get("Album", ""),
             "artist": currentsong.get("Artist", ""),
+            "album_artist": currentsong.get("AlbumArtist", ""),
             "song_length": TimeWrapper(currentsong.get("Time", 0)),
             "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
             "bitrate": int(status.get("bitrate", 0)),
@@ -171,8 +173,8 @@ cleartext to the server.)"),
         full_text = formatp(self.format, **fdict).strip()
         full_text_len = len(full_text)
         if full_text_len > self.max_len and self.max_len > 0:
-            shrink = floor((self.max_len - full_text_len) /
-                           len(self.truncate_fields)) - 1
+            shrink = floor((self.max_len - full_text_len)
+                           / len(self.truncate_fields)) - 1
 
             for key in self.truncate_fields:
                 fdict[key] = fdict[key][:shrink] + "…"

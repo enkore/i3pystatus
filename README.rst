@@ -1,9 +1,6 @@
 i3pystatus
 ==========
 
-.. image:: http://golem.enkore.de/job/i3pystatus-dev/badge/icon
-    :target: http://golem.enkore.de/job/i3pystatus-dev/
-
 .. image:: https://travis-ci.org/enkore/i3pystatus.svg?branch=master
     :target: https://travis-ci.org/enkore/i3pystatus
 

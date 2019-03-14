@@ -1,4 +1,5 @@
 import inspect
+import re
 import threading
 from abc import abstractmethod
 from datetime import datetime, timedelta
@@ -6,6 +7,13 @@ from datetime import datetime, timedelta
 from i3pystatus import IntervalModule, formatp, SettingsBase
 from i3pystatus.core.color import ColorRangeModule
 from i3pystatus.core.desktop import DesktopNotification
+
+humanize_imported = False
+try:
+    import humanize
+    humanize_imported = True
+except ImportError:
+    pass
 
 
 def strip_microseconds(delta):
@@ -49,7 +57,8 @@ class CalendarEvent:
         """
         event_dict = dict(
             title=self.title,
-            remaining=self.time_remaining
+            remaining=self.time_remaining,
+            humanize_remaining=self.humanize_time_remaining,
         )
 
         def is_formatter(x):
@@ -62,6 +71,11 @@ class CalendarEvent:
     @property
     def time_remaining(self):
         return strip_microseconds(self.start - datetime.now(tz=self.start.tzinfo))
+
+    @property
+    def humanize_time_remaining(self):
+        if humanize_imported:
+            return humanize.naturaltime(datetime.now(tz=self.start.tzinfo) - self.start)
 
     def __str__(self):
         return "{}(title='{}', start={}, end={}, recurring={})" \
@@ -111,14 +125,19 @@ class Calendar(IntervalModule, ColorRangeModule):
 
     * {title} - the title or summary of the event
     * {remaining_time} - how long until this event is due
+    * {humanize_remaining} - how long until this event is due in human readable format
 
     Additional formatters may be provided by the backend, consult their documentation for details.
+
+    .. note:: Optionally requires `humanize` to display time in human readable format.
     """
 
     settings = (
         ('format', 'Format string to display in the bar'),
         ('backend', 'Backend to use for collecting calendar events'),
         ('skip_recurring', 'Whether or not to skip recurring events'),
+        ('skip_all_day', 'Whether or not to skip all day events'),
+        ('skip_regex', 'Skip events with titles that match this regex'),
         ('update_interval', "How often in seconds to call the backend's update method"),
         ('urgent_seconds', "When within this many seconds of the event, set the urgent flag"),
         ('urgent_blink', 'Whether or not to blink when within urgent_seconds of the event'),
@@ -128,6 +147,8 @@ class Calendar(IntervalModule, ColorRangeModule):
     required = ('backend',)
 
     skip_recurring = False
+    skip_all_day = False
+    skip_regex = None
     interval = 1
     backend = None
     update_interval = 600
@@ -144,6 +165,9 @@ class Calendar(IntervalModule, ColorRangeModule):
     on_leftclick = 'acknowledge'
 
     def init(self):
+        if 'humanize_remaining' in self.format and not humanize_imported:
+            raise ImportError('Missing humanize module')
+
         self.condition = threading.Condition()
         self.thread = threading.Thread(target=self.update_thread, daemon=True)
         self.thread.start()
@@ -160,7 +184,11 @@ class Calendar(IntervalModule, ColorRangeModule):
         self.backend.update()
 
         def valid_event(ev):
+            if self.skip_all_day and not isinstance(ev.start, datetime):
+                return False
             if self.skip_recurring and ev.recurring:
+                return False
+            if self.skip_regex and re.search(self.skip_regex, ev.title) is not None:
                 return False
             elif ev.time_remaining < timedelta(seconds=0):
                 return False

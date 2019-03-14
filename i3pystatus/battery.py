@@ -1,3 +1,4 @@
+import bisect
 import configparser
 import os
 import re
@@ -5,7 +6,7 @@ import re
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.command import run_through_shell
 from i3pystatus.core.desktop import DesktopNotification
-from i3pystatus.core.util import lchop, TimeWrapper, make_bar, make_vertical_bar
+from i3pystatus.core.util import lchop, TimeWrapper, make_bar, make_glyph
 
 
 class UEventParser(configparser.ConfigParser):
@@ -141,6 +142,7 @@ class BatteryChecker(IntervalModule):
     * `{battery_ident}` — the same as the setting
     * `{bar}` —bar displaying the relative percentage graphically
     * `{bar_design}` —bar displaying the absolute percentage graphically
+    * `{glyph}` — A single character or string (selected from 'glyphs') representing the current battery percentage
 
     This module supports the :ref:`formatp <formatp>` extended string format
     syntax. By setting the ``FULL`` status to an empty string, and including
@@ -160,13 +162,23 @@ class BatteryChecker(IntervalModule):
             format='{battery_ident}: [{status} ]{percentage_design:.2f}%',
             alert=True,
             alert_percentage=15,
-            status = {
+            status={
                 'DPL': 'DPL',
                 'CHR': 'CHR',
                 'DIS': 'DIS',
                 'FULL': '',
             }
         )
+
+        # status.register(
+        #     'battery',
+        #     format='{status} {percentage:.0f}%',
+        #     levels={
+        #         25: "<=25",
+        #         50: "<=50",
+        #         75: "<=75",
+        #     },
+        # )
 
         status.run()
 
@@ -187,6 +199,7 @@ class BatteryChecker(IntervalModule):
         ("base_path", "Override the default base path for searching for batteries"),
         ("battery_prefix", "Override the default battery prefix"),
         ("status", "A dictionary mapping ('DPL', 'DIS', 'CHR', 'FULL') to alternative names"),
+        ("levels", "A dictionary mapping percentages of charge levels to corresponding names."),
         ("color", "The text color"),
         ("full_color", "The full color"),
         ("charging_color", "The charging color"),
@@ -195,6 +208,7 @@ class BatteryChecker(IntervalModule):
         ("not_present_text",
          "The text to display when the battery is not present. Provides {battery_ident} as formatting option"),
         ("no_text_full", "Don't display text when battery is full - 100%"),
+        ("glyphs", "Arbitrarily long string of characters (or array of strings) to represent battery charge percentage"),
     )
 
     battery_ident = "ALL"
@@ -205,6 +219,7 @@ class BatteryChecker(IntervalModule):
         "DIS": "DIS",
         "FULL": "FULL",
     }
+    levels = None
     not_present_text = "Battery {battery_ident} not present"
 
     alert = False
@@ -220,6 +235,7 @@ class BatteryChecker(IntervalModule):
     critical_color = "#ff0000"
     not_present_color = "#ffffff"
     no_text_full = False
+    glyphs = "▁▂▃▄▅▆▇█"
 
     battery_prefix = 'BAT'
     base_path = '/sys/class/power_supply'
@@ -318,6 +334,7 @@ class BatteryChecker(IntervalModule):
             "percentage_design": self.percentage(batteries, design=True),
             "consumption": self.consumption(batteries),
             "remaining": TimeWrapper(0, "%E%h:%M"),
+            "glyph": make_glyph(self.percentage(batteries), self.glyphs),
             "bar": make_bar(self.percentage(batteries)),
             "bar_design": make_bar(self.percentage(batteries, design=True)),
             "vertical_bar": make_vertical_bar(self.percentage(batteries)),
@@ -360,7 +377,14 @@ class BatteryChecker(IntervalModule):
                 self.notification.update(title=title,
                                          body=body)
 
-        fdict["status"] = self.status[fdict["status"]]
+        if self.levels and fdict['status'] == 'DIS':
+            self.levels.setdefault(0, self.status.get('DPL', 'DPL'))
+            self.levels.setdefault(100, self.status.get('FULL', 'FULL'))
+            keys = sorted(self.levels.keys())
+            index = bisect.bisect_left(keys, int(fdict['percentage']))
+            fdict["status"] = self.levels[keys[index]]
+        else:
+            fdict["status"] = self.status[fdict["status"]]
 
         self.data = fdict
         self.output = {

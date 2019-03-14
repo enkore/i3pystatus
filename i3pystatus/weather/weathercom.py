@@ -81,7 +81,7 @@ class WeathercomHTMLParser(HTMLParser):
                             structural changes to this data.
                             '''
                             if isinstance(data, dict):
-                                if 'observation' in data and 'dailyForecast' in data:
+                                if 'Observation' in data and 'DailyForecast' in data:
                                     return data
                                 else:
                                     for key in data:
@@ -166,7 +166,6 @@ class Weathercom(WeatherBackend):
     # This will be set in the init based on the passed location code
     forecast_url = None
 
-    @require(internet)
     def init(self):
         if self.location_code is not None:
             # Ensure that the location code is a string, in the event that a
@@ -214,7 +213,15 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                observed = self.parser.weather_data['observation']['data']['vt1observation']
+                observed = self.parser.weather_data['Observation']
+                # Observation data stored under a sub-key containing the
+                # lat/long coordinates. For example:
+                #
+                # geocode:41.77,-88.35:language:en-US:units:e
+                #
+                # Since this is the only key under "Observation", we can just
+                # use next(iter(observed)) to get it.
+                observed = observed[next(iter(observed))]['data']['vt1observation']
             except KeyError:
                 self.logger.error(
                     'Failed to retrieve current conditions from API response. '
@@ -224,7 +231,11 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                forecast = self.parser.weather_data['dailyForecast']['data']['vt1dailyForecast'][0]
+                forecast = self.parser.weather_data['DailyForecast']
+                # Same as above, use next(iter(forecast)) to drill down to the
+                # correct nested dict level.
+                forecast = forecast[next(iter(forecast))]
+                forecast = forecast['data']['vt1dailyForecast'][0]
             except (IndexError, KeyError):
                 self.logger.error(
                     'Failed to retrieve forecast data from API response. '
@@ -234,7 +245,11 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                self.city_name = self.parser.weather_data['location']['prsntNm']
+                self.city_name = self.parser.weather_data['Location']
+                # Again, same technique as above used to get down to the
+                # correct nested dict level.
+                self.city_name = self.city_name[next(iter(self.city_name))]
+                self.city_name = self.city_name['data']['prsntNm']
             except KeyError:
                 self.logger.warning(
                     'Failed to get city name from API response, falling back '
