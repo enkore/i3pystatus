@@ -441,8 +441,6 @@ class Network(IntervalModule, ColorRangeModule):
                     per_sent = network_usage["bytes_sent"] / self.sent_limit
                     c_recv = self.get_gradient(int(per_recv * 100), self.colors, 100)
                     c_sent = self.get_gradient(int(per_sent * 100), self.colors, 100)
-                    format_values["bytes_recv"] = color_template.format(c_recv, network_usage["bytes_recv"])
-                    format_values["bytes_sent"] = color_template.format(c_sent, network_usage["bytes_sent"])
                     format_values['network_graph_recv'] = color_template.format(c_recv, format_values["network_graph_recv"])
                     format_values['network_graph_sent'] = color_template.format(c_sent, format_values["network_graph_sent"])
                 else:
@@ -484,6 +482,9 @@ class Network(IntervalModule, ColorRangeModule):
                 else:
                     format_values[metric] = '{:.{round}f}'.format(format_values[metric] / self.divisor,
                                                                   round=self.round_size)
+        if self.dynamic_color and self.separate_color and self.pango_enabled:
+            format_values["bytes_recv"] = color_template.format(c_recv, format_values["bytes_recv"])
+            format_values["bytes_sent"] = color_template.format(c_sent, format_values["bytes_sent"])
 
         self.data = format_values
         self.output = {
