@@ -300,6 +300,7 @@ class Network(IntervalModule, ColorRangeModule):
         ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
         ("graph_width", "Width of the network traffic graph"),
         ("graph_style", "Graph style ('blocks', 'braille-fill', 'braille-peak', or 'braille-snake')"),
+        ("graph_direction", 'left-to-right/right-to-left'),
         ("separate_color", "display recv/send color separate in dynamic color mode."
                            "Note: only network speed formatters will display with range color "),
         ("coloring_type", "Whether to use the sent or received kb/s for dynamic coloring with non-separate colors. "
@@ -315,7 +316,7 @@ class Network(IntervalModule, ColorRangeModule):
         ("unknown_up", "If the interface is in unknown state, display it as if it were up"),
         ("next_if_down", "Change to next interface if current one is down"),
         ("detect_active", "Attempt to detect the active interface"),
-        ("auto_units", "foo"),
+        ("auto_units", "if true, unit of measurement is switched automatically (KB/MB/GB/...)"),
     )
 
     # Continue processing statistics when i3bar is hidden.
@@ -332,6 +333,7 @@ class Network(IntervalModule, ColorRangeModule):
     coloring_type = 'recv'
     graph_width = 15
     graph_style = 'blocks'
+    graph_direction = 'left-to-right'
     recv_limit = 2048
     sent_limit = 1024
     separate_color = False
@@ -385,6 +387,10 @@ class Network(IntervalModule, ColorRangeModule):
         self.sent_limit *= 1024
         self.recv_limit *= 1024
 
+        self.graph_direction = self.graph_direction.lower()
+        if self.graph_direction not in ('left-to-right', 'right-to-left'):
+            raise Exception("Invalid direction '%s'." % self.graph_direction)
+
     def cycle_interface(self, increment=1):
         """Cycle through available interfaces in `increment` steps. Sign indicates direction."""
         interfaces = [i for i in netifaces.interfaces() if i not in self.ignore_interfaces]
@@ -402,13 +408,21 @@ class Network(IntervalModule, ColorRangeModule):
         # Cycle array by inserting at the start and chopping off the last element
         self.kbs_recv_arr.insert(0, kbs)
         self.kbs_recv_arr = self.kbs_recv_arr[:self.graph_width]
-        return make_graph(self.kbs_recv_arr, 0.0, limit, self.graph_style)
+        graph = make_graph(self.kbs_recv_arr, 0.0, limit, self.graph_style)
+        if self.graph_direction == 'right-to-left':
+            return graph[::-1]
+        else:
+            return graph
 
     def get_network_graph_sent(self, kbs, limit):
         # Cycle array by inserting at the start and chopping off the last element
         self.kbs_sent_arr.insert(0, kbs)
         self.kbs_sent_arr = self.kbs_sent_arr[:self.graph_width]
-        return make_graph(self.kbs_sent_arr, 0.0, limit, self.graph_style)
+        graph = make_graph(self.kbs_sent_arr, 0.0, limit, self.graph_style)
+        if self.graph_direction == 'right-to-left':
+            return graph[::-1]
+        else:
+            return graph
 
     def run(self):
         format_values = dict(network_graph_recv="", network_graph_sent="", bytes_sent="", bytes_recv="",
