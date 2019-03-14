@@ -32,6 +32,9 @@ class SpaceAPI(IntervalModule):
         ("interval", "update interval")
     )
 
+    required = ('url', )
+    url = None
+
     @require(internet)
     def run(self):
         res = urlopen(self.url)
