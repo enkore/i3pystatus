@@ -133,7 +133,10 @@ cleartext to the server.)"),
         try:
             status = self._mpd_command(self.s, "status")
             playback_state = status["state"]
-            currentsong = self._mpd_command(self.s, "currentsong")
+            if playback_state == "stop":
+                currentsong = {}
+            else:
+                currentsong = self._mpd_command(self.s, "currentsong")
         except Exception:
             if self.hide_inactive:
                 self.output = {
