@@ -44,11 +44,6 @@ class Mem(IntervalModule):
     def run(self):
         memory_usage = psutil.virtual_memory()
 
-        if psutil.version_info < (4, 4, 0):
-            used = memory_usage.used - memory_usage.cached - memory_usage.buffers
-        else:
-            used = memory_usage.used
-
         if memory_usage.percent >= self.alert_percentage:
             color = self.alert_color
         elif memory_usage.percent >= self.warn_percentage:
@@ -57,7 +52,7 @@ class Mem(IntervalModule):
             color = self.color
 
         cdict = {
-            "used_mem": used / self.divisor,
+            "used_mem": max(0, memory_usage.used) / self.divisor,
             "avail_mem": memory_usage.available / self.divisor,
             "total_mem": memory_usage.total / self.divisor,
             "percent_used_mem": memory_usage.percent,
