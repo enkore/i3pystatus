@@ -384,7 +384,7 @@ class internet:
         :py:func:`require`
 
     """
-    address = ("google-public-dns-a.google.com", 53)
+    address = ('google.com', 80)
     check_frequency = 1
 
     dns_cache = []
