@@ -341,6 +341,7 @@ class Scores(Module):
 
     settings = (
         ('backends', 'List of backend instances'),
+        ('interval', 'Update interval (in seconds)'),
         ('favorite_icon', 'Value for the ``{away_favorite}`` and '
                           '``{home_favorite}`` formatter when the displayed game '
                           'is being played by a followed team'),
@@ -430,7 +431,7 @@ class Scores(Module):
                 with self.condition:
                     self.condition.wait(self.interval)
                 self.check_scores(force='scheduled')
-        except:
+        except Exception:
             msg = 'Exception in {thread} at {time}, module {name}'.format(
                 thread=threading.current_thread().name,
                 time=time.strftime('%c'),
