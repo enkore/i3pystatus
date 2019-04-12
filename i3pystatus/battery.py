@@ -79,8 +79,8 @@ class BatteryCharge(Battery):
     def wh_remaining(self):
         return self.battery_info['CHARGE_NOW'] * self.battery_info['VOLTAGE_NOW']
 
-    def wh_total(self):
-        return self.battery_info['CHARGE_FULL'] * self.battery_info['VOLTAGE_NOW']
+    def wh_total(self, design):
+        return self.battery_info['CHARGE_FULL' + design] * self.battery_info['VOLTAGE_NOW']
 
     def wh_depleted(self):
         return (self.battery_info['CHARGE_FULL'] - self.battery_info['CHARGE_NOW']) * self.battery_info['VOLTAGE_NOW']
@@ -107,8 +107,8 @@ class BatteryEnergy(Battery):
     def wh_remaining(self):
         return self.battery_info['ENERGY_NOW']
 
-    def wh_total(self):
-        return self.battery_info['ENERGY_FULL']
+    def wh_total(self, design):
+        return self.battery_info['ENERGY_FULL' + design]
 
     def wh_depleted(self):
         return self.battery_info['ENERGY_FULL'] - self.battery_info['ENERGY_NOW']
@@ -246,7 +246,7 @@ class BatteryChecker(IntervalModule):
 
     def percentage(self, batteries, design=False):
         total_now = [battery.wh_remaining() for battery in batteries]
-        total_full = [battery.wh_total() for battery in batteries]
+        total_full = [battery.wh_total('_DESIGN' if design else '') for battery in batteries]
         return sum(total_now) / sum(total_full) * 100
 
     def consumption(self, batteries):
