@@ -69,7 +69,7 @@ class BatteryCharge(Battery):
 
     def consumption(self):
         if "VOLTAGE_NOW" in self.battery_info and "CURRENT_NOW" in self.battery_info:
-            return super().consumption(self.battery_info["VOLTAGE_NOW"] * self.battery_info["CURRENT_NOW"])  # V * A = W
+            return super().consumption(self.battery_info["VOLTAGE_NOW"] * abs(self.battery_info["CURRENT_NOW"]))  # V * A = W
         else:
             return None
 
