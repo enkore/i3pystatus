@@ -150,7 +150,7 @@ class MLB(ScoresBackend):
         'KC': '#0046DD',
         'LAA': '#BA0021',
         'LAD': '#005A9C',
-        'MIA': '#F14634',
+        'MIA': '#00A3E0',
         'MIL': '#0747CC',
         'MIN': '#D31145',
         'NYY': '#0747CC',
