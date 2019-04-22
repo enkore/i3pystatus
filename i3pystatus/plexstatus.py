@@ -21,6 +21,7 @@ class Plexstatus(IntervalModule):
 
     settings = (
         "format",
+        "color",
         ("apikey", "Your Plex API authentication key"),
         ("address", "Hostname or IP address of the Plex Media Server"),
         ("port", "Port which Plex Media Server is running on"),
