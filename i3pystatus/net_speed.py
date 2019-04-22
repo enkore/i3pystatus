@@ -19,7 +19,8 @@ class NetSpeed(IntervalModule):
 
     settings = (
         ("units", "Valid values are B, b, bytes, or bits"),
-        "format"
+        "format",
+        'color'
     )
     color = "#FFFFFF"
     interval = 300

@@ -142,6 +142,7 @@ class Calendar(IntervalModule, ColorRangeModule):
         ('urgent_seconds', "When within this many seconds of the event, set the urgent flag"),
         ('urgent_blink', 'Whether or not to blink when within urgent_seconds of the event'),
         ('dynamic_color', 'Whether or not to change color as the event approaches'),
+        'color'
     )
 
     required = ('backend',)
@@ -155,6 +156,7 @@ class Calendar(IntervalModule, ColorRangeModule):
     dynamic_color = True
     urgent_seconds = 300
     urgent_blink = False
+    color = None
 
     current_event = None
     urgent_acknowledged = False
@@ -204,9 +206,14 @@ class Calendar(IntervalModule, ColorRangeModule):
 
     def run(self):
         if self.current_event and self.current_event.time_remaining > timedelta(seconds=0):
+            color = None
+            if self.color is not None:
+                color = self.color
+            elif self.dynamic_color:
+                color = self.get_color()
             self.output = {
                 "full_text": formatp(self.format, **self.current_event.formatters()),
-                "color": self.get_color() if self.dynamic_color else None,
+                "color": color,
                 "urgent": self.is_urgent()
             }
         else:

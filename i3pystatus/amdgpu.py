@@ -18,10 +18,12 @@ class Amdgpu(IntervalModule):
 
     settings = (
         'format',
+        'color',
         ('card', '[1, 2, ...] card to read (options are in /sys/class/drm/)')
     )
 
     card = 0
+    color = None
     format = '{temp} {mclk} {sclk}'
 
     def init(self):
@@ -56,6 +58,8 @@ class Amdgpu(IntervalModule):
         self.output = {
             'full_text': self.format.format(**self.data)
         }
+        if self.color:
+            self.output['color'] = self.color
 
     @staticmethod
     def parse_clk_reading(reading):

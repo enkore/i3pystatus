@@ -25,6 +25,7 @@ class Deluge(IntervalModule):
 
     settings = (
         'format',
+        'color',
         ('rounding', 'number of decimal places to round numbers too'),
         ('host', 'address of deluge server (default: 127.0.0.1)'),
         ('port', 'port of deluge server (default: 58846)'),
@@ -38,6 +39,7 @@ class Deluge(IntervalModule):
     host = '127.0.0.1'
     port = 58846
     path = None
+    color = None
     libtorrent_stats = False
     rounding = 2
     offline_string = 'offline'
@@ -79,6 +81,8 @@ class Deluge(IntervalModule):
         self.output = {
             'full_text': self.format.format(**self.data)
         }
+        if self.color:
+            self.output['color'] = self.color
 
     def parse_values(self, values):
         for k, v in values.items():
