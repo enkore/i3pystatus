@@ -21,6 +21,7 @@ import mock
 
 MOCK_MODULES = [
     "alsaaudio",
+    'circleci.api',
     "netifaces", "psutil",
     "lxml.html", "lxml.cssselect", "lxml",
     "praw",
