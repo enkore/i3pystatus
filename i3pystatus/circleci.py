@@ -114,7 +114,6 @@ class CircleCI(IntervalModule):
 
             self.last_build_duration = ''  # TODO: gather this information once circleCI exposes it
 
-
         else:
             self.repo_summary = self.circleci.get_project_build_summary(
                 self.repo_owner,
