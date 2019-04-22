@@ -63,17 +63,17 @@ class CircleCI(IntervalModule):
 
     required = ('circleci_token', 'repo_slug')
 
-    format: str = '{repo_owner}/{repo_name}-{repo_status} [({last_build_started}({last_build_duration}))]'
-    short_format: str = '{repo_name}-{repo_status}'
-    time_format: str = '%m/%d'
-    duration_format: str = '%m:%S'
-    status_color_map: dict = None
-    repo_slug: str = None
-    circleci_token: str = None
-    repo_status_map: dict = None
-    color: str = '#DDDDDD'
-    workflow_name: str = None
-    workflow_branch: str = None
+    format = '{repo_owner}/{repo_name}-{repo_status} [({last_build_started}({last_build_duration}))]'
+    short_format = '{repo_name}-{repo_status}'
+    time_format = '%m/%d'
+    duration_format = '%m:%S'
+    status_color_map = None
+    repo_slug = None
+    circleci_token = None
+    repo_status_map = None
+    color = '#DDDDDD'
+    workflow_name = None
+    workflow_branch = None
 
     circleci: Api = None
 
