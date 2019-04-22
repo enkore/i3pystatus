@@ -156,7 +156,7 @@ class Calendar(IntervalModule, ColorRangeModule):
     dynamic_color = True
     urgent_seconds = 300
     urgent_blink = False
-    color=None
+    color = None
 
     current_event = None
     urgent_acknowledged = False

@@ -39,7 +39,7 @@ class Deluge(IntervalModule):
     host = '127.0.0.1'
     port = 58846
     path = None
-    color=None
+    color = None
     libtorrent_stats = False
     rounding = 2
     offline_string = 'offline'
