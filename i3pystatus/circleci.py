@@ -75,7 +75,7 @@ class CircleCI(IntervalModule):
     workflow_name = None
     workflow_branch = None
 
-    circleci: Api = None
+    circleci = None
 
     on_leftclick = 'open_build_webpage'
 
