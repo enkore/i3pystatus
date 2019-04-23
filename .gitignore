@@ -12,3 +12,5 @@ docs/_build
 *.ropeproject
 
 \.idea/
+
+venv/
