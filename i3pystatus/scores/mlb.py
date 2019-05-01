@@ -212,12 +212,10 @@ class MLB(ScoresBackend):
 
             away_abbrev = self.get_nested(
                 game,
-                'teams:away:team:abbreviation',
-                default='').upper()
+                'teams:away:team:abbreviation').upper()
             home_abbrev = self.get_nested(
                 game,
-                'teams:home:team:abbreviation',
-                default='').upper()
+                'teams:home:team:abbreviation').upper()
             if away_abbrev and home_abbrev:
                 try:
                     for team in (home_abbrev, away_abbrev):
@@ -240,27 +238,24 @@ class MLB(ScoresBackend):
 
         ret['id'] = game['gamePk']
         ret['inning'] = self.get_nested(linescore, 'currentInning', default=0)
-        ret['outs'] = self.get_nested(linescore, 'outs', default='')
+        ret['outs'] = self.get_nested(linescore, 'outs')
         ret['live_url'] = self.live_url % ret['id']
 
         for team in ('away', 'home'):
             team_data = self.get_nested(game, 'teams:%s' % team, default={})
 
             if team == 'home':
-                ret['venue'] = self.get_nested(team_data, 'venue:name', default='')
+                ret['venue'] = self.get_nested(team_data, 'venue:name')
 
             ret['%s_city' % team] = self.get_nested(
                 team_data,
-                'team:locationName',
-                default='')
+                'team:locationName')
             ret['%s_name' % team] = self.get_nested(
                 team_data,
-                'team:teamName',
-                default='')
+                'team:teamName')
             ret['%s_abbrev' % team] = self.get_nested(
                 team_data,
-                'team:abbreviation',
-                default='')
+                'team:abbreviation')
 
             ret['%s_wins' % team] = self.get_nested(
                 team_data,
@@ -279,7 +274,7 @@ class MLB(ScoresBackend):
         for key in ('delay', 'postponed', 'suspended'):
             ret[key] = ''
 
-        ret['status'] = self.get_nested(game, 'status:detailedState', default='').replace(' ', '_').lower()
+        ret['status'] = self.get_nested(game, 'status:detailedState').replace(' ', '_').lower()
 
         if ret['status'] == 'delayed_start':
             ret['status'] = 'pregame'
@@ -303,14 +298,14 @@ class MLB(ScoresBackend):
         except ValueError:
             ret['extra_innings'] = ''
 
-        top_bottom = self.get_nested(linescore, 'inningHalf', default='').lower()
+        top_bottom = self.get_nested(linescore, 'inningHalf').lower()
         ret['top_bottom'] = self.inning_top if top_bottom == 'top' \
             else self.inning_bottom if top_bottom == 'bottom' \
             else ''
 
         try:
             game_time = datetime.strptime(
-                self.get_nested(game, 'gameDate', default=''),
+                self.get_nested(game, 'gameDate'),
                 '%Y-%m-%dT%H:%M:%SZ')
         except ValueError as exc:
             # Log when the date retrieved from the API return doesn't match the
