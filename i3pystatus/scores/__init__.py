@@ -125,7 +125,7 @@ class ScoresBackend(SettingsBase):
         except (TypeError, ValueError):
             return 0
 
-    def get_nested(self, data, expr, callback=None, default=None):
+    def get_nested(self, data, expr, callback=None, default=''):
         if callback is None:
             def callback(x):
                 return x
