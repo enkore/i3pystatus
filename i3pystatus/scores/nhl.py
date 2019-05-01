@@ -308,17 +308,24 @@ class NHL(ScoresBackend):
                 callback=lambda x: self.empty_net if x else '')
 
         if game.get('gameType') == 'P':
-            for team in ('home', 'away'):
-                # Calculate wins in current series. The win value will be the
-                # total wins thus far in the playoffs, so a positive win count
-                # which is equally divisible by 4 indicates 4 wins (i.e. a
-                # series win). Otherwise, the series win will be the remainder
-                # when dividing total wins by 4.
-                key = '%s_wins' % team
-                if ret[key] and ret[key] % 4 == 0:
-                    ret[key] = 4
+            # Calculate wins/losses in current playoff series
+            home_rem = ret['home_wins'] % 4
+            away_rem = ret['away_wins'] % 4
+
+            if ret['home_wins'] == ret['away_wins']:
+                if home_rem == 0:
+                    # Both teams have multiples of 4 wins, so series has no
+                    # completed games.
+                    ret['home_wins'] = ret['away_wins'] = 0
                 else:
-                    ret[key] %= 4
+                    ret['home_wins'] = home_rem
+                    ret['away_wins'] = away_rem
+            elif ret['home_wins'] > ret['away_wins']:
+                ret['home_wins'] = 4 if home_rem == 0 else home_rem
+                ret['away_wins'] = away_rem
+            else:
+                ret['away_wins'] = 4 if away_rem == 0 else away_rem
+                ret['home_wins'] = home_rem
 
             # Series losses are the other team's wins
             ret['home_losses'] = ret['away_wins']
