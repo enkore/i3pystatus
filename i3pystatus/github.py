@@ -325,8 +325,6 @@ class Github(IntervalModule):
         self.logger.debug('Making GitHub Status API request to %s', url)
         try:
             with urlopen(url) as content:
-                # self.logger.log(5, 'url \'%s\' content: ', url)
-                # self.logger.log(5, content)
                 try:
                     content_type = dict(content.getheaders())['Content-Type']
                     charset = re.search(r'charset=(.*)', content_type).group(1)
