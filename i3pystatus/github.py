@@ -16,7 +16,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 
-API_METHODS_URL = 'https://status.github.com/api.json'
+API_METHODS_URL = 'https://www.githubstatus.com/api/v2/status.json'
 STATUS_URL = 'https://www.githubstatus.com'
 NOTIFICATIONS_URL = 'https://github.com/notifications'
 ACCESS_TOKEN_AUTH_URL = 'https://api.github.com/notifications?access_token=%s'
@@ -325,6 +325,8 @@ class Github(IntervalModule):
         self.logger.debug('Making GitHub Status API request to %s', url)
         try:
             with urlopen(url) as content:
+                # self.logger.log(5, 'url \'%s\' content: ', url)
+                # self.logger.log(5, content)
                 try:
                     content_type = dict(content.getheaders())['Content-Type']
                     charset = re.search(r'charset=(.*)', content_type).group(1)
@@ -435,17 +437,18 @@ class Github(IntervalModule):
     def update_status(self):
         try:
             # Get most recent update
-            if not hasattr(self, 'last_message_url'):
-                self.last_message_url = \
-                    self.status_api_request(API_METHODS_URL)['last_message_url']
-            self.current_status = self.status_api_request(self.last_message_url)
+            self.current_status = self.status_api_request(self.api_methods_url)
             if not self.current_status:
                 self.failed_update = True
                 return
 
-            self.data['status'] = self.status.get(
-                self.current_status.get('status'),
-                self.unknown_status)
+            status_key = self.unknown_status
+            if 'status' in self.current_status.keys():
+                status_data = self.current_status.get('status')
+                if 'description' in status_data.keys():
+                    status_key = status_data.get('description')
+            self.logger.error('status: %s unkown: %s', self.current_status.get('status'), self.unknown_status)
+            self.data['status'] = self.status.get(status_key)
 
             if self.previous_status is not None:
                 if self.current_status != self.previous_status:
