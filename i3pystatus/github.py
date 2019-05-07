@@ -445,7 +445,7 @@ class Github(IntervalModule):
                 status_data = self.current_status.get('status')
                 if 'description' in status_data.keys():
                     status_key = status_data.get('description')
-            self.logger.error('status: %s unkown: %s', self.current_status.get('status'), self.unknown_status)
+            
             self.data['status'] = self.status.get(status_key)
 
             if self.previous_status is not None:
