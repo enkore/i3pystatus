@@ -444,8 +444,7 @@ class Github(IntervalModule):
             if 'status' in self.current_status.keys():
                 status_data = self.current_status.get('status')
                 if 'description' in status_data.keys():
-                    status_key = status_data.get('description')
-            
+                    status_key = status_data.get('description')            
             self.data['status'] = self.status.get(status_key)
 
             if self.previous_status is not None:
