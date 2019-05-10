@@ -16,7 +16,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 
-API_METHODS_URL = 'https://status.github.com/api.json'
+API_METHODS_URL = 'https://www.githubstatus.com/api/v2/summary.json'
 STATUS_URL = 'https://www.githubstatus.com'
 NOTIFICATIONS_URL = 'https://github.com/notifications'
 ACCESS_TOKEN_AUTH_URL = 'https://api.github.com/notifications?access_token=%s'
@@ -359,7 +359,7 @@ class Github(IntervalModule):
                 # i3pystatus was started. Set self.previous_status and exit.
                 self.previous_status = response
                 return
-            if response == self.previous_status:
+            if response.get('status', {}).get('description') == self.previous_status.get('status', {}).get('description'):
                 # No change, so no notification
                 return
             self.previous_status = response
@@ -383,13 +383,12 @@ class Github(IntervalModule):
         return False
 
     def show_status_notification(self):
-        message = self.current_status.get(
-            'body',
-            'Missing \'body\' param in API response'
-        )
-        return self.skip_notify(message) \
-            if not self.notify_status \
-            else self.notify(message)
+        incidents = self.current_status.get('incidents')
+        for incident in incidents:
+            message = incident.get('name')
+            self.skip_notify(message) \
+                if not self.notify_status \
+                else self.notify(message)
 
     def show_unread_notification(self):
         if '%d' not in self.unread_notification_template:
@@ -435,20 +434,14 @@ class Github(IntervalModule):
     def update_status(self):
         try:
             # Get most recent update
-            if not hasattr(self, 'last_message_url'):
-                self.last_message_url = \
-                    self.status_api_request(API_METHODS_URL)['last_message_url']
-            self.current_status = self.status_api_request(self.last_message_url)
+            self.current_status = self.status_api_request(self.api_methods_url)
             if not self.current_status:
                 self.failed_update = True
                 return
 
-            self.data['status'] = self.status.get(
-                self.current_status.get('status'),
-                self.unknown_status)
-
+            self.data['status'] = self.status.get('status', {}).get('description')
             if self.previous_status is not None:
-                if self.current_status != self.previous_status:
+                if self.data['status'] != self.previous_status.get('status', {}).get('description'):
                     self.show_status_notification()
             self.previous_status = self.current_status
 
