@@ -387,11 +387,10 @@ class Github(IntervalModule):
         return False
 
     def show_status_notification(self):
-        for incident in self.current_incidents:
-            message = incident.get('name')
-            self.skip_notify(message) \
-                if not self.notify_status \
-                else self.notify(message)
+        message = self.current_status_description
+        self.skip_notify(message) \
+            if not self.notify_status or (self.previous_status == None and self.current_status == 'none') \
+            else self.notify(message)
 
     def show_unread_notification(self):
         if '%d' not in self.unread_notification_template:
@@ -460,6 +459,13 @@ class Github(IntervalModule):
             return self.__previous_json['status']['indicator']
         except (KeyError, TypeError):
             return None
+    
+    @property
+    def current_status_description(self):
+        try:
+            return self.__current_json['status']['description']
+        except (KeyError, TypeError):
+            return None;
 
     @require(internet)
     def update_status(self):
@@ -471,7 +477,7 @@ class Github(IntervalModule):
                 return
 
             self.data['status'] = self.status.get(self.current_status)
-            if self.current_incidents != self.previous_incidents:
+            if self.current_status != self.previous_status:
                 self.show_status_notification()
             self.__previous_json = self.__current_json
 
