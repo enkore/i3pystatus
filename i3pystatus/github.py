@@ -477,7 +477,7 @@ class Github(IntervalModule):
                 return
 
             self.data['status'] = self.status.get(self.current_status)
-            if self.current_status != self.previous_status:
+            if self.current_incidents != self.previous_incidents:
                 self.show_status_notification()
             self.__previous_json = self.__current_json
 
