@@ -41,7 +41,7 @@ class ALSA(IntervalModule):
     format_muted = None
     mixer = "Master"
     mixer_id = 0
-    card = 0
+    card = -1
     channel = 0
     increment = 5
 
