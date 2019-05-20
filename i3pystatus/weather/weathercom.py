@@ -2,10 +2,12 @@ import json
 import re
 from datetime import datetime
 from html.parser import HTMLParser
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from i3pystatus.core.util import internet, require
 from i3pystatus.weather import WeatherBackend
+
+USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
 
 
 class WeathercomHTMLParser(HTMLParser):
@@ -22,7 +24,8 @@ class WeathercomHTMLParser(HTMLParser):
     def get_weather_data(self, url):
         self.logger.debug('Making request to %s to retrieve weather data', url)
         self.weather_data = None
-        with urlopen(url) as content:
+        req = Request(url, headers={'User-Agent': USER_AGENT})
+        with urlopen(req) as content:
             try:
                 content_type = dict(content.getheaders())['Content-Type']
                 charset = re.search(r'charset=(.*)', content_type).group(1)
