@@ -16,7 +16,7 @@ try:
 except ImportError:
     HAS_REQUESTS = False
 
-API_METHODS_URL = 'https://status.github.com/api.json'
+API_METHODS_URL = 'https://www.githubstatus.com/api/v2/summary.json'
 STATUS_URL = 'https://www.githubstatus.com'
 NOTIFICATIONS_URL = 'https://github.com/notifications'
 ACCESS_TOKEN_AUTH_URL = 'https://api.github.com/notifications?access_token=%s'
@@ -74,9 +74,9 @@ class Github(IntervalModule):
     .. rubric:: Available formatters
 
     * `{status}` — Current GitHub status. This formatter can be different
-      depending on the current status (``good``, ``minor``, or ``major``).
-      The content displayed for each of these statuses is defined in the
-      **status** config option.
+      depending on the current outage status (``none``, ``minor``, ``major``,
+      or ``critical``). The content displayed for each of these statuses is
+      defined in the **status** config option.
     * `{unread}` — When there are unread notifications, this formatter will
       contain the value of the **unread_marker** marker config option.
       there are no unread notifications, it formatter will be an empty string.
@@ -137,14 +137,16 @@ class Github(IntervalModule):
             update_error='<span color="#af0000">!</span>',
             refresh_icon='<span color="#ff5f00">⟳</span>',
             status={
-                'good': '✓',
+                'none': '✓',
                 'minor': '!',
                 'major': '!!',
+                'critical': '!!!',
             },
             colors={
-                'good': '#008700',
+                'none': '#008700',
                 'minor': '#d7ff00',
                 'major': '#af0000',
+                'critical': '#640000',
             },
         )
 
@@ -153,8 +155,8 @@ class Github(IntervalModule):
         include the access token in the log file, as the notification URL is
         logged at this level.
 
-    .. _`GitHub Status API`: https://status.github.com/api
-    .. _`GitHub Status Dashboard`: https://status.github.com
+    .. _`GitHub Status API`: https://www.githubstatus.com/api
+    .. _`GitHub Status Dashboard`: https://www.githubstatus.com/
     .. _`notifications page`: https://github.com/notifications
 
     .. rubric:: Extended string formatting
@@ -222,14 +224,16 @@ class Github(IntervalModule):
 
     # Defaults for module configurables
     _default_status = {
-        'good': 'GitHub',
+        'none': 'GitHub',
         'minor': 'GitHub',
         'major': 'GitHub',
+        'critical': 'GitHub',
     }
     _default_colors = {
-        'good': '#2f895c',
-        'minor': '#f29d50',
-        'major': '#cc3300',
+        'none': '#2ecc71',
+        'minor': '#f1c40f',
+        'major': '#e67e22',
+        'critical': '#e74c3c',
     }
 
     # Module configurables
@@ -259,8 +263,8 @@ class Github(IntervalModule):
     unknown_color = None
     unknown_status = '?'
     failed_update = False
-    previous_status = None
-    current_status = None
+    __previous_json = None
+    __current_json = None
     new_unread = None
     previous_unread = None
     current_unread = None
@@ -354,17 +358,17 @@ class Github(IntervalModule):
         if response is not None:
             # Compare last update to current and exit without displaying a
             # notification if one is not needed.
-            if self.previous_status is None:
+            if self.__previous_json is None:
                 # This is the first time status has been updated since
-                # i3pystatus was started. Set self.previous_status and exit.
-                self.previous_status = response
+                # i3pystatus was started. Set self.__previous_json and exit.
+                self.__previous_json = response
                 return
-            if response == self.previous_status:
+            if response.get('status', {}).get('description') == self.__previous_json.get('status', {}).get('description'):
                 # No change, so no notification
                 return
-            self.previous_status = response
+            self.__previous_json = response
 
-        if self.previous_status is None:
+        if self.__previous_json is None:
             # The only way this would happen is if we invoked the right-click
             # event before we completed the initial status check.
             return
@@ -383,12 +387,9 @@ class Github(IntervalModule):
         return False
 
     def show_status_notification(self):
-        message = self.current_status.get(
-            'body',
-            'Missing \'body\' param in API response'
-        )
-        return self.skip_notify(message) \
-            if not self.notify_status \
+        message = self.current_status_description
+        self.skip_notify(message) \
+            if not self.notify_status or (self.previous_status is None and self.current_status == 'none') \
             else self.notify(message)
 
     def show_unread_notification(self):
@@ -431,26 +432,54 @@ class Github(IntervalModule):
             else ''
         self.refresh_display()
 
+    @property
+    def current_incidents(self):
+        try:
+            return self.__current_json['incidents']
+        except (KeyError, TypeError):
+            return []
+
+    @property
+    def previous_incidents(self):
+        try:
+            return self.__previous_json['incidents']
+        except (KeyError, TypeError):
+            return []
+
+    @property
+    def current_status(self):
+        try:
+            return self.__current_json['status']['indicator']
+        except (KeyError, TypeError):
+            return None
+
+    @property
+    def previous_status(self):
+        try:
+            return self.__previous_json['status']['indicator']
+        except (KeyError, TypeError):
+            return None
+
+    @property
+    def current_status_description(self):
+        try:
+            return self.__current_json['status']['description']
+        except (KeyError, TypeError):
+            return None
+
     @require(internet)
     def update_status(self):
         try:
             # Get most recent update
-            if not hasattr(self, 'last_message_url'):
-                self.last_message_url = \
-                    self.status_api_request(API_METHODS_URL)['last_message_url']
-            self.current_status = self.status_api_request(self.last_message_url)
-            if not self.current_status:
+            self.__current_json = self.status_api_request(self.api_methods_url)
+            if not self.__current_json:
                 self.failed_update = True
                 return
 
-            self.data['status'] = self.status.get(
-                self.current_status.get('status'),
-                self.unknown_status)
-
-            if self.previous_status is not None:
-                if self.current_status != self.previous_status:
-                    self.show_status_notification()
-            self.previous_status = self.current_status
+            self.data['status'] = self.status.get(self.current_status)
+            if self.current_incidents != self.previous_incidents:
+                self.show_status_notification()
+            self.__previous_json = self.__current_json
 
         except Exception:
             # Don't let an uncaught exception kill the update thread
@@ -613,13 +642,9 @@ class Github(IntervalModule):
     def refresh_display(self):
         previous_color = self.output.get('color')
         try:
-            if 'status' in self.current_status:
-                color = self.colors.get(
-                    self.current_status['status'],
-                    self.unknown_color)
-            else:
-                # Failed status update, keep the existing color
-                color = previous_color
+            color = self.colors.get(
+                self.current_status,
+                self.unknown_color)
         except TypeError:
             # Shouldn't get here, but this would happen if this function is
             # called before we check the current status for the first time.
