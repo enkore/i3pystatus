@@ -2,14 +2,13 @@ from i3pystatus.file import File
 from i3pystatus import Module
 from i3pystatus.core.command import run_through_shell
 import glob
-import shutil
 
 
 class Backlight(File):
     """
     Screen backlight info
 
-    - (Optional) requires `xbacklight` to change the backlight brightness with the scollwheel.
+    - (Optional) requires `xbacklight` or `light` to change the backlight brightness with the scrollwheel.
 
     .. rubric:: Available formatters
 
@@ -21,6 +20,7 @@ class Backlight(File):
     settings = (
         ("format", "format string, formatters: brightness, max_brightness, percentage"),
         ("format_no_backlight", "format string when no backlight file available"),
+        ("adjust_method", "program used to adjust brightness on scrollwhell, either `xbacklight` or `light` or None to disable (default)"),
         ("backlight",
             "backlight, see `/sys/class/backlight/`. Supports glob expansion, i.e. `*` matches anything. "
             "If it matches more than one filename, selects the first one in alphabetical order"),
@@ -31,6 +31,8 @@ class Backlight(File):
     backlight = "*"
     format = "{brightness}/{max_brightness}"
     format_no_backlight = "No backlight"
+
+    adjust_method = None
 
     base_path = "/sys/class/backlight/{backlight}/"
     components = {
@@ -53,20 +55,23 @@ class Backlight(File):
             return
 
         self.base_path = backlight_entries[0]
-        self.has_xbacklight = shutil.which("xbacklight") is not None
 
-        # xbacklight expects a percentage as parameter. Calculate the percentage
-        # for one step (if smaller xbacklight doesn't increases the brightness)
-        if self.has_xbacklight:
-            parsefunc = self.components['max_brightness'][0]
-            maxbfile = self.components['max_brightness'][1]
-            with open(self.base_path + maxbfile, "r") as f:
-                max_steps = parsefunc(f.read().strip())
-                if max_steps:
-                    self.step_size = 100 // max_steps + 1
-                else:
-                    self.step_size = 5  # default?
+        if self.adjust_method:
+            self.calculate_step_size()
+
         super().init()
+
+    def calculate_step_size(self):
+        # xbacklight/light expects a percentage as parameter. Calculate the
+        # percentage for one step
+        parsefunc = self.components['max_brightness'][0]
+        maxbfile = self.components['max_brightness'][1]
+        with open(self.base_path + maxbfile, "r") as f:
+            max_steps = parsefunc(f.read().strip())
+            if max_steps:
+                self.step_size = 100 // max_steps + 1
+            else:
+                self.step_size = 5  # default?
 
     def run_no_backlight(self):
         cdict = {
@@ -75,20 +80,20 @@ class Backlight(File):
             "percentage": -1
         }
 
-        format = self.format_no_backlight
-        if not format:
-            format = self.format
-
         self.data = cdict
         self.output = {
-            "full_text": format.format(**cdict),
+            "full_text": self.format_no_backlight.format(**cdict),
             "color": self.color
         }
 
     def lighter(self):
-        if self.has_xbacklight:
+        if self.adjust_method == "xbacklight":
             run_through_shell(["xbacklight", "-inc", str(self.step_size)])
+        elif self.adjust_method == "light":
+            run_through_shell(["light", "-A", str(self.step_size)])
 
     def darker(self):
-        if self.has_xbacklight:
+        if self.adjust_method == "xbacklight":
             run_through_shell(["xbacklight", "-dec", str(self.step_size)])
+        elif self.adjust_method == "light":
+            run_through_shell(["light", "-U", str(self.step_size)])
