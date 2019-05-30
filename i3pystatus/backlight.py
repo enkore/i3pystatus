@@ -44,6 +44,8 @@ class Backlight(File):
     on_downscroll = "darker"
 
     def init(self):
+        self.has_xbacklight = shutil.which("xbacklight") is not None
+
         self.base_path = self.base_path.format(backlight=self.backlight)
         backlight_entries = sorted(glob.glob(self.base_path))
 
@@ -53,7 +55,6 @@ class Backlight(File):
             return
 
         self.base_path = backlight_entries[0]
-        self.has_xbacklight = shutil.which("xbacklight") is not None
 
         # xbacklight expects a percentage as parameter. Calculate the percentage
         # for one step (if smaller xbacklight doesn't increases the brightness)
