@@ -76,13 +76,9 @@ class Backlight(File):
             "percentage": -1
         }
 
-        format = self.format_no_backlight
-        if not format:
-            format = self.format
-
         self.data = cdict
         self.output = {
-            "full_text": format.format(**cdict),
+            "full_text": self.format_no_backlight.format(**cdict),
             "color": self.color
         }
 
