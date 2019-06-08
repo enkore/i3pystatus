@@ -252,7 +252,7 @@ class Weathercom(WeatherBackend):
                 # Again, same technique as above used to get down to the
                 # correct nested dict level.
                 self.city_name = self.city_name[next(iter(self.city_name))]
-                self.city_name = self.city_name['data']['prsntNm']
+                self.city_name = self.city_name['data']['location']['displayName']
             except KeyError:
                 self.logger.warning(
                     'Failed to get city name from API response, falling back '
