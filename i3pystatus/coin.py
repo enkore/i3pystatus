@@ -84,7 +84,7 @@ class Coin(IntervalModule):
         fdict["price"] = str(round(Decimal(fdict["price"]), self.decimal))
 
         self.data = fdict
-        
+
         self.output = {"full_text": self.format.format(**fdict)}
         if self.color is not None:
             self.output['color'] = self.color
