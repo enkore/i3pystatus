@@ -147,7 +147,7 @@ class PulseAudio(Module, ColorRangeModule):
 
         self.request_update(context)
 
-    def sink_info_cb(self, context, sink_info_p, _, __):
+    def sink_info_cb(self, context, sink_info_p, eol, _):
         """Updates self.output"""
         if sink_info_p:
             sink_info = sink_info_p.contents
@@ -197,6 +197,9 @@ class PulseAudio(Module, ColorRangeModule):
                     selected=selected),
             }
 
+            self.send_output()
+        elif eol < 0:
+            self.output = None
             self.send_output()
 
     def change_sink(self):
