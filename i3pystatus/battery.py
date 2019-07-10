@@ -403,4 +403,3 @@ class BatteryChecker(IntervalModule):
             else:
                 self.notification.update(title=title,
                                          body=body)
-
