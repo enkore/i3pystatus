@@ -515,7 +515,6 @@ def make_vertical_bar(percentage, width=1, glyphs=None):
     return bar * width
 
 
-
 def make_bar(percentage):
     """
     Draws a bar made of unicode box characters.
