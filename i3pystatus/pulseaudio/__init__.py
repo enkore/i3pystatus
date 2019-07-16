@@ -21,15 +21,15 @@ class PulseAudio(Module, ColorRangeModule):
 
     .. code-block:: python
 
-    status.register(
-        "pulseaudio",
-        color_unmuted='#aa3300,
-        color_muted='#aa0500',
-        format_muted='\uf6a9',
-        format='{volume_bar}',
-        vertical_bar_width=1,
-        vertical_bar_glyphs=['\uf026  ', '\uf027 ', '\uf028']
-    )
+        status.register(
+            "pulseaudio",
+            color_unmuted='#aa3300,
+            color_muted='#aa0500',
+            format_muted='\uf6a9',
+            format='{volume_bar}',
+            vertical_bar_width=1,
+            vertical_bar_glyphs=['\uf026  ', '\uf027 ', '\uf028']
+        )
 
     .. rubric:: Available formatters
 
