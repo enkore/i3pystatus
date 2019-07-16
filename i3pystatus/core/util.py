@@ -500,24 +500,19 @@ def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
     return graph
 
 
-def make_vertical_bar(percentage, width=1):
+def make_vertical_bar(percentage, width=1, glyphs=None):
     """
     Draws a vertical bar made of unicode characters.
 
-    :param value: A value between 0 and 100
+    :param percentage: A value between 0 and 100
     :param width: How many characters wide the bar should be.
     :returns: Bar as a String
     """
-    bar = ' _▁▂▃▄▅▆▇█'
-    percentage //= 10
-    percentage = int(percentage)
-    if percentage < 0:
-        output = bar[0]
-    elif percentage >= len(bar):
-        output = bar[-1]
+    if glyphs is not None:
+        bar = make_glyph(percentage, lower_bound=0, upper_bound=100, glyphs=glyphs)
     else:
-        output = bar[percentage]
-    return output * width
+        bar = make_glyph(percentage, lower_bound=0, upper_bound=100)
+    return bar * width
 
 
 def make_bar(percentage):
@@ -532,13 +527,13 @@ def make_bar(percentage):
     tens = int(percentage / 10)
     ones = int(percentage) - tens * 10
     result = tens * '█'
-    if(ones >= 1):
+    if ones >= 1:
         result = result + bars[ones]
     result = result + (10 - len(result)) * ' '
     return result
 
 
-def make_glyph(number, glyphs="▁▂▃▄▅▆▇█", lower_bound=0, upper_bound=100, enable_boundary_glyphs=False):
+def make_glyph(number, glyphs=" _▁▂▃▄▅▆▇█", lower_bound=0, upper_bound=100, enable_boundary_glyphs=False):
     """
     Returns a single glyph from the list of glyphs provided relative to where
     the number is in the range (by default a percentage value is expected).
