@@ -33,6 +33,7 @@ class Coin(IntervalModule):
 
     settings = (
         ("format", "format string used for output."),
+        ("color"),
         ("coin", "cryptocurrency to fetch"),
         ("decimal", "round coin price down to this decimal place"),
         ("currency", "fiat currency to show fiscal data"),
@@ -42,6 +43,7 @@ class Coin(IntervalModule):
     )
 
     symbol = "¤"
+    color = None
     format = "{symbol} {price}{status}"
     coin = "ethereum"
     currency = "USD"
@@ -82,4 +84,7 @@ class Coin(IntervalModule):
         fdict["price"] = str(round(Decimal(fdict["price"]), self.decimal))
 
         self.data = fdict
+
         self.output = {"full_text": self.format.format(**fdict)}
+        if self.color is not None:
+            self.output['color'] = self.color
