@@ -1,6 +1,7 @@
 import subprocess
 from collections import namedtuple
 
+
 class GPUNotFoundError(Exception):
     """nvidia-smi call exited with a error code"""
     pass

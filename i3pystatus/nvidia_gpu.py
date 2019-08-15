@@ -91,7 +91,6 @@ class NvidiaGPU(IntervalModule):
             else:
                 color = self.color
 
-
         cdict = {
             "usage": gpu_percent,
             "used_mem": info.used_mem / self.divisor,
