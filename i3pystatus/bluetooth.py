@@ -74,7 +74,7 @@ click to cycle backwards.
 
         * `{name}` — (the name of the device)
         * `{dev_addr}` — (the bluetooth device address)
-        
+
         .. rubric:: Available callbacks
 
         * ``next_device`` — iterate forward through devices
@@ -123,7 +123,6 @@ click to cycle backwards.
                 return
             self.dev_index = self.dev_index % len(self.devices)
             self.num_devices = len(self.devices)
-
 
             fdict = {
                 "name": self.devices[self.dev_index]['name'],
