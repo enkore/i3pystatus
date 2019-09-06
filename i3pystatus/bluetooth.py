@@ -5,6 +5,7 @@ import dbus
 from i3pystatus import IntervalModule, formatp
 from i3pystatus.core.util import TimeWrapper
 
+
 def proxyobj(bus, path, interface):
     """ commodity to apply an interface to a proxy object """
     obj = bus.get_object('org.bluez', path)
@@ -22,8 +23,10 @@ def filter_by_interface(objects, interface_name):
                 result.append(path)
     return result
 
+
 def getprop(obj, prop, t):
     return t(obj.Get("org.bluez.Device1", prop))
+
 
 def get_bluetooth_device_list(show_disconnected):
     # shamelessly stolen from https://stackoverflow.com/questions/14262315/list-nearby-discoverable-bluetooth-devices-including-already-paired-in-python/14267310#14267310
@@ -44,10 +47,10 @@ def get_bluetooth_device_list(show_disconnected):
         # skip blocked and unpaired devices.
         if getprop(obj, "Blocked", bool):
             continue
-        if getprop(obj, "Paired", bool) == False:
+        if not getprop(obj, "Paired", bool):
             continue
         if not show_disconnected:
-            if getprop(obj, "Connected", bool) == False:
+            if not getprop(obj, "Connected", bool):
                 continue
         bt_devices.append({
             "name": getprop(obj, "Name", str),
@@ -56,9 +59,10 @@ def get_bluetooth_device_list(show_disconnected):
         })
     return bt_devices
 
+
 class Bluetooth(IntervalModule):
     """
-    Shows currently connected bluetooth devices. 
+    Shows currently connected bluetooth devices.
 
         * Requires ``python-dbus`` from your distro package manager, or \
 ``dbus-python`` from PyPI.
@@ -130,7 +134,6 @@ click to cycle backwards.
             color = self.color
             if self.devices[self.dev_index]['connected']:
                 color = self.connected_color
-            
             self.output = {
                 "full_text": formatp(self.format, **fdict).strip(),
                 "color": color,
@@ -146,7 +149,7 @@ click to cycle backwards.
             return
 
     def next_device(self):
-        self.dev_index = (self.dev_index + 1) % self.num_devices 
+        self.dev_index = (self.dev_index + 1) % self.num_devices
 
     def prev_device(self):
         self.dev_index = (self.dev_index - 1) % self.num_devices
