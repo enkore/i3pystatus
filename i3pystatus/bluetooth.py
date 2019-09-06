@@ -22,7 +22,10 @@ def filter_by_interface(objects, interface_name):
                 result.append(path)
     return result
 
-def get_bluetooth_device_list():
+def getprop(obj, prop, t):
+    return t(obj.Get("org.bluez.Device1", prop))
+
+def get_bluetooth_device_list(show_disconnected):
     # shamelessly stolen from https://stackoverflow.com/questions/14262315/list-nearby-discoverable-bluetooth-devices-including-already-paired-in-python/14267310#14267310
     bus = dbus.SystemBus()
 
@@ -38,9 +41,18 @@ def get_bluetooth_device_list():
     bt_devices = []
     for device in devices:
         obj = proxyobj(bus, device, 'org.freedesktop.DBus.Properties')
+        # skip blocked and unpaired devices.
+        if getprop(obj, "Blocked", bool):
+            continue
+        if getprop(obj, "Paired", bool) == False:
+            continue
+        if not show_disconnected:
+            if getprop(obj, "Connected", bool) == False:
+                continue
         bt_devices.append({
-            "name": str(obj.Get("org.bluez.Device1", "Name")),
-            "dev_addr": str(obj.Get("org.bluez.Device1", "Address"))
+            "name": getprop(obj, "Name", str),
+            "dev_addr": getprop(obj, "Address", str),
+            "connected": getprop(obj, "Connected", bool)
         })
     return bt_devices
 
@@ -79,11 +91,14 @@ click to cycle backwards.
     settings = (
         ("format", "formatp string"),
         ("color", "Text color"),
+        ("connected_color", "Connected device color"),
+        ("show_disconnected", "Show disconnected but paired devices")
     )
 
-    format = "{name}:{dev_addr}"
+    format = "{name}: {dev_addr}"
     color = "#ffffff"
-    
+    connected_color = "#00ff00"
+
     on_leftclick = "next_device"
     on_rightclick = "prev_device"
     on_upscroll = 'next_device'
@@ -92,19 +107,19 @@ click to cycle backwards.
     num_devices = 0
     dev_index = 0
     devices = []
-
+    show_disconnected = True
 
     def run(self):
         try:
-            self.devices = get_bluetooth_device_list()
-            self.dev_index = self.dev_index % len(self.devices)
-            self.num_devices = len(self.devices)
-
+            self.devices = get_bluetooth_device_list(self.show_disconnected)
             if len(self.devices) < 1:
                 if hasattr(self, "data"):
                     del self.data
                 self.output = None
                 return
+            self.dev_index = self.dev_index % len(self.devices)
+            self.num_devices = len(self.devices)
+
 
             fdict = {
                 "name": self.devices[self.dev_index]['name'],
@@ -112,9 +127,13 @@ click to cycle backwards.
             }
 
             self.data = fdict
+            color = self.color
+            if self.devices[self.dev_index]['connected']:
+                color = self.connected_color
+            
             self.output = {
                 "full_text": formatp(self.format, **fdict).strip(),
-                "color": self.color,
+                "color": color,
             }
             return
         except dbus.exceptions.DBusException as e:
