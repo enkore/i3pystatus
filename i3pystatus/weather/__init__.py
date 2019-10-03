@@ -125,7 +125,7 @@ class Weather(IntervalModule):
     If an error is encountered while updating, the ``{update_error}`` formatter
     will be set, and (provided it is in your ``format`` string) will show up
     next to the forecast to alert you to the error. The error message will (by
-    default be logged to ``~/li3pystatus-<pid>`` where ``<pid>`` is the PID of
+    default be logged to ``~/.i3pystatus-<pid>`` where ``<pid>`` is the PID of
     the update thread. However, it may be more convenient to manually set the
     logfile to make the location of the log data predictable and avoid clutter
     in your home directory. Additionally, using the ``DEBUG`` log level can
