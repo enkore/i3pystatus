@@ -22,7 +22,7 @@ tools for this which make this even easier:
   See :py:class:`.SettingsBase` for details.
 - For modules that require credentials, it is recommended to add a
   keyring_backend setting to allow users to specify their own backends
-  for retrieving sensitive credentials. 
+  for retrieving sensitive credentials.
 
   Required settings and default values are also handled.
 
@@ -68,7 +68,7 @@ Testing changes
 i3pystatus uses continuous integration (CI) techniques, which means in
 our case that every patch and every pull request is tested
 automatically. While Travis is used for automatic building of GitHub
-pull requests it is not the authorative CI system (which is `Der Golem
+pull requests, it is not the authoritative CI system (which is `Der Golem
 <http://golem.enkore.de/>`_) for the main repository.
 
 The ``ci-build.sh`` script needs to run successfully for a patch to be
