@@ -242,73 +242,107 @@ class NHL(ScoresBackend):
     def process_game(self, game):
         ret = {}
 
-        def _update(ret_key, game_key=None, callback=None, default='?'):
-            ret[ret_key] = self.get_nested(game,
-                                           game_key or ret_key,
-                                           callback=callback,
-                                           default=default)
-
         self.logger.debug('Processing %s game data: %s',
                           self.__class__.__name__, game)
 
-        _update('id', 'gamePk')
+        linescore = self.get_nested(game, 'linescore', default={})
+
+        ret['id'] = game['gamePk']
         ret['live_url'] = self.live_url % ret['id']
-        _update('period', 'linescore:currentPeriodOrdinal', default='')
-        _update('time_remaining',
-                'linescore:currentPeriodTimeRemaining',
-                lambda x: x.capitalize(),
-                default='')
-        _update('venue', 'venue:name')
+        ret['period'] = self.get_nested(
+            linescore,
+            'currentPeriodOrdinal')
+        ret['time_remaining'] = self.get_nested(
+            linescore,
+            'currentPeriodTimeRemaining',
+            callback=lambda x: x.capitalize())
+        ret['venue'] = self.get_nested(
+            game,
+            'venue:name')
 
-        pp_strength = self.get_nested(game,
-                                      'linescore:powerPlayStrength',
-                                      default='')
-        for team in ('home', 'away'):
-            _update('%s_score' % team,
-                    'teams:%s:score' % team,
-                    callback=self.force_int,
-                    default=0)
-            _update('%s_wins' % team,
-                    'teams:%s:leagueRecord:wins' % team,
-                    callback=self.force_int,
-                    default=0)
-            _update('%s_losses' % team,
-                    'teams:%s:leagueRecord:losses' % team,
-                    callback=self.force_int,
-                    default=0)
-            _update('%s_otl' % team,
-                    'teams:%s:leagueRecord:ot' % team,
-                    callback=self.force_int,
-                    default=0)
+        pp_strength = self.get_nested(linescore, 'powerPlayStrength')
 
-            _update('%s_city' % team, 'teams:%s:team:shortName' % team)
-            _update('%s_name' % team, 'teams:%s:team:teamName' % team)
-            _update('%s_abbrev' % team, 'teams:%s:team:abbreviation' % team)
-            _update('%s_power_play' % team,
-                    'linescore:teams:%s:powerPlay' % team,
-                    lambda x: pp_strength if x and pp_strength != 'Even' else '')
-            _update('%s_empty_net' % team,
-                    'linescore:teams:%s:goaliePulled' % team,
-                    lambda x: self.empty_net if x else '')
+        for team in ('away', 'home'):
+            team_data = self.get_nested(game, 'teams:%s' % team, default={})
+
+            if team == 'home':
+                ret['venue'] = self.get_nested(team_data, 'venue:name')
+
+            ret['%s_score' % team] = self.get_nested(
+                team_data,
+                'score',
+                callback=self.force_int,
+                default=0)
+            ret['%s_wins' % team] = self.get_nested(
+                team_data,
+                'leagueRecord:wins',
+                callback=self.force_int,
+                default=0)
+            ret['%s_losses' % team] = self.get_nested(
+                team_data,
+                'leagueRecord:losses',
+                callback=self.force_int,
+                default=0)
+            ret['%s_otl' % team] = self.get_nested(
+                team_data,
+                'leagueRecord:ot',
+                callback=self.force_int,
+                default=0)
+
+            ret['%s_city' % team] = self.get_nested(
+                team_data,
+                'team:shortName')
+            ret['%s_name' % team] = self.get_nested(
+                team_data,
+                'team:teamName')
+            ret['%s_abbrev' % team] = self.get_nested(
+                team_data,
+                'team:abbreviation')
+            ret['%s_power_play' % team] = self.get_nested(
+                linescore,
+                'teams:%s:powerPlay' % team,
+                callback=lambda x: pp_strength if x and pp_strength != 'Even' else '')
+            ret['%s_empty_net' % team] = self.get_nested(
+                linescore,
+                'teams:%s:goaliePulled' % team,
+                callback=lambda x: self.empty_net if x else '')
 
         if game.get('gameType') == 'P':
-            for team in ('home', 'away'):
-                # Series wins are the remainder of dividing wins by 4
-                ret['_'.join((team, 'wins'))] %= 4
+            # Calculate wins/losses in current playoff series
+            home_rem = ret['home_wins'] % 4
+            away_rem = ret['away_wins'] % 4
+
+            if ret['home_wins'] == ret['away_wins']:
+                if home_rem == 0:
+                    # Both teams have multiples of 4 wins, so series has no
+                    # completed games.
+                    ret['home_wins'] = ret['away_wins'] = 0
+                else:
+                    ret['home_wins'] = home_rem
+                    ret['away_wins'] = away_rem
+            elif ret['home_wins'] > ret['away_wins']:
+                ret['home_wins'] = 4 if home_rem == 0 else home_rem
+                ret['away_wins'] = away_rem
+            else:
+                ret['away_wins'] = 4 if away_rem == 0 else away_rem
+                ret['home_wins'] = home_rem
+
             # Series losses are the other team's wins
             ret['home_losses'] = ret['away_wins']
             ret['away_losses'] = ret['home_wins']
 
-        _update('status',
-                'status:abstractGameState',
-                lambda x: x.lower().replace(' ', '_'))
+        ret['status'] = self.get_nested(
+            game,
+            'status:abstractGameState',
+            callback=lambda x: x.lower().replace(' ', '_'))
 
         if ret['status'] == 'live':
             ret['status'] = 'in_progress'
         elif ret['status'] == 'final':
-            _update('overtime',
-                    'linescore:currentPeriodOrdinal',
-                    lambda x: x if 'OT' in x or x == 'SO' else '')
+            ret['overtime'] = self.get_nested(
+                linescore,
+                'currentPeriodOrdinal',
+                callback=lambda x: x if 'OT' in x or x == 'SO' else '')
         elif ret['status'] != 'in_progress':
             ret['status'] = 'pregame'
 

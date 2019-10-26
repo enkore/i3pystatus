@@ -11,13 +11,18 @@ tools for this which make this even easier:
 - Common base classes: :py:class:`.Module` for everything and
   :py:class:`.IntervalModule` specifically for the aforementioned
   usecase of updating stuff periodically.
+
+  the :py:class:`.Module` class inherits a `logger` attribute and as such
+  all logging should be implemented via `self.logger.<level>` rather then
+  initializing a new logger in the module.
+
 - Settings (already built into above classes) allow you to easily
   specify user-modifiable attributes of your class for configuration.
 
   See :py:class:`.SettingsBase` for details.
 - For modules that require credentials, it is recommended to add a
   keyring_backend setting to allow users to specify their own backends
-  for retrieving sensitive credentials. 
+  for retrieving sensitive credentials.
 
   Required settings and default values are also handled.
 
@@ -63,7 +68,7 @@ Testing changes
 i3pystatus uses continuous integration (CI) techniques, which means in
 our case that every patch and every pull request is tested
 automatically. While Travis is used for automatic building of GitHub
-pull requests it is not the authorative CI system (which is `Der Golem
+pull requests, it is not the authoritative CI system (which is `Der Golem
 <http://golem.enkore.de/>`_) for the main repository.
 
 The ``ci-build.sh`` script needs to run successfully for a patch to be

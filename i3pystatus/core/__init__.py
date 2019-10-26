@@ -60,12 +60,15 @@ class Status:
     :param str logfile: Path to log file that will be used by i3pystatus.
     :param tuple internet_check: Address of server that will be used to check for internet connection by :py:class:`.internet`.
     :param keep_alive: If True, modules that define the keep_alive flag will not be put to sleep when the status bar is hidden.
+    :param dictionary default_hints: Dictionary of default hints to apply to all modules. Can be overridden at a module level.
     """
 
     def __init__(self, standalone=True, click_events=True, interval=1,
                  input_stream=None, logfile=None, internet_check=None,
-                 keep_alive=False, logformat=DEFAULT_LOG_FORMAT):
+                 keep_alive=False, logformat=DEFAULT_LOG_FORMAT,
+                 default_hints=None):
         self.standalone = standalone
+        self.default_hints = default_hints
         self.click_events = standalone and click_events
         input_stream = input_stream or sys.stdin
         logger = logging.getLogger("i3pystatus")
@@ -107,6 +110,13 @@ class Status:
 
         if not module:
             return
+
+        # Merge the module's hints with the default hints
+        # and overwrite any duplicates with the hint from the module
+        hints = self.default_hints.copy() if self.default_hints else {}
+        hints.update(kwargs.get('hints', {}))
+        if hints:
+            kwargs['hints'] = hints
 
         try:
             return self.modules.append(module, *args, **kwargs)

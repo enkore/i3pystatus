@@ -107,7 +107,6 @@ class Wunderground(WeatherBackend):
     station_id = None
     forecast_url = None
 
-    @require(internet)
     def init(self):
         '''
         Use the location_code to perform a geolookup and find the closest

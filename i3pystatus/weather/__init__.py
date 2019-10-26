@@ -125,7 +125,7 @@ class Weather(IntervalModule):
     If an error is encountered while updating, the ``{update_error}`` formatter
     will be set, and (provided it is in your ``format`` string) will show up
     next to the forecast to alert you to the error. The error message will (by
-    default be logged to ``~/li3pystatus-<pid>`` where ``<pid>`` is the PID of
+    default be logged to ``~/.i3pystatus-<pid>`` where ``<pid>`` is the PID of
     the update thread. However, it may be more convenient to manually set the
     logfile to make the location of the log data predictable and avoid clutter
     in your home directory. Additionally, using the ``DEBUG`` log level can
@@ -171,6 +171,8 @@ class Weather(IntervalModule):
                          'shown by the module) when refreshing weather data. '
                          '**NOTE:** Depending on how quickly the update is '
                          'performed, the icon may not be displayed.'),
+        ('online_interval', 'seconds between updates when online (defaults to interval)'),
+        ('offline_interval', 'seconds between updates when offline (default: 300)'),
         'format',
     )
     required = ('backend',)
@@ -191,6 +193,8 @@ class Weather(IntervalModule):
     color = None
     backend = None
     interval = 1800
+    offline_interval = 300
+    online_interval = None
     refresh_icon = '⟳'
     format = '{current_temp}{temp_unit}[ {update_error}]'
 
@@ -205,6 +209,9 @@ class Weather(IntervalModule):
             user_open(self.backend.forecast_url)
 
     def init(self):
+        if self.online_interval is None:
+            self.online_interval = int(self.interval)
+
         if self.backend is None:
             raise RuntimeError('A backend is required')
 
@@ -239,6 +246,10 @@ class Weather(IntervalModule):
         self.thread.start()
 
     def update_thread(self):
+        if internet():
+            self.interval = self.online_interval
+        else:
+            self.interval = self.offline_interval
         try:
             self.check_weather()
             while True:
@@ -253,7 +264,6 @@ class Weather(IntervalModule):
             )
             self.logger.error(msg, exc_info=True)
 
-    @require(internet)
     def check_weather(self):
         '''
         Check the weather using the configured backend

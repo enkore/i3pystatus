@@ -15,6 +15,22 @@ class PulseAudio(Module, ColorRangeModule):
     - Requires amixer for toggling mute and incrementing/decrementing volume on scroll.
     - Depends on the PyPI colour module - https://pypi.python.org/pypi/colour/0.0.5
 
+    .. rubric:: Example configuration
+
+    The example configuration below uses only unicode to display the volume (tested with otf-font-awesome)
+
+    .. code-block:: python
+
+        status.register(
+            "pulseaudio",
+            color_unmuted='#aa3300,
+            color_muted='#aa0500',
+            format_muted='\uf6a9',
+            format='{volume_bar}',
+            vertical_bar_width=1,
+            vertical_bar_glyphs=['\uf026  ', '\uf027 ', '\uf028']
+        )
+
     .. rubric:: Available formatters
 
     * `{volume}` — volume in percent (0...100)
@@ -37,7 +53,8 @@ class PulseAudio(Module, ColorRangeModule):
         ("bar_type", "type of volume bar. Allowed values are 'vertical' or 'horizontal'"),
         ("multi_colors", "whether or not to change the color from "
                          "'color_muted' to 'color_unmuted' based on volume percentage"),
-        ("vertical_bar_width", "how many characters wide the vertical volume_bar should be")
+        ("vertical_bar_width", "how many characters wide the vertical volume_bar should be"),
+        ('vertical_bar_glyphs', 'custom array output as vertical bar instead of unicode bars')
     )
 
     muted = "M"
@@ -49,6 +66,7 @@ class PulseAudio(Module, ColorRangeModule):
     has_amixer = False
     color_muted = "#FF0000"
     color_unmuted = "#FFFFFF"
+    vertical_bar_glyphs = None
 
     sink = None
     move_sink_inputs = True
@@ -147,7 +165,7 @@ class PulseAudio(Module, ColorRangeModule):
 
         self.request_update(context)
 
-    def sink_info_cb(self, context, sink_info_p, _, __):
+    def sink_info_cb(self, context, sink_info_p, eol, _):
         """Updates self.output"""
         if sink_info_p:
             sink_info = sink_info_p.contents
@@ -173,7 +191,7 @@ class PulseAudio(Module, ColorRangeModule):
                 output_format = self.format
 
             if self.bar_type == 'vertical':
-                volume_bar = make_vertical_bar(volume_percent, self.vertical_bar_width)
+                volume_bar = make_vertical_bar(volume_percent, self.vertical_bar_width, glyphs=self.vertical_bar_glyphs)
             elif self.bar_type == 'horizontal':
                 volume_bar = make_bar(volume_percent)
             else:
@@ -198,6 +216,9 @@ class PulseAudio(Module, ColorRangeModule):
             }
 
             self.send_output()
+        elif eol < 0:
+            self.output = None
+            self.send_output()
 
     def change_sink(self):
         sinks = list(s.split()[1] for s in self.sinks)
@@ -210,7 +231,7 @@ class PulseAudio(Module, ColorRangeModule):
         if self.move_sink_inputs:
             sink_inputs = subprocess.check_output("pacmd list-sink-inputs".split(),
                                                   universal_newlines=True)
-            for input_index in re.findall('index:\s+(\d+)', sink_inputs):
+            for input_index in re.findall(r'index:\s+(\d+)', sink_inputs):
                 command = "pacmd move-sink-input {} {}".format(input_index, next_sink)
 
                 # Not all applications can be moved and pulseaudio, and when

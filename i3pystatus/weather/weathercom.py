@@ -2,10 +2,12 @@ import json
 import re
 from datetime import datetime
 from html.parser import HTMLParser
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from i3pystatus.core.util import internet, require
 from i3pystatus.weather import WeatherBackend
+
+USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
 
 
 class WeathercomHTMLParser(HTMLParser):
@@ -22,7 +24,8 @@ class WeathercomHTMLParser(HTMLParser):
     def get_weather_data(self, url):
         self.logger.debug('Making request to %s to retrieve weather data', url)
         self.weather_data = None
-        with urlopen(url) as content:
+        req = Request(url, headers={'User-Agent': USER_AGENT})
+        with urlopen(req) as content:
             try:
                 content_type = dict(content.getheaders())['Content-Type']
                 charset = re.search(r'charset=(.*)', content_type).group(1)
@@ -81,7 +84,7 @@ class WeathercomHTMLParser(HTMLParser):
                             structural changes to this data.
                             '''
                             if isinstance(data, dict):
-                                if 'observation' in data and 'dailyForecast' in data:
+                                if 'Observation' in data and 'DailyForecast' in data:
                                     return data
                                 else:
                                     for key in data:
@@ -166,7 +169,6 @@ class Weathercom(WeatherBackend):
     # This will be set in the init based on the passed location code
     forecast_url = None
 
-    @require(internet)
     def init(self):
         if self.location_code is not None:
             # Ensure that the location code is a string, in the event that a
@@ -214,7 +216,15 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                observed = self.parser.weather_data['observation']['data']['vt1observation']
+                observed = self.parser.weather_data['Observation']
+                # Observation data stored under a sub-key containing the
+                # lat/long coordinates. For example:
+                #
+                # geocode:41.77,-88.35:language:en-US:units:e
+                #
+                # Since this is the only key under "Observation", we can just
+                # use next(iter(observed)) to get it.
+                observed = observed[next(iter(observed))]['data']['vt1observation']
             except KeyError:
                 self.logger.error(
                     'Failed to retrieve current conditions from API response. '
@@ -224,7 +234,11 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                forecast = self.parser.weather_data['dailyForecast']['data']['vt1dailyForecast'][0]
+                forecast = self.parser.weather_data['DailyForecast']
+                # Same as above, use next(iter(forecast)) to drill down to the
+                # correct nested dict level.
+                forecast = forecast[next(iter(forecast))]
+                forecast = forecast['data']['vt1dailyForecast'][0]
             except (IndexError, KeyError):
                 self.logger.error(
                     'Failed to retrieve forecast data from API response. '
@@ -234,7 +248,11 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                self.city_name = self.parser.weather_data['location']['prsntNm']
+                self.city_name = self.parser.weather_data['Location']
+                # Again, same technique as above used to get down to the
+                # correct nested dict level.
+                self.city_name = self.city_name[next(iter(self.city_name))]
+                self.city_name = self.city_name['data']['location']['displayName']
             except KeyError:
                 self.logger.warning(
                     'Failed to get city name from API response, falling back '

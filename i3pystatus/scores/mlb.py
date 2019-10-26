@@ -9,9 +9,9 @@ import time
 from datetime import datetime
 from urllib.request import urlopen
 
-LIVE_URL = 'http://mlb.mlb.com/mlb/gameday/index.jsp?gid=%s'
+LIVE_URL = 'https://www.mlb.com/gameday/%s'
 SCOREBOARD_URL = 'http://m.mlb.com/scoreboard'
-API_URL = 'http://gd2.mlb.com/components/game/mlb/year_%04d/month_%02d/day_%02d/miniscoreboard.json'
+API_URL = 'https://statsapi.mlb.com/api/v1/schedule?sportId=1,51&date=%04d-%02d-%02d&gameTypes=E,S,R,A,F,D,L,W&hydrate=team(),linescore(matchup,runners),stats,game(content(media(featured,epg),summary),tickets),seriesStatus(useOverride=true)&useLatestGames=false&language=en&leagueId=103,104,420'
 
 
 class MLB(ScoresBackend):
@@ -150,7 +150,7 @@ class MLB(ScoresBackend):
         'KC': '#0046DD',
         'LAA': '#BA0021',
         'LAD': '#005A9C',
-        'MIA': '#F14634',
+        'MIA': '#00A3E0',
         'MIL': '#0747CC',
         'MIN': '#D31145',
         'NYY': '#0747CC',
@@ -190,9 +190,10 @@ class MLB(ScoresBackend):
         self.get_api_date()
         url = self.api_url % (self.date.year, self.date.month, self.date.day)
 
-        game_list = self.get_nested(self.api_request(url),
-                                    'data:games:game',
-                                    default=[])
+        game_list = self.get_nested(
+            self.api_request(url),
+            'dates:0:games',
+            default=[])
         if not isinstance(game_list, list):
             # When only one game is taking place during a given day, the game
             # data is just a single dict containing that game's data, rather
@@ -205,17 +206,23 @@ class MLB(ScoresBackend):
         team_game_map = {}
         for game in game_list:
             try:
-                id_ = game['id']
+                id_ = game['gamePk']
             except (KeyError, TypeError):
                 continue
 
-            try:
-                for team in (game['home_name_abbrev'], game['away_name_abbrev']):
-                    team = team.upper()
-                    if team in self.favorite_teams:
-                        team_game_map.setdefault(team, []).append(id_)
-            except KeyError:
-                continue
+            away_abbrev = self.get_nested(
+                game,
+                'teams:away:team:abbreviation').upper()
+            home_abbrev = self.get_nested(
+                game,
+                'teams:home:team:abbreviation').upper()
+            if away_abbrev and home_abbrev:
+                try:
+                    for team in (home_abbrev, away_abbrev):
+                        if team in self.favorite_teams:
+                            team_game_map.setdefault(team, []).append(id_)
+                except KeyError:
+                    continue
 
             data[id_] = game
 
@@ -224,106 +231,82 @@ class MLB(ScoresBackend):
     def process_game(self, game):
         ret = {}
 
-        def _update(ret_key, game_key=None, callback=None, default='?'):
-            ret[ret_key] = self.get_nested(game,
-                                           game_key or ret_key,
-                                           callback=callback,
-                                           default=default)
-
         self.logger.debug('Processing %s game data: %s',
                           self.__class__.__name__, game)
 
-        for key in ('id', 'venue'):
-            _update(key)
+        linescore = self.get_nested(game, 'linescore', default={})
 
-        for key in ('inning', 'outs'):
-            _update(key, callback=self.force_int, default=0)
+        ret['id'] = game['gamePk']
+        ret['inning'] = self.get_nested(linescore, 'currentInning', default=0)
+        ret['outs'] = self.get_nested(linescore, 'outs')
+        ret['live_url'] = self.live_url % ret['id']
 
-        ret['live_url'] = self.live_url % game['gameday_link']
+        for team in ('away', 'home'):
+            team_data = self.get_nested(game, 'teams:%s' % team, default={})
 
-        for team in ('home', 'away'):
-            _update('%s_wins' % team, '%s_win' % team,
-                    callback=self.force_int)
-            _update('%s_losses' % team, '%s_loss' % team,
-                    callback=self.force_int)
-            _update('%s_score' % team, '%s_team_runs' % team,
-                    callback=self.force_int, default=0)
+            if team == 'home':
+                ret['venue'] = self.get_nested(team_data, 'venue:name')
 
-            _update('%s_abbrev' % team, '%s_name_abbrev' % team)
-            for item in ('city', 'name'):
-                _update('%s_%s' % (team, item), '%s_team_%s' % (team, item))
+            ret['%s_city' % team] = self.get_nested(
+                team_data,
+                'team:locationName')
+            ret['%s_name' % team] = self.get_nested(
+                team_data,
+                'team:teamName')
+            ret['%s_abbrev' % team] = self.get_nested(
+                team_data,
+                'team:abbreviation')
 
-        try:
-            ret['status'] = game.get('status').lower().replace(' ', '_')
-        except AttributeError:
-            # During warmup ret['status'] may be a dictionary. Treat these as
-            # pregame
-            ret['status'] = 'pregame'
+            ret['%s_wins' % team] = self.get_nested(
+                team_data,
+                'leagueRecord:wins',
+                default=0)
+            ret['%s_losses' % team] = self.get_nested(
+                team_data,
+                'leagueRecord:losses',
+                default=0)
+
+            ret['%s_score' % team] = self.get_nested(
+                linescore,
+                'teams:%s:runs' % team,
+                default=0)
 
         for key in ('delay', 'postponed', 'suspended'):
             ret[key] = ''
 
+        ret['status'] = self.get_nested(game, 'status:detailedState').replace(' ', '_').lower()
+
         if ret['status'] == 'delayed_start':
             ret['status'] = 'pregame'
-            ret['delay'] = game.get('reason', 'Unknown')
-        elif ret['status'] == 'delayed':
+            ret['delay'] = self.get_nested(game, 'status:reason', default='Unknown')
+        elif ret['status'].startswith('delayed'):
             ret['status'] = 'in_progress'
-            ret['delay'] = game.get('reason', 'Unknown')
+            ret['delay'] = game['status']['detailedState'].split(':', 1)[-1].strip()
         elif ret['status'] == 'postponed':
-            ret['postponed'] = game.get('reason', 'Unknown Reason')
+            ret['postponed'] = self.get_nested(game, 'status:reason', default='Unknown Reason')
         elif ret['status'] == 'suspended':
-            ret['suspended'] = game.get('reason', 'Unknown Reason')
-        elif ret['status'] in ('game_over', 'completed_early'):
+            ret['suspended'] = self.get_nested(game, 'status:reason', default='Unknown Reason')
+        elif ret['status'].startswith('completed_early') or ret['status'] == 'game_over':
             ret['status'] = 'final'
         elif ret['status'] not in ('in_progress', 'final'):
             ret['status'] = 'pregame'
 
         try:
-            inning = game.get('inning', '0')
-            ret['extra_innings'] = inning \
-                if ret['status'] == 'final' and int(inning) != 9 \
+            ret['extra_innings'] = ret['inning'] \
+                if ret['status'] == 'final' and ret['inning'] != 9 \
                 else ''
         except ValueError:
             ret['extra_innings'] = ''
 
-        top_bottom = game.get('top_inning')
-        ret['top_bottom'] = self.inning_top if top_bottom == 'Y' \
-            else self.inning_bottom if top_bottom == 'N' \
+        top_bottom = self.get_nested(linescore, 'inningHalf').lower()
+        ret['top_bottom'] = self.inning_top if top_bottom == 'top' \
+            else self.inning_bottom if top_bottom == 'bottom' \
             else ''
 
-        time_zones = {
-            'PT': 'US/Pacific',
-            'MT': 'US/Mountain',
-            'CT': 'US/Central',
-            'ET': 'US/Eastern',
-        }
-        game_tz = pytz.timezone(
-            time_zones.get(
-                game.get('time_zone', 'ET'),
-                'US/Eastern'
-            )
-        )
-
-        date_and_time = []
-        if 'resume_time_date' in game and game['resume_time_date']:
-            date_and_time.append(game['resume_time_date'])
-        elif 'time_date' in game and game['time_date']:
-            date_and_time.append(game['time_date'])
-        else:
-            keys = ('original_date', 'time')
-            if all(key in game for key in keys):
-                for key in keys:
-                    if game[key]:
-                        date_and_time.append(game[key])
-        if 'resume_ampm' in game and game['resume_ampm']:
-            date_and_time.append(game['resume_ampm'])
-        elif 'ampm' in game and game['ampm']:
-            date_and_time.append(game['ampm'])
-
-        game_time_str = ' '.join(date_and_time)
-
         try:
-            game_time = datetime.strptime(game_time_str, '%Y/%m/%d %I:%M %p')
+            game_time = datetime.strptime(
+                self.get_nested(game, 'gameDate'),
+                '%Y-%m-%dT%H:%M:%SZ')
         except ValueError as exc:
             # Log when the date retrieved from the API return doesn't match the
             # expected format (to help troubleshoot API changes), and set an
@@ -333,12 +316,12 @@ class MLB(ScoresBackend):
             self.logger.error(
                 'Error encountered determining %s game time for game %s:',
                 self.__class__.__name__,
-                game['id'],
+                game['gamePk'],
                 exc_info=True
             )
             game_time = datetime(1970, 1, 1)
 
-        ret['start_time'] = game_tz.localize(game_time).astimezone()
+        ret['start_time'] = pytz.timezone('UTC').localize(game_time).astimezone()
 
         self.logger.debug('Returned %s formatter data: %s',
                           self.__class__.__name__, ret)

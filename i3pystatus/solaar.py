@@ -15,7 +15,7 @@ class NoBatteryStatus(Exception):
 
 class Solaar(IntervalModule):
     """
-    Shows status and load percentage of bluetooth-device
+    Shows status and load percentage of logitech's unifying device
 
     .. rubric:: Available formatters
 
@@ -27,7 +27,7 @@ class Solaar(IntervalModule):
     interval = 30
 
     settings = (
-        ("nameOfDevice", "name of the bluetooth-device"),
+        ("nameOfDevice", "name of the logitech's unifying device"),
         ("color", "standard color"),
         ("error_color", "color to use when non zero exit code is returned"),
     )
@@ -35,7 +35,7 @@ class Solaar(IntervalModule):
     required = ("nameOfDevice",)
 
     def findDeviceNumber(self):
-        command = 'solaar-cli show'
+        command = 'solaar show'
         retvalue, out, stderr = run_through_shell(command, enable_shell=True)
         for line in out.split('\n'):
             if line.count(self.nameOfDevice) > 0 and line.count(':') > 0:
@@ -44,7 +44,7 @@ class Solaar(IntervalModule):
         raise DeviceNotFound()
 
     def findBatteryStatus(self, numberOfDevice):
-        command = 'solaar-cli show -v %s' % (numberOfDevice)
+        command = 'solaar show %s' % (numberOfDevice)
         retvalue, out, stderr = run_through_shell(command, enable_shell=True)
         for line in out.split('\n'):
             if line.count('Battery') > 0:

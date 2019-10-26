@@ -2,6 +2,8 @@
 Changelog
 =========
 
+**No further releases are planned. Install it from Git.**
+
 3.35 (2016-08-31)
 +++++++++++++++++
 

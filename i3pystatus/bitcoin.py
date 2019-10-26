@@ -41,7 +41,7 @@ class Bitcoin(IntervalModule):
     * {bid_price}
     * {daily_average}
     * {volume}
-    * {volume_thousend}
+    * {volume_thousand}
     * {volume_percent}
     * {age}
     * {status}
@@ -132,7 +132,7 @@ class Bitcoin(IntervalModule):
             "bid_price": price_data["bid"],
             "last_price": price_data["last"],
             "volume": price_data["volume"],
-            "volume_thousend": price_data["volume"] / 1000,
+            "volume_thousand": float(price_data["volume"]) / 1000,
             "volume_percent": price_data["volume_percent"],
             "age": self._get_age(price_data['timestamp'])
         }

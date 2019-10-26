@@ -285,13 +285,29 @@ happens. What happens is defined by these settings for each module
 individually:
 
 - ``on_leftclick``
+- ``on_doubleleftclick``
 - ``on_rightclick``
+- ``on_doublerightclick``
 - ``on_upscroll``
 - ``on_downscroll``
 
 The global default action for all settings is ``None`` (do nothing),
 but many modules define other defaults, which are documented in the
 module reference.
+
+.. note::
+    Each of these callbacks, when triggered, will call the module's ``run()``
+    function (typically only called each time the module's interval is
+    reached). If there are things in the ``run()`` function of your module
+    which you do not want to be executed every time a mouse event is triggered,
+    then consider using threading to perform the module update, and manually
+    sleep for the module's interval between updates. You can start the update
+    thread in the module's ``init()`` function. The ``run()`` function can then
+    either just update the module's displayed text, or simply do nothing (if
+    your update thread also handles updating the display text). See the
+    `weather module`_ for an example of this method.
+
+    .. _`weather module`: https://github.com/enkore/i3pystatus/blob/82fc9fb/i3pystatus/weather/__init__.py#L244-L265
 
 The values you can assign to these four settings can be divided to following
 three categories:
@@ -357,6 +373,24 @@ If ``self`` is needed to access the calling module, the
         # or
         on_rightclick = change_text,
         )
+
+If the module your attaching the callback too is not a subclass of
+:py:class:`.IntervalModule` you will need to invoke ``init()``.
+using :py:class:`.Uname` as an example, the following code would suffice.
+
+.. code:: python
+
+    from i3pystatus import get_module
+
+    @get_module
+    def sys_info(self):
+        if self.format == "{nodename}":
+                self.format = "{sysname} {release} on {machine}"
+            else:
+                self.format = "{nodename}"
+            self.init()
+
+    status.register("uname", format="{nodename}", on_rightclick=sys_info)
 
 You can also create callbacks with parameters.
 
@@ -426,6 +460,8 @@ Some possible uses for these attributes are:
     align the text if its width is shorter than `minimal_width`.
 *   `separator` and `separator_block_width` can be used to remove the
     vertical bar that is separating modules.
+*   `background` can be used to set an alternative background color for the
+    module. supports RGBA if your i3bar version does.
 *   `markup` can be set to `"none"` or `"pango"`.
     `Pango markup
     <https://developer.gnome.org/pango/stable/PangoMarkupFormat.html>`_

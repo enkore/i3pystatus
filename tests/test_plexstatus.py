@@ -24,7 +24,7 @@ STREAM = b'''<?xml version="1.0" encoding="UTF-8"?>
     <Producer id="895" tag="Ton Roosendaal" />
     <Country count="2" id="896" tag="Netherlands" />
     <User id="1" thumb="https://plex.tv/users/a111111111a11111/avatar" title="user" />
-    <Player address="1.1.1.1" machineIdentifier="1aa1a11a-a1a1-1a1a-111a-1a1aa11a1111" platform="Chrome" product="Plex Web" state="playing" title="Plex Web (Chrome)" />
+    <Player address="1.1.1.1" device="Linux" machineIdentifier="1aa1a11a-a1a1-1a1a-111a-1a1aa11a1111" platform="Chrome" product="Plex Web" state="playing" title="Plex Web (Chrome)" />
     <TranscodeSession key="1aaa1a11aaa1aaa111a1aaaa11" throttled="1" progress="24.200000762939453" speed="0" duration="596000" remaining="2155" context="streaming" videoDecision="copy" audioDecision="transcode" protocol="http" container="mkv" videoCodec="h264" audioCodec="aac" audioChannels="2" />
   </Video>
 </MediaContainer>'''
