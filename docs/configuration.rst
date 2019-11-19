@@ -285,13 +285,29 @@ happens. What happens is defined by these settings for each module
 individually:
 
 - ``on_leftclick``
+- ``on_doubleleftclick``
 - ``on_rightclick``
+- ``on_doublerightclick``
 - ``on_upscroll``
 - ``on_downscroll``
 
 The global default action for all settings is ``None`` (do nothing),
 but many modules define other defaults, which are documented in the
 module reference.
+
+.. note::
+    Each of these callbacks, when triggered, will call the module's ``run()``
+    function (typically only called each time the module's interval is
+    reached). If there are things in the ``run()`` function of your module
+    which you do not want to be executed every time a mouse event is triggered,
+    then consider using threading to perform the module update, and manually
+    sleep for the module's interval between updates. You can start the update
+    thread in the module's ``init()`` function. The ``run()`` function can then
+    either just update the module's displayed text, or simply do nothing (if
+    your update thread also handles updating the display text). See the
+    `weather module`_ for an example of this method.
+
+    .. _`weather module`: https://github.com/enkore/i3pystatus/blob/82fc9fb/i3pystatus/weather/__init__.py#L244-L265
 
 The values you can assign to these four settings can be divided to following
 three categories:

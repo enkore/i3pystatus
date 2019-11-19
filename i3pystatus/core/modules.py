@@ -153,7 +153,7 @@ class Module(SettingsBase):
                                         "Method callback", **kwargs)
                 call_callback(cb, self, *args, **kwargs)
             elif hasattr(self, cb):
-                if cb is not "run":
+                if cb != "run":
                     # CommandEndpoint already calls run() after every
                     # callback to instantly update any changed state due
                     # to the callback's actions.
