@@ -29,6 +29,7 @@ class Timewarrior(IntervalModule):
 
     settings = (
         ('format', 'format string'),
+        ('duration_format', 'duration format string'),
         ('enable_stop', 'Allow right click to stop tracking'),
         ('enable_continue', 'ALlow right click to continue tracking'),
         ('color_running', '#00FF00'),
