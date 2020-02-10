@@ -29,7 +29,8 @@ class CpuUsageBar(CpuUsage, ColorRangeModule):
         ("cpu", "cpu to base the colors on. Choices are 'usage_cpu' for all or 'usage_cpu*'."
                 " Replace '*' by core number starting at 0."),
         ("start_color", "Hex or English name for start of color range, eg '#00FF00' or 'green'"),
-        ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'")
+        ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'"),
+        ("dynamic_color", "Use dynamic color"),
     )
 
     def init(self):
