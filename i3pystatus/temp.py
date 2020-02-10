@@ -190,9 +190,7 @@ class Temperature(IntervalModule, ColorRangeModule):
 
         if self.dynamic_color:
             perc = int(self.percentage(int(temp), self.alert_temp))
-            if (perc > 99):
-                perc = 99
-            color = self.colors[perc]
+            color = self.get_colour(perc)
         else:
             color = self.color if temp < self.alert_temp else self.alert_color
         return {
@@ -236,7 +234,7 @@ class Temperature(IntervalModule, ColorRangeModule):
         if self.pango_enabled:
             percentage = self.percentage(sensor.current, sensor.critical)
             if self.dynamic_color:
-                color = self.colors[int(percentage)]
+                color = self.get_colour(percentage)
                 return self.format_pango(color, current_val)
         return current_val
 
@@ -246,9 +244,13 @@ class Temperature(IntervalModule, ColorRangeModule):
         bar = make_vertical_bar(int(percentage))
         if self.pango_enabled:
             if self.dynamic_color:
-                color = self.colors[int(percentage)]
+                color = self.get_colour(percentage)
                 return self.format_pango(color, bar)
         return bar
 
     def format_pango(self, color, value):
         return '<span color="{}">{}</span>'.format(color, value)
+
+    def get_colour(self, percentage):
+        index = -1 if int(percentage) > len(self.colors) - 1 else int(percentage)
+        return self.colors[index]
