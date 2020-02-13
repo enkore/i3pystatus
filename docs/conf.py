@@ -67,7 +67,8 @@ MOCK_MODULES = [
     "lxml.etree",
     "requests.adapters",
     "exchangelib",
-    "soco"
+    "soco",
+    "tesla_api"
 ]
 
 for mod_name in MOCK_MODULES:
