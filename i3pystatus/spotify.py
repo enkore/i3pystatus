@@ -5,4 +5,4 @@ class Spotify(NowPlaying):
     """
     Get Spotify info using dbus interface. Based on `now_playing`_ module.
     """
-    player_name = "spotify"
+    player = "spotify"
