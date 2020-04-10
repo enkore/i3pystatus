@@ -519,7 +519,7 @@ class Github(IntervalModule):
                 }
             else:
                 request_kwargs = {
-                     'auth': (self.username, self.password),
+                    'auth': (self.username, self.password),
                 }
 
             self.current_unread = set()
