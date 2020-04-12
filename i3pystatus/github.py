@@ -19,8 +19,7 @@ except ImportError:
 API_METHODS_URL = 'https://www.githubstatus.com/api/v2/summary.json'
 STATUS_URL = 'https://www.githubstatus.com'
 NOTIFICATIONS_URL = 'https://github.com/notifications'
-ACCESS_TOKEN_AUTH_URL = 'https://api.github.com/notifications?access_token=%s'
-BASIC_AUTH_URL = 'https://api.github.com/notifications'
+AUTH_URL = 'https://api.github.com/notifications'
 
 
 class Github(IntervalModule):
@@ -230,10 +229,10 @@ class Github(IntervalModule):
         'critical': 'GitHub',
     }
     _default_colors = {
-        'none': '#2ecc71',
-        'minor': '#f1c40f',
-        'major': '#e67e22',
-        'critical': '#e74c3c',
+        'none': '#28a745',
+        'minor': '#dbab09',
+        'major': '#e36209',
+        'critical': '#dc3545',
     }
 
     # Module configurables
@@ -512,14 +511,21 @@ class Github(IntervalModule):
                 'access token' if self.access_token else 'username/password'
             )
 
-            old_unread_url = None
             if self.access_token:
-                unread_url = ACCESS_TOKEN_AUTH_URL % self.access_token
+                request_kwargs = {
+                    'headers': {
+                        'Authorization': 'token {}'.format(self.access_token),
+                    },
+                }
             else:
-                unread_url = BASIC_AUTH_URL
+                request_kwargs = {
+                    'auth': (self.username, self.password),
+                }
 
             self.current_unread = set()
             page_num = 0
+            old_unread_url = None
+            unread_url = AUTH_URL
             while old_unread_url != unread_url:
                 old_unread_url = unread_url
                 page_num += 1
@@ -528,13 +534,7 @@ class Github(IntervalModule):
                     page_num, unread_url
                 )
                 try:
-                    if self.access_token:
-                        response = requests.get(unread_url)
-                    else:
-                        response = requests.get(
-                            unread_url,
-                            auth=(self.username, self.password)
-                        )
+                    response = requests.get(unread_url, **request_kwargs)
                     self.logger.log(
                         5,
                         'Raw return from GitHub notification check: %s',
