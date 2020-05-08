@@ -4,7 +4,7 @@ from i3pystatus.core.command import run_through_shell
 __author__ = 'Pluggi'
 
 
-class OpenVPN(IntervalModule):
+class Wireguard(IntervalModule):
     """
     Monitor Wireguard connections.
 
