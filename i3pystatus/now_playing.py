@@ -194,6 +194,10 @@ https://specifications.freedesktop.org/mpris-spec/latest/Player_Interface.html
             if hasattr(self, "data"):
                 del self.data
             return
+        except KeyError:
+            if self.hide_no_player:
+                self.output = None
+            return
 
     def playpause(self):
         self.player_command('PlayPause')
