@@ -27,7 +27,7 @@ class NetSpeed(IntervalModule):
     units = 'bits'
     format = "↓{speed_down:.1f}{down_units} ↑{speed_up:.1f}{up_units} ({hosting_provider})"
 
-    def form_b(self, n: float)->tuple:
+    def form_b(self, n: float) -> tuple:
         """
         formats a bps as bps/kbps/mbps/gbps etc
         handles whether its meant to be in bytes
