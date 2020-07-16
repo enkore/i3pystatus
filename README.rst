@@ -7,7 +7,7 @@ i3pystatus
 i3pystatus is a large collection of status modules compatible with i3bar from the i3 window manager.
 
 :License: MIT
-:Python: 3.4+
+:Python: 3.6+
 :Governance: Patches that don't break the build (Travis or docs) are generally just merged. This is a "do-it-yourself" project, so to speak.
 :Releases: No further releases are planned. Install it from Git.
 
@@ -15,7 +15,7 @@ Installation
 ------------
 
 **Supported Python versions**
-    i3pystatus requires Python 3.4 or newer and is not compatible with
+    i3pystatus requires Python 3.6 or newer and is not compatible with
     Python 2.x. Some modules require additional dependencies
     documented in the docs.
 
