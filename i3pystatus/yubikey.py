@@ -48,10 +48,7 @@ class Yubikey(IntervalModule):
 
     @property
     def _device_id(self):
-        command = run_through_shell(
-            "xinput list",
-            enable_shell=True
-        )
+        command = run_through_shell("xinput list")
 
         rval = ""
 
@@ -71,10 +68,7 @@ class Yubikey(IntervalModule):
         if not self._device_id:
             return rval
 
-        result = run_through_shell(
-            f"xinput list-props {self._device_id}",
-            enable_shell=True
-        )
+        result = run_through_shell(f"xinput list-props {self._device_id}")
         if result.rc == 0:
             match = self.status_regex.match(result.out.splitlines()[1])
             if match and "status" in match.groupdict():
