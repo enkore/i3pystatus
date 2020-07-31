@@ -70,9 +70,12 @@ class WeathercomHTMLParser(HTMLParser):
                 weather_data = None
                 self.logger.debug('Located window.__data')
                 # Strip the "window.__data=" from the beginning and load json
-                json_data = self.load_json(
-                    content[begin:].split('=', 1)[1].lstrip()
-                )
+                raw_json = content[begin:].split('=', 1)[1].lstrip()
+                if re.match(r'^JSON\.parse\("', raw_json):
+                    raw_json = re.sub(r'^JSON\.parse\("', '', raw_json)
+                    raw_json = re.sub(r'"\);?$', '', raw_json)
+                    raw_json = raw_json.replace(r'\"', '"').replace(r'\\', '\\')
+                json_data = self.load_json(raw_json)
                 if json_data is not None:
                     try:
                         weather_data = json_data['dal']
