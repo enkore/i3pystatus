@@ -64,7 +64,7 @@ class Wireguard(IntervalModule):
 
     def run(self):
         command_result = run_through_shell(self.status_command % {'vpn_name': self.vpn_name})
-        self.connected = command_result.out.strip() == "active"
+        self.connected = command_result.rc == 0
 
         if self.connected:
             color, status = self.color_up, self.status_up
