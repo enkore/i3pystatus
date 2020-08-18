@@ -76,6 +76,6 @@ class Wireguard(IntervalModule):
 
         self.data = locals()
         self.output = {
-            "full_text": self.format.format(**locals()),
+            "full_text": self.format.format(**self.data),
             'color': color,
         }
