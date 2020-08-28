@@ -97,7 +97,8 @@ class Weathercom(WeatherBackend):
     parameter should be set to the location code from weather.com. To obtain
     this code, search for your location on weather.com, and when you go to the
     forecast page, the code you need will be everything after the last slash in
-    the URL (e.g. ``94107:4:US``).
+    the URL (e.g. ``94107:4:US``, or
+    ``8b7867695971473a260df2c5d49ff92dc9079dcb673c545f5f107f5c4ab30732``).
 
     .. _weather-usage-weathercom:
 
