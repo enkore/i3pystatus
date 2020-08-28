@@ -73,6 +73,11 @@ class Wunderground(WeatherBackend):
     units = 'metric'
     update_error = '!'
 
+    url_template = 'https://www.wunderground.com/dashboard/pws/{location_code}'
+
+    # This will be set in the init based on the passed location code
+    forecast_url = None
+
     summary_url = 'https://api.weather.com/v2/pws/dailysummary/1day?apiKey={api_key}&stationId={location_code}&format=json&units={units_type}'
     observation_url = 'https://api.weather.com/v2/pws/observations/current?apiKey={api_key}&stationId={location_code}&format=json&units={units_type}'
     overview_url = 'https://api.weather.com/v3/aggcommon/v3alertsHeadlines;v3-wx-observations-current;v3-location-point?apiKey={api_key}&geocodes={lat:.2f}%2C{lon:.2f}&language=en-US&units=e&format=json'
@@ -87,6 +92,7 @@ class Wunderground(WeatherBackend):
 
     def init(self):
         self.units_type = 'm' if self.units == 'metric' else 'e'
+        self.forecast_url = self.url_template.format(**vars(self))
 
     @require(internet)
     def get_api_key(self):
