@@ -7,8 +7,6 @@ from urllib.request import Request, urlopen
 from i3pystatus.core.util import internet, require
 from i3pystatus.weather import WeatherBackend
 
-USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-
 
 class WeathercomHTMLParser(HTMLParser):
     '''
@@ -16,6 +14,7 @@ class WeathercomHTMLParser(HTMLParser):
     through some other source at runtime and added as <script> elements to the
     page source.
     '''
+    user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0'
 
     def __init__(self, logger):
         self.logger = logger
@@ -24,7 +23,7 @@ class WeathercomHTMLParser(HTMLParser):
     def get_weather_data(self, url):
         self.logger.debug('Making request to %s to retrieve weather data', url)
         self.weather_data = None
-        req = Request(url, headers={'User-Agent': USER_AGENT})
+        req = Request(url, headers={'User-Agent': self.user_agent})
         with urlopen(req) as content:
             try:
                 content_type = dict(content.getheaders())['Content-Type']
@@ -154,15 +153,10 @@ class Weathercom(WeatherBackend):
 
         # Setting the locale to en-AU returns units in metric. Leaving it blank
         # causes weather.com to return the default, which is imperial.
-        self.locale = 'en-AU' if self.units == 'metric' else ''
+        self.locale = 'en-CA' if self.units == 'metric' else ''
 
         self.forecast_url = self.url_template.format(**vars(self))
         self.parser = WeathercomHTMLParser(self.logger)
-
-    def check_response(self, response):
-        # Errors for weather.com API manifest in HTTP error codes, not in the
-        # JSON response.
-        return False
 
     @require(internet)
     def check_weather(self):
@@ -211,7 +205,7 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                forecast = self.parser.weather_data['getSunV3DailyForecastUrlConfig']
+                forecast = self.parser.weather_data['getSunV3CurrentObservationsUrlConfig']
                 # Same as above, use next(iter(forecast)) to drill down to the
                 # correct nested dict level.
                 forecast = forecast[next(iter(forecast))]['data']
@@ -255,14 +249,13 @@ class Weathercom(WeatherBackend):
             else:
                 pressure_trend = ''
 
-            self.logger.critical('forecast = %s', forecast)
             try:
-                high_temp = forecast.get('temperatureMax', [])[0] or ''
+                high_temp = forecast.get('temperatureMax24Hour', '')
             except (AttributeError, IndexError):
                 high_temp = ''
 
             try:
-                low_temp = forecast.get('temperatureMin', [])[0]
+                low_temp = forecast.get('temperatureMin24Hour', '')
             except (AttributeError, IndexError):
                 low_temp = ''
 
