@@ -12,9 +12,12 @@ setup(name="i3pystatus",
           "Environment :: X11 Applications",
           "License :: OSI Approved :: MIT License",
           "Operating System :: POSIX :: Linux",
-          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.5",
+          "Programming Language :: Python :: 3.6",
+          "Programming Language :: Python :: 3.7",
           "Topic :: Desktop Environment :: Window Managers",
       ],
+      python_requires='>=3.5',
       packages=find_packages(include=['i3pystatus', 'i3pystatus.*']),
       entry_points={
           "console_scripts": [

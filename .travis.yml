@@ -1,6 +1,5 @@
 language: python
 sudo: false
-python:
   - "3.6"
 install:
   - "pip install -r dev-requirements.txt"
