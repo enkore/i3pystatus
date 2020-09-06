@@ -7,8 +7,6 @@ from urllib.request import Request, urlopen
 from i3pystatus.core.util import internet, require
 from i3pystatus.weather import WeatherBackend
 
-USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:66.0) Gecko/20100101 Firefox/66.0'
-
 
 class WeathercomHTMLParser(HTMLParser):
     '''
@@ -16,6 +14,7 @@ class WeathercomHTMLParser(HTMLParser):
     through some other source at runtime and added as <script> elements to the
     page source.
     '''
+    user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0'
 
     def __init__(self, logger):
         self.logger = logger
@@ -24,7 +23,7 @@ class WeathercomHTMLParser(HTMLParser):
     def get_weather_data(self, url):
         self.logger.debug('Making request to %s to retrieve weather data', url)
         self.weather_data = None
-        req = Request(url, headers={'User-Agent': USER_AGENT})
+        req = Request(url, headers={'User-Agent': self.user_agent})
         with urlopen(req) as content:
             try:
                 content_type = dict(content.getheaders())['Content-Type']
@@ -67,52 +66,29 @@ class WeathercomHTMLParser(HTMLParser):
             # Look for feed information embedded as a javascript variable
             begin = content.find('window.__data')
             if begin != -1:
+                weather_data = None
                 self.logger.debug('Located window.__data')
-                # Look for end of JSON dict and end of javascript statement
-                end = content.find('};', begin)
-                if end == -1:
-                    self.logger.debug('Failed to locate end of javascript statement')
-                else:
-                    # Strip the "window.__data=" from the beginning
-                    json_data = self.load_json(
-                        content[begin:end + 1].split('=', 1)[1].lstrip()
+                # Strip the "window.__data=" from the beginning and load json
+                raw_json = content[begin:].split('=', 1)[1].lstrip()
+                if re.match(r'^JSON\.parse\("', raw_json):
+                    raw_json = re.sub(r'^JSON\.parse\("', '', raw_json)
+                    raw_json = re.sub(r'"\);?$', '', raw_json)
+                    raw_json = raw_json.replace(r'\"', '"').replace(r'\\', '\\')
+                json_data = self.load_json(raw_json)
+                if json_data is not None:
+                    try:
+                        weather_data = json_data['dal']
+                    except KeyError:
+                        pass
+
+                if weather_data is None:
+                    self.logger.debug(
+                        'Failed to locate weather data in the '
+                        'following data: %s', json_data
                     )
-                    if json_data is not None:
-                        def _find_weather_data(data):
-                            '''
-                            Helper designed to minimize impact of potential
-                            structural changes to this data.
-                            '''
-                            if isinstance(data, dict):
-                                if 'Observation' in data and 'DailyForecast' in data:
-                                    return data
-                                else:
-                                    for key in data:
-                                        ret = _find_weather_data(data[key])
-                                        if ret is not None:
-                                            return ret
-                                return None
-
-                        weather_data = _find_weather_data(json_data)
-                        if weather_data is None:
-                            self.logger.debug(
-                                'Failed to locate weather data in the '
-                                'following data structure: %s', json_data
-                            )
-                        else:
-                            self.weather_data = weather_data
-                            return
-
-            for line in content.splitlines():
-                line = line.strip().rstrip(';')
-                if line.startswith('var adaptorParams'):
-                    # Strip off the "var adaptorParams = " from the beginning,
-                    # and the javascript semicolon from the end. This will give
-                    # us JSON that we can load.
-                    weather_data = self.load_json(line.split('=', 1)[1].lstrip())
-                    if weather_data is not None:
-                        self.weather_data = weather_data
-                        return
+                else:
+                    self.weather_data = weather_data
+                    return
 
 
 class Weathercom(WeatherBackend):
@@ -121,7 +97,8 @@ class Weathercom(WeatherBackend):
     parameter should be set to the location code from weather.com. To obtain
     this code, search for your location on weather.com, and when you go to the
     forecast page, the code you need will be everything after the last slash in
-    the URL (e.g. ``94107:4:US``).
+    the URL (e.g. ``94107:4:US``, or
+    ``8b7867695971473a260df2c5d49ff92dc9079dcb673c545f5f107f5c4ab30732``).
 
     .. _weather-usage-weathercom:
 
@@ -177,15 +154,10 @@ class Weathercom(WeatherBackend):
 
         # Setting the locale to en-AU returns units in metric. Leaving it blank
         # causes weather.com to return the default, which is imperial.
-        self.locale = 'en-AU' if self.units == 'metric' else ''
+        self.locale = 'en-CA' if self.units == 'metric' else ''
 
         self.forecast_url = self.url_template.format(**vars(self))
         self.parser = WeathercomHTMLParser(self.logger)
-
-    def check_response(self, response):
-        # Errors for weather.com API manifest in HTTP error codes, not in the
-        # JSON response.
-        return False
 
     @require(internet)
     def check_weather(self):
@@ -216,15 +188,15 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                observed = self.parser.weather_data['Observation']
+                observed = self.parser.weather_data['getSunV3CurrentObservationsUrlConfig']
                 # Observation data stored under a sub-key containing the
-                # lat/long coordinates. For example:
+                # lat/long coordinates, locale info, etc. For example:
                 #
                 # geocode:41.77,-88.35:language:en-US:units:e
                 #
                 # Since this is the only key under "Observation", we can just
                 # use next(iter(observed)) to get it.
-                observed = observed[next(iter(observed))]['data']['vt1observation']
+                observed = observed[next(iter(observed))]['data']
             except KeyError:
                 self.logger.error(
                     'Failed to retrieve current conditions from API response. '
@@ -234,11 +206,10 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                forecast = self.parser.weather_data['DailyForecast']
+                forecast = self.parser.weather_data['getSunV3CurrentObservationsUrlConfig']
                 # Same as above, use next(iter(forecast)) to drill down to the
                 # correct nested dict level.
-                forecast = forecast[next(iter(forecast))]
-                forecast = forecast['data']['vt1dailyForecast'][0]
+                forecast = forecast[next(iter(forecast))]['data']
             except (IndexError, KeyError):
                 self.logger.error(
                     'Failed to retrieve forecast data from API response. '
@@ -248,11 +219,11 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                self.city_name = self.parser.weather_data['Location']
+                location = self.parser.weather_data['getSunV3LocationPointUrlConfig']
                 # Again, same technique as above used to get down to the
                 # correct nested dict level.
-                self.city_name = self.city_name[next(iter(self.city_name))]
-                self.city_name = self.city_name['data']['location']['displayName']
+                location = location[next(iter(location))]
+                self.city_name = location['data']['location']['displayName']
             except KeyError:
                 self.logger.warning(
                     'Failed to get city name from API response, falling back '
@@ -260,19 +231,15 @@ class Weathercom(WeatherBackend):
                 )
                 self.city_name = self.location_code
 
-            # Cut off the timezone from the end of the string (it's after the last
-            # space, hence the use of rpartition). International timezones (or ones
-            # outside the system locale) don't seem to be handled well by
-            # datetime.datetime.strptime().
             try:
-                observation_time_str = str(observed.get('observationTime', ''))
+                observation_time_str = str(observed.get('validTimeLocal', ''))
                 observation_time = datetime.strptime(observation_time_str,
                                                      '%Y-%d-%yT%H:%M:%S%z')
             except (ValueError, AttributeError):
                 observation_time = datetime.fromtimestamp(0)
 
             try:
-                pressure_trend_str = observed.get('barometerTrend', '').lower()
+                pressure_trend_str = observed.get('pressureTendencyTrend', '').lower()
             except AttributeError:
                 pressure_trend_str = ''
 
@@ -284,17 +251,12 @@ class Weathercom(WeatherBackend):
                 pressure_trend = ''
 
             try:
-                high_temp = forecast.get('day', {}).get('temperature', '')
+                high_temp = forecast.get('temperatureMax24Hour', '')
             except (AttributeError, IndexError):
                 high_temp = ''
-            else:
-                if high_temp is None:
-                    # In the mid-afternoon, the high temp disappears from the
-                    # forecast, so just set high_temp to an empty string.
-                    high_temp = ''
 
             try:
-                low_temp = forecast.get('night', {}).get('temperature', '')
+                low_temp = forecast.get('temperatureMin24Hour', '')
             except (AttributeError, IndexError):
                 low_temp = ''
 
@@ -310,25 +272,25 @@ class Weathercom(WeatherBackend):
                 visibility_unit = 'km'
 
             self.data['city'] = self.city_name
-            self.data['condition'] = str(observed.get('phrase', ''))
+            self.data['condition'] = str(observed.get('wxPhraseMedium', ''))
             self.data['observation_time'] = observation_time
             self.data['current_temp'] = str(observed.get('temperature', ''))
             self.data['low_temp'] = str(low_temp)
             self.data['high_temp'] = str(high_temp)
             self.data['temp_unit'] = temp_unit
-            self.data['feelslike'] = str(observed.get('feelsLike', ''))
-            self.data['dewpoint'] = str(observed.get('dewPoint', ''))
+            self.data['feelslike'] = str(observed.get('temperatureFeelsLike', ''))
+            self.data['dewpoint'] = str(observed.get('temperatureDewPoint', ''))
             self.data['wind_speed'] = str(observed.get('windSpeed', ''))
             self.data['wind_unit'] = wind_unit
-            self.data['wind_direction'] = str(observed.get('windDirCompass', ''))
+            self.data['wind_direction'] = str(observed.get('windDirectionCardinal', ''))
             # Gust can be None, using "or" to ensure empty string in this case
-            self.data['wind_gust'] = str(observed.get('gust', '') or '')
-            self.data['pressure'] = str(observed.get('altimeter', ''))
+            self.data['wind_gust'] = str(observed.get('windGust', '') or '')
+            self.data['pressure'] = str(observed.get('pressureAltimeter', ''))
             self.data['pressure_unit'] = pressure_unit
             self.data['pressure_trend'] = pressure_trend
             self.data['visibility'] = str(observed.get('visibility', ''))
             self.data['visibility_unit'] = visibility_unit
-            self.data['humidity'] = str(observed.get('humidity', ''))
+            self.data['humidity'] = str(observed.get('relativeHumidity', ''))
             self.data['uv_index'] = str(observed.get('uvIndex', ''))
         except Exception:
             # Don't let an uncaught exception kill the update thread

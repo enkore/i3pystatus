@@ -2,7 +2,7 @@ import json
 import re
 import threading
 import time
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from i3pystatus import SettingsBase, IntervalModule, formatp
 from i3pystatus.core.util import user_open, internet, require
@@ -12,32 +12,37 @@ class WeatherBackend(SettingsBase):
     settings = ()
 
     @require(internet)
-    def api_request(self, url):
+    def http_request(self, url, headers=None):
+        req = Request(url, headers=headers or {})
+        with urlopen(req) as content:
+            try:
+                content_type = dict(content.getheaders())['Content-Type']
+                charset = re.search(r'charset=(.*)', content_type).group(1)
+            except AttributeError:
+                charset = 'utf-8'
+            return content.read().decode(charset)
+
+    @require(internet)
+    def api_request(self, url, headers=None):
         self.logger.debug('Making API request to %s', url)
         try:
-            with urlopen(url) as content:
-                try:
-                    content_type = dict(content.getheaders())['Content-Type']
-                    charset = re.search(r'charset=(.*)', content_type).group(1)
-                except AttributeError:
-                    charset = 'utf-8'
-                response_json = content.read().decode(charset).strip()
-                if not response_json:
-                    self.logger.debug('JSON response from %s was blank', url)
-                    return {}
-                try:
-                    response = json.loads(response_json)
-                except json.decoder.JSONDecodeError as exc:
-                    self.logger.error('Error loading JSON: %s', exc)
-                    self.logger.debug('JSON text that failed to load: %s',
-                                      response_json)
-                    return {}
-                self.logger.log(5, 'API response: %s', response)
-                error = self.check_response(response)
-                if error:
-                    self.logger.error('Error in JSON response: %s', error)
-                    return {}
-                return response
+            response_json = self.http_request(url, headers=headers).strip()
+            if not response_json:
+                self.logger.debug('JSON response from %s was blank', url)
+                return {}
+            try:
+                response = json.loads(response_json)
+            except json.decoder.JSONDecodeError as exc:
+                self.logger.error('Error loading JSON: %s', exc)
+                self.logger.debug('JSON text that failed to load: %s',
+                                  response_json)
+                return {}
+            self.logger.log(5, 'API response: %s', response)
+            error = self.check_response(response)
+            if error:
+                self.logger.error('Error in JSON response: %s', error)
+                return {}
+            return response
         except Exception as exc:
             self.logger.error(
                 'Failed to make API request to %s. Exception follows:', url,
@@ -45,8 +50,8 @@ class WeatherBackend(SettingsBase):
             )
             return {}
 
-    def check_response(response):
-        raise NotImplementedError
+    def check_response(self, response):
+        return False
 
 
 class Weather(IntervalModule):
@@ -98,21 +103,6 @@ class Weather(IntervalModule):
     The default **format** string value for this module makes use of this
     syntax to conditionally show the value of the **update_error** config value
     when the backend encounters an error during an update.
-
-    The extended string format syntax also comes in handy for the
-    :py:mod:`weathercom <.weather.weathercom>` backend, which at a certain
-    point in the afternoon will have a blank ``{high_temp}`` value. Using the
-    following snippet in your format string will only display the high
-    temperature information if it is not blank:
-
-    ::
-
-        {current_temp}{temp_unit}[ Hi: {high_temp}] Lo: {low_temp}[ {update_error}]
-
-    Brackets are evaluated from the outside-in, so the fact that the only
-    formatter in the outer block (``{high_temp}``) is empty would keep the
-    inner block from being evaluated at all, and entire block would not be
-    displayed.
 
     See the following links for usage examples for the available weather
     backends:

@@ -1,55 +1,36 @@
+import re
+from datetime import datetime
+from urllib.request import Request, urlopen
+
 from i3pystatus.core.util import internet, require
 from i3pystatus.weather import WeatherBackend
-
-from datetime import datetime
-from urllib.request import urlopen
-
-GEOLOOKUP_URL = 'http://api.wunderground.com/api/%s/geolookup%s/q/%s.json'
-STATION_QUERY_URL = 'http://api.wunderground.com/api/%s/%s/q/%s.json'
 
 
 class Wunderground(WeatherBackend):
     '''
-    This module retrieves weather data using the Weather Underground API.
+    This module retrieves weather data from Weather Underground.
 
     .. note::
-        A Weather Underground API key is required to use this module, you can
-        sign up for a developer API key free at
-        https://www.wunderground.com/weather/api/
+        Previous versions of this module required an API key to work. Weather
+        Underground has since discontinued their API, and this module has been
+        rewritten to reflect that.
 
-        Valid values for ``location_code`` include:
+    .. rubric:: Finding your weather station
 
-        * **State/City_Name** - CA/San_Francisco
-        * **Country/City** - France/Paris
-        * **Geolocation by IP** - autoip
-        * **Zip or Postal Code** - 60616
-        * **ICAO Airport Code** - icao:LAX
-        * **Latitude/Longitude** - 41.8301943,-87.6342619
-        * **Personal Weather Station (PWS)** - pws:KILCHICA30
+    To use this module, you must provide a weather station code (as the
+    ``location_code`` option). To find your weather station, first search for
+    your city and click to view the current conditions. Below the city name you
+    will see the station name, and to the right of that a ``CHANGE`` link.
+    Clicking that link will display a map, where you can find the station
+    closest to you. Clicking on that station will take you back to the current
+    conditions page. The weather station code will now be the last part of the
+    URL. For example:
 
-        When not using a ``pws`` or ``icao`` station ID, the location will be
-        queried (this uses an API query), and the closest station will be used.
-        For a list of PWS station IDs, visit the following URL:
+    .. code-block:: text
 
-        http://www.wunderground.com/weatherstation/ListStations.asp
+        https://www.wunderground.com/weather/us/ma/cambridge/KMACAMBR4
 
-        .. rubric:: API usage
-
-        An API key is allowed 500 queries per day, and no more than 10 in a
-        given minute. Therefore, it is recommended to be conservative when
-        setting the update interval (the default is 1800 seconds, or 30
-        minutes), and one should be careful how often one restarts i3pystatus
-        and how often a refresh is forced by left-clicking the module.
-
-        As noted above, when not using a ``pws`` or ``icao`` station ID, an API
-        query will be used to determine the station ID to use. This will be
-        done once when i3pystatus is started, and not repeated until the next
-        time i3pystatus is started.
-
-        When updating weather data, one API query will be used to obtain the
-        current conditions. The high/low temperature forecast requires an
-        additonal API query, and is optional (disabled by default). To enable
-        forecast checking, set ``forecast=True``.
+    In this case, the weather station code would be ``KMACAMBR4``.
 
     .. _weather-usage-wunderground:
 
@@ -68,10 +49,8 @@ class Wunderground(WeatherBackend):
             colorize=True,
             hints={'markup': 'pango'},
             backend=wunderground.Wunderground(
-                api_key='api_key_goes_here',
-                location_code='pws:MAT645',
+                location_code='KMACAMBR4',
                 units='imperial',
-                forecast=True,
                 update_error='<span color="#ff0000">!</span>',
             ),
         )
@@ -82,204 +61,170 @@ class Wunderground(WeatherBackend):
     used.
     '''
     settings = (
-        ('api_key', 'Weather Underground API key'),
         ('location_code', 'Location code from wunderground.com'),
         ('units', '\'metric\' or \'imperial\''),
-        ('use_pws', 'Set to False to use only airport stations'),
-        ('forecast', 'Set to ``True`` to check forecast (generates one '
-                     'additional API request per weather update). If set to '
-                     '``False``, then the ``low_temp`` and ``high_temp`` '
-                     'formatters will be set to empty strings.'),
         ('update_error', 'Value for the ``{update_error}`` formatter when an '
                          'error is encountered while checking weather data'),
     )
 
-    required = ('api_key', 'location_code')
+    required = ('location_code',)
 
-    api_key = None
     location_code = None
     units = 'metric'
-    use_pws = True
-    forecast = False
     update_error = '!'
 
-    # These will be set once weather data has been checked
-    station_id = None
+    url_template = 'https://www.wunderground.com/dashboard/pws/{location_code}'
+
+    # This will be set in the init based on the passed location code
     forecast_url = None
 
+    summary_url = 'https://api.weather.com/v2/pws/dailysummary/1day?apiKey={api_key}&stationId={location_code}&format=json&units={units_type}'
+    observation_url = 'https://api.weather.com/v2/pws/observations/current?apiKey={api_key}&stationId={location_code}&format=json&units={units_type}'
+    overview_url = 'https://api.weather.com/v3/aggcommon/v3alertsHeadlines;v3-wx-observations-current;v3-location-point?apiKey={api_key}&geocodes={lat:.2f}%2C{lon:.2f}&language=en-US&units=e&format=json'
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0',
+        'Referer': 'https://www.wunderground.com/dashboard/pws/{location_code}',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+    }
+
     def init(self):
-        '''
-        Use the location_code to perform a geolookup and find the closest
-        station. If the location is a pws or icao station ID, no lookup will be
-        peformed.
-        '''
-        try:
-            for no_lookup in ('pws', 'icao'):
-                sid = self.location_code.partition(no_lookup + ':')[-1]
-                if sid:
-                    self.station_id = self.location_code
-                    return
-        except AttributeError:
-            # Numeric or some other type, either way we'll just stringify
-            # it below and perform a lookup.
-            pass
-
-        self.get_station_id()
+        self.units_type = 'm' if self.units == 'metric' else 'e'
+        self.forecast_url = self.url_template.format(**vars(self))
 
     @require(internet)
-    def get_forecast(self):
+    def get_api_key(self):
         '''
-        If configured to do so, make an API request to retrieve the forecast
-        data for the configured/queried weather station, and return the low and
-        high temperatures. Otherwise, return two empty strings.
+        Grab the API key out of the page source from the home page
         '''
-        no_data = ('', '')
-        if self.forecast:
-            query_url = STATION_QUERY_URL % (self.api_key,
-                                             'forecast',
-                                             self.station_id)
+        url = 'https://www.wunderground.com'
+        try:
+            page_source = self.http_request(
+                url,
+                headers={
+                    'User-Agent': self.headers['User-Agent'],
+                    'Accept-Language': self.headers['Accept-Language'],
+                    'Conncetion': self.headers['Connection'],
+                },
+            )
+        except Exception as exc:
+            self.logger.exception('Failed to load %s', url)
+        else:
             try:
-                response = self.api_request(query_url)['forecast']
-                response = response['simpleforecast']['forecastday'][0]
-            except (KeyError, IndexError, TypeError):
-                self.logger.error(
-                    'No forecast data found for %s', self.station_id)
-                self.data['update_error'] = self.update_error
-                return no_data
-
-            unit = 'celsius' if self.units == 'metric' else 'fahrenheit'
-            low_temp = response.get('low', {}).get(unit, '')
-            high_temp = response.get('high', {}).get(unit, '')
-            return low_temp, high_temp
-        else:
-            return no_data
+                return re.search(r'apiKey=([0-9a-f]+)', page_source).group(1)
+            except AttributeError:
+                self.logger.error('Failed to find API key in mainpage source')
 
     @require(internet)
-    def get_station_id(self):
-        '''
-        Use geolocation to get the station ID
-        '''
-        extra_opts = '/pws:0' if not self.use_pws else ''
-        api_url = GEOLOOKUP_URL % (self.api_key,
-                                   extra_opts,
-                                   self.location_code)
-        response = self.api_request(api_url)
-        station_type = 'pws' if self.use_pws else 'airport'
-        try:
-            stations = response['location']['nearby_weather_stations']
-            nearest = stations[station_type]['station'][0]
-        except (KeyError, IndexError):
-            raise Exception(
-                'No locations matched location_code %s' % self.location_code)
-
-        self.logger.error('nearest = %s', nearest)
-        if self.use_pws:
-            nearest_pws = nearest.get('id', '')
-            if not nearest_pws:
-                raise Exception('No id entry for nearest PWS')
-            self.station_id = 'pws:%s' % nearest_pws
-        else:
-            nearest_airport = nearest.get('icao', '')
-            if not nearest_airport:
-                raise Exception('No icao entry for nearest airport')
-            self.station_id = 'icao:%s' % nearest_airport
-
-    def check_response(self, response):
-        try:
-            return response['response']['error']['description']
-        except KeyError:
-            # No error in response
-            return False
+    def api_request(self, url, headers=None):
+        if headers is None:
+            headers = {}
+        return super(Wunderground, self).api_request(
+            url,
+            headers=dict([(k, v.format(**vars(self))) for k, v in headers.items()]))
 
     @require(internet)
     def check_weather(self):
         '''
-        Query the configured/queried station and return the weather data
+        Query the desired station and return the weather data
         '''
-        if self.station_id is None:
-            # Failed to get the nearest station ID when first launched, so
-            # retry it.
-            self.get_station_id()
+        # Get the API key from the page source
+        self.api_key = self.get_api_key()
+        if self.api_key is None:
+            self.data['update_error'] = self.update_error
+            return
 
         self.data['update_error'] = ''
         try:
-            query_url = STATION_QUERY_URL % (self.api_key,
-                                             'conditions',
-                                             self.station_id)
             try:
-                response = self.api_request(query_url)['current_observation']
-                self.forecast_url = response.pop('ob_url', None)
-            except KeyError:
-                self.logger.error('No weather data found for %s', self.station_id)
+                summary = self.api_request(self.summary_url.format(**vars(self)))['summaries'][0]
+            except (IndexError, KeyError):
+                self.logger.error(
+                    'Failed to retrieve summary data from API response. '
+                    'Run module with debug logging to get more information.'
+                )
                 self.data['update_error'] = self.update_error
                 return
 
-            if self.forecast:
-                query_url = STATION_QUERY_URL % (self.api_key,
-                                                 'forecast',
-                                                 self.station_id)
-                try:
-                    forecast = self.api_request(query_url)['forecast']
-                    forecast = forecast['simpleforecast']['forecastday'][0]
-                except (KeyError, IndexError, TypeError):
-                    self.logger.error(
-                        'No forecast data found for %s', self.station_id)
-                    # This is a non-fatal error, so don't return but do set the
-                    # error flag.
-                    self.data['update_error'] = self.update_error
+            try:
+                observation = self.api_request(self.observation_url.format(**vars(self)))['observations'][0]
+            except (IndexError, KeyError):
+                self.logger.error(
+                    'Failed to retrieve observation data from API response. '
+                    'Run module with debug logging to get more information.'
+                )
+                self.data['update_error'] = self.update_error
+                return
 
-                unit = 'celsius' if self.units == 'metric' else 'fahrenheit'
-                low_temp = forecast.get('low', {}).get(unit, '')
-                high_temp = forecast.get('high', {}).get(unit, '')
-            else:
-                low_temp = high_temp = ''
+            self.lat = observation['lat']
+            self.lon = observation['lon']
+
+            try:
+                overview = self.api_request(self.overview_url.format(**vars(self)))[0]
+            except IndexError:
+                self.logger.error(
+                    'Failed to retrieve overview data from API response. '
+                    'Run module with debug logging to get more information.'
+                )
+                self.data['update_error'] = self.update_error
+                return
 
             if self.units == 'metric':
-                temp_unit = 'c'
+                temp_unit = '°C'
                 speed_unit = 'kph'
                 distance_unit = 'km'
                 pressure_unit = 'mb'
             else:
-                temp_unit = 'f'
+                temp_unit = '°F'
                 speed_unit = 'mph'
                 distance_unit = 'mi'
                 pressure_unit = 'in'
 
-            def _find(key, data=None, default=''):
-                if data is None:
-                    data = response
-                return str(data.get(key, default))
-
             try:
-                observation_epoch = _find('observation_epoch') or _find('local_epoch')
-                observation_time = datetime.fromtimestamp(int(observation_epoch))
-            except (TypeError, ValueError):
-                log.debug(
-                    'Observation time \'%s\' is not a UNIX timestamp',
-                    observation_epoch
-                )
+                observation_time_str = observation.get('obsTimeLocal', '')
+                observation_time = datetime.strptime(observation_time_str,
+                                                     '%Y-%m-%d %H:%M:%S')
+            except (ValueError, AttributeError):
                 observation_time = datetime.fromtimestamp(0)
 
-            self.data['city'] = _find('city', response['observation_location'])
-            self.data['condition'] = _find('weather')
+            def _find(path, data, default=''):
+                ptr = data
+                try:
+                    for item in path.split(':'):
+                        if item == 'units':
+                            item = self.units
+                        ptr = ptr[item]
+                except (KeyError, IndexError, TypeError):
+                    return default
+                return str(ptr)
+
+            pressure_tendency = _find(
+                'v3-wx-observations-current:pressureTendencyTrend',
+                overview).lower()
+            pressure_trend = '+' if pressure_tendency == 'rising' else '-'
+
+            self.data['city'] = _find('v3-location-point:location:city', overview)
+            self.data['condition'] = _find('v3-wx-observations-current:wxPhraseShort', overview)
             self.data['observation_time'] = observation_time
-            self.data['current_temp'] = _find('temp_' + temp_unit).split('.')[0]
-            self.data['low_temp'] = low_temp
-            self.data['high_temp'] = high_temp
-            self.data['temp_unit'] = '°' + temp_unit.upper()
-            self.data['feelslike'] = _find('feelslike_' + temp_unit)
-            self.data['dewpoint'] = _find('dewpoint_' + temp_unit)
-            self.data['wind_speed'] = _find('wind_' + speed_unit)
+            self.data['current_temp'] = _find('units:temp', observation, '0')
+            self.data['low_temp'] = _find('units:tempLow', summary)
+            self.data['high_temp'] = _find('units:tempHigh', summary)
+            self.data['temp_unit'] = temp_unit
+            self.data['feelslike'] = _find('units:heatIndex', observation)
+            self.data['dewpoint'] = _find('units:dewpt', observation)
+            self.data['wind_speed'] = _find('units:windSpeed', observation)
             self.data['wind_unit'] = speed_unit
-            self.data['wind_direction'] = _find('wind_dir')
-            self.data['wind_gust'] = _find('wind_gust_' + speed_unit)
-            self.data['pressure'] = _find('pressure_' + pressure_unit)
+            self.data['wind_direction'] = _find('v3-wx-observations-current:windDirectionCardinal', overview)
+            self.data['wind_gust'] = _find('units:windGust', observation)
+            self.data['pressure'] = _find('units:pressure', observation)
             self.data['pressure_unit'] = pressure_unit
-            self.data['pressure_trend'] = _find('pressure_trend')
-            self.data['visibility'] = _find('visibility_' + distance_unit)
+            self.data['pressure_trend'] = pressure_trend
+            self.data['visibility'] = _find('v3-wx-observations-current:visibility', overview)
             self.data['visibility_unit'] = distance_unit
-            self.data['humidity'] = _find('relative_humidity').rstrip('%')
-            self.data['uv_index'] = _find('UV')
+            self.data['humidity'] = _find('humidity', observation)
+            self.data['uv_index'] = _find('uv', observation)
         except Exception:
             # Don't let an uncaught exception kill the update thread
             self.logger.error(
