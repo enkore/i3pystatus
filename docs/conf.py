@@ -101,7 +101,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'i3pystatus'
-copyright = '2012-2017 i3pystatus developers. Free and open software under the MIT license'
+copyright = '2012-2020 i3pystatus developers. Free and open software under the MIT license'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
