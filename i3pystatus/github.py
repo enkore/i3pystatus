@@ -222,14 +222,9 @@ class Github(IntervalModule):
     )
 
     # Defaults for module configurables
-    _default_status = {
-        'none': 'GitHub',
-        'minor': 'GitHub',
-        'major': 'GitHub',
-        'critical': 'GitHub',
-    }
     _default_colors = {
         'none': '#28a745',
+        'maintenance': '#4f8cc9',
         'minor': '#dbab09',
         'major': '#e36209',
         'critical': '#dc3545',
@@ -237,7 +232,7 @@ class Github(IntervalModule):
 
     # Module configurables
     format = '{status}[ {unread}][ {update_error}]'
-    status = _default_status
+    status = {}
     colors = _default_colors
     refresh_icon = '⟳'
     update_error = '!'
@@ -291,17 +286,11 @@ class Github(IntervalModule):
         user_open(self.notifications_url)
 
     def init(self):
-        if self.status != self._default_status:
-            new_status = copy.copy(self._default_status)
-            new_status.update(self.status)
-            self.status = new_status
-
         if self.colors != self._default_colors:
             new_colors = copy.copy(self._default_colors)
             new_colors.update(self.colors)
             self.colors = new_colors
 
-        self.logger.debug('status = %s', self.status)
         self.logger.debug('colors = %s', self.colors)
 
         self.condition = threading.Condition()
@@ -475,7 +464,8 @@ class Github(IntervalModule):
                 self.failed_update = True
                 return
 
-            self.data['status'] = self.status.get(self.current_status)
+            self.logger.debug('Current GitHub Status: %s', self.current_status)
+            self.data['status'] = self.status.get(self.current_status, 'GitHub')
             if self.current_incidents != self.previous_incidents:
                 self.show_status_notification()
             self.__previous_json = self.__current_json
