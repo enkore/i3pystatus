@@ -105,6 +105,7 @@ class NHL(ScoresBackend):
     * **OTT** — Ottawa Senators
     * **PHI** — Philadelphia Flyers
     * **PIT** — Pittsburgh Penguins
+    * **SEA** — Seattle Kraken
     * **SJS** — San Jose Sharks
     * **STL** — St. Louis Blues
     * **TBL** — Tampa Bay Lightning
@@ -184,6 +185,7 @@ class NHL(ScoresBackend):
         'OTT': '#C50B2F',
         'PHI': '#FF690B',
         'PIT': '#FFB81C',
+        'SEA': '#96D8D8',
         'SJS': '#007888',
         'STL': '#1764AD',
         'TBL': '#296AD5',

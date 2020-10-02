@@ -158,7 +158,7 @@ class MLB(ScoresBackend):
         'OAK': '#006659',
         'PHI': '#E81828',
         'PIT': '#FFCC01',
-        'SD': '#285F9A',
+        'SD': '#FFC425',
         'SEA': '#2E8B90',
         'SF': '#FD5A1E',
         'STL': '#B53B30',
