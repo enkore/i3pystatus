@@ -206,7 +206,7 @@ class Wunderground(WeatherBackend):
             pressure_trend = '+' if pressure_tendency == 'rising' else '-'
 
             self.data['city'] = _find('v3-location-point:location:city', overview)
-            self.data['condition'] = _find('v3-wx-observations-current:wxPhraseShort', overview)
+            self.data['condition'] = _find('v3-wx-observations-current:wxPhraseMedium', overview)
             self.data['observation_time'] = observation_time
             self.data['current_temp'] = _find('units:temp', observation, '0')
             self.data['low_temp'] = _find('units:tempLow', summary)
