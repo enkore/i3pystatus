@@ -64,6 +64,8 @@ class WindowTitle(Module):
         else:
             title = w.name
             class_name = w.window_class
+            if title is None:
+                title = self.empty_title
             if len(title) > self.max_width:
                 title = title[:self.max_width - 1] + "…"
             return self.format.format(title=title, class_name=class_name)
