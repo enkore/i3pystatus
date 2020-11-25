@@ -28,8 +28,8 @@ class Bitcoin(IntervalModule):
     """
     This module fetches and displays current Bitcoin market prices and
     optionally monitors transactions to and from a list of user-specified
-    wallet addresses. Market data is pulled from the BitcoinAverage Price
-    Index API <https://bitcoinaverage.com> and it is possible to specify
+    wallet addresses. Market data is pulled from the Bitaps Market
+    API <https://bitaps.com> and it is possible to specify
     the exchange to be monitored.
     Transaction data is pulled from blockchain.info
     <https://blockchain.info/api/blockchain_api>.
@@ -39,7 +39,7 @@ class Bitcoin(IntervalModule):
     * {last_price}
     * {ask_price}
     * {bid_price}
-    * {daily_average}
+    * {open_price}
     * {volume}
     * {volume_thousand}
     * {volume_percent}
@@ -69,8 +69,8 @@ class Bitcoin(IntervalModule):
     )
     format = "{symbol} {status}{last_price}"
     currency = "USD"
-    exchange = None
-    symbol = "฿"
+    exchange = "bitstamp"
+    symbol = "\uF15A"
     wallet_addresses = ""
     color = "#FFFFFF"
     colorize = False
@@ -83,7 +83,7 @@ class Bitcoin(IntervalModule):
     }
 
     on_leftclick = "electrum"
-    on_rightclick = ["open_something", "https://bitcoinaverage.com/"]
+    on_rightclick = ["open_something", "https://bitaps.com/"]
 
     _price_prev = 0
 
@@ -95,25 +95,17 @@ class Bitcoin(IntervalModule):
         return int(diff.total_seconds())
 
     def _query_api(self, api_url):
-        url = "{}BTC{}".format(api_url, self.currency.upper())
+        url = "{}/{}".format(api_url, self.exchange.upper())
         response = urllib.request.urlopen(url).read().decode("utf-8")
         return json.loads(response)
 
     def _fetch_price_data(self):
-        if self.exchange is None:
-            api_url = "https://apiv2.bitcoinaverage.com/indices/global/ticker/"
-            return self._query_api(api_url)
-        else:
-            api_url = "https://api.bitcoinaverage.com/exchanges/"
-            ret = self._query_api(api_url)
-            exchange = ret[self.exchange.lower()]
-            # Adapt values to global ticker format
-            exchange['ask'] = exchange['rates']['ask']
-            exchange['bid'] = exchange['rates']['bid']
-            exchange['last'] = exchange['rates']['last']
-            exchange['24h_avg'] = None
-            exchange['timestamp'] = ret['timestamp']
-            return exchange
+        api_url = "https://api.bitaps.com/market/v1/tickers"
+        ret = self._query_api(api_url)["data"]
+        exchange = ret[self.exchange.upper()]["pairs"]["BTC{}".format(self.currency.upper())]
+        # Adapt values to global ticker format
+        exchange['24h_avg'] = None
+        return exchange
 
     def _fetch_blockchain_data(self):
         api = "https://blockchain.info/multiaddr?active="
@@ -127,13 +119,12 @@ class Bitcoin(IntervalModule):
 
         fdict = {
             "symbol": self.symbol,
-            "daily_average": price_data["averages"]["day"],
+            "open": price_data["open"],
             "ask_price": price_data["ask"],
             "bid_price": price_data["bid"],
             "last_price": price_data["last"],
             "volume": price_data["volume"],
             "volume_thousand": float(price_data["volume"]) / 1000,
-            "volume_percent": price_data["volume_percent"],
             "age": self._get_age(price_data['timestamp'])
         }
 
