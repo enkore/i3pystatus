@@ -1,5 +1,5 @@
 """
-Basic test for the plexstatus module
+Basic test for the hassio module
 """
 
 import unittest
@@ -49,7 +49,7 @@ class HassioTest(unittest.TestCase):
     @patch('i3pystatus.hassio.get', autospec=True)
     def test_desired_state(self, urlopen):
         """
-        Test output from side-loaded xml (generated from a real plex server
+        Test output from side-loaded xml (generated from a real hassio server
         response)
         """
         hassio.get.return_value.text = json.dumps(STREAM)
