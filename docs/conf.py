@@ -68,7 +68,8 @@ MOCK_MODULES = [
     "requests.adapters",
     "exchangelib",
     "soco",
-    "tesla_api"
+    "tesla_api",
+    "json"
 ]
 
 for mod_name in MOCK_MODULES:
