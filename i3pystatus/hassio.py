@@ -6,6 +6,7 @@ import json
 class Hassio(IntervalModule):
     """
     Displays the state of a Homeassistant.io entity
+    Requires the PyPI package `requests`
     """
 
     settings = (
