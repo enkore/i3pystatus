@@ -4,7 +4,6 @@ Basic test for the hassio module
 
 import unittest
 from mock import patch
-from unittest.mock import MagicMock
 from requests import get
 from i3pystatus import hassio
 import json
