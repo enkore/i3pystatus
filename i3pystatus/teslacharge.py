@@ -1,4 +1,4 @@
-from tesla_api import TeslaApiClient
+import teslapy
 from i3pystatus import IntervalModule
 
 
@@ -7,7 +7,7 @@ class TeslaCharge(IntervalModule):
     Displays the current charge/range of your Tesla vehicle. There is a ton of
     data that could be displayed, so read this module to see the full list of
     datapoints that can be displayed.
-    Requires: tesla_api
+    Requires: teslapy
     """
 
     settings = (
@@ -32,21 +32,21 @@ class TeslaCharge(IntervalModule):
 
     def run(self):
         # Setup Tesla API client
-        tclient = TeslaApiClient(self.email, self.password)
-        vehicles = tclient.list_vehicles()
+        tclient = teslapy.Tesla(self.email, self.password)
+        vehicles = tclient.vehicle_list()
         # Currently, only one vehicle is supported. It would be nice to be
         # able to click through multipe vehicles.
         thisvehicle = vehicles[0]
-        display_name = thisvehicle.display_name
+        display_name = thisvehicle['display_name']
 
         # If vehicle is offline, do not bother grabbing info
-        if thisvehicle.state != 'online':
+        if thisvehicle['state'] != 'online':
             self.output = {
-                "full_text": "%s: %s" % (display_name, thisvehicle.state),
+                "full_text": "%s: %s" % (display_name, thisvehicle['state']),
                 "color": self.offline_color
             }
         else:
-            charge_info = vehicles[0].charge.get_state()
+            charge_info = vehicles[0].get_vehicle_data()['charge_state']
 
             # Miles or meters?
             if self.units != "miles":
