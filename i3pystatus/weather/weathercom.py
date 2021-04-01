@@ -252,12 +252,12 @@ class Weathercom(WeatherBackend):
                 pressure_trend = ''
 
             try:
-                high_temp = forecast.get('temperatureMax', [])[0]
+                high_temp = forecast.get('temperatureMax', [])[0] or ''
             except (AttributeError, IndexError):
                 high_temp = ''
 
             try:
-                low_temp = forecast.get('temperatureMin', [])[0]
+                low_temp = forecast.get('temperatureMin', [])[0] or ''
             except (AttributeError, IndexError):
                 low_temp = ''
 
