@@ -187,6 +187,7 @@ class Weathercom(WeatherBackend):
                 self.data['update_error'] = self.update_error
                 return
 
+            self.logger.debug('Parsed weather data: %s', self.parser.weather_data)
             try:
                 observed = self.parser.weather_data['getSunV3CurrentObservationsUrlConfig']
                 # Observation data stored under a sub-key containing the
@@ -206,7 +207,7 @@ class Weathercom(WeatherBackend):
                 return
 
             try:
-                forecast = self.parser.weather_data['getSunV3CurrentObservationsUrlConfig']
+                forecast = self.parser.weather_data['getSunV3DailyForecastWithHeadersUrlConfig']
                 # Same as above, use next(iter(forecast)) to drill down to the
                 # correct nested dict level.
                 forecast = forecast[next(iter(forecast))]['data']
@@ -251,12 +252,12 @@ class Weathercom(WeatherBackend):
                 pressure_trend = ''
 
             try:
-                high_temp = forecast.get('temperatureMax24Hour', '')
+                high_temp = forecast.get('temperatureMax', [])[0] or ''
             except (AttributeError, IndexError):
                 high_temp = ''
 
             try:
-                low_temp = forecast.get('temperatureMin24Hour', '')
+                low_temp = forecast.get('temperatureMin', [])[0] or ''
             except (AttributeError, IndexError):
                 low_temp = ''
 
