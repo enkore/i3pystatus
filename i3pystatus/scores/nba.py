@@ -6,10 +6,8 @@ import pytz
 import time
 from datetime import datetime
 
-LIVE_URL = 'http://www.nba.com/gametracker/#/%s/lp'
-SCOREBOARD_URL = 'http://www.nba.com/scores'
-API_URL = 'http://data.nba.com/data/10s/json/cms/noseason/scoreboard/%04d%02d%02d/games.json'
-STANDINGS_URL = 'http://data.nba.com/data/json/cms/%s/league/standings.json'
+LIVE_URL = 'https://www.nba.com/game/{id}'
+API_URL = 'https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json'
 
 
 class NBA(ScoresBackend):
@@ -43,7 +41,6 @@ class NBA(ScoresBackend):
       followed. Otherwise, this formatter will be blank.
     * `{time_remaining}` — Time remaining in the current quarter/OT period
     * `{quarter}` — Number of the current quarter
-    * `{venue}` — Name of arena where game is being played
     * `{start_time}` — Start time of game in system's localtime (supports
       strftime formatting, e.g. `{start_time:%I:%M %p}`)
     * `{overtime}` — If the game ended in overtime, this formatter will show
@@ -171,66 +168,32 @@ class NBA(ScoresBackend):
     format_final = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Final[/{overtime}])'
     team_colors = _default_colors
     live_url = LIVE_URL
-    scoreboard_url = SCOREBOARD_URL
     api_url = API_URL
-    standings_url = STANDINGS_URL
 
     def check_scores(self):
         self.get_api_date()
-        url = self.api_url % (self.date.year, self.date.month, self.date.day)
 
-        response = self.api_request(url)
-        game_list = self.get_nested(response,
-                                    'sports_content:games:game',
-                                    default=[])
-
-        standings_year = self.get_nested(
-            response,
-            'sports_content:sports_meta:season_meta:standings_season_year',
-            default=self.date.year,
-        )
-
-        stats_list = self.get_nested(
-            self.api_request(self.standings_url % standings_year),
-            'sports_content:standings:team',
-            default=[],
-        )
-        team_stats = {}
-        for item in stats_list:
-            try:
-                key = item.pop('abbreviation')
-            except KeyError:
-                self.logger.debug('Error occurred obtaining team stats',
-                                  exc_info=True)
-                continue
-            team_stats[key] = item.get('team_stats', {})
-
-        self.logger.debug('%s team stats: %s',
-                          self.__class__.__name__, team_stats)
+        response = self.api_request(self.api_url)
+        game_list = self.get_nested(response, 'scoreboard:games', default=[])
 
         # Convert list of games to dictionary for easy reference later on
         data = {}
         team_game_map = {}
         for game in game_list:
             try:
-                id_ = game['game_url']
+                id_ = game['gameId']
             except KeyError:
                 continue
 
             try:
-                for key in ('home', 'visitor'):
-                    team = game[key]['abbreviation'].upper()
+                for key in ('homeTeam', 'awayTeam'):
+                    team = game[key]['teamTricode']
                     if team in self.favorite_teams:
                         team_game_map.setdefault(team, []).append(id_)
             except KeyError:
                 continue
 
             data[id_] = game
-            # Merge in the team stats, because they are not returned in the
-            # initial API request.
-            for key in ('home', 'visitor'):
-                team = data[id_][key]['abbreviation'].upper()
-                data[id_][key].update(team_stats.get(team, {}))
 
         self.interpret_api_return(data, team_game_map)
 
@@ -243,11 +206,10 @@ class NBA(ScoresBackend):
                                            callback=callback,
                                            default=default)
 
-        self.logger.debug('Processing %s game data: %s',
-                          self.__class__.__name__, game)
+        self.logger.debug(f'Processing {self.name} game data: {game}')
 
-        _update('id', 'game_url')
-        ret['live_url'] = self.live_url % ret['id']
+        _update('id', 'gameId')
+        ret['live_url'] = self.live_url.format(id=ret['id'])
 
         status_map = {
             '1': 'pregame',
@@ -258,8 +220,9 @@ class NBA(ScoresBackend):
         status_code = period_data.get('game_status', '1')
         status = status_map.get(status_code)
         if status is None:
-            self.logger.debug('Unknown %s game status code \'%s\'',
-                              self.__class__.__name__, status_code)
+            self.logger.debug(
+                f"Unknown {self.name} game status code '{status_code}'"
+            )
             status_code = '1'
         ret['status'] = status_map[status_code]
 
@@ -269,64 +232,59 @@ class NBA(ScoresBackend):
             period_diff = period_number - total_periods
             ret['quarter'] = 'OT' \
                 if period_diff == 1 \
-                else '%dOT' % period_diff if period_diff > 1 \
+                else f'{period_diff}OT' if period_diff > 1 \
                 else self.add_ordinal(period_number)
         else:
             ret['quarter'] = ''
 
-        ret['time_remaining'] = period_data.get('game_clock')
+        ret['time_remaining'] = game.get('game_clock')
         if ret['time_remaining'] == '':
             ret['time_remaining'] = 'End'
         elif ret['time_remaining'] is None:
             ret['time_remaining'] = ''
         ret['overtime'] = ret['quarter'] if 'OT' in ret['quarter'] else ''
 
-        _update('venue', 'arena')
-
-        for ret_key, game_key in (('home', 'home'), ('away', 'visitor')):
-            _update('%s_score' % ret_key, '%s:score' % game_key,
+        for key in ('home', 'away'):
+            team_key = f'{key}Team'
+            _update(f'{key}_score', f'{team_key}:score',
                     callback=self.force_int, default=0)
-            _update('%s_city' % ret_key, '%s:city' % game_key)
-            _update('%s_name' % ret_key, '%s:nickname' % game_key)
-            _update('%s_abbrev' % ret_key, '%s:abbreviation' % game_key)
+            _update(f'{key}_city', f'{team_key}:teamCity')
+            _update(f'{key}_name', f'{team_key}:teamName')
+            _update(f'{key}_abbrev', f'{team_key}:teamTricode')
             if 'playoffs' in game:
-                _update('%s_wins' % ret_key, 'playoffs:%s_wins' % game_key,
+                _update(f'{key}_wins', f'playoffs:{key}_wins',
                         callback=self.force_int, default=0)
-                _update('%s_seed' % ret_key, 'playoffs:%s_seed' % game_key,
+                _update(f'{key}_seed', f'playoffs:{key}_seed',
                         callback=self.force_int, default=0)
             else:
-                _update('%s_wins' % ret_key, '%s:wins' % game_key,
+                _update(f'{key}_wins', f'{team_key}:wins',
                         callback=self.force_int, default=0)
-                _update('%s_losses' % ret_key, '%s:losses' % game_key,
+                _update(f'{key}_losses', f'{team_key}:losses',
                         callback=self.force_int, default=0)
-                ret['%s_seed' % ret_key] = ''
+                ret[f'{key}_seed'] = ''
 
         if 'playoffs' in game:
             ret['home_losses'] = ret['away_wins']
             ret['away_losses'] = ret['home_wins']
 
         # From API data, date is YYYYMMDD, time is HHMM
-        game_time_str = '%s%s' % (game.get('date', ''), game.get('time', ''))
         try:
-            game_time = datetime.strptime(game_time_str, '%Y%m%d%H%M')
+            game_et = game.get('gameEt', '')
+            game_time = datetime.strptime(game_et, '%Y-%m-%dT%H:%M:%S%z')
         except ValueError as exc:
             # Log when the date retrieved from the API return doesn't match the
             # expected format (to help troubleshoot API changes), and set an
             # actual datetime so format strings work as expected. The times
             # will all be wrong, but the logging here will help us make the
             # necessary changes to adapt to any API changes.
-            self.logger.error(
-                'Error encountered determining game time for %s game %s:',
-                self.__class__.__name__,
-                game['id'],
-                exc_info=True
+            self.logger.exception(
+                f'Error encountered determining game time for {self.name} '
+                f'game {game["id"]} (time string: {game_et})'
             )
             game_time = datetime.datetime(1970, 1, 1)
 
-        eastern = pytz.timezone('US/Eastern')
-        ret['start_time'] = eastern.localize(game_time).astimezone()
+        ret['start_time'] = game_time.astimezone()
 
-        self.logger.debug('Returned %s formatter data: %s',
-                          self.__class__.__name__, ret)
+        self.logger.debug(f'Returned {self.name} formatter data: {ret}')
 
         return ret
