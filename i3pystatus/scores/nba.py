@@ -4,7 +4,7 @@ from i3pystatus.scores import ScoresBackend
 import copy
 import pytz
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 LIVE_URL = 'https://www.nba.com/game/{id}'
 API_URL = 'https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json'
@@ -269,8 +269,10 @@ class NBA(ScoresBackend):
 
         # From API data, date is YYYYMMDD, time is HHMM
         try:
-            game_et = game.get('gameEt', '')
-            game_time = datetime.strptime(game_et, '%Y-%m-%dT%H:%M:%S%z')
+            game_time = datetime.strptime(
+                game.get('gameTimeUTC', ''),
+                '%Y-%m-%dT%H:%M:%SZ'
+            ).replace(tzinfo=timezone.utc)
         except ValueError as exc:
             # Log when the date retrieved from the API return doesn't match the
             # expected format (to help troubleshoot API changes), and set an
