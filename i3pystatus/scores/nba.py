@@ -112,15 +112,9 @@ class NBA(ScoresBackend):
                  'exists primarily for troubleshooting purposes.'),
         ('live_url', 'URL string to launch NBA Game Tracker. This value '
                      'should not need to be changed.'),
-        ('scoreboard_url', 'Link to the NBA.com scoreboard page. Like '
-                           '**live_url**, this value should not need to be '
-                           'changed.'),
         ('api_url', 'Alternate URL string from which to retrieve score data. '
                     'Like, **live_url**, this value should not need to be '
                     'changed.'),
-        ('standings_url', 'Alternate URL string from which to retrieve team '
-                          'standings. Like **live_url**, this value should '
-                          'not need to be changed.'),
     )
 
     required = ()

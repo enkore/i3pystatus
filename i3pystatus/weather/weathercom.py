@@ -21,7 +21,7 @@ class WeathercomHTMLParser(HTMLParser):
         super(WeathercomHTMLParser, self).__init__()
 
     def get_weather_data(self, url):
-        self.logger.debug('Making request to %s to retrieve weather data', url)
+        self.logger.debug(f'Making request to {url} to retrieve weather data')
         self.weather_data = None
         req = Request(url, headers={'User-Agent': self.user_agent})
         with urlopen(req) as content:
@@ -40,12 +40,12 @@ class WeathercomHTMLParser(HTMLParser):
             )
 
     def load_json(self, json_input):
-        self.logger.debug('Loading the following data as JSON: %s', json_input)
+        self.logger.debug(f'Loading the following data as JSON: {json_input}')
         try:
             return json.loads(json_input)
         except json.decoder.JSONDecodeError as exc:
-            self.logger.debug('Error loading JSON: %s', exc)
-            self.logger.debug('String that failed to load: %s', json_input)
+            self.logger.debug(f'Error loading JSON: {exc}')
+            self.logger.debug(f'String that failed to load: {json_input}')
         return None
 
     def handle_data(self, content):
@@ -84,7 +84,7 @@ class WeathercomHTMLParser(HTMLParser):
                 if weather_data is None:
                     self.logger.debug(
                         'Failed to locate weather data in the '
-                        'following data: %s', json_data
+                        f'following data: {json_data}'
                     )
                 else:
                     self.weather_data = weather_data
@@ -144,7 +144,7 @@ class Weathercom(WeatherBackend):
     url_template = 'https://weather.com/{locale}/weather/today/l/{location_code}'
 
     # This will be set in the init based on the passed location code
-    forecast_url = None
+    conditions_url = None
 
     def init(self):
         if self.location_code is not None:
@@ -156,7 +156,7 @@ class Weathercom(WeatherBackend):
         # causes weather.com to return the default, which is imperial.
         self.locale = 'en-CA' if self.units == 'metric' else ''
 
-        self.forecast_url = self.url_template.format(**vars(self))
+        self.conditions_url = self.url_template.format(**vars(self))
         self.parser = WeathercomHTMLParser(self.logger)
 
     @require(internet)
@@ -178,7 +178,7 @@ class Weathercom(WeatherBackend):
         self.data['update_error'] = ''
         try:
 
-            self.parser.get_weather_data(self.forecast_url)
+            self.parser.get_weather_data(self.conditions_url)
             if self.parser.weather_data is None:
                 self.logger.error(
                     'Failed to read weather data from page. Run module with '
@@ -187,7 +187,7 @@ class Weathercom(WeatherBackend):
                 self.data['update_error'] = self.update_error
                 return
 
-            self.logger.debug('Parsed weather data: %s', self.parser.weather_data)
+            self.logger.debug(f'Parsed weather data: {self.parser.weather_data}')
             try:
                 observed = self.parser.weather_data['getSunV3CurrentObservationsUrlConfig']
                 # Observation data stored under a sub-key containing the
@@ -228,7 +228,7 @@ class Weathercom(WeatherBackend):
             except KeyError:
                 self.logger.warning(
                     'Failed to get city name from API response, falling back '
-                    'to location code \'%s\'', self.location_code
+                    f'to location code {self.location_code}'
                 )
                 self.city_name = self.location_code
 
@@ -295,8 +295,5 @@ class Weathercom(WeatherBackend):
             self.data['uv_index'] = str(observed.get('uvIndex', ''))
         except Exception:
             # Don't let an uncaught exception kill the update thread
-            self.logger.error(
-                'Uncaught error occurred while checking weather. '
-                'Exception follows:', exc_info=True
-            )
+            self.logger.exception('Uncaught error occurred while checking weather')
             self.data['update_error'] = self.update_error
