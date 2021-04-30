@@ -183,7 +183,7 @@ class Wunderground(WeatherBackend):
                 for item in path.split(':'):
                     if item == 'units':
                         item = self.units
-                    #self.logger.debug(f'item = {item}')
+                    # self.logger.debug(f'item = {item}')
                     try:
                         ptr = ptr[item]
                     except (KeyError, TypeError):
