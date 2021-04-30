@@ -24,30 +24,26 @@ class WeatherBackend(SettingsBase):
 
     @require(internet)
     def api_request(self, url, headers=None):
-        self.logger.debug('Making API request to %s', url)
+        self.logger.debug(f'Making API request to {url}')
         try:
             response_json = self.http_request(url, headers=headers).strip()
             if not response_json:
-                self.logger.debug('JSON response from %s was blank', url)
+                self.logger.debug(f'JSON response from {url} was blank')
                 return {}
             try:
                 response = json.loads(response_json)
             except json.decoder.JSONDecodeError as exc:
-                self.logger.error('Error loading JSON: %s', exc)
-                self.logger.debug('JSON text that failed to load: %s',
-                                  response_json)
+                self.logger.error(f'Error loading JSON: {exc}')
+                self.logger.debug(f'JSON text that failed to load: {response_json}')
                 return {}
-            self.logger.log(5, 'API response: %s', response)
+            self.logger.log(5, f'API response: {response}')
             error = self.check_response(response)
             if error:
-                self.logger.error('Error in JSON response: %s', error)
+                self.logger.error(f'Error in JSON response: {error}')
                 return {}
             return response
         except Exception as exc:
-            self.logger.error(
-                'Failed to make API request to %s. Exception follows:', url,
-                exc_info=True
-            )
+            self.logger.exception(f'Failed to make API request to {url}')
             return {}
 
     def check_response(self, response):
@@ -194,9 +190,9 @@ class Weather(IntervalModule):
     on_leftclick = ['check_weather']
 
     def launch_web(self):
-        if self.backend.forecast_url and self.backend.forecast_url != 'N/A':
-            self.logger.debug('Launching %s in browser', self.backend.forecast_url)
-            user_open(self.backend.forecast_url)
+        if self.backend.conditions_url and self.backend.conditions_url != 'N/A':
+            self.logger.debug(f'Launching {self.backend.conditions_url} in browser')
+            user_open(self.backend.conditions_url)
 
     def init(self):
         if self.online_interval is None:
@@ -296,7 +292,7 @@ class Weather(IntervalModule):
             else self.color_icons[condition]
 
     def refresh_display(self):
-        self.logger.debug('Weather data: %s', self.backend.data)
+        self.logger.debug(f'Weather data: {self.backend.data}')
         self.backend.data['icon'], condition_color = \
             self.get_color_data(self.backend.data['condition'])
         color = condition_color if self.colorize else self.color
