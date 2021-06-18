@@ -75,6 +75,7 @@ fields, if truncated, ellipsis are appended as indicator. It's applied \
 fields specefied in truncate_fields are truncated equaly. If truncated, \
 ellipsis are appended as indicator. It's applied *after* max_field_len. Value \
 of 0 disables this."),
+        ("time_format", "format string for 'pos' and 'len' fields"),
         ("truncate_fields", "fields that will be truncated if exceeding \
 max_field_len or max_len."),
         ("hide_inactive", "Hides status information when MPD is not running"),
@@ -96,6 +97,7 @@ cleartext to the server.)"),
     color_map = {}
     max_field_len = 25
     max_len = 100
+    time_format = "%M:MS"
     truncate_fields = ("title", "album", "artist", "album_artist")
     hide_inactive = False
     on_leftclick = "switch_playpause"
@@ -156,8 +158,8 @@ cleartext to the server.)"),
             "album": currentsong.get("Album", ""),
             "artist": currentsong.get("Artist", ""),
             "album_artist": currentsong.get("AlbumArtist", ""),
-            "song_length": TimeWrapper(currentsong.get("Time", 0)),
-            "song_elapsed": TimeWrapper(float(status.get("elapsed", 0))),
+            "song_length": TimeWrapper(currentsong.get("Time", 0), default_format=self.time_format),
+            "song_elapsed": TimeWrapper(float(status.get("elapsed", 0)), default_format=self.time_format),
             "bitrate": int(status.get("bitrate", 0)),
         }
 
