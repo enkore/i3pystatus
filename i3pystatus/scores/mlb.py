@@ -283,8 +283,12 @@ class MLB(ScoresBackend):
             ret['delay'] = game['status']['detailedState'].split(':', 1)[-1].strip()
         elif ret['status'] == 'postponed':
             ret['postponed'] = self.get_nested(game, 'status:reason', default='Unknown Reason')
-        elif ret['status'] == 'suspended':
-            ret['suspended'] = self.get_nested(game, 'status:reason', default='Unknown Reason')
+        elif ret['status'].startswith('suspended'):
+            ret['status'] = 'suspended'
+            ret['suspended'] = self.get_nested(
+                game,
+                'status:detailedState',
+                default='Suspended').replace('Suspended: ', '')
         elif ret['status'].startswith('completed_early') or ret['status'] == 'game_over':
             ret['status'] = 'final'
         elif ret['status'] not in ('in_progress', 'final'):
