@@ -68,7 +68,8 @@ MOCK_MODULES = [
     "requests.adapters",
     "exchangelib",
     "soco",
-    "tesla_api"
+    "tesla_api",
+    "yfinance"
 ]
 
 for mod_name in MOCK_MODULES:
