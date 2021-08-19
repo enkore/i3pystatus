@@ -28,9 +28,9 @@ class Wireguard(IntervalModule):
     status_down = '▼'
     format = "{vpn_name} {status}"
 
-    status_command = "systemctl is-active wg-quick@%(vpn_name)s"
-    vpn_up_command = "sudo /bin/systemctl start wg-quick@%(vpn_name)s.service"
-    vpn_down_command = "sudo /bin/systemctl stop wg-quick@%(vpn_name)s.service"
+    status_command = "systemctl is-active wg-quick@{vpn_name}"
+    vpn_up_command = "sudo /bin/systemctl start wg-quick@{vpn_name}.service"
+    vpn_down_command = "sudo /bin/systemctl stop wg-quick@{vpn_name}.service"
 
     connected = False
     label = ''
@@ -57,13 +57,13 @@ class Wireguard(IntervalModule):
             command = self.vpn_down_command
         else:
             command = self.vpn_up_command
-        run_through_shell(command % {'vpn_name': self.vpn_name})
+        run_through_shell(command.format(vpn_name=self.vpn_name))
 
     def on_click(self, button, **kwargs):
         self.toggle_connection()
 
     def run(self):
-        command_result = run_through_shell(self.status_command % {'vpn_name': self.vpn_name})
+        command_result = run_through_shell(self.status_command.format(vpn_name=self.vpn_name))
         self.connected = command_result.rc == 0
 
         if self.connected:
