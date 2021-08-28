@@ -62,7 +62,7 @@ class sabnzbd(IntervalModule):
 
         answer = json.loads(answer)
 
-        # if answer["status"] exists and is False, an error occured
+        # if answer["status"] exists and is False, an error occurred
         if not answer.get("status", True):
             self.output = {
                 "full_text": answer["error"],

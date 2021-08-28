@@ -57,7 +57,7 @@ class Google(CalendarBackend):
     this will open a browser window for auth, and save a token to `credential_path`. you will need to reload i3poystatus
     afterwards
 
-    If you already have a token `credentials_json` is not required (though highly recomended incase your token gets broken)
+    If you already have a token `credentials_json` is not required (though highly recommended incase your token gets broken)
 
     .. rubric:: Available formatters
 

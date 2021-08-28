@@ -8,7 +8,7 @@ class Ping(IntervalModule):
     This module display the ping value between your computer and a host.
 
     ``switch_state`` callback can disable the Ping when desired.
-    ``host`` propertie can be changed for set a specific host.
+    ``host`` property can be changed for set a specific host.
 
     .. rubric:: Available formatters
 
