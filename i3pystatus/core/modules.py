@@ -215,7 +215,7 @@ class Module(SettingsBase):
 
         :param button: The ID of button event received from i3bar.
         :param kwargs: Further information received from i3bar like the
-         positions of the mouse where the click occured.
+         positions of the mouse where the click occurred.
         :return: Returns ``True`` if a valid callback action was executed.
          ``False`` otherwise.
         """
