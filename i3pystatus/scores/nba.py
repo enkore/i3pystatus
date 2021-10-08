@@ -3,6 +3,7 @@ from i3pystatus.scores import ScoresBackend
 
 import copy
 import pytz
+import re
 import time
 from datetime import datetime, timezone
 
@@ -206,12 +207,11 @@ class NBA(ScoresBackend):
         ret['live_url'] = self.live_url.format(id=ret['id'])
 
         status_map = {
-            '1': 'pregame',
-            '2': 'in_progress',
-            '3': 'final',
+            1: 'pregame',
+            2: 'in_progress',
+            3: 'final',
         }
-        period_data = game.get('period_time', {})
-        status_code = period_data.get('game_status', '1')
+        status_code = int(game.get('gameStatus', 1))
         status = status_map.get(status_code)
         if status is None:
             self.logger.debug(
@@ -221,8 +221,8 @@ class NBA(ScoresBackend):
         ret['status'] = status_map[status_code]
 
         if ret['status'] in ('in_progress', 'final'):
-            period_number = int(period_data.get('period_value', 1))
-            total_periods = int(period_data.get('total_periods', 0))
+            period_number = int(game.get('period', 1))
+            total_periods = int(game.get('regulationPeriods', 4))
             period_diff = period_number - total_periods
             ret['quarter'] = 'OT' \
                 if period_diff == 1 \
@@ -231,11 +231,21 @@ class NBA(ScoresBackend):
         else:
             ret['quarter'] = ''
 
-        ret['time_remaining'] = game.get('game_clock')
-        if ret['time_remaining'] == '':
-            ret['time_remaining'] = 'End'
-        elif ret['time_remaining'] is None:
+        clock = game.get('gameClock', '')
+        try:
+            mins, secs = re.match(r'^PT(\d+)M(\d+\.\d)0?S$', clock).groups()
+        except AttributeError:
             ret['time_remaining'] = ''
+            self.logger.warning('Failed to parse gameClock value: {clock}')
+        else:
+            mins = mins.lstrip('0')
+            if mins:
+                secs = secs.split('.')[0]
+            if not mins and secs == '00.0':
+                ret['time_remaining'] = 'End'
+            else:
+                ret['time_remaining'] = f'{mins}:{secs}'
+
         ret['overtime'] = ret['quarter'] if 'OT' in ret['quarter'] else ''
 
         for key in ('home', 'away'):
