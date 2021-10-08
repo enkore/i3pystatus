@@ -62,7 +62,7 @@ class MLB(ScoresBackend):
     * **BOS** — Boston Red Sox
     * **CHC** — Chicago Cubs
     * **CIN** — Cincinnati Reds
-    * **CLE** — Cleveland Indians
+    * **CLE** — Cleveland Guardians
     * **COL** — Colorado Rockies
     * **CWS** — Chicago White Sox
     * **DET** — Detroit Tigers
