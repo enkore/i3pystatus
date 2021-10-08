@@ -114,7 +114,7 @@ class ScoresBackend(SettingsBase):
             suffix = 'th'
         else:
             ord_map = {1: 'st', 2: 'nd', 3: 'rd'}
-            suffix = ordmap.get(number % 10, 'th')
+            suffix = ord_map.get(number % 10, 'th')
         return f'{number}{suffix}'
 
     @staticmethod
