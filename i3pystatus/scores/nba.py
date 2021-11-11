@@ -232,19 +232,20 @@ class NBA(ScoresBackend):
             ret['quarter'] = ''
 
         clock = game.get('gameClock', '')
-        try:
-            mins, secs = re.match(r'^PT(\d+)M(\d+\.\d)0?S$', clock).groups()
-        except AttributeError:
-            ret['time_remaining'] = ''
-            self.logger.warning('Failed to parse gameClock value: {clock}')
-        else:
-            mins = mins.lstrip('0')
-            if mins:
-                secs = secs.split('.')[0]
-            if not mins and secs == '00.0':
-                ret['time_remaining'] = 'End'
+        ret['time_remaining'] = ''
+        if clock:
+            try:
+                mins, secs = re.match(r'^PT(\d+)M(\d+\.\d)0?S$', clock).groups()
+            except AttributeError:
+                self.logger.warning(f'Failed to parse gameClock value: {clock}')
             else:
-                ret['time_remaining'] = f'{mins}:{secs}'
+                mins = mins.lstrip('0')
+                if mins:
+                    secs = secs.split('.')[0]
+                if not mins and secs == '00.0':
+                    ret['time_remaining'] = 'End'
+                else:
+                    ret['time_remaining'] = f'{mins}:{secs}'
 
         ret['overtime'] = ret['quarter'] if 'OT' in ret['quarter'] else ''
 
