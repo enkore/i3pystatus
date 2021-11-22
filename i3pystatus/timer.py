@@ -57,7 +57,7 @@ class Timer(IntervalModule):
     Two new event settings were added:
 
     - ``on_overflow`` - Executed when remaining time reaches zero.
-    - ``on_reset`` - Executed when timer is reset but only if overflow occured.
+    - ``on_reset`` - Executed when timer is reset but only if overflow occurred.
 
     These settings accept either a python callable object or a string with shell
     command.
@@ -159,9 +159,9 @@ class Timer(IntervalModule):
 
     def increase(self, seconds):
         """
-        Change remainig time value.
+        Change remaining time value.
 
-        :param int seconds: Seconds to add. Negative value substracts from
+        :param int seconds: Seconds to add. Negative value subtracts from
          remaining time.
         """
         if self.state is TimerState.running:
@@ -171,7 +171,7 @@ class Timer(IntervalModule):
 
     def reset(self):
         """
-        Stop timer and execute ``on_reset`` if overflow occured.
+        Stop timer and execute ``on_reset`` if overflow occurred.
         """
         if self.state is not TimerState.stopped:
             if self.on_reset and self.state is TimerState.overflow:

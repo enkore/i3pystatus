@@ -1,3 +1,4 @@
+import html
 import inspect
 import traceback
 
@@ -214,7 +215,7 @@ class Module(SettingsBase):
 
         :param button: The ID of button event received from i3bar.
         :param kwargs: Further information received from i3bar like the
-         positions of the mouse where the click occured.
+         positions of the mouse where the click occurred.
         :return: Returns ``True`` if a valid callback action was executed.
          ``False`` otherwise.
         """
@@ -260,14 +261,16 @@ class Module(SettingsBase):
 
         Can be called multiple times (`&amp;` won't change to `&amp;amp;`).
         """
-        def replace(s):
-            s = s.split("&")
-            out = s[0]
-            for i in range(len(s) - 1):
-                if s[i + 1].startswith("amp;"):
-                    out += "&" + s[i + 1]
+        def replace(text):
+            components = text.split("&")
+            out = components[0]
+            for item in components[1:]:
+                if item.startswith("amp;") \
+                        or (not item.startswith("amp;")
+                            and html.unescape(f'&{item}') != f'&{item}'):
+                    out += "&" + item
                 else:
-                    out += "&amp;" + s[i + 1]
+                    out += "&amp;" + item
             return out
 
         if "full_text" in self.output.keys():

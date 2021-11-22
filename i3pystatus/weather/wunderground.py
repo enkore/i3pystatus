@@ -73,18 +73,15 @@ class Wunderground(WeatherBackend):
     units = 'metric'
     update_error = '!'
 
-    url_template = 'https://www.wunderground.com/dashboard/pws/{location_code}'
+    # Will be set in the init func
+    conditions_url = None
 
-    # This will be set in the init based on the passed location code
-    forecast_url = None
-
-    summary_url = 'https://api.weather.com/v2/pws/dailysummary/1day?apiKey={api_key}&stationId={location_code}&format=json&units={units_type}'
+    forecast_url = 'https://api.weather.com/v3/wx/forecast/daily/7day?apiKey={api_key}&geocode={lat:.2f}%2C{lon:.2f}&language=en-US&units={units_type}&format=json'
     observation_url = 'https://api.weather.com/v2/pws/observations/current?apiKey={api_key}&stationId={location_code}&format=json&units={units_type}'
-    overview_url = 'https://api.weather.com/v3/aggcommon/v3alertsHeadlines;v3-wx-observations-current;v3-location-point?apiKey={api_key}&geocodes={lat:.2f}%2C{lon:.2f}&language=en-US&units=e&format=json'
+    overview_url = 'https://api.weather.com/v3/aggcommon/v3alertsHeadlines;v3-wx-observations-current;v3-location-point?apiKey={api_key}&geocodes={lat:.2f}%2C{lon:.2f}&language=en-US&units={units_type}&format=json'
 
     headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0',
-        'Referer': 'https://www.wunderground.com/dashboard/pws/{location_code}',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:88.0) Gecko/20100101 Firefox/88.0',
         'Accept': 'application/json, text/plain, */*',
         'Accept-Language': 'en-US,en;q=0.5',
         'Connection': 'keep-alive',
@@ -92,7 +89,7 @@ class Wunderground(WeatherBackend):
 
     def init(self):
         self.units_type = 'm' if self.units == 'metric' else 'e'
-        self.forecast_url = self.url_template.format(**vars(self))
+        self.headers['Referer'] = self.conditions_url = f'https://www.wunderground.com/weather/{self.location_code}'
 
     @require(internet)
     def get_api_key(self):
@@ -110,7 +107,7 @@ class Wunderground(WeatherBackend):
                 },
             )
         except Exception as exc:
-            self.logger.exception('Failed to load %s', url)
+            self.logger.exception(f'Failed to load {url}')
         else:
             try:
                 return re.search(r'apiKey=([0-9a-f]+)', page_source).group(1)
@@ -139,16 +136,6 @@ class Wunderground(WeatherBackend):
         self.data['update_error'] = ''
         try:
             try:
-                summary = self.api_request(self.summary_url.format(**vars(self)))['summaries'][0]
-            except (IndexError, KeyError):
-                self.logger.error(
-                    'Failed to retrieve summary data from API response. '
-                    'Run module with debug logging to get more information.'
-                )
-                self.data['update_error'] = self.update_error
-                return
-
-            try:
                 observation = self.api_request(self.observation_url.format(**vars(self)))['observations'][0]
             except (IndexError, KeyError):
                 self.logger.error(
@@ -160,6 +147,8 @@ class Wunderground(WeatherBackend):
 
             self.lat = observation['lat']
             self.lon = observation['lon']
+
+            forecast = self.api_request(self.forecast_url.format(**vars(self)))
 
             try:
                 overview = self.api_request(self.overview_url.format(**vars(self)))[0]
@@ -191,13 +180,27 @@ class Wunderground(WeatherBackend):
 
             def _find(path, data, default=''):
                 ptr = data
-                try:
-                    for item in path.split(':'):
-                        if item == 'units':
-                            item = self.units
+                for item in path.split(':'):
+                    if item == 'units':
+                        item = self.units
+                    # self.logger.debug(f'item = {item}')
+                    try:
                         ptr = ptr[item]
-                except (KeyError, IndexError, TypeError):
-                    return default
+                    except (KeyError, TypeError):
+                        try:
+                            # Try list index
+                            int_item = int(item)
+                        except (TypeError, ValueError):
+                            return default
+                        else:
+                            if len(item) == len(str(int_item)):
+                                try:
+                                    ptr = ptr[int_item]
+                                    continue
+                                except IndexError:
+                                    return default
+                            else:
+                                return default
                 return str(ptr)
 
             pressure_tendency = _find(
@@ -206,11 +209,11 @@ class Wunderground(WeatherBackend):
             pressure_trend = '+' if pressure_tendency == 'rising' else '-'
 
             self.data['city'] = _find('v3-location-point:location:city', overview)
-            self.data['condition'] = _find('v3-wx-observations-current:wxPhraseShort', overview)
+            self.data['condition'] = _find('v3-wx-observations-current:wxPhraseMedium', overview)
             self.data['observation_time'] = observation_time
             self.data['current_temp'] = _find('units:temp', observation, '0')
-            self.data['low_temp'] = _find('units:tempLow', summary)
-            self.data['high_temp'] = _find('units:tempHigh', summary)
+            self.data['low_temp'] = _find('calendarDayTemperatureMin:0', forecast)
+            self.data['high_temp'] = _find('calendarDayTemperatureMax:0', forecast)
             self.data['temp_unit'] = temp_unit
             self.data['feelslike'] = _find('units:heatIndex', observation)
             self.data['dewpoint'] = _find('units:dewpt', observation)

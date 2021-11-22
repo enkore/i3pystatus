@@ -9,9 +9,9 @@ import time
 from datetime import datetime
 from urllib.request import urlopen
 
-LIVE_URL = 'https://www.mlb.com/gameday/%s'
+LIVE_URL = 'https://www.mlb.com/gameday/{id}'
 SCOREBOARD_URL = 'http://m.mlb.com/scoreboard'
-API_URL = 'https://statsapi.mlb.com/api/v1/schedule?sportId=1,51&date=%04d-%02d-%02d&gameTypes=E,S,R,A,F,D,L,W&hydrate=team(),linescore(matchup,runners),stats,game(content(media(featured,epg),summary),tickets),seriesStatus(useOverride=true)&useLatestGames=false&language=en&leagueId=103,104,420'
+API_URL = 'https://statsapi.mlb.com/api/v1/schedule?sportId=1,51&date={date:%Y-%m-%d}&gameTypes=E,S,R,A,F,D,L,W&hydrate=team(),linescore(matchup,runners),stats,game(content(media(featured,epg),summary),tickets),seriesStatus(useOverride=true)&useLatestGames=false&language=en&leagueId=103,104,420'
 
 
 class MLB(ScoresBackend):
@@ -62,7 +62,7 @@ class MLB(ScoresBackend):
     * **BOS** — Boston Red Sox
     * **CHC** — Chicago Cubs
     * **CIN** — Cincinnati Reds
-    * **CLE** — Cleveland Indians
+    * **CLE** — Cleveland Guardians
     * **COL** — Colorado Rockies
     * **CWS** — Chicago White Sox
     * **DET** — Detroit Tigers
@@ -158,7 +158,7 @@ class MLB(ScoresBackend):
         'OAK': '#006659',
         'PHI': '#E81828',
         'PIT': '#FFCC01',
-        'SD': '#285F9A',
+        'SD': '#FFC425',
         'SEA': '#2E8B90',
         'SF': '#FD5A1E',
         'STL': '#B53B30',
@@ -188,7 +188,7 @@ class MLB(ScoresBackend):
     @require(internet)
     def check_scores(self):
         self.get_api_date()
-        url = self.api_url % (self.date.year, self.date.month, self.date.day)
+        url = self.api_url.format(date=self.date)
 
         game_list = self.get_nested(
             self.api_request(url),
@@ -231,44 +231,43 @@ class MLB(ScoresBackend):
     def process_game(self, game):
         ret = {}
 
-        self.logger.debug('Processing %s game data: %s',
-                          self.__class__.__name__, game)
+        self.logger.debug(f'Processing {self.name} game data: {game}')
 
         linescore = self.get_nested(game, 'linescore', default={})
 
         ret['id'] = game['gamePk']
         ret['inning'] = self.get_nested(linescore, 'currentInning', default=0)
         ret['outs'] = self.get_nested(linescore, 'outs')
-        ret['live_url'] = self.live_url % ret['id']
+        ret['live_url'] = self.live_url.format(id=ret['id'])
 
         for team in ('away', 'home'):
-            team_data = self.get_nested(game, 'teams:%s' % team, default={})
+            team_data = self.get_nested(game, f'teams:{team}', default={})
 
             if team == 'home':
                 ret['venue'] = self.get_nested(team_data, 'venue:name')
 
-            ret['%s_city' % team] = self.get_nested(
+            ret[f'{team}_city'] = self.get_nested(
                 team_data,
                 'team:locationName')
-            ret['%s_name' % team] = self.get_nested(
+            ret[f'{team}_name'] = self.get_nested(
                 team_data,
                 'team:teamName')
-            ret['%s_abbrev' % team] = self.get_nested(
+            ret[f'{team}_abbrev'] = self.get_nested(
                 team_data,
                 'team:abbreviation')
 
-            ret['%s_wins' % team] = self.get_nested(
+            ret[f'{team}_wins'] = self.get_nested(
                 team_data,
                 'leagueRecord:wins',
                 default=0)
-            ret['%s_losses' % team] = self.get_nested(
+            ret[f'{team}_losses'] = self.get_nested(
                 team_data,
                 'leagueRecord:losses',
                 default=0)
 
-            ret['%s_score' % team] = self.get_nested(
+            ret[f'{team}_score'] = self.get_nested(
                 linescore,
-                'teams:%s:runs' % team,
+                f'teams:{team}:runs',
                 default=0)
 
         for key in ('delay', 'postponed', 'suspended'):
@@ -284,8 +283,12 @@ class MLB(ScoresBackend):
             ret['delay'] = game['status']['detailedState'].split(':', 1)[-1].strip()
         elif ret['status'] == 'postponed':
             ret['postponed'] = self.get_nested(game, 'status:reason', default='Unknown Reason')
-        elif ret['status'] == 'suspended':
-            ret['suspended'] = self.get_nested(game, 'status:reason', default='Unknown Reason')
+        elif ret['status'].startswith('suspended'):
+            ret['status'] = 'suspended'
+            ret['suspended'] = self.get_nested(
+                game,
+                'status:detailedState',
+                default='Suspended').replace('Suspended: ', '')
         elif ret['status'].startswith('completed_early') or ret['status'] == 'game_over':
             ret['status'] = 'final'
         elif ret['status'] not in ('in_progress', 'final'):
@@ -313,17 +316,14 @@ class MLB(ScoresBackend):
             # actual datetime so format strings work as expected. The times
             # will all be wrong, but the logging here will help us make the
             # necessary changes to adapt to any API changes.
-            self.logger.error(
-                'Error encountered determining %s game time for game %s:',
-                self.__class__.__name__,
-                game['gamePk'],
-                exc_info=True
+            self.logger.exception(
+                f'Error encountered determining {self.name} game time for '
+                f'game {game["gamePk"]}'
             )
             game_time = datetime(1970, 1, 1)
 
         ret['start_time'] = pytz.timezone('UTC').localize(game_time).astimezone()
 
-        self.logger.debug('Returned %s formatter data: %s',
-                          self.__class__.__name__, ret)
+        self.logger.debug(f'Returned {self.name} formatter data: {ret}')
 
         return ret

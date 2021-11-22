@@ -27,7 +27,7 @@ tools for this which make this even easier:
   Required settings and default values are also handled.
 
 Check out i3pystatus' source code for plenty of (`simple
-<https://github.com/enkore/i3pystatus/blob/master/i3pystatus/mem.py>`_)
+<https://github.com/enkore/i3pystatus/blob/current/i3pystatus/mem.py>`_)
 examples on how to build modules.
 
 The settings system is built to ease documentation. If you specify

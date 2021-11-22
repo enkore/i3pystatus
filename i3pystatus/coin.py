@@ -8,7 +8,7 @@ from i3pystatus.core.util import internet, require
 
 class Coin(IntervalModule):
     """
-    Fetches live data of all cryptocurrencies availible at coinmarketcap <https://coinmarketcap.com/>.
+    Fetches live data of all cryptocurrencies available at coinmarketcap <https://coinmarketcap.com/>.
     Coin setting should be equal to the 'id' field of your coin in <https://api.coinmarketcap.com/v1/ticker/>.
 
     Example coin settings: bitcoin, bitcoin-cash, ethereum, litecoin, dash, lisk.

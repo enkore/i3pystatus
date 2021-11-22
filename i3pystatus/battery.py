@@ -13,8 +13,8 @@ class UEventParser(configparser.ConfigParser):
     @staticmethod
     def parse_file(file):
         parser = UEventParser()
-        with open(file, "r") as file:
-            parser.read_string(file.read())
+        with open(file, "rb") as file:
+            parser.read_string(file.read().decode(errors="replace"))
         return dict(parser.items("id10t"))
 
     def __init__(self):

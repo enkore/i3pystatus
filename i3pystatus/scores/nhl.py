@@ -9,9 +9,9 @@ import time
 from datetime import datetime
 from urllib.request import urlopen
 
-LIVE_URL = 'https://www.nhl.com/gamecenter/%s'
+LIVE_URL = 'https://www.nhl.com/gamecenter/{id}'
 SCOREBOARD_URL = 'https://www.nhl.com/scores'
-API_URL = 'https://statsapi.web.nhl.com/api/v1/schedule?startDate=%04d-%02d-%02d&endDate=%04d-%02d-%02d&expand=schedule.teams,schedule.linescore,schedule.broadcasts.all&site=en_nhl&teamId='
+API_URL = 'https://statsapi.web.nhl.com/api/v1/schedule?startDate={date:%Y-%m-%d}&endDate={date:%Y-%m-%d}&expand=schedule.teams,schedule.linescore,schedule.broadcasts.all&site=en_nhl&teamId='
 
 
 class NHL(ScoresBackend):
@@ -105,6 +105,7 @@ class NHL(ScoresBackend):
     * **OTT** — Ottawa Senators
     * **PHI** — Philadelphia Flyers
     * **PIT** — Pittsburgh Penguins
+    * **SEA** — Seattle Kraken
     * **SJS** — San Jose Sharks
     * **STL** — St. Louis Blues
     * **TBL** — Tampa Bay Lightning
@@ -184,6 +185,7 @@ class NHL(ScoresBackend):
         'OTT': '#C50B2F',
         'PHI': '#FF690B',
         'PIT': '#FFB81C',
+        'SEA': '#96D8D8',
         'SJS': '#007888',
         'STL': '#1764AD',
         'TBL': '#296AD5',
@@ -211,8 +213,7 @@ class NHL(ScoresBackend):
     @require(internet)
     def check_scores(self):
         self.get_api_date()
-        url = self.api_url % (self.date.year, self.date.month, self.date.day,
-                              self.date.year, self.date.month, self.date.day)
+        url = self.api_url.format(date=self.date)
 
         game_list = self.get_nested(self.api_request(url),
                                     'dates:0:games',
@@ -242,13 +243,12 @@ class NHL(ScoresBackend):
     def process_game(self, game):
         ret = {}
 
-        self.logger.debug('Processing %s game data: %s',
-                          self.__class__.__name__, game)
+        self.logger.debug(f'Processing {self.name} game data: {game}')
 
         linescore = self.get_nested(game, 'linescore', default={})
 
         ret['id'] = game['gamePk']
-        ret['live_url'] = self.live_url % ret['id']
+        ret['live_url'] = self.live_url.format(id=ret['id'])
         ret['period'] = self.get_nested(
             linescore,
             'currentPeriodOrdinal')
@@ -357,17 +357,14 @@ class NHL(ScoresBackend):
             # actual datetime so format strings work as expected. The times
             # will all be wrong, but the logging here will help us make the
             # necessary changes to adapt to any API changes.
-            self.logger.error(
-                'Error encountered determining %s game time for game %s:',
-                self.__class__.__name__,
-                game['id'],
-                exc_info=True
+            self.logger.exception(
+                f'Error encountered determining {self.name} game time for '
+                f'game {game["id"]}'
             )
             game_time = datetime.datetime(1970, 1, 1)
 
         ret['start_time'] = pytz.utc.localize(game_time).astimezone()
 
-        self.logger.debug('Returned %s formatter data: %s',
-                          self.__class__.__name__, ret)
+        self.logger.debug(f'Returned {self.name} formatter data: {ret}')
 
         return ret

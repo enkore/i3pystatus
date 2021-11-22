@@ -136,7 +136,7 @@ If no arguments were provided, ``i3pystatus`` script works as an example of
 Formatting
 ----------
 
-All modules let you specifiy the exact output formatting using a
+All modules let you specify the exact output formatting using a
 `format string <http://docs.python.org/3/library/string.html#formatstrings>`_, which
 gives you a great deal of flexibility.
 

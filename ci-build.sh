@@ -12,14 +12,14 @@ mkdir -p $BUILD
 python3 -mpycodestyle i3pystatus tests
 
 # Check that the setup.py script works
-rm -rf ${BUILD}/test-install ${BUILD}/test-install-bin
-mkdir ${BUILD}/test-install ${BUILD}/test-install-bin
-PYTHONPATH=${BUILD}/test-install python3 setup.py --quiet install --install-lib ${BUILD}/test-install --install-scripts ${BUILD}/test-install-bin
+rm -rf ${BUILD}/test-install{,-bin}
+mkdir ${BUILD}/test-install{,-bin}
+python3 setup.py install --quiet --install-lib ${BUILD}/test-install --install-scripts ${BUILD}/test-install-bin
 
 test -f ${BUILD}/test-install-bin/i3pystatus
 test -f ${BUILD}/test-install-bin/i3pystatus-setting-util
 
-PYTHONPATH=${BUILD}/test-install py.test -q --junitxml ${BUILD}/testlog.xml tests
+PYTHONPATH="$(echo ${BUILD}/test-install/i3pystatus-*.egg)" py.test -q --junitxml ${BUILD}/testlog.xml tests
 
 # Check that the docs build w/o warnings (-W flag)
 sphinx-build -Nq -b html -W docs ${BUILD}/docs/

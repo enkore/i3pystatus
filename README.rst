@@ -3,6 +3,9 @@ i3pystatus
 
 .. image:: https://travis-ci.org/enkore/i3pystatus.svg?branch=master
     :target: https://travis-ci.org/enkore/i3pystatus
+    
+.. image:: https://readthedocs.org/projects/i3pystatus/badge/?version=latest
+      :target: https://i3pystatus.readthedocs.io/en/latest/?badge=latest
 
 i3pystatus is a large collection of status modules compatible with i3bar from the i3 window manager.
 
