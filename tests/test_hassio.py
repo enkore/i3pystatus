@@ -1,5 +1,6 @@
 """
 Basic test for the hassio module
+Requires the PyPI package `requests`
 """
 
 import unittest
