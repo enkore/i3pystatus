@@ -68,7 +68,7 @@ MOCK_MODULES = [
     "requests.adapters",
     "exchangelib",
     "soco",
-    "tesla_api",
+    "teslapy"
     "yfinance"
 ]
 
