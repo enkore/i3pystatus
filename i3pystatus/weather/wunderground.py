@@ -212,8 +212,8 @@ class Wunderground(WeatherBackend):
             self.data['condition'] = _find('v3-wx-observations-current:wxPhraseMedium', overview)
             self.data['observation_time'] = observation_time
             self.data['current_temp'] = _find('units:temp', observation, '0')
-            self.data['low_temp'] = _find('calendarDayTemperatureMin:0', forecast)
-            self.data['high_temp'] = _find('calendarDayTemperatureMax:0', forecast)
+            self.data['low_temp'] = _find('temperatureMin:0', forecast)
+            self.data['high_temp'] = _find('temperatureMax:0', forecast)
             self.data['temp_unit'] = temp_unit
             self.data['feelslike'] = _find('units:heatIndex', observation)
             self.data['dewpoint'] = _find('units:dewpt', observation)
