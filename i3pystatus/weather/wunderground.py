@@ -201,6 +201,9 @@ class Wunderground(WeatherBackend):
                                     return default
                             else:
                                 return default
+
+                if ptr is None:
+                    return default
                 return str(ptr)
 
             pressure_tendency = _find(
