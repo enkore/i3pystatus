@@ -102,6 +102,7 @@ class NBA(ScoresBackend):
         ('format_pregame', 'Format used when the game has not yet started'),
         ('format_in_progress', 'Format used when the game is in progress'),
         ('format_final', 'Format used when the game is complete'),
+        ('format_postponed', 'Format used when the game has been postponed'),
         ('team_colors', 'Dictionary mapping team abbreviations to hex color '
                         'codes. If overridden, the passed values will be '
                         'merged with the defaults, so it is not necessary to '
@@ -160,6 +161,7 @@ class NBA(ScoresBackend):
     format_no_games = 'NBA: No games'
     format_pregame = '[{scroll} ]NBA: [{away_favorite} ][{away_seed} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ][{home_seed} ]{home_abbrev} ({home_wins}-{home_losses}) {start_time:%H:%M %Z}'
     format_in_progress = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score}[ ({away_power_play})], [{home_favorite} ]{home_abbrev} {home_score}[ ({home_power_play})] ({time_remaining} {quarter})'
+    format_postponed = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) PPD'
     format_final = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Final[/{overtime}])'
     team_colors = _default_colors
     live_url = LIVE_URL
@@ -206,19 +208,22 @@ class NBA(ScoresBackend):
         _update('id', 'gameId')
         ret['live_url'] = self.live_url.format(id=ret['id'])
 
-        status_map = {
-            1: 'pregame',
-            2: 'in_progress',
-            3: 'final',
-        }
-        status_code = int(game.get('gameStatus', 1))
-        status = status_map.get(status_code)
-        if status is None:
-            self.logger.debug(
-                f"Unknown {self.name} game status code '{status_code}'"
-            )
-            status_code = '1'
-        ret['status'] = status_map[status_code]
+        if game.get('gameStatusText', '') == 'PPD':
+            ret['status'] = 'postponed'
+        else:
+            status_map = {
+                1: 'pregame',
+                2: 'in_progress',
+                3: 'final',
+            }
+            status_code = int(game.get('gameStatus', 1))
+            status = status_map.get(status_code)
+            if status is None:
+                self.logger.debug(
+                    f"Unknown {self.name} game status code '{status_code}'"
+                )
+                status_code = '1'
+            ret['status'] = status_map[status_code]
 
         if ret['status'] in ('in_progress', 'final'):
             period_number = int(game.get('period', 1))
