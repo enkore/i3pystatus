@@ -155,13 +155,13 @@ class NBA(ScoresBackend):
     }
 
     _valid_teams = [x for x in _default_colors]
-    _valid_display_order = ['in_progress', 'final', 'pregame']
+    _valid_display_order = ['in_progress', 'final', 'postponed', 'pregame']
 
     display_order = _valid_display_order
     format_no_games = 'NBA: No games'
     format_pregame = '[{scroll} ]NBA: [{away_favorite} ][{away_seed} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ][{home_seed} ]{home_abbrev} ({home_wins}-{home_losses}) {start_time:%H:%M %Z}'
     format_in_progress = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score}[ ({away_power_play})], [{home_favorite} ]{home_abbrev} {home_score}[ ({home_power_play})] ({time_remaining} {quarter})'
-    format_postponed = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) PPD'
+    format_postponed = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) PPD'
     format_final = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Final[/{overtime}])'
     team_colors = _default_colors
     live_url = LIVE_URL

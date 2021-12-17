@@ -136,6 +136,7 @@ class NHL(ScoresBackend):
         ('format_pregame', 'Format used when the game has not yet started'),
         ('format_in_progress', 'Format used when the game is in progress'),
         ('format_final', 'Format used when the game is complete'),
+        ('format_postponed', 'Format used when the game has been postponed'),
         ('empty_net', 'Value for the ``{away_empty_net}`` or '
                       '``{home_empty_net}`` formatter when the net is empty. '
                       'When the net is not empty, these formatters will be '
@@ -197,13 +198,14 @@ class NHL(ScoresBackend):
     }
 
     _valid_teams = [x for x in _default_colors]
-    _valid_display_order = ['in_progress', 'final', 'pregame']
+    _valid_display_order = ['in_progress', 'final', 'postponed', 'pregame']
 
     display_order = _valid_display_order
     format_no_games = 'NHL: No games'
     format_pregame = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}-{home_otl}) {start_time:%H:%M %Z}'
     format_in_progress = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} {away_score}[ ({away_power_play})][ ({away_empty_net})], [{home_favorite} ]{home_abbrev} {home_score}[ ({home_power_play})][ ({home_empty_net})] ({time_remaining} {period})'
     format_final = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}-{home_otl}) (Final[/{overtime}])'
+    format_postponed = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}-{home_otl}) PPD'
     empty_net = 'EN'
     team_colors = _default_colors
     live_url = LIVE_URL
@@ -331,20 +333,23 @@ class NHL(ScoresBackend):
             ret['home_losses'] = ret['away_wins']
             ret['away_losses'] = ret['home_wins']
 
-        ret['status'] = self.get_nested(
-            game,
-            'status:abstractGameState',
-            callback=lambda x: x.lower().replace(' ', '_'))
+        if self.get_nested(game, 'status:detailedState').lower() == 'postponed':
+            ret['status'] = 'postponed'
+        else:
+            ret['status'] = self.get_nested(
+                game,
+                'status:abstractGameState',
+                callback=lambda x: x.lower().replace(' ', '_'))
 
-        if ret['status'] == 'live':
-            ret['status'] = 'in_progress'
-        elif ret['status'] == 'final':
-            ret['overtime'] = self.get_nested(
-                linescore,
-                'currentPeriodOrdinal',
-                callback=lambda x: x if 'OT' in x or x == 'SO' else '')
-        elif ret['status'] != 'in_progress':
-            ret['status'] = 'pregame'
+            if ret['status'] == 'live':
+                ret['status'] = 'in_progress'
+            elif ret['status'] == 'final':
+                ret['overtime'] = self.get_nested(
+                    linescore,
+                    'currentPeriodOrdinal',
+                    callback=lambda x: x if 'OT' in x or x == 'SO' else '')
+            elif ret['status'] != 'in_progress':
+                ret['status'] = 'pregame'
 
         # Game time is in UTC, ISO format, thank the FSM
         # Ex. 2016-04-02T17:00:00Z
