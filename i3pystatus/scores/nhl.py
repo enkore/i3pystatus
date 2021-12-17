@@ -21,9 +21,8 @@ class NHL(ScoresBackend):
 
     .. rubric:: Available formatters
 
-    * `{home_name}` — Name of home team
-    * `{home_city}` — Name of home team's city
-    * `{home_abbrev}` — 3-letter abbreviation for home team's city
+    * `{home_team}` — Depending on the value of the ``team_format`` option,
+      will contain either the home team's name, abbreviation, or city
     * `{home_score}` — Home team's current score
     * `{home_wins}` — Home team's number of wins
     * `{home_losses}` — Home team's number of losses
@@ -33,9 +32,8 @@ class NHL(ScoresBackend):
       followed. Otherwise, this formatter will be blank.
     * `{home_empty_net}` — Shows the value from the ``empty_net`` parameter
       when the home team's net is empty.
-    * `{away_name}` — Name of away team
-    * `{away_city}` — Name of away team's city
-    * `{away_abbrev}` — 2 or 3-letter abbreviation for away team's city
+    * `{away_team}` — Depending on the value of the ``team_format`` option,
+      will contain either the away team's name, abbreviation, or city
     * `{away_score}` — Away team's current score
     * `{away_wins}` — Away team's number of wins
     * `{away_losses}` — Away team's number of losses
@@ -74,8 +72,7 @@ class NHL(ScoresBackend):
             backends=[
                 nhl.NHL(
                     favorite_teams=['CHI'],
-                    format_pregame = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} ({away_wins}) at [{home_favorite} ]{home_abbrev} ({home_wins}) {start_time:%H:%M %Z}',
-                    format_final = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}) (Final[/{overtime}])',
+                    format='[{scroll} ]NHL: [{away_favorite} ]{away_team} ({away_wins}) at [{home_favorite} ]{home_team} ({home_wins}) {game_status}'
                 ),
             ],
         )
@@ -133,10 +130,15 @@ class NHL(ScoresBackend):
         ('format_no_games', 'Format used when no tracked games are scheduled '
                             'for the current day (does not support formatter '
                             'placeholders)'),
-        ('format_pregame', 'Format used when the game has not yet started'),
-        ('format_in_progress', 'Format used when the game is in progress'),
-        ('format_final', 'Format used when the game is complete'),
-        ('format_postponed', 'Format used when the game has been postponed'),
+        ('format', 'Format used to display game information'),
+        ('status_pregame', 'Format string used for the ``{game_status}`` '
+                           'formatter when the game has not started '),
+        ('status_in_progress', 'Format string used for the ``{game_status}`` '
+                               'formatter when the game is in progress'),
+        ('status_final', 'Format string used for the ``{game_status}`` '
+                         'formatter when the game has finished'),
+        ('status_postponed', 'Format string used for the ``{game_status}`` '
+                             'formatter when the game has been postponed'),
         ('empty_net', 'Value for the ``{away_empty_net}`` or '
                       '``{home_empty_net}`` formatter when the net is empty. '
                       'When the net is not empty, these formatters will be '
@@ -145,6 +147,9 @@ class NHL(ScoresBackend):
                         'codes. If overridden, the passed values will be '
                         'merged with the defaults, so it is not necessary to '
                         'define all teams if specifying this value.'),
+        ('team_format', 'One of ``name``, ``abbreviation``, or ``city``. If '
+                        'not specified, takes the value from the ``scores`` '
+                        'module.'),
         ('date', 'Date for which to display game scores, in **YYYY-MM-DD** '
                  'format. If unspecified, the current day\'s games will be '
                  'displayed starting at 10am Eastern time, with last '
@@ -202,15 +207,19 @@ class NHL(ScoresBackend):
 
     display_order = _valid_display_order
     format_no_games = 'NHL: No games'
-    format_pregame = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}-{home_otl}) {start_time:%H:%M %Z}'
-    format_in_progress = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} {away_score}[ ({away_power_play})][ ({away_empty_net})], [{home_favorite} ]{home_abbrev} {home_score}[ ({home_power_play})][ ({home_empty_net})] ({time_remaining} {period})'
-    format_final = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}-{home_otl}) (Final[/{overtime}])'
-    format_postponed = '[{scroll} ]NHL: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}-{home_otl}) PPD'
+    format = '[{scroll} ]NHL: [{away_favorite} ]{away_team} ({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_team} ({home_wins}-{home_losses}-{home_otl}) {game_status}'
+    status_pregame = '{start_time:%H:%M %Z}'
+    status_in_progress = '({time_remaining} {period})'
+    status_final = '(Final[/{overtime}])'
+    status_postponed = 'PPD'
     empty_net = 'EN'
     team_colors = _default_colors
     live_url = LIVE_URL
     scoreboard_url = SCOREBOARD_URL
     api_url = API_URL
+
+    # These will inherit from the Scores class if not overridden
+    team_format = None
 
     @require(internet)
     def check_scores(self):
@@ -265,48 +274,48 @@ class NHL(ScoresBackend):
         pp_strength = self.get_nested(linescore, 'powerPlayStrength')
 
         for team in ('away', 'home'):
-            team_data = self.get_nested(game, 'teams:%s' % team, default={})
+            team_data = self.get_nested(game, f'teams:{team}', default={})
 
             if team == 'home':
                 ret['venue'] = self.get_nested(team_data, 'venue:name')
 
-            ret['%s_score' % team] = self.get_nested(
+            ret[f'{team}_score'] = self.get_nested(
                 team_data,
                 'score',
                 callback=self.force_int,
                 default=0)
-            ret['%s_wins' % team] = self.get_nested(
+            ret[f'{team}_wins'] = self.get_nested(
                 team_data,
                 'leagueRecord:wins',
                 callback=self.force_int,
                 default=0)
-            ret['%s_losses' % team] = self.get_nested(
+            ret[f'{team}_losses'] = self.get_nested(
                 team_data,
                 'leagueRecord:losses',
                 callback=self.force_int,
                 default=0)
-            ret['%s_otl' % team] = self.get_nested(
+            ret[f'{team}_otl'] = self.get_nested(
                 team_data,
                 'leagueRecord:ot',
                 callback=self.force_int,
                 default=0)
 
-            ret['%s_city' % team] = self.get_nested(
+            ret[f'{team}_city'] = self.get_nested(
                 team_data,
                 'team:shortName')
-            ret['%s_name' % team] = self.get_nested(
+            ret[f'{team}_name'] = self.get_nested(
                 team_data,
                 'team:teamName')
-            ret['%s_abbrev' % team] = self.get_nested(
+            ret[f'{team}_abbreviation'] = self.get_nested(
                 team_data,
                 'team:abbreviation')
-            ret['%s_power_play' % team] = self.get_nested(
+            ret[f'{team}_power_play'] = self.get_nested(
                 linescore,
-                'teams:%s:powerPlay' % team,
+                f'teams:{team}:powerPlay',
                 callback=lambda x: pp_strength if x and pp_strength != 'Even' else '')
-            ret['%s_empty_net' % team] = self.get_nested(
+            ret[f'{team}_empty_net'] = self.get_nested(
                 linescore,
-                'teams:%s:goaliePulled' % team,
+                f'teams:{team}:goaliePulled',
                 callback=lambda x: self.empty_net if x else '')
 
         if game.get('gameType') == 'P':
