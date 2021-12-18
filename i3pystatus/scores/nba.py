@@ -161,7 +161,7 @@ class NBA(ScoresBackend):
     }
 
     _valid_teams = [x for x in _default_colors]
-    _valid_display_order = ['in_progress', 'final', 'postponed', 'pregame']
+    _valid_display_order = ['in_progress', 'final', 'pregame', 'postponed']
 
     display_order = _valid_display_order
     format_no_games = 'NBA: No games'

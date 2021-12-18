@@ -178,7 +178,7 @@ class MLB(ScoresBackend):
     }
 
     _valid_teams = [x for x in _default_colors]
-    _valid_display_order = ['in_progress', 'suspended', 'final', 'postponed', 'pregame']
+    _valid_display_order = ['in_progress', 'suspended', 'final', 'pregame', 'postponed']
 
     display_order = _valid_display_order
     format_no_games = 'MLB: No games'
