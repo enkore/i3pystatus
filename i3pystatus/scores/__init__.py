@@ -632,9 +632,10 @@ class Scores(Module):
             # Set the game_status using the formatter
             game_status_opt = f'status_{game["status"]}'
             try:
-                game['game_status'] = str(
-                    getattr(self.current_backend, game_status_opt)
-                ).format(**game)
+                game['game_status'] = formatp(
+                    str(getattr(self.current_backend, game_status_opt)),
+                    **game
+                )
             except AttributeError:
                 self.logger.error(
                     f'Unable to find {self.current_backend.name} option '
