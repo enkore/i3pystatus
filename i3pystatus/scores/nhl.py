@@ -207,7 +207,7 @@ class NHL(ScoresBackend):
 
     display_order = _valid_display_order
     format_no_games = 'NHL: No games'
-    format = '[{scroll} ]NHL: [{away_favorite} ]{away_team} ({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_team} ({home_wins}-{home_losses}-{home_otl}) {game_status}'
+    format = '[{scroll} ]NHL: [{away_favorite} ]{away_team} [{away_score} ]({away_wins}-{away_losses}-{away_otl}) at [{home_favorite} ]{home_team} [{home_score} ]({home_wins}-{home_losses}-{home_otl}) {game_status}'
     status_pregame = '{start_time:%H:%M %Z}'
     status_in_progress = '({time_remaining} {period})'
     status_final = '(Final[/{overtime}])'

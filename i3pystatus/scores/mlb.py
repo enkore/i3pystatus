@@ -182,7 +182,7 @@ class MLB(ScoresBackend):
 
     display_order = _valid_display_order
     format_no_games = 'MLB: No games'
-    format = '[{scroll} ]MLB: [{away_favorite} ]{away_team} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_team} ({home_wins}-{home_losses}) {game_status}'
+    format = '[{scroll} ]MLB: [{away_favorite} ]{away_team} [{away_score} ]({away_wins}-{away_losses}) at [{home_favorite} ]{home_team} [{home_score} ]({home_wins}-{home_losses}) {game_status}'
     status_pregame = '{start_time:%H:%M %Z}[ ({delay} Delay)]'
     status_in_progress = '({top_bottom} {inning}, {outs} Out)[ ({delay} Delay)]'
     status_final = '(Final[/{extra_innings}])'

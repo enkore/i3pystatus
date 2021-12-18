@@ -165,7 +165,7 @@ class NBA(ScoresBackend):
 
     display_order = _valid_display_order
     format_no_games = 'NBA: No games'
-    format = '[{scroll} ]NBA: [{away_favorite} ][{away_seed} ]{away_team} ({away_wins}-{away_losses}) at [{home_favorite} ][{home_seed} ]{home_team} ({home_wins}-{home_losses}) {game_status}'
+    format = '[{scroll} ]NBA: [{away_favorite} ][{away_seed} ]{away_team} [{away_score} ]({away_wins}-{away_losses}) at [{home_favorite} ][{home_seed} ]{home_team} [{home_score} ]({home_wins}-{home_losses}) {game_status}'
     status_pregame = '{start_time:%H:%M %Z}'
     status_in_progress = '({time_remaining} {quarter})'
     status_final = '(Final[/{overtime}])'
