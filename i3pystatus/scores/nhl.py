@@ -282,22 +282,22 @@ class NHL(ScoresBackend):
             ret[f'{team}_score'] = self.get_nested(
                 team_data,
                 'score',
-                callback=self.force_int,
+                callback=self.zero_fallback,
                 default=0)
             ret[f'{team}_wins'] = self.get_nested(
                 team_data,
                 'leagueRecord:wins',
-                callback=self.force_int,
+                callback=self.zero_fallback,
                 default=0)
             ret[f'{team}_losses'] = self.get_nested(
                 team_data,
                 'leagueRecord:losses',
-                callback=self.force_int,
+                callback=self.zero_fallback,
                 default=0)
             ret[f'{team}_otl'] = self.get_nested(
                 team_data,
                 'leagueRecord:ot',
-                callback=self.force_int,
+                callback=self.zero_fallback,
                 default=0)
 
             ret[f'{team}_city'] = self.get_nested(

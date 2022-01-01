@@ -118,11 +118,13 @@ class ScoresBackend(SettingsBase):
         return f'{number}{suffix}'
 
     @staticmethod
-    def force_int(value):
+    def zero_fallback(value):
         try:
-            return int(value)
+            int(value)
         except (TypeError, ValueError):
-            return 0
+            return '0'
+        else:
+            return str(value)
 
     def get_nested(self, data, expr, callback=None, default=''):
         if callback is None:
@@ -572,7 +574,14 @@ class Scores(Module):
             self.show_refresh_icon()
             cur_id = self.current_game_id
             cur_games = self.current_backend.games.keys()
+
             self.current_backend.check_scores()
+            for game in self.current_backend.games.values():
+                if game['status'] in ('pregame', 'postponed'):
+                    # Allow formatp to conditionally hide the score when game
+                    # hasn't started (or has been postponed)
+                    game['home_score'] = game['away_score'] = ''
+
             if cur_games == self.current_backend.games.keys():
                 # Set the index to the scroll position of the current game (it
                 # may have changed due to this game or other games changing

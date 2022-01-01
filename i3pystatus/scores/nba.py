@@ -267,20 +267,20 @@ class NBA(ScoresBackend):
         for key in ('home', 'away'):
             team_key = f'{key}Team'
             _update(f'{key}_score', f'{team_key}:score',
-                    callback=self.force_int, default=0)
+                    callback=self.zero_fallback, default='0')
             _update(f'{key}_city', f'{team_key}:teamCity')
             _update(f'{key}_name', f'{team_key}:teamName')
             _update(f'{key}_abbreviation', f'{team_key}:teamTricode')
             if 'playoffs' in game:
                 _update(f'{key}_wins', f'playoffs:{key}_wins',
-                        callback=self.force_int, default=0)
+                        callback=self.zero_fallback, default='0')
                 _update(f'{key}_seed', f'playoffs:{key}_seed',
-                        callback=self.force_int, default=0)
+                        callback=self.zero_fallback, default='0')
             else:
                 _update(f'{key}_wins', f'{team_key}:wins',
-                        callback=self.force_int, default=0)
+                        callback=self.zero_fallback, default='0')
                 _update(f'{key}_losses', f'{team_key}:losses',
-                        callback=self.force_int, default=0)
+                        callback=self.zero_fallback, default='0')
                 ret[f'{key}_seed'] = ''
 
         if 'playoffs' in game:
