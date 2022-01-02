@@ -46,7 +46,7 @@ modules use ``IntervalModule``, which just calls a function repeatedly in a
 specified interval.
 
 The ``output`` attribute should be set to a dictionary which represents your
-modules output, the protocol is documented `here
+module's output, the protocol is documented `here
 <http://i3wm.org/docs/i3bar-protocol.html>`_.
 
 Developer documentation is available in the source code and `here
