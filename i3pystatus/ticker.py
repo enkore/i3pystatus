@@ -21,7 +21,7 @@ class Ticker(IntervalModule):
         ("bad_threshold", "The target value for consindering the stock a poor value"),
         "format"
     )
-    #required = "symbol"
+    required = ("symbol",)
     good_color = "#00FF00"     # green
     caution_color = "#FFFF00"  # yellow
     bad_color = "#FF0000"      # red
