@@ -469,7 +469,10 @@ Some possible uses for these attributes are:
     provides additional formatting options for drawing rainbows and other
     fancy stuff.
 
-.. note:: Pango markup requires that i3bar is configured to use `Pango <http://i3wm.org/docs/userguide.html#fonts>`_, too. It can't work with X core fonts.
+.. note::
+   Pango markup requires that i3bar is configured to use `Pango
+   <http://i3wm.org/docs/userguide.html#fonts>`_, too. It can't work with X
+   core fonts.
 
 Here is an example with the :py:mod:`.network` module.
 Pango markup is used to keep the ESSID green at all times while the
@@ -513,6 +516,12 @@ Or make two modules look like one.
             hints = {"separator": False, "separator_block_width": 0},
             text = "Antidisestabli",
             color="#FF0000")
+
+.. note::
+    To prevent pango rendering errors, ampersands in the formatted text will be
+    replaced with the HTML escape code ``&amp;``. Any ampersands that are
+    themselves part of an HTML escape (e.g. ``&lt;``, ``&gt;``, etc.) will not
+    be replaced.
 
 .. _refresh:
 
