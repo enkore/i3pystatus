@@ -17,8 +17,6 @@ i3pystatus is a large collection of status modules compatible with i3bar from th
 Installation
 ------------
 
-.. rubric:: Supported Python Versions
-
 i3pystatus requires Python 3.6 or newer and is not compatible with Python 2.
 Some modules require additional dependencies documented in the docs.
 
