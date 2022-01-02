@@ -7,6 +7,7 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
+   installation
    configuration
    i3pystatus
    changelog
