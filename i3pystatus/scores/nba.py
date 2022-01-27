@@ -18,9 +18,8 @@ class NBA(ScoresBackend):
 
     .. rubric:: Available formatters
 
-    * `{home_name}` — Name of home team
-    * `{home_city}` — Name of home team's city
-    * `{home_abbrev}` — 3-letter abbreviation for home team's city
+    * `{home_team}` — Depending on the value of the ``team_format`` option,
+      will contain either the home team's name, abbreviation, or city
     * `{home_score}` — Home team's current score
     * `{home_wins}` — Home team's number of wins
     * `{home_losses}` — Home team's number of losses
@@ -29,9 +28,8 @@ class NBA(ScoresBackend):
     * `{home_favorite}` — Displays the value for the :py:mod:`.scores` module's
       ``favorite`` attribute, if the home team is one of the teams being
       followed. Otherwise, this formatter will be blank.
-    * `{away_name}` — Name of away team
-    * `{away_city}` — Name of away team's city
-    * `{away_abbrev}` — 2 or 3-letter abbreviation for away team's city
+    * `{away_team}` — Depending on the value of the ``team_format`` option,
+      will contain either the away team's name, abbreviation, or city
     * `{away_score}` — Away team's current score
     * `{away_wins}` — Away team's number of wins
     * `{away_losses}` — Away team's number of losses
@@ -99,14 +97,22 @@ class NBA(ScoresBackend):
         ('format_no_games', 'Format used when no tracked games are scheduled '
                             'for the current day (does not support formatter '
                             'placeholders)'),
-        ('format_pregame', 'Format used when the game has not yet started'),
-        ('format_in_progress', 'Format used when the game is in progress'),
-        ('format_final', 'Format used when the game is complete'),
-        ('format_postponed', 'Format used when the game has been postponed'),
+        ('format', 'Format used to display game information'),
+        ('status_pregame', 'Format string used for the ``{game_status}`` '
+                           'formatter when the game has not started '),
+        ('status_in_progress', 'Format string used for the ``{game_status}`` '
+                               'formatter when the game is in progress'),
+        ('status_final', 'Format string used for the ``{game_status}`` '
+                         'formatter when the game has finished'),
+        ('status_postponed', 'Format string used for the ``{game_status}`` '
+                             'formatter when the game has been postponed'),
         ('team_colors', 'Dictionary mapping team abbreviations to hex color '
                         'codes. If overridden, the passed values will be '
                         'merged with the defaults, so it is not necessary to '
                         'define all teams if specifying this value.'),
+        ('team_format', 'One of ``name``, ``abbreviation``, or ``city``. If '
+                        'not specified, takes the value from the ``scores`` '
+                        'module.'),
         ('date', 'Date for which to display game scores, in **YYYY-MM-DD** '
                  'format. If unspecified, the current day\'s games will be '
                  'displayed starting at 10am Eastern time, with last '
@@ -155,17 +161,21 @@ class NBA(ScoresBackend):
     }
 
     _valid_teams = [x for x in _default_colors]
-    _valid_display_order = ['in_progress', 'final', 'postponed', 'pregame']
+    _valid_display_order = ['in_progress', 'final', 'pregame', 'postponed']
 
     display_order = _valid_display_order
     format_no_games = 'NBA: No games'
-    format_pregame = '[{scroll} ]NBA: [{away_favorite} ][{away_seed} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ][{home_seed} ]{home_abbrev} ({home_wins}-{home_losses}) {start_time:%H:%M %Z}'
-    format_in_progress = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score}[ ({away_power_play})], [{home_favorite} ]{home_abbrev} {home_score}[ ({home_power_play})] ({time_remaining} {quarter})'
-    format_postponed = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) PPD'
-    format_final = '[{scroll} ]NBA: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Final[/{overtime}])'
+    format = '[{scroll} ]NBA: [{away_favorite} ][{away_seed} ]{away_team} [{away_score} ]({away_wins}-{away_losses}) at [{home_favorite} ][{home_seed} ]{home_team} [{home_score} ]({home_wins}-{home_losses}) {game_status}'
+    status_pregame = '{start_time:%H:%M %Z}'
+    status_in_progress = '({time_remaining} {quarter})'
+    status_final = '(Final[/{overtime}])'
+    status_postponed = 'PPD'
     team_colors = _default_colors
     live_url = LIVE_URL
     api_url = API_URL
+
+    # These will inherit from the Scores class if not overridden
+    team_format = None
 
     def check_scores(self):
         self.get_api_date()
@@ -257,20 +267,20 @@ class NBA(ScoresBackend):
         for key in ('home', 'away'):
             team_key = f'{key}Team'
             _update(f'{key}_score', f'{team_key}:score',
-                    callback=self.force_int, default=0)
+                    callback=self.zero_fallback, default='0')
             _update(f'{key}_city', f'{team_key}:teamCity')
             _update(f'{key}_name', f'{team_key}:teamName')
-            _update(f'{key}_abbrev', f'{team_key}:teamTricode')
+            _update(f'{key}_abbreviation', f'{team_key}:teamTricode')
             if 'playoffs' in game:
                 _update(f'{key}_wins', f'playoffs:{key}_wins',
-                        callback=self.force_int, default=0)
+                        callback=self.zero_fallback, default='0')
                 _update(f'{key}_seed', f'playoffs:{key}_seed',
-                        callback=self.force_int, default=0)
+                        callback=self.zero_fallback, default='0')
             else:
                 _update(f'{key}_wins', f'{team_key}:wins',
-                        callback=self.force_int, default=0)
+                        callback=self.zero_fallback, default='0')
                 _update(f'{key}_losses', f'{team_key}:losses',
-                        callback=self.force_int, default=0)
+                        callback=self.zero_fallback, default='0')
                 ret[f'{key}_seed'] = ''
 
         if 'playoffs' in game:

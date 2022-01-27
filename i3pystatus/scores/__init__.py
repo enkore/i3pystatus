@@ -118,11 +118,13 @@ class ScoresBackend(SettingsBase):
         return f'{number}{suffix}'
 
     @staticmethod
-    def force_int(value):
+    def zero_fallback(value):
         try:
-            return int(value)
+            int(value)
         except (TypeError, ValueError):
-            return 0
+            return '0'
+        else:
+            return str(value)
 
     def get_nested(self, data, expr, callback=None, default=''):
         if callback is None:
@@ -219,7 +221,7 @@ class Scores(Module):
     .. code-block:: python
 
         from i3pystatus import Status
-        from i3pystatus.scores import mlb, nhl
+        from i3pystatus.scores import mlb, nhl, nba
 
         status = Status()
 
@@ -228,9 +230,11 @@ class Scores(Module):
             hints={'markup': 'pango'},
             colorize_teams=True,
             favorite_icon='<span size="small" color="#F5FF00">★</span>',
+            team_format='abbreviation',
             backends=[
                 mlb.MLB(
                     teams=['CWS', 'SF'],
+                    team_format='name',
                     format_no_games='No games today :(',
                     inning_top='⬆',
                     inning_bottom='⬇',
@@ -240,7 +244,6 @@ class Scores(Module):
                     teams=['GSW'],
                     all_games=False,
                 ),
-                epl.EPL(),
             ],
         )
 
@@ -362,6 +365,7 @@ class Scores(Module):
                          'shown by the module) when refreshing scores. '
                          '**NOTE:** Depending on how quickly the update is '
                          'performed, the icon may not be displayed.'),
+        ('team_format', 'One of ``name``, ``abbreviation``, or ``city``'),
     )
 
     backends = []
@@ -371,6 +375,7 @@ class Scores(Module):
     colorize_teams = False
     scroll_arrow = '⬍'
     refresh_icon = '⟳'
+    team_format = 'name'
 
     output = {'full_text': ''}
     game_map = {}
@@ -416,6 +421,9 @@ class Scores(Module):
                         f"'{backend.display_order[index]}'"
                     )
                 backend.display_order[index] = order_lc
+
+            if backend.team_format is None:
+                backend.team_format = self.team_format
 
         self.condition = threading.Condition()
         self.thread = threading.Thread(target=self.update_thread, daemon=True)
@@ -566,7 +574,14 @@ class Scores(Module):
             self.show_refresh_icon()
             cur_id = self.current_game_id
             cur_games = self.current_backend.games.keys()
+
             self.current_backend.check_scores()
+            for game in self.current_backend.games.values():
+                if game['status'] in ('pregame', 'postponed'):
+                    # Allow formatp to conditionally hide the score when game
+                    # hasn't started (or has been postponed)
+                    game['home_score'] = game['away_score'] = ''
+
             if cur_games == self.current_backend.games.keys():
                 # Set the index to the scroll position of the current game (it
                 # may have changed due to this game or other games changing
@@ -623,31 +638,55 @@ class Scores(Module):
         else:
             game = copy.copy(self.current_game)
 
-            fstr = str(getattr(self.current_backend, f'format_{game["status"]}'))
+            # Set the game_status using the formatter
+            game_status_opt = f'status_{game["status"]}'
+            try:
+                game['game_status'] = formatp(
+                    str(getattr(self.current_backend, game_status_opt)),
+                    **game
+                )
+            except AttributeError:
+                self.logger.error(
+                    f'Unable to find {self.current_backend.name} option '
+                    f'{game_status_opt}'
+                )
+                game['game_status'] = 'Unknown Status'
 
             for team in ('home', 'away'):
-                abbrev_key = f'{team}_abbrev'
+                team_abbrev = game[f'{team}_abbreviation']
                 # Set favorite icon, if applicable
                 game[f'{team}_favorite'] = self.favorite_icon \
-                    if game[abbrev_key] in self.current_backend.favorite_teams \
+                    if team_abbrev in self.current_backend.favorite_teams \
                     else ''
 
-                if self.colorize_teams:
-                    # Wrap in Pango markup
-                    color = self.current_backend.team_colors.get(
-                        game.get(abbrev_key)
+                try:
+                    game[f'{team}_team'] = game[f'{team}_{self.current_backend.team_format}']
+                except KeyError:
+                    self.logger.debug(
+                        f'Unable to find {self.current_backend.team_format} '
+                        f'value, falling back to {team_abbrev}'
                     )
-                    if color is not None:
-                        for item in ('abbrev', 'city', 'name', 'name_short'):
-                            key = f'{team}_{item}'
-                            if key in game:
-                                game[key] = f'<span color="{color}">{game[key]}</span>'
+                    game[f'{team}_team'] = team_abbrev
+
+                if self.colorize_teams:
+                    try:
+                        color = self.current_backend.team_colors[team_abbrev]
+                    except KeyError:
+                        pass
+                    else:
+                        for val in ('team', 'name', 'city', 'abbreviation'):
+                            # Wrap in Pango markup
+                            game[f'{team}_{val}'] = ''.join((
+                                f'<span color="{color}">',
+                                game[f'{team}_{val}'],
+                                '</span>',
+                            ))
 
             game['scroll'] = self.scroll_arrow \
                 if len(self.current_backend.games) > 1 \
                 else ''
 
-            output = formatp(fstr, **game).strip()
+            output = formatp(self.current_backend.format, **game).strip()
 
         self.output = {'full_text': output, 'color': self.color}
 

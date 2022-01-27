@@ -21,18 +21,16 @@ class MLB(ScoresBackend):
 
     .. rubric:: Available formatters
 
-    * `{home_name}` — Name of home team
-    * `{home_city}` — Name of home team's city
-    * `{home_abbrev}` — 2 or 3-letter abbreviation for home team's city
+    * `{home_team}` — Depending on the value of the ``team_format`` option,
+      will contain either the home team's name, abbreviation, or city
     * `{home_score}` — Home team's current score
     * `{home_wins}` — Home team's number of wins
     * `{home_losses}` — Home team's number of losses
     * `{home_favorite}` — Displays the value for the :py:mod:`.scores` module's
       ``favorite`` attribute, if the home team is one of the teams being
       followed. Otherwise, this formatter will be blank.
-    * `{away_name}` — Name of away team
-    * `{away_city}` — Name of away team's city
-    * `{away_abbrev}` — 2 or 3-letter abbreviation for away team's city
+    * `{away_team}` — Depending on the value of the ``team_format`` option,
+      will contain either the away team's name, abbreviation, or city
     * `{away_score}` — Away team's current score
     * `{away_wins}` — Away team's number of wins
     * `{away_losses}` — Away team's number of losses
@@ -50,6 +48,8 @@ class MLB(ScoresBackend):
     * `{delay}` — Reason for delay, if game is currently delayed. Otherwise,
       this formatter will be blank.
     * `{postponed}` — Reason for postponement, if game has been postponed.
+      Otherwise, this formatter will be blank.
+    * `{suspended}` — Reason for suspension, if game has been suspended.
       Otherwise, this formatter will be blank.
     * `{extra_innings}` — When a game lasts longer than 9 innings, this
       formatter will show that number of innings. Otherwise, it will blank.
@@ -105,11 +105,17 @@ class MLB(ScoresBackend):
         ('format_no_games', 'Format used when no tracked games are scheduled '
                             'for the current day (does not support formatter '
                             'placeholders)'),
-        ('format_pregame', 'Format used when the game has not yet started'),
-        ('format_in_progress', 'Format used when the game is in progress'),
-        ('format_final', 'Format used when the game is complete'),
-        ('format_postponed', 'Format used when the game has been postponed'),
-        ('format_suspended', 'Format used when the game has been suspended'),
+        ('format', 'Format used to display game information'),
+        ('status_pregame', 'Format string used for the ``{game_status}`` '
+                           'formatter when the game has not started '),
+        ('status_in_progress', 'Format string used for the ``{game_status}`` '
+                               'formatter when the game is in progress'),
+        ('status_final', 'Format string used for the ``{game_status}`` '
+                         'formatter when the game has finished'),
+        ('status_postponed', 'Format string used for the ``{game_status}`` '
+                             'formatter when the game has been postponed'),
+        ('status_suspended', 'Format string used for the ``{game_status}`` '
+                             'formatter when the game has been suspended'),
         ('inning_top', 'Value for the ``{top_bottom}`` formatter when game '
                        'is in the top half of an inning'),
         ('inning_bottom', 'Value for the ``{top_bottom}`` formatter when game '
@@ -118,6 +124,9 @@ class MLB(ScoresBackend):
                         'codes. If overridden, the passed values will be '
                         'merged with the defaults, so it is not necessary to '
                         'define all teams if specifying this value.'),
+        ('team_format', 'One of ``name``, ``abbreviation``, or ``city``. If '
+                        'not specified, takes the value from the ``scores`` '
+                        'module.'),
         ('date', 'Date for which to display game scores, in **YYYY-MM-DD** '
                  'format. If unspecified, the current day\'s games will be '
                  'displayed starting at 10am Eastern time, with last '
@@ -169,21 +178,25 @@ class MLB(ScoresBackend):
     }
 
     _valid_teams = [x for x in _default_colors]
-    _valid_display_order = ['in_progress', 'suspended', 'final', 'postponed', 'pregame']
+    _valid_display_order = ['in_progress', 'suspended', 'final', 'pregame', 'postponed']
 
     display_order = _valid_display_order
     format_no_games = 'MLB: No games'
-    format_pregame = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) {start_time:%H:%M %Z}[ ({delay} Delay)]'
-    format_in_progress = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score}, [{home_favorite} ]{home_abbrev} {home_score} ({top_bottom} {inning}, {outs} Out)[ ({delay} Delay)]'
-    format_final = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Final[/{extra_innings}])'
-    format_postponed = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} ({home_wins}-{home_losses}) (PPD: {postponed})'
-    format_suspended = '[{scroll} ]MLB: [{away_favorite} ]{away_abbrev} {away_score} ({away_wins}-{away_losses}) at [{home_favorite} ]{home_abbrev} {home_score} ({home_wins}-{home_losses}) (Suspended: {suspended})'
+    format = '[{scroll} ]MLB: [{away_favorite} ]{away_team} [{away_score} ]({away_wins}-{away_losses}) at [{home_favorite} ]{home_team} [{home_score} ]({home_wins}-{home_losses}) {game_status}'
+    status_pregame = '{start_time:%H:%M %Z}[ ({delay} Delay)]'
+    status_in_progress = '({top_bottom} {inning}, {outs} Out)[ ({delay} Delay)]'
+    status_final = '(Final[/{extra_innings}])'
+    status_postponed = '(PPD: {postponed})'
+    status_suspended = '(Suspended: {suspended})'
     inning_top = 'Top'
     inning_bottom = 'Bot'
     team_colors = _default_colors
     live_url = LIVE_URL
     scoreboard_url = SCOREBOARD_URL
     api_url = API_URL
+
+    # These will inherit from the Scores class if not overridden
+    team_format = None
 
     @require(internet)
     def check_scores(self):
@@ -252,7 +265,7 @@ class MLB(ScoresBackend):
             ret[f'{team}_name'] = self.get_nested(
                 team_data,
                 'team:teamName')
-            ret[f'{team}_abbrev'] = self.get_nested(
+            ret[f'{team}_abbreviation'] = self.get_nested(
                 team_data,
                 'team:abbreviation')
 
@@ -268,7 +281,7 @@ class MLB(ScoresBackend):
             ret[f'{team}_score'] = self.get_nested(
                 linescore,
                 f'teams:{team}:runs',
-                default=0)
+                default='0')
 
         for key in ('delay', 'postponed', 'suspended'):
             ret[key] = ''
