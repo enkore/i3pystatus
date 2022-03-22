@@ -272,16 +272,19 @@ class MLB(ScoresBackend):
             ret[f'{team}_wins'] = self.get_nested(
                 team_data,
                 'leagueRecord:wins',
+                callback=self.zero_fallback,
                 default=0)
             ret[f'{team}_losses'] = self.get_nested(
                 team_data,
                 'leagueRecord:losses',
+                callback=self.zero_fallback,
                 default=0)
 
             ret[f'{team}_score'] = self.get_nested(
                 linescore,
                 f'teams:{team}:runs',
-                default='0')
+                callback=self.zero_fallback,
+                default=0)
 
         for key in ('delay', 'postponed', 'suspended'):
             ret[key] = ''
