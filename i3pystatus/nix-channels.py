@@ -23,21 +23,25 @@ class NixChannels(IntervalModule):
     color_offline = '#ff0000'
     format_online = 'online'
     format_offline = 'offline'
+    # https://channels.nix.gsc.io/ is a non official service and requests to not be polled
+    # more frequently than every 15 mn
     interval = 3600
 
     @require(internet)
     def run(self):
-        url = "https://nixos.org/channels/%s" % self.channel
+        url = f"https://channels.nix.gsc.io/{self.channel}/latest-url"
         conn = urllib.request.urlopen(url, timeout=30)
-        last_modified = conn.headers['last-modified']
-
+        advancement_timestamp = conn.read().decode().split()[-1]
+        # print()
+        # last_modified = conn.headers['last-modified']
+        last_modified = datetime.datetime.fromtimestamp(int(advancement_timestamp))
         # outstr = today.strftime(self.prefixformat) + " "
-        span = last_update - datetime.now()
+        span = datetime.datetime.now() - last_modified
 
         # if internet():
         self.output = {
             "color": self.color,
-            "full_text": "nixos-unstable: %s" % (span)
+            "full_text": "%s" % (span)
         }
 
 
