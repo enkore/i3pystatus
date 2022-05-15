@@ -97,7 +97,7 @@ cleartext to the server.)"),
     color_map = {}
     max_field_len = 25
     max_len = 100
-    time_format = "%M:MS"
+    time_format = "%m:%S"
     truncate_fields = ("title", "album", "artist", "album_artist")
     hide_inactive = False
     on_leftclick = "switch_playpause"
