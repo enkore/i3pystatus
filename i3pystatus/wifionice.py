@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 from json import loads
-from subprocess import check_output
 from urllib.request import urlopen
+from threading import Condition, Thread
 
-from i3pystatus import IntervalModule
-from i3pystatus.core.util import formatp
+from i3pystatus import Module
+from i3pystatus.core.util import formatp, user_open
 
 
-class WifiOnIceAPI(IntervalModule):
+class WifiOnIceAPI(Module):
     """
     Displays information about your current trip on Deutsche Bahn trains.
     The default behaviour on left-click is to send you to travelynx for
@@ -31,20 +31,23 @@ class WifiOnIceAPI(IntervalModule):
     """
 
     final_destination = 'Endstation'
-    format_ontrain = '{speed}km/h > {next_station} ({arrival_in}[ | {delay_minutes}])'
     format_offtrain = None
+    format_ontrain = '{speed}km/h > {next_station} ({arrival_in}[ | {delay_minutes}])'
     ice_status = {}
-    interval = 2
+    off_train_interval = 10
     on_leftclick = 'open_travelynx'
+    on_train_interval = 2
     travelynx_url = 'travelynx.de'
     trip_info = {}
     wifi_adapters = ['wlan0']
-    wifi_names = ['wifi@db', 'wifionice']
+    wifi_names = ['WiFi@DB', 'WIFIonICE']
 
     settings = (
         ("final_destination", "Information text for 'final destination has been reached'"),
         ("format_ontrain", "Formatter for 'on a train'"),
-        ("format_offtrain", "Formatter for 'not on a train' (module hidden if `None`)"),
+        ("format_offtrain", "Formatter for 'not on a train' (module hidden if `None` - no formatters available)"),
+        ("off_train_interval", "time between updates if no train is detected"),
+        ("on_train_interval", "time between updates while on a train"),
         ("travelynx_url", "URL of your travelynx page"),
         ("wifi_adapters", "List of wifi adapters the module should consider "
                           "when detecting if you are in a train. Set to `None` "
@@ -69,13 +72,6 @@ class WifiOnIceAPI(IntervalModule):
             components.append('now')
         return " ".join(components)
 
-    def _get_data(self):
-        trip_info_req = urlopen('https://iceportal.de/api1/rs/tripInfo/trip')
-        self.trip_info = loads(trip_info_req.read())['trip']
-
-        ice_status_req = urlopen('https://iceportal.de/api1/rs/status')
-        self.ice_status = loads(ice_status_req.read())
-
     def _check_wifi(self):
         if self.wifi_adapters is None:
             return True
@@ -88,24 +84,54 @@ class WifiOnIceAPI(IntervalModule):
                     return True
         return False
 
+    def _loop(self):
+        while True:
+
+            if self._check_wifi():
+                try:
+                    trip_info_req = urlopen('https://iceportal.de/api1/rs/tripInfo/trip')
+                    self.trip_info = loads(trip_info_req.read())['trip']
+
+                    ice_status_req = urlopen('https://iceportal.de/api1/rs/status')
+                    self.ice_status = loads(ice_status_req.read())
+                except Exception:
+                    self.trip_info = {}
+                    self.ice_status = {}
+
+                self.update_bar()
+
+                with self.condition:
+                    self.condition.wait(self.on_train_interval)
+            else:
+                self.trip_info = {}
+                self.ice_status = {}
+
+                self.update_bar()
+
+                with self.condition:
+                    self.condition.wait(self.off_train_interval)
+
+    def init(self):
+        self.condition = Condition()
+        self.thread = Thread(
+            target=self._loop,
+            daemon=True
+        )
+        self.thread.start()
+
     def open_travelynx(self):
-        if not self._check_wifi():
-            return None
-
         if not self.trip_info:
-            self._get_data()
+            return
 
-        check_output(['xdg-open', 'https://{}/s/{}?train={}%20{}'.format(
+        user_open('https://{}/s/{}?train={}%20{}'.format(
             self.travelynx_url,
             self.trip_info['stopInfo']['actualLast'],
             self.trip_info['trainType'],
             self.trip_info['vzn'],
-        )])
+        ))
 
-    def run(self):
-        if self._check_wifi():
-            self._get_data()
-
+    def update_bar(self):
+        if self.trip_info and self.ice_status:
             format_vars = {
                 'arrival_in': '?',
                 'arrival_time': '',
