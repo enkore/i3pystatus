@@ -4,7 +4,6 @@ from subprocess import check_output
 from json import loads
 
 from i3pystatus import IntervalModule
-from i3pystatus.core.util import internet, require
 
 
 class WifiOnIceAPI(IntervalModule):
@@ -13,7 +12,7 @@ class WifiOnIceAPI(IntervalModule):
 
     Requires the PyPI package `basiciw` if you want to use automatic
     detection. See below on how to disable automatic detection based on
-    wifi network names.
+    wifi adapter names.
 
     .. rubric:: Available formatters
 
