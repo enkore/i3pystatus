@@ -74,20 +74,26 @@ class WifiOnIceAPI(Module):
 
     def _check_wifi(self):
         if self.wifi_adapters is None:
+            self.logger.debug('self.wifi_adapters is None')
             return True
 
         from basiciw import iwinfo
         for adapter in self.wifi_adapters:
+            self.logger.info(f'Checking {adapter} for compatible wifi network')
             iwi = iwinfo(adapter)
             for wifi in self.wifi_names:
                 if iwi['essid'].lower() == wifi.lower():
+                    self.logger.info(f'{adapter} uses {wifi} - success!')
                     return True
+        self.logger.info('No matching wifi connection found')
         return False
 
     def _loop(self):
+        self.logger.debug('begin of _loop()')
         while True:
-
+            self.logger.debug('new _loop()')
             if self._check_wifi():
+                self.logger.info('On a train :)')
                 try:
                     trip_info_req = urlopen('https://iceportal.de/api1/rs/tripInfo/trip')
                     self.trip_info = loads(trip_info_req.read())['trip']
@@ -98,13 +104,21 @@ class WifiOnIceAPI(Module):
                     self.trip_info = {}
                     self.ice_status = {}
 
+                self.logger.debug(f'trip_info: {repr(self.trip_info)}')
+                self.logger.debug(f'ice_status: {repr(self.ice_status)}')
+
                 self.update_bar()
 
                 with self.condition:
                     self.condition.wait(self.on_train_interval)
             else:
+                self.logger.info('Not on a train :(')
+
                 self.trip_info = {}
                 self.ice_status = {}
+
+                self.logger.debug(f'trip_info: {repr(self.trip_info)}')
+                self.logger.debug(f'ice_status: {repr(self.ice_status)}')
 
                 self.update_bar()
 
@@ -173,8 +187,10 @@ class WifiOnIceAPI(Module):
 
             if net_current not in (None, 'NO_INFO') or net_future not in (None, 'NO_INFO'):
                 format_vars['net_current'] = net_current
-                format_vars['net_expected'] = net_expected
+                format_vars['net_expected'] = net_future
                 format_vars['net_duration'] = self._format_time(self.ice_status['connectivity']['remainingTimeSeconds'])
+
+            self.logger.debug(f'format_vars: {repr(format_vars)}')
 
             self.output = {
                 'full_text': formatp(self.format_ontrain, **format_vars).strip(),
