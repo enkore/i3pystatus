@@ -32,7 +32,7 @@ class WifiOnIceAPI(Module):
 
     final_destination = 'Endstation'
     format_offtrain = None
-    format_ontrain = '{speed}km/h > {next_station} ({arrival_in}[ | {delay_minutes}])'
+    format_ontrain = '{speed}km/h > {next_station} ({arrival_in}[ | {delay}])'
     ice_status = {}
     off_train_interval = 10
     on_leftclick = 'open_travelynx'
@@ -162,7 +162,7 @@ class WifiOnIceAPI(Module):
             for stop in self.trip_info['stops']:
                 if stop['station']['evaNr'] == next_stop_id:
                     if stop['timetable']['departureDelay']:
-                        format_vars['delay'] = stop['timetable']['departureDelay'],
+                        format_vars['delay'] = stop['timetable']['departureDelay']
                     else:
                         format_vars['delay'] = 0
 
