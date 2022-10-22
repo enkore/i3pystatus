@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 from i3pystatus import IntervalModule
@@ -62,7 +63,7 @@ class Ping(IntervalModule):
     def ping_host(self):
         p = subprocess.Popen(["ping", "-c1", "-w%d" % self.interval,
                               self.host], stdout=subprocess.PIPE,
-                             stderr=subprocess.DEVNULL)
+                             stderr=subprocess.DEVNULL, env=dict(os.environ, LC_ALL="C"))
         out, _ = p.communicate()
         if p.returncode == 0:
             return float(out.decode().split("\n")[1]
