@@ -1,7 +1,7 @@
 from i3pystatus import IntervalModule
 from psutil import virtual_memory
 from i3pystatus.core.color import ColorRangeModule
-from i3pystatus.core.util import make_bar
+from i3pystatus.core.util import make_bar, make_glyph
 
 
 class MemBar(IntervalModule, ColorRangeModule):
@@ -23,7 +23,11 @@ class MemBar(IntervalModule, ColorRangeModule):
     alert_percentage = 80
     multi_colors = False
 
+    bar_type = "bar"
+
     def init(self):
+        if self.bar_type not in ("glyph", "bar"):
+            raise Exception("bar_type must be one of 'glyph' or 'bar'")
         self.colors = self.get_hex_color_range(self.color, self.alert_color, 100)
 
     settings = (
@@ -36,6 +40,7 @@ class MemBar(IntervalModule, ColorRangeModule):
         ("alert_color",
          "defines the color used when alert percentage is exceeded"),
         ("multi_colors", "whether to use range of colors from 'color' to 'alert_color' based on memory usage."),
+        ("bar_type", "choose from 'glyph' or 'bar'")
     )
 
     def run(self):
@@ -50,8 +55,13 @@ class MemBar(IntervalModule, ColorRangeModule):
         else:
             color = self.color
 
+        if self.bar_type == "glyph":
+            bar = make_glyph(memory_usage.percent, glyphs='○◔◑◕●')
+        else:
+            bar = make_bar(memory_usage.percent)
+
         self.output = {
             "full_text": self.format.format(
-                used_mem_bar=make_bar(memory_usage.percent)),
+                used_mem_bar=bar),
             "color": color
         }
