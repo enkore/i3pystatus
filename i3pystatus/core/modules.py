@@ -122,13 +122,14 @@ class Module(SettingsBase):
                 tmp_cb = cb
 
             try:
-                args_spec = inspect.getargspec(tmp_cb)
+                args_spec = inspect.getfullargspec(tmp_cb)
             except Exception:
-                args_spec = inspect.ArgSpec([], None, None, None)
+                args_spec = inspect.FullArgSpec(
+                    [], None, None, None, None, None, {})
 
             # Remove all variables present in kwargs that are not used in the
             # callback, except if there is a keyword argument.
-            if not args_spec.keywords:
+            if not args_spec.varkw:
                 kwargs = {k: v for k, v in kwargs.items()
                           if k in args_spec.args}
             cb(*args, **kwargs)
