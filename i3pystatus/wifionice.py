@@ -84,10 +84,13 @@ class WifiOnIceAPI(Module):
 
     def _check_wifi(self):
         if self.wifi_adapters is None:
-            self.logger.debug('self.wifi_adapters is None')
+            self.logger.debug('Disabling automatic on-train detection because wifi_adapters is None')
             return True
-
-        from basiciw import iwinfo
+        try:
+            from basiciw import iwinfo
+        except ModuleNotFoundError:
+            self.logger.warning('Disabling automatic on-train detection because basiciw is not installed')
+            return True
         for adapter in self.wifi_adapters:
             self.logger.info(f'Checking {adapter} for compatible wifi network')
             iwi = iwinfo(adapter)
