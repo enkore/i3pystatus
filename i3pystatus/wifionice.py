@@ -191,7 +191,7 @@ class WifiOnIceAPI(Module):
             format_vars['net_expected'] = net_future
             format_vars['net_duration'] = self._format_time(self.ice_status['connectivity']['remainingTimeSeconds'])
 
-        self.logger.debug(f'format_vars: {repr(format_vars)}')
+        self.logger.debug(f'format_vars: {format_vars!r}')
         return format_vars
 
     def init(self):
