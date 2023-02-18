@@ -73,11 +73,11 @@ class WifiOnIceAPI(Module):
         if seconds >= 3600:
             hours = int(seconds / 3600)
             seconds -= hours * 3600
-            components.append('{}h'.format(hours))
+            components.append(f'{hours}h')
         if seconds >= 60:
             minutes = int(seconds / 60)
             seconds -= minutes * 60
-            components.append('{}m'.format(minutes))
+            components.append(f'{minutes}m')
         if not components:
             components.append('now')
         return " ".join(components)
@@ -114,8 +114,8 @@ class WifiOnIceAPI(Module):
                     self.trip_info = {}
                     self.ice_status = {}
 
-                self.logger.debug(f'trip_info: {repr(self.trip_info)}')
-                self.logger.debug(f'ice_status: {repr(self.ice_status)}')
+                self.logger.debug(f'trip_info: {self.trip_info!r}')
+                self.logger.debug(f'ice_status: {self.ice_status!r}')
 
                 self.update_bar()
 
@@ -127,8 +127,8 @@ class WifiOnIceAPI(Module):
                 self.trip_info = {}
                 self.ice_status = {}
 
-                self.logger.debug(f'trip_info: {repr(self.trip_info)}')
-                self.logger.debug(f'ice_status: {repr(self.ice_status)}')
+                self.logger.debug(f'trip_info: {self.trip_info!r}')
+                self.logger.debug(f'ice_status: {self.ice_status!r}')
 
                 self.update_bar()
 
