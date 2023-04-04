@@ -145,7 +145,7 @@ class MLB(ScoresBackend):
     required = ()
 
     _default_colors = {
-        'ARI': '#A71930',
+        'AZ': '#A71930',
         'ATL': '#CE1141',
         'BAL': '#DF4601',
         'BOS': '#BD3039',
