@@ -21,23 +21,22 @@ class Ticker(IntervalModule):
         ("bad_threshold", "The target value for consindering the stock a poor value"),
         "format"
     )
-    #required = "symbol"
+    required = ("symbol",)
     good_color = "#00FF00"     # green
     caution_color = "#FFFF00"  # yellow
     bad_color = "#FF0000"      # red
     good_threshold = 100
     bad_threshold = 50
     interval = 300
-    format = "{symbol}: {regularMarketPrice} ({regularMarketDayHigh}/{regularMarketDayLow})"
+    format = "{symbol}: {ask}"
 
     def run(self):
 
-        stock = yf.Ticker(self.symbol)
-        tick = stock.info
+        tick = yf.Ticker(self.symbol).info
 
-        if tick['regularMarketPrice'] >= float(self.good_threshold):
+        if tick['ask'] >= float(self.good_threshold):
             color = self.good_color
-        elif tick['regularMarketPrice'] <= float(self.bad_threshold):
+        elif tick['ask'] <= float(self.bad_threshold):
             color = self.bad_color
         else:
             color = self.caution_color
