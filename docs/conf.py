@@ -367,4 +367,4 @@ epub_copyright = '2013, Author'
 #epub_use_index = True
 
 def setup(app):
-    app.add_stylesheet('i3pystatus.css')
+    app.add_css_file('i3pystatus.css')
