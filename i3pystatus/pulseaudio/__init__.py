@@ -1,4 +1,3 @@
-import os
 import re
 import subprocess
 
@@ -46,7 +45,7 @@ class PulseAudio(Module, ColorRangeModule):
         ("format_muted", "optional format string to use when muted"),
         ("format_selected", "string used to mark this sink if selected"),
         "muted", "unmuted",
-        "color_muted", "color_unmuted",
+        "color_error", "color_muted", "color_unmuted",
         ("step", "percentage to increment volume on scroll"),
         ("sink", "sink name to use, None means pulseaudio default"),
         ("move_sink_inputs", "Move all sink inputs when we change the default sink"),
@@ -64,6 +63,7 @@ class PulseAudio(Module, ColorRangeModule):
     format_selected = " 🗸"
     currently_muted = False
     has_amixer = False
+    color_error = "#FF0000"
     color_muted = "#FF0000"
     color_unmuted = "#FFFFFF"
     vertical_bar_glyphs = None
@@ -120,8 +120,7 @@ class PulseAudio(Module, ColorRangeModule):
         if self.sink is not None:
             return self.sink
 
-        self.sinks = subprocess.check_output(['pactl', 'list', 'short', 'sinks'],
-                                             universal_newlines=True).splitlines()
+        self.sinks = self._call_pactl(["list", "short", "sinks"]).splitlines()
         bestsink = None
         state = 'DEFAULT'
         for sink in self.sinks:
@@ -191,19 +190,17 @@ class PulseAudio(Module, ColorRangeModule):
                 output_format = self.format
 
             if self.bar_type == 'vertical':
-                volume_bar = make_vertical_bar(volume_percent, self.vertical_bar_width, glyphs=self.vertical_bar_glyphs)
+                volume_bar = make_vertical_bar(volume_percent, self.vertical_bar_width,
+                                               glyphs=self.vertical_bar_glyphs)
             elif self.bar_type == 'horizontal':
                 volume_bar = make_bar(volume_percent)
             else:
                 raise Exception("bar_type must be 'vertical' or 'horizontal'")
 
             selected = ""
-            dump = subprocess.check_output("pacmd dump".split(), universal_newlines=True)
-            for line in dump.split("\n"):
-                if line.startswith("set-default-sink"):
-                    default_sink = line.split()[1]
-                    if default_sink == self.current_sink:
-                        selected = self.format_selected
+            default_sink = self._call_pactl(["get-default-sink"]).strip()
+            if default_sink == self.current_sink:
+                selected = self.format_selected
 
             self.output = {
                 "color": color,
@@ -223,28 +220,33 @@ class PulseAudio(Module, ColorRangeModule):
     def change_sink(self):
         sinks = list(s.split()[1] for s in self.sinks)
         if self.sink is None:
-            next_sink = sinks[(sinks.index(self.current_sink) + 1) %
-                              len(sinks)]
+            next_sink = sinks[(sinks.index(self.current_sink) + 1) % len(sinks)]
         else:
             next_sink = self.current_sink
 
         if self.move_sink_inputs:
-            sink_inputs = subprocess.check_output("pacmd list-sink-inputs".split(),
-                                                  universal_newlines=True)
+            sink_inputs = self._call_pactl(["list-sink-inputs"])
             for input_index in re.findall(r'index:\s+(\d+)', sink_inputs):
-                command = "pacmd move-sink-input {} {}".format(input_index, next_sink)
+                pactl_args = ["move-sink-input", input_index, next_sink]
+                self._call_pactl(pactl_args)
+        self._call_pactl(["set-default-sink", next_sink])
 
-                # Not all applications can be moved and pulseaudio, and when
-                # this fail pacmd print error messaging
-                with open(os.devnull, 'w') as devnull:
-                    subprocess.call(command.split(), stdout=devnull)
-        subprocess.call("pacmd set-default-sink {}".format(next_sink).split())
+    def _call_pactl(self, pactl_arguments):
+        try:
+            output = subprocess.check_output(
+                ["pactl"] + [str(arg) for arg in pactl_arguments],
+                universal_newlines=True)
+            return output
+        except Exception:
+            self.logger.exception("Error while executing pactl")
+            self.output = {"color": self.color_error, "full_text": "Error while executing pactl"}
+            self.send_output()
 
     def switch_mute(self):
-        subprocess.call(['pactl', '--', 'set-sink-mute', self.current_sink, "toggle"])
+        self._call_pactl(["--", "set-sink-mute", self.current_sink, "toggle"])
 
     def increase_volume(self):
-        subprocess.call(['pactl', '--', 'set-sink-volume', self.current_sink, "+%s%%" % self.step])
+        self._call_pactl(["--", "set-sink-volume", self.current_sink, f"+{self.step}%"])
 
     def decrease_volume(self):
-        subprocess.call(['pactl', '--', 'set-sink-volume', self.current_sink, "-%s%%" % self.step])
+        self._call_pactl(["--", "set-sink-volume", self.current_sink, f"-{self.step}%"])
