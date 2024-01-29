@@ -110,8 +110,10 @@ class Wunderground(WeatherBackend):
             self.logger.exception(f'Failed to load {url}')
         else:
             try:
-                return re.search(r'apiKey=([0-9a-f]+)', page_source).group(1)
-            except AttributeError:
+                r = re.finditer(r'apiKey=([0-9a-f]+)', page_source)
+                next(r)
+                return next(r).group(1)
+            except (StopIteration, IndexError, AttributeError):
                 self.logger.error('Failed to find API key in mainpage source')
 
     @require(internet)
