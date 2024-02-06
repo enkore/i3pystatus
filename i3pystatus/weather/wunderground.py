@@ -109,10 +109,15 @@ class Wunderground(WeatherBackend):
         except Exception as exc:
             self.logger.exception(f'Failed to load {url}')
         else:
-            try:
-                return re.search(r'apiKey=([0-9a-f]+)', page_source).group(1)
-            except AttributeError:
+            self.logger.debug('Scanning page source for embedded API keys')
+            for key_match in re.finditer(r'apiKey=([0-9a-f]+)', page_source):
+                self.api_key = key_match.group(1)
+                self.logger.debug(f'Checking if {self.api_key} works')
+                if self.api_request(self.observation_url.format(**vars(self))):
+                    break
+            else:
                 self.logger.error('Failed to find API key in mainpage source')
+                self.api_key = None
 
     @require(internet)
     def api_request(self, url, headers=None):
@@ -128,7 +133,7 @@ class Wunderground(WeatherBackend):
         Query the desired station and return the weather data
         '''
         # Get the API key from the page source
-        self.api_key = self.get_api_key()
+        self.get_api_key()
         if self.api_key is None:
             self.data['update_error'] = self.update_error
             return
@@ -136,7 +141,9 @@ class Wunderground(WeatherBackend):
         self.data['update_error'] = ''
         try:
             try:
-                observation = self.api_request(self.observation_url.format(**vars(self)))['observations'][0]
+                observation = self.api_request(
+                    self.observation_url.format(**vars(self))
+                )['observations'][0]
             except (IndexError, KeyError):
                 self.logger.error(
                     'Failed to retrieve observation data from API response. '
