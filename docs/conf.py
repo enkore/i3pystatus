@@ -70,6 +70,7 @@ MOCK_MODULES = [
     "soco",
     "teslapy",
     "yfinance",
+    "docker",
 ]
 
 for mod_name in MOCK_MODULES:
