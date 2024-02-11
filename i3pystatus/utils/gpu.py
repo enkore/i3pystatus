@@ -10,8 +10,8 @@ GPUUsageInfo = namedtuple('GPUUsageInfo', ['total_mem', 'avail_mem', 'used_mem',
 def _convert_nvidia_smi_value(value) -> Optional[int]:
     value = value.lower()
     # If value contains 'not' or 'N/A' - it is not supported for this GPU
-    # (in fact, for now nvidia-smi returns '[Not Supported]' or '[N/A]' depending of its version)
-    if "not" in value or "n/a" in value:
+    # (in fact, for now nvidia-smi returns '[Not Supported]' or '[N/A]' or '[unknown error]' depending of its version)
+    if "not" in value or "n/a" in value or "error" in value:
         return None
     return int(value)
 
