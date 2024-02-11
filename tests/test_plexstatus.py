@@ -3,8 +3,7 @@ Basic test for the plexstatus module
 """
 
 import unittest
-from mock import patch
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
 from urllib.request import urlopen
 from i3pystatus import plexstatus
 
