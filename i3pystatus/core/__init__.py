@@ -38,8 +38,15 @@ class CommandEndpoint:
             button = cmd["button"]
             kwargs = {"button_id": button}
             try:
-                kwargs.update({"pos_x": cmd["x"],
-                               "pos_y": cmd["y"]})
+                kwargs.update({
+                    "pos_x": cmd["x"],
+                    "pos_y": cmd["y"],
+                    "modifiers": cmd.get("modifiers"),
+                    "relative_x": cmd.get("relative_x"),
+                    "relative_y": cmd.get("relative_y"),
+                    "width": cmd.get("width"),
+                    "height": cmd.get("height"),
+                })
             except Exception:
                 continue
 
