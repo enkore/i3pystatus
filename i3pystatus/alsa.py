@@ -37,18 +37,23 @@ class ALSA(IntervalModule):
     unmuted = ""
     color_muted = "#AAAAAA"
     color = "#FFFFFF"
-    format = "♪: {volume}"
+    format = "♪: {volume}{captured}"
     format_muted = None
     mixer = "Master"
     mixer_id = 0
     card = -1
     channel = 0
     increment = 5
+    format_captured = None
+    color_captured = "#AAAAAA"
+    captured = "C"
+    uncaptured = ""
 
     map_volume = False
 
     alsamixer = None
     has_mute = True
+    has_capture = True
 
     on_upscroll = "increase_volume"
     on_downscroll = "decrease_volume"
@@ -58,6 +63,10 @@ class ALSA(IntervalModule):
     def init(self):
         self.create_mixer()
         try:
+            self.alsamixer.getrec()
+        except ALSAAudioError:
+            self.has_capture = False
+        try:
             self.alsamixer.getmute()
         except ALSAAudioError:
             self.has_mute = False
@@ -65,6 +74,10 @@ class ALSA(IntervalModule):
         self.fdict = {
             "card": self.alsamixer.cardname(),
             "mixer": self.mixer,
+            "volume": "",
+            "db": "",
+            "muted": "",
+            "captured": "",
         }
 
         self.dbRng = self.alsamixer.getrange()
@@ -79,24 +92,39 @@ class ALSA(IntervalModule):
     def run(self):
         self.create_mixer()
 
+        captured = False
         muted = False
-        if self.has_mute:
-            muted = self.alsamixer.getmute()[self.channel] == 1
 
-        self.fdict["volume"] = self.get_cur_volume()
-        self.fdict["muted"] = self.muted if muted else self.unmuted
-        self.fdict["db"] = self.get_db()
+        if self.has_capture:
+            captured = self.alsamixer.getrec()[self.channel] == 1
+            self.fdict["captured"] = self.captured if captured else self.uncaptured
+            if captured and self.format_captured is not None:
+                output_format = self.format_captured
+            else:
+                output_format = self.format
 
-        if muted and self.format_muted is not None:
-            output_format = self.format_muted
+            self.data = self.fdict
+            self.output = {
+                "full_text": output_format.format(**self.fdict),
+                "color": self.color if captured else self.color_captured
+            }
         else:
-            output_format = self.format
+            if self.has_mute:
+                muted = self.alsamixer.getmute()[self.channel] == 1
+            self.fdict["volume"] = self.get_cur_volume()
+            self.fdict["db"] = self.get_db()
+            self.fdict["muted"] = self.muted if muted else self.unmuted
 
-        self.data = self.fdict
-        self.output = {
-            "full_text": output_format.format(**self.fdict),
-            "color": self.color_muted if muted else self.color,
-        }
+            if muted and self.format_muted is not None:
+                output_format = self.format_muted
+            else:
+                output_format = self.format
+
+            self.data = self.fdict
+            self.output = {
+                "full_text": output_format.format(**self.fdict),
+                "color": self.color_muted if muted else self.color,
+            }
 
     def switch_mute(self):
         if self.has_mute:
