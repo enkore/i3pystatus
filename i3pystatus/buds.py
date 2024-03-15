@@ -32,15 +32,32 @@ class Buds(IntervalModule, ColorRangeModule):
         ("format", "Format string used for output"),
         ("interval", "Interval to run the module"),
         ("hide_no_device", "Hide the output if no device is connected"),
+        ("connected_color", "Output color for when the device is connected"),
+        ("disconnected_color", "Output color for when the device is disconnected"),
+        ("dynamic_color", "Output color based on battery level. Overrides connected_color"),
+        ("start_color", "Hex or English name for start of color range, eg '#00FF00' or 'green'"),
+        ("end_color", "Hex or English name for end of color range, eg '#FF0000' or 'red'")
     )
 
     format = "{device_model} L{placement_left}{battery}R{placement_right}{battery_case}{amb}{anc}"
     hide_no_device = False
+    battery_limit = 100
+
+    connected_color = "#00FF00"
+    disconnected_color = "#FF0000"
+    dynamic_color = True
+    colors = []
 
     on_leftclick = 'toggle_anc'
     on_rightclick = 'toggle_amb'
     on_doubleleftclick = 'connect'
     on_doublerightclick = 'disconnect'
+
+    def init(self):
+        if not self.dynamic_color:
+            self.end_color = self.start_color = self.connected_color
+        # battery discharges from battery_limit to 0
+        self.colors = self.get_hex_color_range(self.end_color, self.start_color, self.battery_limit)
 
     def run(self):
         try:
@@ -71,15 +88,22 @@ class Buds(IntervalModule, ColorRangeModule):
                     "placement_right": self.translate_placement(placement_right),
                 }
 
+                color = self.get_gradient(
+                    left_battery if left_battery < right_battery else right_battery,
+                    self.colors,
+                    self.battery_limit)
+
                 self.output = {
-                    "full_text": self.format.format(**fdict)
+                    "full_text": self.format.format(**fdict),
+                    "color": color if self.dynamic_color else self.connected_color
                 }
 
                 return payload
             else:
                 if not self.hide_no_device:
                     self.output = {
-                        "full_text": "Disconnected"
+                        "full_text": "Disconnected",
+                        "color": self.disconnected_color
                     }
                 else:
                     self.output = None

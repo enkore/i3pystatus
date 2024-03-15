@@ -24,7 +24,12 @@ class TestBuds(unittest.TestCase):
         mock_run.assert_called_with(f"{self.buds.earbuds_binary} status -o json -q")
 
         expected_output = {
-            "full_text": "Buds2 LW53 48RW"
+            "full_text": "Buds2 LW53 48RW",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
         }
 
         # Verify: Assert correct output
@@ -44,7 +49,8 @@ class TestBuds(unittest.TestCase):
         mock_run.assert_called_with(f"{self.buds.earbuds_binary} status -o json -q")
 
         expected_output = {
-            "full_text": "Disconnected"
+            "full_text": "Disconnected",
+            "color": self.buds.disconnected_color
         }
 
         # Verify: Assert correct output
@@ -75,7 +81,12 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays AMB is enabled
         expected_output = {
-            "full_text": "Buds2 LW53 48RW AMB"
+            "full_text": "Buds2 LW53 48RW AMB",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
         }
 
         self.assertEqual(self.buds.output, expected_output)
@@ -95,7 +106,12 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays AMB is disabled
         expected_output = {
-            "full_text": "Buds2 LW53 48RW"
+            "full_text": "Buds2 LW53 48RW",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
         }
 
         self.assertEqual(self.buds.output, expected_output)
@@ -123,7 +139,12 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays ANC is enabled
         expected_output = {
-            "full_text": "Buds2 LW53 48RW ANC"
+            "full_text": "Buds2 LW53 48RW ANC",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
         }
 
         self.assertEqual(self.buds.output, expected_output)
@@ -143,7 +164,12 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays ANC is disabled
         expected_output = {
-            "full_text": "Buds2 LW53 48RW"
+            "full_text": "Buds2 LW53 48RW",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
         }
 
         self.assertEqual(self.buds.output, expected_output)
@@ -160,7 +186,12 @@ class TestBuds(unittest.TestCase):
         self.buds.run()
 
         expected_output = {
-            "full_text": "Buds2 LW48RW"
+            "full_text": "Buds2 LW48RW",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
         }
 
         # Verify: The output correctly displays combined battery status
@@ -173,7 +204,12 @@ class TestBuds(unittest.TestCase):
         self.buds.run()
 
         expected_output = {
-            "full_text": "Buds2 LW53 48RW"
+            "full_text": "Buds2 LW53 48RW",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
         }
 
         # Verify: The output correctly displays combined battery status
@@ -205,7 +241,14 @@ class TestBuds(unittest.TestCase):
 
         self.buds.run()
 
-        expected_output = {"full_text": expected_display}
+        expected_output = {
+            "full_text": expected_display,
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
+        }
         self.assertEqual(self.buds.output, expected_output)
 
     @patch('i3pystatus.buds.run_through_shell')
