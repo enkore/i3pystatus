@@ -2,7 +2,8 @@ import json
 import unittest
 from copy import deepcopy
 from unittest.mock import patch
-from i3pystatus.buds import Buds, BudsPlacementStatus
+from i3pystatus.core.color import ColorRangeModule
+from i3pystatus.buds import Buds, BudsEqualizer, BudsPlacementStatus
 
 
 class TestBuds(unittest.TestCase):
@@ -231,6 +232,14 @@ class TestBuds(unittest.TestCase):
         # Verify: The correct command is sent to disconnect
         mock_run.assert_called_with(f"{self.buds.earbuds_binary} disconnect")
 
+    @patch('i3pystatus.buds.run_through_shell')
+    def test_restart_daemin(self, mock_run):
+        # Action: Call restart_daemon
+        self.buds.restart_daemon()
+
+        # Verify: The correct command is sent to restart the daemon
+        mock_run.assert_called_with(f"{self.buds.earbuds_binary} -kd")
+
     def run_placement_helper(self, mock_run, placement_left, placement_right, case_battery, expected_display):
         modified_payload = deepcopy(self.payload.get('connected_payload'))
         modified_payload['payload']['placement_left'] = placement_left
@@ -281,3 +290,136 @@ class TestBuds(unittest.TestCase):
             88,
             "Buds2 LC53 48RC 88C"
         )
+
+    @patch('i3pystatus.buds.run_through_shell')
+    def test_battery_level_dynamic_color(self, mock_run):
+        # Setup: Build the colors array independently of our class
+        colors = ColorRangeModule.get_hex_color_range(
+            self.buds.end_color,
+            self.buds.start_color,
+            self.buds.battery_limit
+        )
+        modified_payload = deepcopy(self.payload.get('connected_payload'))
+
+        for battery_level in range(0, self.buds.battery_limit + 1):
+            # Setup: Make both levels equal
+            modified_payload['payload']['batt_left'] = battery_level
+            modified_payload['payload']['batt_right'] = battery_level
+            mock_run.return_value.out = json.dumps(modified_payload)
+
+            # Action: Call run() again to update the output
+            self.buds.run()
+
+            expected_output = {
+                "full_text": f"Buds2 LW{battery_level}RW",
+                "color": self.buds.get_gradient(
+                    battery_level,
+                    colors,
+                    self.buds.battery_limit
+                )
+            }
+
+            self.assertEqual(self.buds.output, expected_output)
+
+    @patch('i3pystatus.buds.run_through_shell')
+    def test_set_equalizer_direct(self, mock_run):
+        for eq_setting in BudsEqualizer:
+            with self.subTest(msg=f"Failed testing equalizer {eq_setting.name}", eq_setting=eq_setting):
+                # Setup: Create a copy of the payload
+                modified_payload = deepcopy(self.payload.get('connected_payload'))
+
+                mock_run.return_value.out = json.dumps(modified_payload)
+
+                # Action: Call the set function with each equalizer setting
+                self.buds.equalizer_set(eq_setting)
+
+                expected_command = f"{self.buds.earbuds_binary} set equalizer {eq_setting.name}"
+
+                # Verify: Correct equalizer command is used
+                mock_run.assert_called_with(expected_command)
+
+                # Setup: Modify payload to verify output
+                modified_payload['payload']['equalizer_type'] = eq_setting.value
+                mock_run.return_value.out = json.dumps(modified_payload)
+
+                # Action: Call run() again to update the output
+                self.buds.run()
+
+                expected_equalizer = f" {eq_setting.name.capitalize()}" if eq_setting.name != "off" else ""
+                expected_output = {
+                    "full_text": f"Buds2 LW53 48RW{expected_equalizer}",
+                    "color": self.buds.get_gradient(
+                        48,
+                        self.buds.colors,
+                        self.buds.battery_limit
+                    )
+                }
+
+                # Verify: Output was updated with equalizer
+                self.assertEqual(self.buds.output, expected_output)
+
+    @patch('i3pystatus.buds.run_through_shell')
+    def test_increment_equalizer(self, mock_run):
+        # Setup: Create a copy of the payload
+        modified_payload = deepcopy(self.payload.get('connected_payload'))
+        mock_run.return_value.out = json.dumps(modified_payload)
+
+        # Action: Call the set to increment by one the equalizer setting
+        self.buds.equalizer_set(+1)
+
+        # Verify: Correct equalizer command is used
+        expected_command = f"{self.buds.earbuds_binary} set equalizer {BudsEqualizer.bass.name}"
+        mock_run.assert_called_with(expected_command)
+
+        # Setup: Modify payload to verify output
+        modified_payload['payload']['equalizer_type'] = BudsEqualizer.bass.value
+        mock_run.return_value.out = json.dumps(modified_payload)
+
+        # Action: Call run() again to update the output
+        self.buds.run()
+
+        expected_equalizer = f" {BudsEqualizer.bass.name.capitalize()}"
+        expected_output = {
+            "full_text": f"Buds2 LW53 48RW{expected_equalizer}",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
+        }
+
+        # Verify: Output was updated with equalizer
+        self.assertEqual(self.buds.output, expected_output)
+
+    @patch('i3pystatus.buds.run_through_shell')
+    def test_decrement_equalizer_from_off(self, mock_run):
+        # Setup: Create a copy of the payload
+        modified_payload = deepcopy(self.payload.get('connected_payload'))
+        mock_run.return_value.out = json.dumps(modified_payload)
+
+        # Action: Call the set to decrement by one the equalizer setting
+        self.buds.equalizer_set(-1)
+
+        # Verify: Correct equalizer command is used
+        expected_command = f"{self.buds.earbuds_binary} set equalizer {BudsEqualizer.treble.name}"
+        mock_run.assert_called_with(expected_command)
+
+        # Setup: Modify payload to verify output
+        modified_payload['payload']['equalizer_type'] = BudsEqualizer.treble.value
+        mock_run.return_value.out = json.dumps(modified_payload)
+
+        # Action: Call run() again to update the output
+        self.buds.run()
+
+        expected_equalizer = f" {BudsEqualizer.treble.name.capitalize()}"
+        expected_output = {
+            "full_text": f"Buds2 LW53 48RW{expected_equalizer}",
+            "color": self.buds.get_gradient(
+                48,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
+        }
+
+        # Verify: Output was updated with equalizer
+        self.assertEqual(self.buds.output, expected_output)
