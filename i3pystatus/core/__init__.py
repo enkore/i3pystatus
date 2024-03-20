@@ -113,7 +113,7 @@ class Status:
 
         # Merge the module's hints with the default hints
         # and overwrite any duplicates with the hint from the module
-        hints = self.default_hints.copy() if self.default_hints else {}
+        hints = self.default_hints.copy() if hasattr(self, "default_hints") else {}
         hints.update(kwargs.get('hints', {}))
         if hints:
             kwargs['hints'] = hints
