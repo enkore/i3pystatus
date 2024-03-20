@@ -66,7 +66,7 @@ class Status:
     def __init__(self, standalone=True, click_events=True, interval=1,
                  input_stream=None, logfile=None, internet_check=None,
                  keep_alive=False, logformat=DEFAULT_LOG_FORMAT,
-                 default_hints=None):
+                 default_hints={}):
         self.standalone = standalone
         self.default_hints = default_hints
         self.click_events = standalone and click_events
@@ -113,7 +113,7 @@ class Status:
 
         # Merge the module's hints with the default hints
         # and overwrite any duplicates with the hint from the module
-        hints = self.default_hints.copy() if self.default_hints else {}
+        hints = self.default_hints.copy() if hasattr(self, "default_hints") else {}
         hints.update(kwargs.get('hints', {}))
         if hints:
             kwargs['hints'] = hints
