@@ -1,0 +1,48 @@
+{
+  "connected_payload": {
+    "status": "success",
+    "device": "00:00:00:00:00:00",
+    "status_message": null,
+    "payload": {
+      "address": "00:00:00:00:00:00",
+      "ready": true,
+      "batt_left": 53,
+      "batt_right": 48,
+      "batt_case": 88,
+      "placement_left": 1,
+      "placement_right": 1,
+      "equalizer_type": 0,
+      "touchpads_blocked": false,
+      "noise_reduction": false,
+      "did_battery_notify": false,
+      "touchpad_option_left": 2,
+      "touchpad_option_right": 2,
+      "paused_music_earlier": false,
+      "debug": {
+        "voltage_left": 0.0,
+        "voltage_right": 0.0,
+        "temperature_left": 36.0,
+        "temperature_right": 37.0,
+        "current_left": 0.0,
+        "current_right": 0.0
+      },
+      "model": "Buds2",
+      "ambient_sound_enabled": false,
+      "ambient_sound_volume": 0,
+      "extra_high_ambient_volume": false,
+      "tab_lock_status": {
+        "touch_an_hold_on": true,
+        "triple_tap_on": true,
+        "double_tap_on": true,
+        "tap_on": true,
+        "touch_controls_on": true
+      }
+    }
+  },
+  "disconnected_payload": {
+    "status": "error",
+    "device": "",
+    "status_message": "No connected device found",
+    "payload": null
+  }
+}
