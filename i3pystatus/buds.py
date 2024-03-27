@@ -83,7 +83,7 @@ class Buds(IntervalModule, ColorRangeModule):
     on_rightclick = 'toggle_amb'
     on_doubleleftclick = 'connect'
     on_doublerightclick = 'disconnect'
-    on_middleclic1k = ['equalizer_set', BudsEqualizer.off]
+    on_middleclick = ['equalizer_set', BudsEqualizer.off]
     on_downscroll = ['equalizer_set', -1]
     on_upscroll = ['equalizer_set', +1]
     on_doublemiddleclick = 'restart_daemon'
