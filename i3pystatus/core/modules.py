@@ -87,8 +87,8 @@ class Module(SettingsBase):
             if "name" not in self.output:
                 self.output["name"] = self.__name__
             self.output["instance"] = str(id(self))
-            if (self.output.get("color", "") or "").lower() == "#ffffff":
-                del self.output["color"]
+            if (self.output.get("color", "") or "").lower() in ("", "#ffffff"):
+                self.output.pop("color", None)
             if self.hints:
                 for key, val in self.hints.items():
                     if key not in self.output:
