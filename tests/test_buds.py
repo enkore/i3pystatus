@@ -25,7 +25,7 @@ class TestBuds(unittest.TestCase):
         mock_run.assert_called_with(f"{self.buds.earbuds_binary} status -o json -q")
 
         expected_output = {
-            "full_text": "Buds2 LW53 48RW",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -82,7 +82,7 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays AMB is enabled
         expected_output = {
-            "full_text": "Buds2 LW53 48RW AMB",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol} AMB",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -107,7 +107,7 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays AMB is disabled
         expected_output = {
-            "full_text": "Buds2 LW53 48RW",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -140,7 +140,7 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays ANC is enabled
         expected_output = {
-            "full_text": "Buds2 LW53 48RW ANC",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol} ANC",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -165,7 +165,7 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays ANC is disabled
         expected_output = {
-            "full_text": "Buds2 LW53 48RW",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -187,7 +187,7 @@ class TestBuds(unittest.TestCase):
         self.buds.run()
 
         expected_output = {
-            "full_text": "Buds2 LW48RW",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}48R{self.buds.wearing_symbol}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -205,7 +205,7 @@ class TestBuds(unittest.TestCase):
         self.buds.run()
 
         expected_output = {
-            "full_text": "Buds2 LW53 48RW",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -218,7 +218,7 @@ class TestBuds(unittest.TestCase):
 
     @patch('i3pystatus.buds.run_through_shell')
     def test_combined_battery_drift(self, mock_run):
-        # Setup: Different battery level, should show smaller
+        # Setup: Different battery level, should show combined, but the smaller level
         modified_payload = deepcopy(self.payload.get('connected_payload'))
         modified_payload['payload']['batt_left'] = modified_payload['payload']['batt_right']
         modified_payload['payload']['batt_left'] -= self.buds.battery_drift_threshold
@@ -232,7 +232,7 @@ class TestBuds(unittest.TestCase):
         expected_output = {
             # Verify: The level should be the smallest one
             "full_text":
-                f"Buds2 LW{expected_level}RW",
+                f"Buds2 L{self.buds.wearing_symbol}{expected_level}R{self.buds.wearing_symbol}",
             "color": self.buds.get_gradient(
                 expected_level,
                 self.buds.colors,
@@ -243,7 +243,7 @@ class TestBuds(unittest.TestCase):
         # Verify: The output correctly displays combined battery status
         self.assertEqual(expected_output, self.buds.output)
 
-        # Setup: One battery is at level 0, should show the other
+        # Setup: One battery is at level 0, should show the one still with some battery level
         modified_payload = deepcopy(self.payload.get('connected_payload'))
         modified_payload['payload']['batt_left'] = 0
         modified_payload['payload']['batt_right'] = 0 + self.buds.battery_drift_threshold
@@ -257,7 +257,33 @@ class TestBuds(unittest.TestCase):
         expected_output = {
             # Verify: The level should be the biggest one
             "full_text":
-                f"Buds2 LW{expected_level}RW",
+                f"Buds2 L{self.buds.wearing_symbol}{expected_level}R{self.buds.wearing_symbol}",
+            "color": self.buds.get_gradient(
+                expected_level,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
+        }
+
+        # Verify: The output correctly displays combined battery status
+        self.assertEqual(expected_output, self.buds.output)
+
+        # Setup: Different battery level, but bigger than threshold, should show both levels
+        modified_payload = deepcopy(self.payload.get('connected_payload'))
+        modified_payload['payload']['batt_left'] = modified_payload['payload']['batt_right']
+        modified_payload['payload']['batt_left'] -= self.buds.battery_drift_threshold + 1
+
+        mock_run.return_value.out = json.dumps(modified_payload)
+
+        # Action: Call run() to update the output
+        self.buds.run()
+
+        expected_level = min(modified_payload['payload']['batt_left'], modified_payload['payload']['batt_right'])
+        expected_output = {
+            # Verify: The level should be the smallest one
+            "full_text":
+                f"Buds2 L{self.buds.wearing_symbol}{modified_payload['payload']['batt_left']} "
+                f"{modified_payload['payload']['batt_right']}R{self.buds.wearing_symbol}",
             "color": self.buds.get_gradient(
                 expected_level,
                 self.buds.colors,
@@ -270,8 +296,9 @@ class TestBuds(unittest.TestCase):
 
     @patch('i3pystatus.buds.run_through_shell')
     def test_combined_battery_drift_case(self, mock_run):
-        # Setup: Change status of one buds to be on the case
+        # Setup: Change status of one buds to be on the case, should show both regardless of drift or not
         modified_payload = deepcopy(self.payload.get('connected_payload'))
+        modified_payload['payload']['batt_left'] = modified_payload['payload']['batt_right']
         modified_payload['payload']['placement_left'] = BudsPlacementStatus.case
 
         mock_run.return_value.out = json.dumps(modified_payload)
@@ -280,7 +307,8 @@ class TestBuds(unittest.TestCase):
         self.buds.run()
 
         expected_output = {
-            "full_text": f"Buds2 LC53 48RW 88C",
+            "full_text": f"Buds2 L{self.buds.case_symbol}48 48R{self.buds.wearing_symbol} "
+                         f"88{self.buds.battery_case_symbol}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -290,6 +318,150 @@ class TestBuds(unittest.TestCase):
 
         # Verify: The output correctly displays combined battery status
         self.assertEqual(expected_output, self.buds.output)
+
+        # Setup: Change status of one buds to be on the case, should show both regardless of drift or not
+        modified_payload = deepcopy(self.payload.get('connected_payload'))
+        modified_payload['payload']['batt_left'] = modified_payload['payload']['batt_right']
+        # Action: Introduce drift
+        modified_payload['payload']['batt_left'] -= self.buds.battery_drift_threshold + 1
+        modified_payload['payload']['placement_left'] = BudsPlacementStatus.case
+
+        mock_run.return_value.out = json.dumps(modified_payload)
+
+        # Action: Call run() to update the output
+        self.buds.run()
+
+        expected_output = {
+            "full_text": f"Buds2 L{self.buds.case_symbol}44 48R{self.buds.wearing_symbol} "
+                         f"88{self.buds.battery_case_symbol}",
+            "color": self.buds.get_gradient(
+                44,
+                self.buds.colors,
+                self.buds.battery_limit
+            )
+        }
+
+        # Verify: The output correctly displays combined battery status
+        self.assertEqual(expected_output, self.buds.output)
+
+    @patch('i3pystatus.buds.DesktopNotification')
+    @patch('i3pystatus.buds.run_through_shell')
+    def test_drift_notification(self, mock_run, mock_notification):
+        # Setup: We set drift, but one of the buds is on the case, should not notify
+        modified_payload = deepcopy(self.payload.get('connected_payload'))
+        modified_payload['payload']['batt_left'] = modified_payload['payload']['batt_right']
+        modified_payload['payload']['placement_left'] = BudsPlacementStatus.case
+        # Action: Introduce drift
+        modified_payload['payload']['batt_left'] += self.buds.battery_drift_threshold + 1
+
+        mock_run.return_value.out = json.dumps(modified_payload)
+
+        # Action: Call run()
+        self.buds.run()
+
+        # Verify: Should not notify in this scenario
+        mock_notification.assert_not_called()
+
+        # Setup: We set a drift threshold smaller than the class and number of expected calls
+        drift_threshold = self.buds.battery_drift_threshold - 1
+        expected_calls = (self.buds.battery_drift_threshold * 2) - 1 - drift_threshold
+
+        # Setup: We range from our threshold to class threshold * 2 + 1, so we can check all possible notifications
+        for drift in range(drift_threshold, (self.buds.battery_drift_threshold * 2) + 1):
+            with self.subTest(msg=f"Failed testing drift notification with drift: {drift}", drift=drift):
+                # Setup: Set the battery level according the drift
+                modified_payload = deepcopy(self.payload.get('connected_payload'))
+                modified_payload['payload']['batt_left'] = modified_payload['payload']['batt_right']
+                # Action: Introduce drift
+                modified_payload['payload']['batt_left'] += drift
+
+                mock_run.return_value.out = json.dumps(modified_payload)
+
+                # Action: Call run()
+                self.buds.run()
+
+                if drift <= self.buds.battery_drift_threshold:
+                    # Verify: Should not notify in this scenario
+                    mock_notification.assert_not_called()
+                elif self.buds.battery_drift_threshold < drift <= self.buds.battery_drift_threshold * 2:
+                    # Verify: Notification should have been called with right arguments
+                    expected_arguments = {
+                        "title": "Buds",
+                        "body": f"Battery drift occurred L{modified_payload['payload']['batt_left']} "
+                                f"{modified_payload['payload']['batt_right']}R",
+                        "icon": "battery",
+                        "urgency": 1
+                    }
+
+                    mock_notification.assert_called_with(**expected_arguments)
+
+                    # Verify: Make sure the notification was actually displayed
+                    mock_notification.return_value.display.assert_called()
+                elif drift > self.buds.battery_drift_threshold * 2:
+                    # Verify: Notification should not be called after threshold * 2
+                    mock_notification.assert_not_called()
+
+        # Verify: Make sure we only had the expected number of notifications
+        self.assertEqual(mock_notification.call_count, expected_calls)
+        self.assertEqual(mock_notification.return_value.display.call_count, expected_calls)
+
+    @patch('i3pystatus.buds.DesktopNotification')
+    @patch('i3pystatus.buds.run_through_shell')
+    def test_drift_case_notification(self, mock_run, mock_notification):
+        # Setup: Both buds have same level and are on the case, should not notify
+        modified_payload = deepcopy(self.payload.get('connected_payload'))
+        modified_payload['payload']['batt_left'] = modified_payload['payload']['batt_right']
+        modified_payload['payload']['placement_left'] = BudsPlacementStatus.case
+        modified_payload['payload']['placement_right'] = BudsPlacementStatus.case
+
+        mock_run.return_value.out = json.dumps(modified_payload)
+
+        # Action: Call run()
+        self.buds.run()
+
+        # Verify: Should not notify in this scenario
+        mock_notification.assert_not_called()
+
+        # Setup: Start with one battery level smaller than the other and on case
+        modified_payload = deepcopy(self.payload.get('connected_payload'))
+        modified_payload['payload']['batt_left'] = modified_payload['payload']['batt_right']
+        modified_payload['payload']['batt_left'] -= self.buds.battery_drift_threshold + 1
+        modified_payload['payload']['placement_left'] = BudsPlacementStatus.case
+        batt_left_level_start = modified_payload['payload']['batt_left']
+        batt_left_level_end = modified_payload['payload']['batt_right']
+
+        # Setup: Range from start to end + threshold + 2, so we can check all possible notifications
+        for level in range(batt_left_level_start, (batt_left_level_end + self.buds.battery_drift_threshold + 2)):
+            with self.subTest(msg=f"Failed testing drift case notification with level: {level}", level=level):
+                # Action: Increase level
+                modified_payload['payload']['batt_left'] = level
+
+                mock_run.return_value.out = json.dumps(modified_payload)
+
+                # Action: Call run()
+                self.buds.run()
+
+                if level < batt_left_level_end:
+                    # Verify: Should not notify in this scenario
+                    mock_notification.assert_not_called()
+                elif level == batt_left_level_end:
+                    # Verify: Notification should have been called with right arguments
+                    expected_arguments = {
+                        "title": "Buds",
+                        "body": f"Battery level reached L{modified_payload['payload']['batt_left']} "
+                                f"{modified_payload['payload']['batt_right']}R",
+                        "icon": "battery",
+                        "urgency": 1
+                    }
+
+                    mock_notification.assert_called_with(**expected_arguments)
+
+                    # Verify: Make sure the notification was actually displayed
+                    mock_notification.return_value.display.assert_called()
+
+        # Verify: Make sure we only had one notification
+        self.assertEqual(mock_notification.call_count, 1)
+        self.assertEqual(mock_notification.return_value.display.call_count, 1)
 
     @patch('i3pystatus.buds.run_through_shell')
     def test_connect(self, mock_run):
@@ -337,33 +509,73 @@ class TestBuds(unittest.TestCase):
 
     @patch('i3pystatus.buds.run_through_shell')
     def test_placement_wearing(self, mock_run):
+        # Setup: Test once with class defaults
         self.run_placement_helper(
             mock_run,
             BudsPlacementStatus.wearing.value,
             BudsPlacementStatus.wearing.value,
             None,
-            "Buds2 LW53 48RW"
+            f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}"
+        )
+
+        # Setup: test again, this time changing the wearing symbol
+        self.buds.wearing_symbol = "🦻"
+
+        self.run_placement_helper(
+            mock_run,
+            BudsPlacementStatus.wearing.value,
+            BudsPlacementStatus.wearing.value,
+            None,
+            f"Buds2 L🦻53 48R🦻"
         )
 
     @patch('i3pystatus.buds.run_through_shell')
     def test_placement_idle(self, mock_run):
+        # Setup: Test once with class defaults
         self.run_placement_helper(
             mock_run,
             BudsPlacementStatus.idle.value,
             BudsPlacementStatus.idle.value,
             None,
-            "Buds2 LI53 48RI"
+            f"Buds2 L{self.buds.idle_symbol}53 48R{self.buds.idle_symbol}"
+        )
+
+        # Setup: test again, this time changing the idle symbol
+        self.buds.idle_symbol = "🛋️"
+
+        self.run_placement_helper(
+            mock_run,
+            BudsPlacementStatus.idle.value,
+            BudsPlacementStatus.idle.value,
+            None,
+            "Buds2 L🛋️53 48R🛋️"
         )
 
     @patch('i3pystatus.buds.run_through_shell')
     def test_placement_case_with_battery(self, mock_run):
+        # Setup: Test once with class defaults
+
         # Verify: Case battery is returned if a bud is on the case
         self.run_placement_helper(
             mock_run,
             BudsPlacementStatus.case.value,
             BudsPlacementStatus.case.value,
             88,
-            "Buds2 LC53 48RC 88C"
+            f"Buds2 L{self.buds.case_symbol}53 48R{self.buds.case_symbol} "
+            f"88{self.buds.battery_case_symbol}"
+        )
+
+        # Setup: test again, this time changing the symbols
+        self.buds.case_symbol = "\u26a1"
+        self.buds.battery_case_symbol = "🔋"
+
+        # Verify: Case battery is returned if a bud is on the case
+        self.run_placement_helper(
+            mock_run,
+            BudsPlacementStatus.case.value,
+            BudsPlacementStatus.case.value,
+            88,
+            f"Buds2 L\u26a153 48R\u26a1 88{self.buds.battery_case_symbol}"
         )
 
     @patch('i3pystatus.buds.run_through_shell')
@@ -386,7 +598,7 @@ class TestBuds(unittest.TestCase):
             self.buds.run()
 
             expected_output = {
-                "full_text": f"Buds2 LW{battery_level}RW",
+                "full_text": f"Buds2 L{self.buds.wearing_symbol}{battery_level}R{self.buds.wearing_symbol}",
                 "color": self.buds.get_gradient(
                     battery_level,
                     colors,
@@ -422,7 +634,7 @@ class TestBuds(unittest.TestCase):
 
                 expected_equalizer = f" {eq_setting.name.capitalize()}" if eq_setting.name != "off" else ""
                 expected_output = {
-                    "full_text": f"Buds2 LW53 48RW{expected_equalizer}",
+                    "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}{expected_equalizer}",
                     "color": self.buds.get_gradient(
                         48,
                         self.buds.colors,
@@ -455,7 +667,7 @@ class TestBuds(unittest.TestCase):
 
         expected_equalizer = f" {BudsEqualizer.bass.name.capitalize()}"
         expected_output = {
-            "full_text": f"Buds2 LW53 48RW{expected_equalizer}",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}{expected_equalizer}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -488,7 +700,7 @@ class TestBuds(unittest.TestCase):
 
         expected_equalizer = f" {BudsEqualizer.treble.name.capitalize()}"
         expected_output = {
-            "full_text": f"Buds2 LW53 48RW{expected_equalizer}",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}{expected_equalizer}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
@@ -522,7 +734,8 @@ class TestBuds(unittest.TestCase):
 
         # Setup:
         expected_output = {
-            "full_text": f"Buds2 LW53 48RW{' TL' if setting_value == 'false' else ''}",
+            "full_text": f"Buds2 L{self.buds.wearing_symbol}53 48R{self.buds.wearing_symbol}"
+                         f"{' TL' if setting_value == 'false' else ''}",
             "color": self.buds.get_gradient(
                 48,
                 self.buds.colors,
