@@ -1,4 +1,5 @@
 import json
+import os.path
 import unittest
 from copy import deepcopy
 from unittest.mock import patch
@@ -9,7 +10,7 @@ from i3pystatus.buds import Buds, BudsEqualizer, BudsPlacementStatus
 class TestBuds(unittest.TestCase):
     def setUp(self):
         self.buds = Buds()
-        with open('test_buds.json', 'rb') as file:
+        with open(os.path.join(os.path.dirname(__file__), 'test_buds.json'), 'rb') as file:
             self.payload = json.load(file)
 
     @patch('i3pystatus.buds.run_through_shell')
