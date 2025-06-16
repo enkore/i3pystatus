@@ -18,7 +18,7 @@ class UEventParser(configparser.ConfigParser):
         return dict(parser.items("id10t"))
 
     def __init__(self):
-        super().__init__(default_section="id10t")
+        super().__init__(default_section="id10t", strict=False)
 
     def optionxform(self, key):
         return lchop(key, "POWER_SUPPLY_")
