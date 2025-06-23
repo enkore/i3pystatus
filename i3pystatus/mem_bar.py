@@ -55,7 +55,7 @@ class MemBar(IntervalModule, ColorRangeModule):
         else:
             color = self.color
 
-        if self.bar_type == "glyph":
+        if self.bar_type.lower() == "glyph":
             bar = make_glyph(memory_usage.percent, glyphs='○◔◑◕●')
         else:
             bar = make_bar(memory_usage.percent)
