@@ -2,6 +2,12 @@ import subprocess
 from collections import namedtuple
 from typing import Optional
 
+
+class GPUNotFoundError(Exception):
+    """nvidia-smi call exited with a error code"""
+    pass
+
+
 GPUUsageInfo = namedtuple('GPUUsageInfo', ['total_mem', 'avail_mem', 'used_mem',
                                            'temp', 'percent_fan',
                                            'usage_gpu', 'usage_mem'])
@@ -10,8 +16,8 @@ GPUUsageInfo = namedtuple('GPUUsageInfo', ['total_mem', 'avail_mem', 'used_mem',
 def _convert_nvidia_smi_value(value) -> Optional[int]:
     value = value.lower()
     # If value contains 'not' or 'N/A' - it is not supported for this GPU
-    # (in fact, for now nvidia-smi returns '[Not Supported]' or '[N/A]' depending of its version)
-    if "not" in value or "n/a" in value:
+    # (in fact, for now nvidia-smi returns '[Not Supported]' or '[N/A]' or '[unknown error]' depending of its version)
+    if "not" in value or "n/a" in value or "error" in value:
         return None
     return int(value)
 
@@ -42,7 +48,7 @@ def query_nvidia_smi(gpu_number) -> GPUUsageInfo:
     except FileNotFoundError:
         raise Exception("No nvidia-smi")
     except subprocess.CalledProcessError:
-        raise Exception("nvidia-smi call failed")
+        raise GPUNotFoundError("nvidia-smi call exited with a error code")
 
     output = output.decode('utf-8').split("\n")[gpu_number].strip()
     values = output.split(", ")

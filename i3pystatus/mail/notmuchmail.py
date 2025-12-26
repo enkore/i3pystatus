@@ -1,6 +1,6 @@
 # note that this needs the notmuch python bindings. For more info see:
 # http://notmuchmail.org/howto/#index4h2
-import notmuch
+import notmuch2
 import configparser
 import os
 from i3pystatus.mail import Backend
@@ -36,8 +36,8 @@ class Notmuch(Backend):
 
     @property
     def unread(self):
-        db = notmuch.Database(self.db_path)
-        result = notmuch.Query(db, self.query).count_messages()
+        db = notmuch2.Database(self.db_path)
+        result = db.count_messages(self.query)
         db.close()
         return result
 
