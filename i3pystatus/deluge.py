@@ -119,7 +119,7 @@ class Deluge(IntervalModule):
         out = {}  # some of the values from deluge-client are bytes, the others are ints - we need to decode them
         for k, v in self.client.call('core.get_session_status', keys).items():
             k = k.decode('utf-8')  # keys aswell
-            if type(v) == bytes:
+            if isinstance(v, bytes):
                 out[k] = v.decode('utf-8')
             else:
                 out[k] = v

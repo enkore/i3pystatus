@@ -42,7 +42,7 @@ class Keyboard_locks(IntervalModule):
         cap = xset.split("Caps Lock:")[1][0:8]
         num = xset.split("Num Lock:")[1][0:8]
         scr = xset.split("Scroll Lock:")[1][0:8]
-        return("on" in cap, "on" in num, "on" in scr)
+        return ("on" in cap, "on" in num, "on" in scr)
 
     def run(self):
         (cap, num, scr) = self.get_status()

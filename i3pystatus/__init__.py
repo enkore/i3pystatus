@@ -49,6 +49,7 @@ def load_source(modname, filename):
     loader.exec_module(module)
     return module
 
+
 def main():
     parser = argparse.ArgumentParser(description='''
         run i3pystatus configuration file. Starts i3pystatus clock example if no arguments were provided

@@ -37,12 +37,12 @@ class Docker(IntervalModule):
         dclient = docker.from_env()
 
         docker_info = {
-                'containers': {
-                    'running': 0
-                },
-                'volumes': {},
-                'images': {},
-                'networks': {}}
+            'containers': {
+                'running': 0
+            },
+            'volumes': {},
+            'images': {},
+            'networks': {}}
 
         all_containers = dclient.containers.list(all=True)
         for container in all_containers:
@@ -51,9 +51,9 @@ class Docker(IntervalModule):
             docker_info['containers'][container.name] = container.stats(stream=False)
 
             # Add some helper details
-            docker_info['containers'][container.name]['memory_stats']['usage_kb'] = round(docker_info['containers'][container.name]['memory_stats'].get('usage', 0)/1024, 2)
-            docker_info['containers'][container.name]['memory_stats']['usage_mb'] = round(docker_info['containers'][container.name]['memory_stats']['usage_kb']/1024, 2)
-            docker_info['containers'][container.name]['memory_stats']['usage_gb'] = round(docker_info['containers'][container.name]['memory_stats']['usage_mb']/1024, 2)
+            docker_info['containers'][container.name]['memory_stats']['usage_kb'] = round(docker_info['containers'][container.name]['memory_stats'].get('usage', 0) / 1024, 2)
+            docker_info['containers'][container.name]['memory_stats']['usage_mb'] = round(docker_info['containers'][container.name]['memory_stats']['usage_kb'] / 1024, 2)
+            docker_info['containers'][container.name]['memory_stats']['usage_gb'] = round(docker_info['containers'][container.name]['memory_stats']['usage_mb'] / 1024, 2)
         docker_info['containers']['total'] = len(all_containers)
 
         all_volumes = dclient.volumes.list()

@@ -30,7 +30,7 @@ class Yaourt(Backend):
         command = ["yaourt", "-Qua"]
         checkupdates = run_through_shell(command)
         out = checkupdates.out
-        if(self.aur_only):
+        if self.aur_only:
             out = "".join([line for line in out.splitlines(True)
                            if line.startswith("aur")])
         return out.count("\n"), out

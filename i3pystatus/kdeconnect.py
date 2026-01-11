@@ -252,4 +252,3 @@ class KDEConnect(IntervalModule):
     def refresh(self):
         """Force refresh notification list"""
         self.run()
-

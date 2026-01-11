@@ -237,8 +237,7 @@ class TestBuds(unittest.TestCase):
             "color": self.buds.get_gradient(
                 expected_level,
                 self.buds.colors,
-                self.buds.battery_limit
-            )
+                self.buds.battery_limit)
         }
 
         # Verify: The output correctly displays combined battery status
@@ -262,8 +261,7 @@ class TestBuds(unittest.TestCase):
             "color": self.buds.get_gradient(
                 expected_level,
                 self.buds.colors,
-                self.buds.battery_limit
-            )
+                self.buds.battery_limit)
         }
 
         # Verify: The output correctly displays combined battery status
@@ -288,8 +286,7 @@ class TestBuds(unittest.TestCase):
             "color": self.buds.get_gradient(
                 expected_level,
                 self.buds.colors,
-                self.buds.battery_limit
-            )
+                self.buds.battery_limit)
         }
 
         # Verify: The output correctly displays combined battery status
