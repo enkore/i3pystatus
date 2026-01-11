@@ -6,4 +6,3 @@ i3ipc>=1.2.0
 requests
 pytz
 dbus-python
-mock
