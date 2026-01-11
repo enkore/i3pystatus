@@ -172,4 +172,3 @@ class HassioMulti(IntervalModule):
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
-

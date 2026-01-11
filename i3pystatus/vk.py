@@ -45,7 +45,7 @@ class Vk(IntervalModule):
             self.api = vk.API(self.session, v='5.40', lang='en', timeout=10)
             try:
                 permissions = int(self.api.account.getAppPermissions())
-                assert((permissions & 65536 == 65536) and (permissions & 4096 == 4096))
+                assert ((permissions & 65536 == 65536) and (permissions & 4096 == 4096))
             except:
                 self.token_request(self.error)
         else:

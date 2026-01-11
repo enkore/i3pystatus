@@ -475,7 +475,7 @@ def make_graph(values, lower_limit=0.0, upper_limit=100.0, style="blocks"):
         elif 'peak' in style:
             vbits = [[0, 0x40, 0x04, 0x02, 0x01][vs] for vs in vscale]
         else:
-            assert('snake' in style)
+            assert ('snake' in style)
             # there are a few choices for what to put last in vb2.
             # arguable vscale[-1] from the _previous_ call is best.
             vb2 = [vscale[0]] + vscale + [0]

@@ -128,7 +128,7 @@ def get_modules(path, package):
 
 def get_module(finder, modname, package):
     fullname = "{package}.{modname}".format(package=package, modname=modname)
-    return (modname, finder.find_loader(fullname)[0].load_module(fullname))
+    return (modname, importlib.import_module(fullname))
 
 
 def get_all(module_path, modname, basecls):

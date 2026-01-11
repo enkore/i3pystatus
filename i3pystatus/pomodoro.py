@@ -71,7 +71,7 @@ class Pomodoro(IntervalModule):
         self.total_pomodoro = self.short_break_count + 1  # and 1 long break
         self.time = None
 
-        if self.color is not None and type(self.color) == dict:
+        if self.color is not None and isinstance(self.color, dict):
             self.color_map.update(self.color)
 
     def run(self):

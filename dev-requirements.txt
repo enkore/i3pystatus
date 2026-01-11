@@ -1,5 +1,9 @@
 pytest>=2.5
-sphinx>=1.1,<1.5
+sphinx
 colour>=0.0.5
 pycodestyle>=1.5.7
 i3ipc>=1.2.0
+requests
+pytz
+dbus-python
+mock

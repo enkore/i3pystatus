@@ -22,30 +22,31 @@ class BudsPlacementStatus(IntEnum):
 
 
 class Buds(IntervalModule, ColorRangeModule):
-    earbuds_binary = "earbuds"
-
     """
     Displays information about Galaxy Buds devices
 
     Requires the earbuds tool from https://github.com/JojiiOfficial/LiveBudsCli
 
+    Requires `colour` module from PyPi
+
     .. rubric :: Available formatters
-    * {amb} Displays the current ambient sound control status.
-    * {anc} Displays the current active noise control status.
-    * {battery} Displays combined battery level for left and right.
+
+    * ``{amb}`` Displays the current ambient sound control status.
+    * ``{anc}`` Displays the current active noise control status.
+    * ``{battery}`` Displays combined battery level for left and right.
         If both are at the same level, it simply returns the battery level.
         If they have different levels and the drift threshold is enabled, provided
         they do not exceed the threshold, display the smaller level.
         If they have different battery levels, it returns both levels, if the threshold
         is exceeded.
-    * `{left_battery}` Displays the left bud battery level.
-    * `{right_battery}` Displays the right bud battery level.
-    * `{battery_case} Displays the case battery level, if one of the buds is on the case.
-    * `{device_model}` The model of the device.
-    * `{equalizer} Displays current equalizer setting, only if the equalizer is on.
-    * `{placement_left}` A placement indicator for the left bud, if it's on the (C)ase, (I)dle or being (W)ear.
-    * `{placement_right}` A placement indicator for the right bud, if it's on the (C)ase, (I)dle or being (W)ear.
-    * `{touchpad}` Displays if the touchpad is locked, and only if it is locked. A T(ouchpad)L(ocked) string indicates
+    * ``{left_battery}`` Displays the left bud battery level.
+    * ``{right_battery}`` Displays the right bud battery level.
+    * ``{battery_case}`` Displays the case battery level, if one of the buds is on the case.
+    * ``{device_model}`` The model of the device.
+    * ``{equalizer}`` Displays current equalizer setting, only if the equalizer is on.
+    * ``{placement_left}`` A placement indicator for the left bud, if it's on the (C)ase, (I)dle or being (W)ear.
+    * ``{placement_right}`` A placement indicator for the right bud, if it's on the (C)ase, (I)dle or being (W)ear.
+    * ``{touchpad}`` Displays if the touchpad is locked, and only if it is locked. A T(ouchpad)L(ocked) string indicates
         the touchpad is locked.
     """
 
@@ -78,6 +79,9 @@ class Buds(IntervalModule, ColorRangeModule):
         "{equalizer}"
         "{touchpad}"
     )
+
+    earbuds_binary = "earbuds"
+
     hide_no_device = False
     battery_limit = 100
     battery_drift_threshold = 3

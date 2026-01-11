@@ -27,7 +27,7 @@ class Yay(Backend):
 
     @property
     def updates(self):
-        if(self.aur_only):
+        if self.aur_only:
             command = ["yay", "-Qua"]
         else:
             command = ["yay", "-Qu"]
