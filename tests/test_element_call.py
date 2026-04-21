@@ -129,7 +129,7 @@ class TestCountParticipants(unittest.TestCase):
 
     def _run_with_events(self, events):
         with patch("urllib.request.urlopen") as mock_urlopen, \
-             patch("time.time", return_value=NOW_MS / 1000):
+                patch("time.time", return_value=NOW_MS / 1000):
             mock_urlopen.return_value = urlopen_returning(events)
             return self.ec._count_participants()
 

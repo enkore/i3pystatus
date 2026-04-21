@@ -167,5 +167,3 @@ class ElementCall(IntervalModule):
             return expires > now_ms
         created_ts = membership.get("created_ts") or origin_ts
         return (created_ts + expires) > now_ms
-
-
