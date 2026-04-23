@@ -9,12 +9,48 @@ except ImportError:
 import contextlib
 import time
 import socket
+import base64
 from threading import Thread
 
 from i3pystatus.mail import Backend
 
 
 IMAP_EXCEPTIONS = (socket.error, socket.gaierror, IMAP4.abort, IMAP4.error)
+
+
+class IMAPGSSMixin(object):
+    def gss_cb(self,challenge):
+        import kerberos
+        input_token = base64.b64encode(challenge).decode('utf-8')
+
+        if self.step == 0:
+            ret = kerberos.authGSSClientStep(self._gss_context, input_token)
+            if ret != kerberos.AUTH_GSS_CONTINUE:
+                self.step = 1
+        elif self.step == 1:
+            ret = kerberos.authGSSClientUnwrap(self._gss_context, input_token)
+            response = kerberos.authGSSClientResponse(self._gss_context)
+            ret = kerberos.authGSSClientWrap(self._gss_context, response, self.user)
+        response = kerberos.authGSSClientResponse(self._gss_context)
+
+        if response is None:
+            return ""
+        else:
+            return base64.b64decode(response)
+
+    def login_gssapi(self, user):
+        import kerberos
+        self.user = user
+        self.step = 0
+        _unused, self._gss_context = kerberos.authGSSClientInit("imap@{}".format(self.host))
+        return self.authenticate(b"GSSAPI", self.gss_cb)
+
+
+class IMAP4_SSL(IMAP4_SSL, IMAPGSSMixin):
+    pass
+
+class IMAP4(IMAP4, IMAPGSSMixin):
+    pass
 
 
 class IMAP(Backend):
@@ -27,6 +63,7 @@ class IMAP(Backend):
         "username", "password",
         ('keyring_backend', 'alternative keyring backend for retrieving credentials'),
         "ssl",
+        "gssapi",
         "mailbox",
     )
     required = ("host", "username", "password")
@@ -35,6 +72,7 @@ class IMAP(Backend):
     port = 993
     ssl = True
     mailbox = "INBOX"
+    gssapi = False
 
     imap_class = IMAP4
     connection = None
@@ -56,7 +94,10 @@ class IMAP(Backend):
                 self.connection.select(self.mailbox)
             if not self.connection:
                 self.connection = self.imap_class(self.host, self.port)
-                self.connection.login(self.username, self.password)
+                if self.gssapi:
+                    self.connection.login_gssapi(self.username)
+                else:
+                    self.connection.login(self.username, self.password)
                 self.connection.select(self.mailbox)
             yield
         except IMAP_EXCEPTIONS:
