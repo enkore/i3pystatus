@@ -16,7 +16,7 @@ class WeatherBackend(SettingsBase):
         req = Request(url, headers=headers or {})
         with urlopen(req) as content:
             try:
-                content_type = dict(content.getheaders())['Content-Type']
+                content_type = content.headers.get("Content-Type", "")
                 charset = re.search(r'charset=(.*)', content_type).group(1)
             except AttributeError:
                 charset = 'utf-8'
