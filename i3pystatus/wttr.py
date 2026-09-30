@@ -25,7 +25,7 @@ Requires: requests
 import requests
 from datetime import datetime
 from i3pystatus import IntervalModule
-
+from i3pystatus.core.util import user_open
 
 class Wttr(IntervalModule):
     """
@@ -145,10 +145,18 @@ class Wttr(IntervalModule):
 
     interval = 600  # seconds; wttr.in doesn't need to be polled every second
 
-    on_leftclick = "run"  # manual refresh on click
+    #on_leftclick = "run"  # manual refresh on click
+    on_rightclick = "open_in_browser"
 
     def init(self):
         self._session = requests.Session()
+
+    def open_in_browser(self):
+        """
+        Opens the modules location on wttr.in in the users default browser
+        """
+        location = self.location.replace(" ","+")
+        user_open(f"https://wttr.in/{location}")
 
     def run(self):
         try:
