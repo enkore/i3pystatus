@@ -37,19 +37,7 @@ class Bitcoin(IntervalModule):
     .. rubric:: Available formatters
 
     * {last_price}
-    * {ask_price}
-    * {bid_price}
-    * {open_price}
-    * {volume}
-    * {volume_thousand}
-    * {volume_percent}
-    * {age}
     * {status}
-    * {last_tx_type}
-    * {last_tx_addr}
-    * {last_tx_value}
-    * {balance_btc}
-    * {balance_fiat}
     * {symbol}
 
     """
@@ -57,9 +45,9 @@ class Bitcoin(IntervalModule):
     settings = (
         ("format", "Format string used for output."),
         ("currency", "Base fiat currency used for pricing."),
-        ("wallet_addresses", "List of wallet address(es) to monitor."),
+        # ("wallet_addresses", "List of wallet address(es) to monitor."),
         ("color", "Standard color"),
-        ("exchange", "Get ticker from a custom exchange instead"),
+        # ("exchange", "Get ticker from a custom exchange instead"),
         ("colorize", "Enable color change on price increase/decrease"),
         ("color_up", "Color for price increases"),
         ("color_down", "Color for price decreases"),
@@ -69,7 +57,7 @@ class Bitcoin(IntervalModule):
     )
     format = "{symbol} {status}{last_price}"
     currency = "USD"
-    exchange = "bitstamp"
+    exchange = "blockchain.info"
     symbol = "\uF15A"
     wallet_addresses = ""
     color = "#FFFFFF"
@@ -95,17 +83,14 @@ class Bitcoin(IntervalModule):
         return int(diff.total_seconds())
 
     def _query_api(self, api_url):
-        url = "{}/{}".format(api_url, self.exchange.upper())
+        url = "{}".format(api_url)
         response = urllib.request.urlopen(url).read().decode("utf-8")
         return json.loads(response)
 
     def _fetch_price_data(self):
-        api_url = "https://api.bitaps.com/market/v1/tickers"
-        ret = self._query_api(api_url)["data"]
-        exchange = ret[self.exchange.upper()]["pairs"]["BTC{}".format(self.currency.upper())]
-        # Adapt values to global ticker format
-        exchange['24h_avg'] = None
-        return exchange
+        api_url = "https://blockchain.info/ticker"
+        ret = self._query_api(api_url)
+        return ret[self.currency.upper()]
 
     def _fetch_blockchain_data(self):
         api = "https://blockchain.info/multiaddr?active="
@@ -119,13 +104,7 @@ class Bitcoin(IntervalModule):
 
         fdict = {
             "symbol": self.symbol,
-            "open": price_data["open"],
-            "ask_price": price_data["ask"],
-            "bid_price": price_data["bid"],
-            "last_price": price_data["last"],
-            "volume": price_data["volume"],
-            "volume_thousand": float(price_data["volume"]) / 1000,
-            "age": self._get_age(price_data['timestamp'])
+            "last_price": float(price_data["last"]),
         }
 
         if self._price_prev and fdict["last_price"] > self._price_prev:
@@ -141,26 +120,6 @@ class Bitcoin(IntervalModule):
 
         if not self.colorize:
             color = self.color
-
-        if self.wallet_addresses:
-            blockchain_data = self._fetch_blockchain_data()
-            wallet_data = blockchain_data["wallet"]
-            balance_btc = wallet_data["final_balance"] / 100000000
-            fdict["balance_btc"] = round(balance_btc, 2)
-            balance_fiat = fdict["balance_btc"] * fdict["last_price"]
-            fdict["balance_fiat"] = round(balance_fiat, 2)
-            fdict["total_sent"] = wallet_data["total_sent"]
-            fdict["total_received"] = wallet_data["total_received"]
-            fdict["transactions"] = wallet_data["n_tx"]
-
-            if fdict["transactions"]:
-                last_tx = blockchain_data["txs"][0]
-                fdict["last_tx_addr"] = last_tx["out"][0]["addr"]
-                fdict["last_tx_value"] = last_tx["out"][0]["value"] / 100000000
-                if fdict["last_tx_addr"] in self.wallet_addresses:
-                    fdict["last_tx_type"] = "recv"
-                else:
-                    fdict["last_tx_type"] = "sent"
 
         self.data = fdict
         self.output = {
