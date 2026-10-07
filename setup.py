@@ -26,5 +26,6 @@ setup(name="i3pystatus",
               "i3pystatus-setting-util = i3pystatus.tools.setting_util:main"
           ]
       },
+      extras_require={'hassio-websocket': ['requests', 'websockets>=10']},
       zip_safe=True,
       )
