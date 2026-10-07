@@ -1,4 +1,4 @@
-from i3pystatus import IntervalModule
+from i3pystatus import IntervalModule, Module
 from requests import get, post
 import json
 import subprocess
@@ -13,7 +13,14 @@ _hassio_cache_time = {}
 class Hassio(IntervalModule):
     """
     Displays the state of a Homeassistant.io entity
-    Requires the PyPI package `requests`
+    Requires the PyPI package `requests`. State transport is selected with
+    ``protocol="rest"`` (default) or ``protocol="websocket"``. WebSocket mode
+    additionally requires Python 3.7+ and ``websockets>=10`` and shares one filtered entity
+    subscription per URL/token within this process. It updates immediately,
+    reconnects with backoff, and marks disconnected values stale.
+    ``interval``, ``use_cache`` and ``cache_timeout`` apply only to REST.
+    Click-to-toggle still uses REST in both modes; middle click requests
+    a fresh snapshot over the selected state transport.
 
     Left click toggles the entity state (for switches, lights, etc.)
     Middle click forces a refresh of the current state.
@@ -49,7 +56,8 @@ class Hassio(IntervalModule):
             "https://localhost:8123)"),
         ("hassio_token", "HomeAssistant API token "
             "(https://developers.home-assistant.io/docs/auth_api/#long-lived-access-token)"),
-        ("interval", "Update interval."),
+        ("interval", "Update interval (REST only)."),
+        ("protocol", "State transport: rest (default) or websocket."),
         ("desired_state", "The desired or \"good\" state of the entity."),
         ("good_color", "Color of text while entity is in desired state"),
         ("bad_color", "Color of text while entity is not in desired state"),
@@ -69,6 +77,26 @@ class Hassio(IntervalModule):
     browser_cmd = "xdg-open"
     use_cache = False
     cache_timeout = None
+    protocol = "rest"
+
+    def init(self):
+        if self.protocol not in ("rest", "websocket"):
+            raise ValueError("protocol must be rest or websocket")
+        self._connection = None
+
+    def registered(self, status_handler):
+        if self.protocol == "rest":
+            super().registered(status_handler)
+            return
+        from .websocket import get_connection
+        Module.registered(self, status_handler)
+        self._connection = get_connection(self.hassio_url, self.hassio_token)
+        self.run()
+        self._connection.add(self.entity_id, self._push_update)
+
+    def _push_update(self):
+        self.run()
+        self.send_output()
 
     on_leftclick = "toggle"
     on_middleclick = "refresh"
@@ -114,7 +142,15 @@ class Hassio(IntervalModule):
             return json.loads(response.text)
 
     def run(self):
-        entity = self._fetch_entity(self.entity_id)
+        connection_status = "ready"
+        if self.protocol == "websocket":
+            entity = self._connection.entity(self.entity_id) if self._connection else None
+            connection_status = self._connection.status if self._connection else "connecting"
+            if entity is None and connection_status != "ready":
+                self.output = {"full_text": "HA: " + connection_status, "color": self.bad_color}
+                return
+        else:
+            entity = self._fetch_entity(self.entity_id)
 
         if not entity:
             self.output = {
@@ -139,9 +175,19 @@ class Hassio(IntervalModule):
         if entity['state'] == self.hide_state:
             self.output = {"full_text": ''}
         else:
+            try:
+                text = self.format.format(**cdict)
+            except KeyError as exc:
+                if self.protocol == "rest":
+                    raise
+                text = "HA: missing attribute " + str(exc.args[0])
+                color = self.bad_color
+            self.output = {"full_text": text, "color": color}
+        if connection_status != "ready":
+            text = self.output.get("full_text") or self.entity_id
             self.output = {
-                "full_text": self.format.format(**cdict),
-                "color": color
+                "full_text": "{} [stale: {}]".format(text, connection_status),
+                "color": self.bad_color,
             }
 
     def toggle(self):
@@ -152,6 +198,11 @@ class Hassio(IntervalModule):
 
     def refresh(self):
         """Force a refresh of the current state"""
+        if self.protocol == "websocket":
+            if self._connection:
+                self._connection.refresh()
+            self.run()
+            return
         # Invalidate cache for this server
         cache_key = (self.hassio_url, self.hassio_token)
         if cache_key in _hassio_cache_time:
