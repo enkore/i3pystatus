@@ -88,7 +88,7 @@ class Hassio(IntervalModule):
         if self.protocol == "rest":
             super().registered(status_handler)
             return
-        from i3pystatus.hassio_websocket import get_connection
+        from .websocket import get_connection
         Module.registered(self, status_handler)
         self._connection = get_connection(self.hassio_url, self.hassio_token)
         self.run()

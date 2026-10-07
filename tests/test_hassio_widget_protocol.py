@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from i3pystatus.hassio import Hassio
-from i3pystatus.hassio_websocket import SharedConnection
+from i3pystatus.hassio.websocket import SharedConnection
 
 
 class WidgetTests(unittest.TestCase):
@@ -15,7 +15,7 @@ class WidgetTests(unittest.TestCase):
         widget = Hassio(hassio_url='http://ha', hassio_token='test-only',
                         entity_id='climate.garage', protocol='websocket',
                         format='Garage temp: {current_temperature}')
-        with patch('i3pystatus.hassio_websocket.get_connection', return_value=client), patch('i3pystatus.hassio.get', side_effect=AssertionError('REST poll')):
+        with patch('i3pystatus.hassio.websocket.get_connection', return_value=client), patch('i3pystatus.hassio.get', side_effect=AssertionError('REST poll')):
             widget.registered(handler)
             callback = client.add.call_args[0][1]
             client.apply_event({'c': {'climate.garage': {'+': {'a': {'current_temperature': 73}}}}})
@@ -37,7 +37,7 @@ class WidgetTests(unittest.TestCase):
         client.apply_event({'a': {'climate.garage': {'s': 'heat', 'a': {}, 'lc': 1}}})
         widget = Hassio(hassio_url='http://ha', hassio_token='test-only', entity_id='climate.garage',
                         protocol='websocket', format='Garage temp: {current_temperature}')
-        with patch('i3pystatus.hassio_websocket.get_connection', return_value=client):
+        with patch('i3pystatus.hassio.websocket.get_connection', return_value=client):
             widget.registered(Mock())
             self.assertIn('current_temperature', widget.output['full_text'])
             client.apply_event({'c': {'climate.garage': {'+': {'a': {'current_temperature': 73}}}}})

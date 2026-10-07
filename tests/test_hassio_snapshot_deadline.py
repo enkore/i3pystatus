@@ -4,7 +4,7 @@ import json
 import unittest
 from unittest.mock import Mock, patch
 
-from i3pystatus.hassio_websocket import SharedConnection
+from i3pystatus.hassio.websocket import SharedConnection
 
 
 class SnapshotDeadlineTests(unittest.TestCase):
@@ -31,6 +31,6 @@ class SnapshotDeadlineTests(unittest.TestCase):
         clock = Mock()
         clock.time.side_effect = itertools.chain([0], itertools.repeat(20))
         client = SharedConnection('http://test-only', 'test-only')
-        with patch('i3pystatus.hassio_websocket.asyncio.get_event_loop', return_value=clock):
+        with patch('i3pystatus.hassio.websocket.asyncio.get_event_loop', return_value=clock):
             with self.assertRaisesRegex(TimeoutError, 'Initial entity snapshot timed out'):
                 asyncio.run(client._session(Socket()))

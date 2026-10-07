@@ -14,7 +14,7 @@ except ImportError:
 @unittest.skipIf(serve is None, 'Requires optional websockets dependency')
 class TransportTests(unittest.TestCase):
     def test_shared_filtered_subscription_and_late_widget(self):
-        from i3pystatus.hassio_websocket import get_connection
+        from i3pystatus.hassio.websocket import get_connection
 
         async def scenario():
             sockets, subscriptions, notifications = [], [], []
@@ -69,7 +69,7 @@ class TransportTests(unittest.TestCase):
         asyncio.run(scenario())
 
     def test_reconnect_refreshes_snapshot_and_resets_backoff(self):
-        from i3pystatus.hassio_websocket import SharedConnection
+        from i3pystatus.hassio.websocket import SharedConnection
 
         async def scenario():
             times, statuses = [], []
